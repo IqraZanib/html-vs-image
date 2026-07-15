@@ -1,6 +1,6 @@
 # HTML vs Image
 
-Lesson plans jo HTML mein design ki jaati hain aur phir [Puppeteer](https://pptr.dev/) (headless Chrome) se print-ready **PNG images** mein render hoti hain. Har lesson plan ek HTML file hoti hai — poore page ki screenshot le kar image bana di jaati hai.
+Lesson plans designed in HTML and rendered into print-ready **PNG images** using [Puppeteer](https://pptr.dev/) (headless Chrome). Each lesson plan is a single HTML file — a full-page screenshot turns it into an image.
 
 ## Grade 1 · English
 
@@ -11,11 +11,11 @@ Lesson plans jo HTML mein design ki jaati hain aur phir [Puppeteer](https://pptr
 
 ---
 
-## Kaise banti hai (How it's made)
+## How it's made
 
 ```bash
-npm install     # ek baar — Puppeteer + Chromium install karta hai
-node render.js  # index.html ko render kar ke lesson-plan.png banata hai
+npm install     # one time — installs Puppeteer + Chromium
+node render.js  # renders index.html into lesson-plan.png
 ```
 
-Naya lesson plan add karne ke liye `index.html` edit karein, `node render.js` chalayein, aur nayi image ko `assets/` mein save kar ke upar gallery mein daal dein.
+To add a new lesson plan, edit `index.html`, run `node render.js`, then save the new image into `assets/` and add it to the gallery above.
