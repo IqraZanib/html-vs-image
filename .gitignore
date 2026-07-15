@@ -1,0 +1,9 @@
+# Dependencies
+node_modules/
+
+# Generated output
+lesson-plan.png
+*.png
+
+# OS / editor
+.DS_Store
