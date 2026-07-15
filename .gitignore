@@ -1,9 +1,11 @@
 # Dependencies
 node_modules/
 
-# Generated output
-lesson-plan.png
-*.png
+# Generated output (root) — regenerated on every run
+/lesson-plan.png
+
+# ...but keep the sample image stored in assets/
+!assets/
 
 # OS / editor
 .DS_Store
