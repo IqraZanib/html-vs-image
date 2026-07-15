@@ -51,3 +51,11 @@ test('renderReport produces an HTML page with a table and images', () => {
   assert.match(html, /claude-haiku-4-5/);
   assert.match(html, /<img/);
 });
+
+test('renderReport shows the error text for failed rows', () => {
+  const html = renderReport([
+    { model: 'claude-haiku-4-5', item: 't1', ok: false, error: 'boom-xyz' },
+  ]);
+  assert.match(html, /Error \/ Notes/);
+  assert.match(html, /boom-xyz/);
+});
