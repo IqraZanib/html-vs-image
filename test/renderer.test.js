@@ -33,3 +33,12 @@ test('renderHtml detects horizontal overflow', async () => {
   assert.strictEqual(res.overflowed, true);
   fs.unlinkSync(outPath);
 });
+
+test('renderHtml cleans up the temp file even when the screenshot fails', async () => {
+  const tmp = os.tmpdir();
+  const before = fs.readdirSync(tmp).filter((f) => f.startsWith(`lp-${process.pid}-`));
+  const badOut = path.join(tmp, 'no-such-dir-xyz', 'out.png');
+  await assert.rejects(() => renderHtml('<!DOCTYPE html><html><body>x</body></html>', badOut));
+  const after = fs.readdirSync(tmp).filter((f) => f.startsWith(`lp-${process.pid}-`));
+  assert.deepStrictEqual(after, before, 'no temp .html files should leak');
+});
