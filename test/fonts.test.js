@@ -19,3 +19,8 @@ test('fontFaceCss emits one @font-face per family with file:// URL', () => {
   assert.match(css, /Noto Nastaliq Urdu/);
   assert.match(css, /file:\/\//);
 });
+
+test('fontFaceCss emits a 700 weight face for Noto Nastaliq Urdu', () => {
+  const css = fontFaceCss();
+  assert.match(css, /font-family:'Noto Nastaliq Urdu'[^}]*font-weight:700/);
+});
