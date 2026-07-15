@@ -29,7 +29,10 @@
 <div id="out"></div>
 <script>
 fetch('/models').then(r=>r.json()).then(ms=>{
-  document.getElementById('model').innerHTML = ms.map(m=>`<option>${m}</option>`).join('');
+  document.getElementById('model').innerHTML = ms.map(m=>{
+    const label = m === 'template' ? m + ' (no API key needed)' : m + ' (needs API key)';
+    return `<option value="${m}">${label}</option>`;
+  }).join('');
 });
 document.getElementById('go').onclick = async () => {
   const meta = document.getElementById('meta');
@@ -44,7 +47,11 @@ document.getElementById('go').onclick = async () => {
     const r = await fetch('/generate', {method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
     const data = await r.json();
     if (!r.ok) throw new Error(data.error || 'failed');
-    meta.textContent = `${data.metadata.model} · $${data.metadata.costUsd.toFixed(5)} · ${data.metadata.latencyMs}ms · ${data.metadata.attempts} attempt(s)`;
+    const md = data.metadata || {};
+    const cost = typeof md.costUsd === 'number' ? ' · $' + md.costUsd.toFixed(5) : '';
+    const lat = typeof md.latencyMs === 'number' ? ' · ' + md.latencyMs + 'ms' : '';
+    const att = md.attempts ? ' · ' + md.attempts + ' attempt(s)' : '';
+    meta.textContent = (md.model || '') + cost + lat + att;
     const img = document.createElement('img'); img.src = data.imageDataUrl; out.appendChild(img);
     const a = document.createElement('a'); a.href = data.imageDataUrl; a.download = 'lesson-plan.png'; a.textContent = 'Download PNG';
     a.style.display='block'; a.style.marginTop='8px'; out.appendChild(a);

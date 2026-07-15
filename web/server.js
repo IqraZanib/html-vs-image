@@ -25,6 +25,14 @@ app.post('/generate', async (req, res) => {
     return res.status(400).json({ error: 'subject, language, topic, and model are required' });
   }
   const input = { subject, grade: grade || 1, language, topic };
+
+  // Friendly guard: Claude models need credentials; 'template' does not.
+  if (model !== 'template' && !process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
+    return res.status(400).json({
+      error: `"${model}" needs an Anthropic API key, which is not set here. Choose the "template" model to generate without a key, or set ANTHROPIC_API_KEY and restart.`,
+    });
+  }
+
   const outPath = path.join(os.tmpdir(), `web-lp-${Date.now()}.png`);
 
   try {
