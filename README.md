@@ -19,3 +19,16 @@ node render.js  # renders index.html into lesson-plan.png
 ```
 
 To add a new lesson plan, edit `index.html`, run `node render.js`, then save the new image into `assets/` and add it to the gallery above.
+
+## Running the generator
+
+Prerequisites: Node.js 20+, and an Anthropic API key (`export ANTHROPIC_API_KEY=...` or `ant auth login`). No image-model key is needed — images are rendered from code.
+
+```bash
+npm install
+npm test           # run the unit tests
+npm run web        # start the web form at http://localhost:3000
+npm run benchmark  # run all models over the golden test set -> out/report.html
+```
+
+The pipeline: your prompt → Claude writes self-contained HTML/CSS/SVG → Puppeteer renders it to a PNG. No AI image model is used at any step.
