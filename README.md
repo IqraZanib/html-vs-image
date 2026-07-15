@@ -32,3 +32,10 @@ npm run benchmark  # run all models over the golden test set -> out/report.html
 ```
 
 The pipeline: your prompt → Claude writes self-contained HTML/CSS/SVG → Puppeteer renders it to a PNG. No AI image model is used at any step.
+
+## Generated lesson plans
+
+### English — Pinky day out (Sindhi)
+<img src="assets/generated/english-sindhi-pinky-day-out-1.png" width="480" alt="English Sindhi lesson plan">
+
+English · Grade 1 · Sindhi — Pinky day out _(hand-authored HTML → Puppeteer (no AI image model))_
