@@ -3,13 +3,21 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test",
+    "render": "node render.js",
+    "benchmark": "node scripts/run-benchmark.js",
+    "web": "node web/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.111.0",
+    "@fontsource/noto-naskh-arabic": "^5.2.11",
+    "@fontsource/noto-nastaliq-urdu": "^5.2.8",
+    "@fontsource/noto-sans": "^5.2.10",
+    "express": "^5.2.1",
     "puppeteer": "^24.43.1"
   }
 }

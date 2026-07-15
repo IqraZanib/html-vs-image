@@ -19,3 +19,33 @@ node render.js  # renders index.html into lesson-plan.png
 ```
 
 To add a new lesson plan, edit `index.html`, run `node render.js`, then save the new image into `assets/` and add it to the gallery above.
+
+## Running the generator
+
+Prerequisites: Node.js 20+, and an Anthropic API key (`export ANTHROPIC_API_KEY=...` or `ant auth login`). No image-model key is needed — images are rendered from code.
+
+```bash
+npm install
+npm test           # run the unit tests
+npm run web        # start the web form at http://localhost:3000
+npm run benchmark  # run all models over the golden test set -> out/report.html
+```
+
+The pipeline: your prompt → Claude writes self-contained HTML/CSS/SVG → Puppeteer renders it to a PNG. No AI image model is used at any step.
+
+## Generated lesson plans
+
+### English — Pinky day out (Sindhi)
+<img src="assets/generated/english-sindhi-pinky-day-out-1.png" width="480" alt="English Sindhi lesson plan">
+
+English · Grade 1 · Sindhi — Pinky day out _(hand-authored HTML → Puppeteer (no AI image model))_
+
+### Science — parts of a plant (Urdu)
+<img src="assets/generated/science-urdu-parts-of-a-plant-1.png" width="480" alt="Science Urdu lesson plan">
+
+Science · Grade 3 · Urdu — parts of a plant _(template (no API key) · $0.00000 · 0ms)_
+
+### Science — living and non-living things (Sindhi)
+<img src="assets/generated/science-sindhi-living-and-non-living-things-1.png" width="480" alt="Science Sindhi lesson plan">
+
+Science · Grade 2 · Sindhi — living and non-living things _(template (no API key) · $0.00000 · 0ms)_
