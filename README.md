@@ -39,10 +39,10 @@ See **[docs/comparison.html](docs/comparison.html)** — a side-by-side comparis
 
 ## Generated lesson plans
 
-### Pinky day out (Sindhi) — reference reproduction with the exact Ali & Sara art
-<img src="assets/generated/pinky-day-out-exact-1.png" width="480" alt="Code-rendered reproduction using the exact reference characters">
+### Pinky day out (Sindhi) — full reproduction reusing every reference illustration
+<img src="assets/generated/pinky-day-out-full-1.png" width="480" alt="Code-rendered reproduction reusing all reference illustrations">
 
-Code-rendered reproduction of the nano-banana reference — layout & Sindhi text are real code, and **Ali & Sara are the exact illustrations from the reference** (cropped and reused). No AI image model.
+Code-rendered reproduction of the nano-banana reference — layout & Sindhi text are real code, and **every illustration is the exact art cropped from the reference** (Ali, Sara, houses, park, painting, school, bus, bench, trees). No AI image model. Rebuild via `python3 scripts/build-reference-repro.py`.
 
 ### English — Pinky day out (Sindhi)
 <img src="assets/generated/english-sindhi-pinky-day-out-1.png" width="480" alt="English Sindhi lesson plan">
