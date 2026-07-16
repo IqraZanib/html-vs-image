@@ -5,8 +5,7 @@
   "scripts": {
     "test": "node --test",
     "render": "node render.js",
-    "benchmark": "node scripts/run-benchmark.js",
-    "web": "node web/server.js"
+    "benchmark": "node scripts/run-benchmark.js"
   },
   "keywords": [],
   "author": "",

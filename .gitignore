@@ -12,3 +12,6 @@ out/
 
 # OS / editor
 .DS_Store
+
+# Large rendered reference pages (regenerable from the PDF)
+references/source/page-*.png
