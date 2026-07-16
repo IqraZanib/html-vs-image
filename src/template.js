@@ -1,9 +1,10 @@
 // Template-based lesson-plan generator — builds a RICH, reference-style, self-contained
-// lesson-plan HTML from the form inputs WITHOUT any LLM/API key. Layout matches the
-// "Pinky day out" reference (navy header, warm-up + CFU, hook with two characters and
-// speech bubbles, Big Idea, Goal + Key Words, I-Do steps, Write-on-the-Board Q&A).
-// Text uses real bundled fonts (no AI image model, no cost). Topic-specific CONTENT is
-// generic scaffolding filled with the topic — smart per-topic content needs the LLM path.
+// lesson-plan HTML from the form inputs WITHOUT any LLM/API key. Illustrations are
+// bundled, open-license artwork (OpenMoji, CC BY-SA 4.0) composed by code. Text uses real
+// bundled fonts. No AI image model, no per-lesson cost. Topic-specific CONTENT is generic
+// scaffolding filled with the topic — smart per-topic content needs the LLM path.
+
+const { illustration } = require('./illustrations');
 
 const RTL_LANGS = new Set(['Urdu', 'Sindhi', 'Arabic', 'Pashto']);
 
@@ -93,18 +94,6 @@ const PHRASES = {
   },
 };
 
-const SVG_DEFS = `<svg width="0" height="0" style="position:absolute"><defs>
-<symbol id="ic-thumbsup" viewBox="0 0 64 64"><path d="M20 28h6v28h-6z" fill="#fff"/><path d="M28 28l4-14a4 4 0 0 1 8 0l-2 12h14a5 5 0 0 1 5 6l-4 18a6 6 0 0 1-6 5H28z" fill="#fff"/></symbol>
-<symbol id="ic-lightbulb" viewBox="0 0 64 64"><circle cx="32" cy="26" r="16" fill="#fff"/><rect x="25" y="40" width="14" height="8" rx="2" fill="#fff"/><rect x="27" y="50" width="10" height="4" rx="2" fill="#fff"/></symbol>
-<symbol id="ic-target" viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="none" stroke="#fff" stroke-width="4"/><circle cx="32" cy="32" r="13" fill="none" stroke="#fff" stroke-width="4"/><circle cx="32" cy="32" r="5" fill="#fff"/></symbol>
-<symbol id="ic-key" viewBox="0 0 64 64"><circle cx="22" cy="32" r="12" fill="none" stroke="#fff" stroke-width="4.5"/><rect x="32" y="29" width="26" height="6" fill="#fff"/><rect x="46" y="35" width="5" height="8" fill="#fff"/><rect x="53" y="35" width="5" height="8" fill="#fff"/></symbol>
-<symbol id="char-ali" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#eef2ff"/><path d="M28 78c0-14 10-22 22-22s22 8 22 22" fill="#fff"/><rect x="41" y="58" width="18" height="10" fill="#f4c28e"/><circle cx="50" cy="40" r="17" fill="#f4c28e"/><path d="M33 36a17 17 0 0 1 34 0c0-2-2-14-17-14s-17 12-17 14z" fill="#2b2118"/><path d="M46 64l4 6 4-6" fill="#c0392b"/></symbol>
-<symbol id="char-sara" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#f3f0ff"/><path d="M26 82c0-16 24-16 24-16s24 0 24 16" fill="#a06bf0"/><path d="M30 44c0-14 9-22 20-22s20 8 20 22v10c0 3-2 5-4 6-2-6-6-9-16-9s-14 3-16 9c-2-1-4-3-4-6z" fill="#a06bf0"/><circle cx="50" cy="46" r="15" fill="#f4c28e"/><circle cx="44" cy="46" r="1.6" fill="#2b2118"/><circle cx="56" cy="46" r="1.6" fill="#2b2118"/><path d="M45 52q5 4 10 0" stroke="#7a4a26" stroke-width="1.5" fill="none" stroke-linecap="round"/></symbol>
-<symbol id="scn-school" viewBox="0 0 120 100"><rect x="10" y="90" width="100" height="4" fill="#c9d6e8"/><rect x="20" y="40" width="80" height="50" fill="#fff" stroke="#1c2541" stroke-width="2"/><path d="M14 42l46-26 46 26z" fill="#2f80ed"/><rect x="52" y="62" width="16" height="28" fill="#7c4dff"/><rect x="30" y="52" width="14" height="14" fill="#eef6ff" stroke="#2f80ed" stroke-width="1.5"/><rect x="76" y="52" width="14" height="14" fill="#eef6ff" stroke="#2f80ed" stroke-width="1.5"/></symbol>
-<symbol id="scn-park" viewBox="0 0 140 100"><circle cx="112" cy="20" r="12" fill="#f5a623"/><rect x="0" y="82" width="140" height="18" fill="#bbe7c6"/><rect x="26" y="60" width="6" height="24" fill="#8a5a2b"/><circle cx="29" cy="50" r="18" fill="#4caf6e"/><rect x="58" y="46" width="4" height="38" fill="#8a5a2b"/><path d="M62 46l18 22h-18z" fill="#f5a623"/></symbol>
-<symbol id="scn-book" viewBox="0 0 120 100"><rect x="20" y="24" width="80" height="56" rx="4" fill="#fff" stroke="#7c4dff" stroke-width="3"/><line x1="60" y1="24" x2="60" y2="80" stroke="#7c4dff" stroke-width="3"/><line x1="30" y1="38" x2="52" y2="38" stroke="#2f80ed" stroke-width="2"/><line x1="30" y1="48" x2="52" y2="48" stroke="#2f80ed" stroke-width="2"/><line x1="68" y1="38" x2="90" y2="38" stroke="#2f80ed" stroke-width="2"/><line x1="68" y1="48" x2="90" y2="48" stroke="#2f80ed" stroke-width="2"/></symbol>
-</defs></svg>`;
-
 function renderTemplateHtml(input) {
   const { subject, grade, language, topic } = input;
   const p = PHRASES[language] || PHRASES.English;
@@ -117,22 +106,26 @@ function renderTemplateHtml(input) {
   const kws = String(topic).split(/\s+/).filter(Boolean).slice(0, 4);
   const keywords = (kws.length ? kws : [String(topic)]).map((w) => `<li>${esc(w)}</li>`).join('');
   const bigIdea = p.bigIdea(t).map((li) => `<li>${li}</li>`).join('');
-  const idoIcons = ['char-sara', 'scn-school', 'scn-park'];
-  const ido = p.iDo(t)
+
+  const idoIcons = ['girl', 'school', 'tree'];
+  const ido = p
+    .iDo(t)
     .map(
       (s, i) =>
         `<div class="ido"><div class="stepnum">${i + 1}</div>` +
-        `<div class="iconf"><svg viewBox="0 0 120 100" width="34" height="30"><use href="#${idoIcons[i]}"/></svg></div>` +
+        `<div class="iconf">${illustration(idoIcons[i], 30)}</div>` +
         `<div class="content">${s}</div></div>` +
         (i < 2 ? '<div class="arrow">▼</div>' : '')
     )
     .join('');
-  const boardIcons = ['scn-school', 'scn-park', 'scn-book'];
-  const board = p.board(t)
+
+  const boardIcons = ['school', 'tree', 'books'];
+  const board = p
+    .board(t)
     .map(
       (b, i) =>
         `<div class="bitem"><div class="bnum">${i + 1}</div>` +
-        `<div class="iconf"><svg viewBox="0 0 120 100" width="26" height="22"><use href="#${boardIcons[i]}"/></svg></div>` +
+        `<div class="iconf">${illustration(boardIcons[i], 26)}</div>` +
         `<div class="bq content">${b.q}</div><div class="ba content">${b.a}</div></div>`
     )
     .join('');
@@ -155,22 +148,22 @@ function renderTemplateHtml(input) {
   .warmup .content{font-size:12px;margin-top:1.5mm}
   .cfu{flex:1;background:#22c55e;color:#fff;border-radius:10px;padding:3mm;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1.2mm;font-weight:700;font-size:10px}
   .cfu .content{color:#fff}
-  .iconf{border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:0 1mm 2mm rgba(0,0,0,.08)}
+  .iconf{border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
   .hook{background:#fff;border:2px solid #f5c451;border-radius:10px;padding:3.5mm 4.5mm}
   .hook-chars{display:flex;justify-content:space-between;gap:4mm;margin-top:2.5mm}
   .char{flex:1;text-align:center}
   .bubble{background:#f4f6fb;border:1.5px solid #dfe4ee;border-radius:14px;padding:3mm;font-size:11.5px;margin-bottom:2mm}
-  .char .iconf{width:20mm;height:20mm;margin:0 auto;background:#f4f6fb}
-  .char .name{font-size:9px;font-weight:700;color:#4b5563;margin-top:1mm}
-  .bigidea{background:#fff;border:2px solid #7c4dff;border-radius:10px;padding:3.5mm 4.5mm;display:flex;gap:3.5mm}
-  .bigidea .iconf{width:11mm;height:11mm;background:#7c4dff}
+  .char .iconf{width:22mm;height:22mm;margin:0 auto;background:#f4f6fb;border-radius:50%}
+  .char .name{font-size:10px;font-weight:700;color:#4b5563;margin-top:1mm}
+  .bigidea{background:#fff;border:2px solid #7c4dff;border-radius:10px;padding:3.5mm 4.5mm;display:flex;gap:3.5mm;align-items:flex-start}
+  .bigidea .iconf{width:12mm;height:12mm;background:#f3f0ff}
   .bigidea h2{font-size:13px;color:#6a3df0;font-weight:800;margin-bottom:1.5mm}
   .bigidea ul{list-style:none}
   .bigidea li{font-size:11.5px;margin-bottom:1.5mm;padding-${align}:4mm;position:relative;font-family:${fam};direction:${dir};text-align:${align};line-height:2.2}
   .bigidea li::before{content:"•";color:#7c4dff;position:absolute;${align}:0;font-weight:900}
   .goal{flex:1.4;background:#7c4dff;color:#fff;border-radius:10px;padding:3.5mm 4.5mm;display:flex;gap:3mm;align-items:flex-start}
   .keywords{flex:1;background:#f5a623;color:#fff;border-radius:10px;padding:3.5mm 4.5mm;display:flex;gap:3mm;align-items:flex-start}
-  .goal .iconf,.keywords .iconf{width:10mm;height:10mm;background:rgba(255,255,255,.25)}
+  .goal .iconf,.keywords .iconf{width:11mm;height:11mm;background:#fff}
   .goal h3,.keywords h3{font-size:11.5px;font-weight:800;margin-bottom:1.5mm}
   .goal .content{font-size:11px;color:#fff}
   .keywords ul{list-style:none;font-size:11px}.keywords li{font-family:${fam};direction:${dir};margin-bottom:1.2mm;color:#fff}
@@ -190,29 +183,28 @@ function renderTemplateHtml(input) {
   .board-star{text-align:center;margin-top:3mm;font-size:11px;color:#eab308;font-family:${fam};direction:${dir};line-height:2.1}
   .foot{text-align:center;font-size:9px;color:#9aa3b5;margin-top:auto}
 </style></head><body>
-${SVG_DEFS}
 <div class="page">
   <div class="hdr"><h1>${esc(subject)} — Grade ${esc(grade)}</h1><div class="badge">${esc(language)} · 35 min</div></div>
 
   <div class="row">
     <div class="card warmup"><span class="bar amber">WARM-UP · 4 min</span><p class="content">${p.warmup(t)}</p></div>
-    <div class="cfu"><div class="iconf" style="width:11mm;height:11mm;background:rgba(255,255,255,.25)"><svg viewBox="0 0 64 64" width="22" height="22"><use href="#ic-thumbsup"/></svg></div><div>CFU</div><div class="content">${p.cfu}</div></div>
+    <div class="cfu"><div class="iconf" style="width:12mm;height:12mm;background:rgba(255,255,255,.85)">${illustration('thumbsup', 28)}</div><div>CFU</div><div class="content">${p.cfu}</div></div>
   </div>
 
   <div class="hook"><span class="bar cream">HOOK · 4 min</span>
     <div class="hook-chars">
-      <div class="char"><div class="bubble content">${p.hookA(t)}</div><div class="iconf"><svg viewBox="0 0 100 100" width="70" height="70"><use href="#char-ali"/></svg></div><div class="name">Ali</div></div>
-      <div class="char"><div class="bubble content">${p.hookB(t)}</div><div class="iconf"><svg viewBox="0 0 100 100" width="70" height="70"><use href="#char-sara"/></svg></div><div class="name">Sara</div></div>
+      <div class="char"><div class="bubble content">${p.hookA(t)}</div><div class="iconf">${illustration('boy', 58)}</div><div class="name">Ali</div></div>
+      <div class="char"><div class="bubble content">${p.hookB(t)}</div><div class="iconf">${illustration('girl', 58)}</div><div class="name">Sara</div></div>
     </div>
   </div>
 
-  <div class="bigidea"><div class="iconf"><svg viewBox="0 0 64 64" width="24" height="24"><use href="#ic-lightbulb"/></svg></div>
+  <div class="bigidea"><div class="iconf">${illustration('lightbulb', 30)}</div>
     <div><h2>The Big Idea</h2><ul>${bigIdea}</ul></div></div>
 
   <div class="row">
-    <div class="goal"><div class="iconf"><svg viewBox="0 0 64 64" width="20" height="20"><use href="#ic-target"/></svg></div>
+    <div class="goal"><div class="iconf">${illustration('target', 26)}</div>
       <div><h3>Today's Goal</h3><p class="content">${p.goal(t)}</p></div></div>
-    <div class="keywords"><div class="iconf"><svg viewBox="0 0 64 64" width="20" height="20"><use href="#ic-key"/></svg></div>
+    <div class="keywords"><div class="iconf">${illustration('key', 26)}</div>
       <div><h3>Key Words</h3><ul>${keywords}</ul></div></div>
   </div>
 
@@ -222,7 +214,7 @@ ${SVG_DEFS}
   <div class="board"><h3>Write on the Board</h3><div class="board-cols">${board}</div>
     <div class="board-star">⭐ ${p.star(t)}</div></div>
 
-  <div class="foot">Code-rendered (HTML/CSS/SVG + Puppeteer) · no AI image model · template mode</div>
+  <div class="foot">Code-rendered (HTML/CSS + Puppeteer) · illustrations: OpenMoji (CC BY-SA 4.0) · no AI image model · template mode</div>
 </div>
 </body></html>`;
 }
