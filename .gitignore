@@ -15,3 +15,7 @@ out/
 
 # Large rendered reference pages (regenerable from the PDF)
 references/source/page-*.png
+
+# Large base64 build artifacts (regenerate via scripts/build-reference-repro.py)
+references/samples/pinky-day-out-full.html
+references/samples/pinky-day-out-exact.html
