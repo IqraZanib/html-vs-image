@@ -39,6 +39,11 @@ See **[docs/comparison.html](docs/comparison.html)** — a side-by-side comparis
 
 ## Generated lesson plans
 
+### Pinky day out (Urdu) — code-rendered, Nastaliq
+<img src="assets/generated/pinky-day-out-urdu.png" width="480" alt="Code-rendered Urdu lesson plan in Nastaliq">
+
+Urdu · Grade 1 — Pinky day out. Same lesson as the Sindhi reference, translated to Urdu and rendered in proper **Noto Nastaliq Urdu** _(hand-authored HTML → Puppeteer, no AI image model)_.
+
 ### Pinky day out (Sindhi) — full reproduction reusing every reference illustration
 <img src="assets/generated/pinky-day-out-full-1.png" width="480" alt="Code-rendered reproduction reusing all reference illustrations">
 
