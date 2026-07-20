@@ -39,6 +39,11 @@ See **[docs/comparison.html](docs/comparison.html)** — a side-by-side comparis
 
 ## Generated lesson plans
 
+### States of Water (Urdu) — original design, hand-coded SVG art
+<img src="assets/generated/science-urdu-states-of-water.png" width="480" alt="Code-rendered Urdu science lesson on states of water, with hand-coded SVG illustrations">
+
+Science · Grade 3 · Urdu — پانی کی حالتیں. A **from-scratch** design (not the shared template) with **topic-relevant illustrations hand-coded as inline SVG** (ice cube, water glass, steam, sun, a solid→liquid→gas transition diagram). No template reuse, no OpenMoji/dataset art, no AI image model. Source: [references/samples/states-of-water.html](references/samples/states-of-water.html).
+
 ### Pinky day out (Urdu) — code-rendered, Nastaliq
 <img src="assets/generated/pinky-day-out-urdu.png" width="480" alt="Code-rendered Urdu lesson plan in Nastaliq">
 
