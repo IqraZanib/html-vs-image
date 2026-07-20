@@ -39,6 +39,11 @@ See **[docs/comparison.html](docs/comparison.html)** — a side-by-side comparis
 
 ## Generated lesson plans
 
+### English — Descriptive Sentences (Grade 1) — original design, hand-coded SVG art
+<img src="assets/generated/english-descriptive-sentences.png" width="480" alt="Code-rendered Grade 1 English lesson on descriptive sentences, with a colour-coded word wall and hand-coded SVG icons">
+
+English · Grade 1 — writing descriptive sentences with 5 target words (name, age, family, like, school). A **from-scratch** two-page design with a colour-coded word wall, sentence-formula strip, illustrated sample sentences, thumbs-up/down assessment and a coaching corner. **Every icon and character is hand-coded inline SVG** (person, cake, family, heart, school, apple, Ali/Sara). No template art, no dataset, no AI image model. Source: [lesson-descriptive-sentences.html](lesson-descriptive-sentences.html).
+
 ### States of Water (Urdu) — original design, hand-coded SVG art
 <img src="assets/generated/science-urdu-states-of-water.png" width="480" alt="Code-rendered Urdu science lesson on states of water, with hand-coded SVG illustrations">
 
