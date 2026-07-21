@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lesson Plan 113087 — Descriptive Sentences (full)</title>
+<style>
+  /* ============================================================
+     FROM-SCRATCH original design (no template, no benchmark, no AI image).
+     Full lesson-plan content, colourful & interactive, UI/UX-driven.
+     ============================================================ */
+  :root{
+    --paper:#fffdf3;
+    --sky:#5ec6ff;   --sky-soft:#e9f7ff;  --sky-bd:#bfe9ff;
+    --sun:#ffcf33;   --sun-soft:#fff6d6;  --sun-bd:#ffe79e;
+    --coral:#ff6f61; --coral-soft:#ffe6e2;--coral-bd:#ffc7c0;
+    --mint:#2fd0a6;  --mint-soft:#dcfbf1; --mint-bd:#b7f3e3;
+    --grape:#9b6bff; --grape-soft:#efe6ff;--grape-bd:#d9c8ff;
+    --ink:#33334d;   --ink-soft:#61617a;
+    --font:"Trebuchet MS","Segoe UI",Verdana,sans-serif;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:var(--font); color:var(--ink); background:#eae4cf;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .sheet{ width:900px; margin:0 auto; padding:30px 34px 40px;
+    background:radial-gradient(circle at 1px 1px, rgba(190,175,120,.16) 1.5px, transparent 0) 0 0/26px 26px, var(--paper);
+    box-shadow:0 6px 24px rgba(0,0,0,.14); }
+
+  /* ---- BANNER ---- */
+  .banner{ position:relative; border-radius:28px; padding:22px 26px; overflow:hidden;
+    background:linear-gradient(135deg,var(--sky-soft),#f3fbff); border:3px solid var(--sky-bd);
+    display:flex; align-items:center; gap:20px; }
+  .banner .rainbow{ position:absolute; right:-30px; top:-54px; }
+  .banner .txt{ position:relative; z-index:2; flex:1; }
+  .kicker{ display:inline-block; background:var(--coral); color:#fff; font-weight:800; font-size:12px;
+    letter-spacing:.6px; padding:5px 13px; border-radius:20px; transform:rotate(-2deg); }
+  .banner h1{ font-size:40px; line-height:1.02; margin-top:10px; letter-spacing:-.5px; text-shadow:2px 2px 0 #fff; }
+  .banner h1 .hl{ color:var(--coral); }
+  .banner .sub{ font-size:15px; color:var(--ink-soft); margin-top:8px; font-weight:600; }
+  .meta{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  .meta span{ background:#fff; border:2px solid var(--sky-bd); color:var(--ink); font-size:12px; font-weight:700;
+    padding:4px 11px; border-radius:14px; }
+  .meta span b{ color:var(--sky); }
+
+  /* ---- SECTION ---- */
+  .sec{ margin-top:22px; }
+  .sec-head{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+  .sec-num{ width:40px; height:40px; border-radius:14px; color:#fff; font-size:20px; font-weight:800;
+    display:flex; align-items:center; justify-content:center; flex:0 0 auto; box-shadow:0 4px 0 rgba(0,0,0,.08); }
+  .sec-title{ font-size:22px; font-weight:800; }
+  .time{ margin-left:auto; background:#fff; border:2px solid #e7dcb6; color:var(--ink-soft);
+    font-size:12px; font-weight:800; padding:5px 12px; border-radius:16px; white-space:nowrap; }
+  .c1 .sec-num{background:var(--coral)} .c2 .sec-num{background:var(--sun);color:#7a5b00}
+  .c3 .sec-num{background:var(--sky)} .c4 .sec-num{background:var(--grape)}
+  .c5 .sec-num{background:var(--mint)} .c6 .sec-num{background:#ff9f43}
+
+  .panel{ background:#fff; border:3px solid #f0e8cd; border-radius:20px; padding:18px 20px; }
+  .panel + .panel{ margin-top:12px; }
+  .lead{ font-size:16px; line-height:1.55; font-weight:600; }
+  .lead b{ color:var(--coral); }
+  .tag-apply{ display:inline-block; background:var(--grape); color:#fff; font-size:11px; font-weight:800;
+    padding:3px 10px; border-radius:12px; margin-left:6px; vertical-align:middle; }
+
+  .subh{ font-size:14px; font-weight:800; color:var(--ink); margin-bottom:6px; display:flex; align-items:center; gap:7px; }
+  .list{ list-style:none; }
+  .list li{ font-size:14px; line-height:1.5; padding-left:22px; position:relative; margin-bottom:5px; font-weight:600; color:#44445c; }
+  .list li::before{ content:"●"; position:absolute; left:4px; color:var(--sky); font-size:10px; top:4px; }
+
+  /* teacher note callout */
+  .note{ background:var(--sun-soft); border:2px solid var(--sun-bd); border-left:7px solid var(--sun);
+    border-radius:14px; padding:12px 16px; margin-top:12px; }
+  .note .subh{ color:#8a6d00; }
+  .note p{ font-size:13.5px; line-height:1.55; font-weight:600; color:#5f5320; }
+  .note p b{ color:var(--coral); }
+
+  /* story / character rows */
+  .story{ display:flex; gap:16px; align-items:center; }
+  .story + .story{ margin-top:12px; }
+  .story .pic{ flex:0 0 auto; width:86px; height:86px; border-radius:20px; display:flex; align-items:center; justify-content:center; }
+  .story .bubble{ flex:1; background:#fff; border:2.5px solid #eee3c4; border-radius:18px; padding:12px 16px; font-size:14px; line-height:1.55; font-weight:600; }
+  .story .bubble b{ color:var(--coral); }
+  .greet{ font-size:16px; font-weight:800; color:var(--sky); margin-bottom:10px; }
+
+  /* WORD WALL grid */
+  .wordgrid{ display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+  .wcard{ border-radius:20px; padding:14px 8px 12px; text-align:center; border:3px solid; }
+  .wcard:nth-child(1){background:var(--sky-soft);border-color:var(--sky-bd)}
+  .wcard:nth-child(2){background:var(--sun-soft);border-color:var(--sun-bd)}
+  .wcard:nth-child(3){background:var(--grape-soft);border-color:var(--grape-bd)}
+  .wcard:nth-child(4){background:var(--coral-soft);border-color:var(--coral-bd)}
+  .wcard:nth-child(5){background:var(--mint-soft);border-color:var(--mint-bd)}
+  .wcard .disc{ width:56px;height:56px;border-radius:50%;background:#fff;margin:0 auto 8px;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 3px 7px rgba(0,0,0,.08); }
+  .wcard .w{ font-size:17px; font-weight:800; }
+  .wcard .m{ font-size:11px; color:var(--ink-soft); margin-top:3px; line-height:1.35; font-weight:600; }
+
+  /* FORMULA */
+  .formula{ background:#fff; border:3px dashed var(--sky); border-radius:20px; padding:16px; margin-top:12px; }
+  .frow{ display:flex; align-items:center; justify-content:center; gap:9px; flex-wrap:wrap; }
+  .fb{ color:#fff; border-radius:15px; padding:9px 16px; text-align:center; box-shadow:0 4px 0 rgba(0,0,0,.08); }
+  .fb.a{background:var(--sky)} .fb.b{background:var(--grape)} .fb.c{background:var(--mint)}
+  .fb .l{ font-size:10px; font-weight:800; opacity:.9; letter-spacing:.4px } .fb .v{ font-size:15px; font-weight:800; margin-top:2px }
+  .plus{ font-size:22px; font-weight:900; color:var(--sun) }
+
+  /* model / shared practice steps */
+  .step{ display:flex; gap:12px; margin-top:12px; }
+  .step .badge{ flex:0 0 auto; width:66px; height:44px; border-radius:12px; color:#fff; font-size:10.5px; font-weight:800;
+    display:flex; align-items:center; justify-content:center; text-align:center; line-height:1.15; padding:2px; }
+  .step .badge.md{ background:var(--grape) } .step .badge.sp{ background:var(--mint) }
+  .step .body{ flex:1; background:#faf7ee; border:2px solid #eee3c4; border-radius:14px; padding:10px 14px; font-size:13.5px; line-height:1.55; font-weight:600; }
+  .step .body b{ color:var(--coral) }
+
+  /* CFU q&a */
+  .qa3{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px; }
+  .qa{ background:#fff; border:2.5px solid var(--sky-bd); border-radius:16px; padding:12px; }
+  .qa .q{ font-size:13px; font-weight:700; line-height:1.45; min-height:56px; }
+  .qa .ans{ margin-top:8px; background:var(--mint); color:#fff; font-size:12.5px; font-weight:800; border-radius:10px; padding:6px 10px; text-align:center; }
+
+  /* sample sentences */
+  .samp{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-top:12px; }
+  .scard{ background:#fff; border:2.5px solid #eee3c4; border-radius:16px; overflow:hidden; text-align:center; }
+  .scard .top{ height:52px; display:flex; align-items:center; justify-content:center; }
+  .scard .s{ font-size:12px; font-weight:700; padding:8px 6px 10px; line-height:1.35; }
+  .scard .s b{ color:var(--coral) }
+
+  /* differentiation two-up */
+  .two{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
+  .diff{ border-radius:16px; padding:14px 16px; }
+  .diff.s{ background:var(--sky-soft); border:2.5px solid var(--sky-bd) }
+  .diff.a{ background:var(--grape-soft); border:2.5px solid var(--grape-bd) }
+  .diff .subh{ margin-bottom:6px } .diff.s .subh{color:#1f7fb8} .diff.a .subh{color:var(--grape)}
+  .diff p{ font-size:13px; line-height:1.5; font-weight:600 } .diff p b{ color:var(--coral) }
+
+  /* AFL */
+  .afl-note{ font-size:13.5px; font-weight:600; color:var(--ink-soft); margin-bottom:10px; }
+  .grow{ display:flex; align-items:center; gap:12px; padding:9px 12px; border-radius:14px; margin-bottom:8px; }
+  .grow.up{ background:var(--mint-soft) } .grow.down{ background:var(--coral-soft) }
+  .grow .t{ flex:1; font-size:14px; font-weight:700 }
+  .vb{ flex:0 0 auto; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center }
+  .vb.u{ background:var(--mint) } .vb.d{ background:var(--coral) }
+
+  .exit{ background:var(--sky-soft); border:2.5px solid var(--sky-bd); border-radius:16px; padding:12px 16px; margin-top:12px; display:flex; gap:12px; align-items:center; }
+  .exit .subh{ color:#1f7fb8; margin:0 } .exit p{ font-size:13.5px; font-weight:600; line-height:1.5 }
+
+  .closing{ margin-top:12px; display:flex; align-items:center; gap:16px; background:var(--grape-soft); border:3px solid var(--grape-bd); border-radius:20px; padding:16px 20px; }
+  .closing h4{ font-size:18px; color:var(--grape) } .closing p{ font-size:14px; color:var(--ink-soft); font-weight:600; margin-top:4px; line-height:1.5 }
+  .closing p b{ color:var(--coral) }
+
+  .sig{ text-align:center; font-size:11px; color:#b9ad82; margin-top:24px; letter-spacing:.4px; }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <!-- reusable symbols -->
+  <svg width="0" height="0" style="position:absolute"><defs>
+    <symbol id="s-nametag" viewBox="0 0 64 64"><rect x="8" y="16" width="48" height="34" rx="7" fill="#5ec6ff"/><rect x="8" y="16" width="48" height="11" rx="6" fill="#3aa8e8"/><circle cx="32" cy="13" r="4" fill="#33334d"/><line x1="32" y1="13" x2="32" y2="20" stroke="#33334d" stroke-width="3"/><circle cx="25" cy="33" r="5" fill="#fff"/><path d="M18 42a7 7 0 0 1 14 0" fill="#fff"/><line x1="38" y1="32" x2="50" y2="32" stroke="#fff" stroke-width="3" stroke-linecap="round"/><line x1="38" y1="40" x2="47" y2="40" stroke="#fff" stroke-width="3" stroke-linecap="round"/></symbol>
+    <symbol id="s-cake" viewBox="0 0 64 64"><path d="M16 34h32l-4 18a4 4 0 0 1-4 4H24a4 4 0 0 1-4-4z" fill="#ff9a8b"/><path d="M14 34c0-9 8-14 18-14s18 5 18 14z" fill="#fff3c9" stroke="#f0a500" stroke-width="3"/><circle cx="24" cy="30" r="3" fill="#ff6f61"/><circle cx="34" cy="27" r="3" fill="#9b6bff"/><circle cx="42" cy="31" r="3" fill="#2fd0a6"/><rect x="30" y="8" width="4" height="12" fill="#5ec6ff"/><path d="M32 2c3 3 3 6 0 8-3-2-3-5 0-8z" fill="#ffcf33"/></symbol>
+    <symbol id="s-family" viewBox="0 0 64 64"><circle cx="16" cy="18" r="8" fill="#9b6bff"/><rect x="8" y="28" width="16" height="22" rx="8" fill="#9b6bff"/><circle cx="48" cy="18" r="8" fill="#5ec6ff"/><rect x="40" y="28" width="16" height="22" rx="8" fill="#5ec6ff"/><circle cx="32" cy="26" r="6" fill="#ff6f61"/><rect x="26" y="34" width="12" height="16" rx="6" fill="#ff6f61"/></symbol>
+    <symbol id="s-heart" viewBox="0 0 64 64"><path d="M32 54S8 40 8 24a12 12 0 0 1 24-4 12 12 0 0 1 24 4c0 16-24 30-24 30z" fill="#ff6f61"/><path d="M20 26a8 8 0 0 1 8-6" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M50 14l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#ffcf33"/></symbol>
+    <symbol id="s-school" viewBox="0 0 64 64"><rect x="14" y="30" width="36" height="24" rx="3" fill="#2fd0a6"/><path d="M10 30L32 14l22 16z" fill="#ff6f61"/><rect x="28" y="40" width="8" height="14" fill="#fff"/><rect x="18" y="35" width="7" height="7" rx="1.5" fill="#fff"/><rect x="39" y="35" width="7" height="7" rx="1.5" fill="#fff"/><rect x="31" y="6" width="2.5" height="9" fill="#33334d"/><path d="M33.5 6l8 3-8 3z" fill="#ffcf33"/></symbol>
+    <symbol id="s-apple" viewBox="0 0 64 64"><path d="M32 20c-4-6-14-6-18 0-5 8-1 26 6 32 3 3 5 3 8 1 3 2 5 2 8-1 7-6 11-24 6-32-4-6-14-6-18 0z" fill="#ff6f61"/><rect x="30" y="10" width="3" height="10" rx="1.5" fill="#8a5a2b"/><path d="M33 14c5-4 9-2 9-2s-2 6-8 6z" fill="#2fd0a6"/></symbol>
+    <symbol id="s-up" viewBox="0 0 64 64"><path d="M20 28h6v28h-6z" fill="#fff"/><path d="M28 28l4-14a4 4 0 0 1 8 0l-2 12h14a5 5 0 0 1 5 6l-4 18a6 6 0 0 1-6 5H28z" fill="#fff"/></symbol>
+    <symbol id="s-down" viewBox="0 0 64 64"><path d="M44 36h-6V8h6z" fill="#fff"/><path d="M36 36l-4 14a4 4 0 0 1-8 0l2-12H12a5 5 0 0 1-5-6l4-18a6 6 0 0 1 6-5h19z" fill="#fff"/></symbol>
+    <symbol id="s-girl" viewBox="0 0 64 64"><circle cx="32" cy="30" r="26" fill="#ffe3df"/><path d="M14 34c0-14 8-22 18-22s18 8 18 22c0 3-1 5-3 6-2-6-6-9-15-9s-13 3-15 9c-2-1-3-3-3-6z" fill="#6a4a3a"/><circle cx="32" cy="33" r="12" fill="#f4c28e"/><circle cx="27" cy="32" r="1.6" fill="#33334d"/><circle cx="37" cy="32" r="1.6" fill="#33334d"/><path d="M28 38q4 3 8 0" stroke="#c0392b" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="24" cy="36" r="3" fill="#ff9a8b" opacity=".6"/><circle cx="40" cy="36" r="3" fill="#ff9a8b" opacity=".6"/><path d="M20 20l4-6M44 20l-4-6" stroke="#6a4a3a" stroke-width="3" stroke-linecap="round"/></symbol>
+    <symbol id="s-hand" viewBox="0 0 64 64"><path d="M26 56V30c0-3 2-5 5-5s5 2 5 5v-4c0-3 2-5 5-5s5 2 5 5v4c0-3 2-4 4-4s4 2 4 5v14c0 8-5 12-12 12z" fill="#f4c28e" stroke="#d99a63" stroke-width="2"/><path d="M26 34l-6-10c-1.5-3 .5-6 3-6 2 0 3 1 4 3l5 9" fill="#f4c28e" stroke="#d99a63" stroke-width="2"/></symbol>
+    <symbol id="s-board" viewBox="0 0 64 64"><rect x="8" y="10" width="48" height="36" rx="4" fill="#2f6b4f"/><rect x="8" y="10" width="48" height="36" rx="4" fill="none" stroke="#8a5a2b" stroke-width="4"/><path d="M18 22h20M18 30h26M18 38h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><rect x="24" y="48" width="16" height="6" fill="#8a5a2b"/></symbol>
+  </defs></svg>
+
+  <!-- ============ BANNER ============ -->
+  <div class="banner">
+    <svg class="rainbow" width="220" height="170" viewBox="0 0 220 170" fill="none">
+      <path d="M14 170a92 92 0 0 1 184 0" stroke="#ff6f61" stroke-width="12"/>
+      <path d="M32 170a74 74 0 0 1 148 0" stroke="#ffcf33" stroke-width="12"/>
+      <path d="M50 170a56 56 0 0 1 112 0" stroke="#2fd0a6" stroke-width="12"/>
+      <path d="M68 170a38 38 0 0 1 76 0" stroke="#5ec6ff" stroke-width="12"/>
+    </svg>
+    <svg width="104" height="104" viewBox="0 0 132 132" style="flex:0 0 auto">
+      <g stroke="#f0a500" stroke-width="7" stroke-linecap="round">
+        <line x1="66" y1="8" x2="66" y2="24"/><line x1="66" y1="108" x2="66" y2="124"/><line x1="8" y1="66" x2="24" y2="66"/><line x1="108" y1="66" x2="124" y2="66"/>
+        <line x1="24" y1="24" x2="36" y2="36"/><line x1="96" y1="96" x2="108" y2="108"/><line x1="108" y1="24" x2="96" y2="36"/><line x1="36" y1="96" x2="24" y2="108"/></g>
+      <circle cx="66" cy="66" r="42" fill="#ffcf33" stroke="#f0a500" stroke-width="5"/>
+      <circle cx="52" cy="60" r="6" fill="#33334d"/><circle cx="80" cy="60" r="6" fill="#33334d"/>
+      <path d="M50 78q16 16 32 0" stroke="#33334d" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <circle cx="44" cy="74" r="6" fill="#ff9a8b" opacity=".6"/><circle cx="88" cy="74" r="6" fill="#ff9a8b" opacity=".6"/>
+    </svg>
+    <div class="txt">
+      <span class="kicker">COMPREHENSION · WORD MEANINGS</span>
+      <h1>My <span class="hl">Talking</span> Words</h1>
+      <div class="sub">Describe yourself with 5 powerful words ✏️</div>
+      <div class="meta">
+        <span><b>Lesson&nbsp;ID</b> 113087</span>
+        <span><b>Subject</b> English</span>
+        <span><b>Grade</b> One</span>
+        <span><b>Class</b> 23 students</span>
+        <span><b>Total</b> 40 min</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 1 OBJECTIVES ============ -->
+  <div class="sec c1">
+    <div class="sec-head"><div class="sec-num">1</div><div class="sec-title">🎯 Objectives</div><div class="time">2 min</div></div>
+    <div class="panel">
+      <p class="lead">Students will be able to use <b>5 target words</b> — name, age, family, like, school — in <b>descriptive sentences</b>.<span class="tag-apply">APPLY</span></p>
+    </div>
+  </div>
+
+  <!-- ============ 2 RESOURCES ============ -->
+  <div class="sec c2">
+    <div class="sec-head"><div class="sec-num">2</div><div class="sec-title">💡 Resources &amp; Teacher Support</div><div class="time">—</div></div>
+    <div class="panel">
+      <div class="subh">🧰 Resources</div>
+      <ul class="list">
+        <li>Whiteboard and markers</li>
+        <li>Flashcards of the 5 target words with simple icons (e.g. a thumbs up for <b>'like'</b>, a building for <b>'school'</b>)</li>
+      </ul>
+      <div class="subh" style="margin-top:10px">🔑 Target Words</div>
+      <ul class="list"><li>name · age · family · like · school</li></ul>
+      <div class="note">
+        <div class="subh">👩‍🏫 Teacher Note — teach meaning with gestures</div>
+        <p>Point to yourself for <b>"name"</b> · hold up fingers for <b>"age"</b> · hug your arms around yourself for <b>"family"</b> · give a big thumbs up for <b>"like"</b> · form a roof over your head with your hands for <b>"school"</b>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 3 INTRODUCTION ============ -->
+  <div class="sec c3">
+    <div class="sec-head"><div class="sec-num">3</div><div class="sec-title">🚀 Introduction</div><div class="time">5 min</div></div>
+    <div class="panel">
+      <div class="greet">👋 “Good morning, class! Today we are going to learn how to use some powerful new words in our writing!”</div>
+      <div class="story">
+        <div class="pic" style="background:var(--coral-soft)"><svg width="60" height="60"><use href="#s-girl"/></svg></div>
+        <div class="bubble"><b>A short story:</b> Once upon a time, a little girl named <b>Pinky</b> went to a big building to read and write. She felt so happy playing with her friends there! Can you guess where she was? Yes — at <b>school!</b></div>
+      </div>
+      <div class="story">
+        <div class="pic" style="background:var(--grape-soft)"><svg width="58" height="58"><use href="#s-family"/></svg></div>
+        <div class="bubble"><b>Zainab</b> has a big house where she lives with her mother, father, and baby brother. Who are the people Zainab lives with? What do we call them? <b>(family!)</b></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 4 EXPLANATION ============ -->
+  <div class="sec c4">
+    <div class="sec-head"><div class="sec-num">4</div><div class="sec-title">🧠 Explanation &amp; Teaching</div><div class="time">15 min</div></div>
+    <div class="panel">
+      <div class="subh">📋 Write the 5 target words &amp; their meanings on the board</div>
+      <div class="wordgrid">
+        <div class="wcard"><div class="disc"><svg width="34" height="34"><use href="#s-nametag"/></svg></div><div class="w">name</div><div class="m">what people call you</div></div>
+        <div class="wcard"><div class="disc"><svg width="34" height="34"><use href="#s-cake"/></svg></div><div class="w">age</div><div class="m">how many years old you are</div></div>
+        <div class="wcard"><div class="disc"><svg width="36" height="36"><use href="#s-family"/></svg></div><div class="w">family</div><div class="m">the people you live with</div></div>
+        <div class="wcard"><div class="disc"><svg width="34" height="34"><use href="#s-heart"/></svg></div><div class="w">like</div><div class="m">something that makes you happy</div></div>
+        <div class="wcard"><div class="disc"><svg width="36" height="36"><use href="#s-school"/></svg></div><div class="w">school</div><div class="m">the place where you go to learn</div></div>
+      </div>
+
+      <div class="subh" style="margin-top:16px">🧩 Sentence Formula</div>
+      <div class="formula">
+        <div class="frow">
+          <div class="fb a"><div class="l">WHO / WHAT</div><div class="v">Who / What</div></div>
+          <div class="plus">+</div>
+          <div class="fb b"><div class="l">ACTION</div><div class="v">Action</div></div>
+          <div class="plus">+</div>
+          <div class="fb c"><div class="l">DESCRIPTION</div><div class="v">Description</div></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="badge md">Teacher<br>Model</div>
+        <div class="body">“I want to use the word <b>'like'</b>. I am thinking of something I enjoy doing. Who? <b>I</b>. Action? <b>like</b>. Description? <b>to paint nice pictures</b>. So, my sentence is: <b>I like to paint nice pictures.</b>”</div>
+      </div>
+      <div class="step">
+        <div class="badge sp">Shared<br>Practice</div>
+        <div class="body">“Let's build a sentence for <b>'school'</b>. Bilal says he goes to school. Who? <b>Bilal</b>. Action? <b>goes to</b>. Description? <b>a big school</b>. Great job — <b>Bilal goes to a big school.</b>”</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="subh">✅ Check for Understanding (CFU)</div>
+      <div class="qa3">
+        <div class="qa"><div class="q"><b>Q1.</b> Which word means the people you live with?</div><div class="ans">Family</div></div>
+        <div class="qa"><div class="q"><b>Q2.</b> If I say “I am six years old,” which target word am I talking about?</div><div class="ans">Age</div></div>
+        <div class="qa"><div class="q"><b>Q3.</b> In our formula, what comes after “Who/What”?</div><div class="ans">Action</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 5 PRACTICE ============ -->
+  <div class="sec c5">
+    <div class="sec-head"><div class="sec-num">5</div><div class="sec-title">✍️ Practice</div><div class="time">15 min</div></div>
+    <div class="panel">
+      <p class="lead"><b>Mandatory Task:</b> All students write original sentences for <b>all 5 target words</b> in their notebooks using the <b>Who/What + Action + Description</b> formula.</p>
+      <div class="note">
+        <div class="subh">👩‍🏫 Teacher Note</div>
+        <p>Choose to work in <b>Pairs</b> (brainstorming) or <b>Individually</b> (focused writing) based on your class.</p>
+      </div>
+
+      <div class="subh" style="margin-top:14px">🌟 Teacher Support — Sample Reference Sentences</div>
+      <div class="samp">
+        <div class="scard"><div class="top" style="background:var(--sky-soft)"><svg width="30" height="30"><use href="#s-nametag"/></svg></div><div class="s">My <b>name</b> is Ali.</div></div>
+        <div class="scard"><div class="top" style="background:var(--sun-soft)"><svg width="30" height="30"><use href="#s-cake"/></svg></div><div class="s">My <b>age</b> is six.</div></div>
+        <div class="scard"><div class="top" style="background:var(--grape-soft)"><svg width="32" height="32"><use href="#s-family"/></svg></div><div class="s">My <b>family</b> loves to play.</div></div>
+        <div class="scard"><div class="top" style="background:var(--coral-soft)"><svg width="30" height="30"><use href="#s-apple"/></svg></div><div class="s">I <b>like</b> to eat apples.</div></div>
+        <div class="scard"><div class="top" style="background:var(--mint-soft)"><svg width="32" height="32"><use href="#s-school"/></svg></div><div class="s">My <b>school</b> has a big park.</div></div>
+      </div>
+
+      <div class="subh" style="margin-top:14px">🪜 Differentiation</div>
+      <div class="two">
+        <div class="diff s"><div class="subh">🐣 For Struggling Students</div><p>Provide sentence starters on the board: <b>“My name ______.”</b> · <b>“I like ______.”</b></p></div>
+        <div class="diff a"><div class="subh">🚀 For Advanced Students</div><p>Challenge them to use <b>two</b> target words in one sentence: <b>“My family likes my school.”</b></p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 6 CONCLUSION ============ -->
+  <div class="sec c6">
+    <div class="sec-head"><div class="sec-num">6</div><div class="sec-title">🏁 Conclusion</div><div class="time">3 min</div></div>
+    <div class="panel">
+      <div class="subh">👍👎 AFL Check — Thumbs Up / Thumbs Down</div>
+      <div class="afl-note">Listen to each sentence. Thumbs <b>up</b> if the target word is used correctly, thumbs <b>down</b> if it is wrong!</div>
+      <div class="grow down"><div class="t">I eat my name for breakfast.</div><div class="vb d"><svg width="20" height="20"><use href="#s-down"/></svg></div></div>
+      <div class="grow up"><div class="t">My family lives in my house.</div><div class="vb u"><svg width="20" height="20"><use href="#s-up"/></svg></div></div>
+      <div class="grow down"><div class="t">I am age years old.</div><div class="vb d"><svg width="20" height="20"><use href="#s-down"/></svg></div></div>
+      <div class="grow up"><div class="t">I like to play games.</div><div class="vb u"><svg width="20" height="20"><use href="#s-up"/></svg></div></div>
+      <div class="grow down"><div class="t">I sleep in my school at night.</div><div class="vb d"><svg width="20" height="20"><use href="#s-down"/></svg></div></div>
+
+      <div class="exit">
+        <div class="pic" style="flex:0 0 auto;width:52px;height:52px;border-radius:14px;background:var(--sky-soft);display:flex;align-items:center;justify-content:center"><svg width="34" height="34"><use href="#s-board"/></svg></div>
+        <div><div class="subh">🎟️ Exit Ticket</div><p>Have 2–3 students read their favourite original sentence aloud to the class.</p></div>
+      </div>
+    </div>
+
+    <div class="closing">
+      <svg width="56" height="56" viewBox="0 0 64 64" style="flex:0 0 auto"><path d="M32 4l8 18 20 2-15 13 5 20-18-11-18 11 5-20L4 24l20-2z" fill="#ffcf33" stroke="#f0a500" stroke-width="3"/></svg>
+      <div>
+        <h4>🏠 Closing &amp; Homework</h4>
+        <p>Draw a picture of your <b>family</b> and write one sentence about them using our formula. <b>You all worked so hard today — well done, class!</b></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sig">Lesson Plan 113087 · rendered entirely from hand-written HTML + CSS + hand-drawn SVG — no template, no benchmark, no AI image model</div>
+</div>
+</body>
+</html>

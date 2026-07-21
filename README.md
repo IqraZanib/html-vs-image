@@ -39,6 +39,11 @@ See **[docs/comparison.html](docs/comparison.html)** — a side-by-side comparis
 
 ## Generated lesson plans
 
+### English — Lesson 113087 · Descriptive Sentences (Grade 1) — full plan, original design
+<img src="assets/generated/lesson-113087-descriptive-sentences.png" width="480" alt="Full Grade 1 English lesson plan 113087 on descriptive sentences, colourful from-scratch design with hand-coded SVG illustrations">
+
+English · Grade One · Comprehension (Word Meanings) · 23 students. The **complete** lesson plan (Lesson ID 113087) — every section rendered in one colourful, UI/UX-driven poster: objectives, resources + gesture notes, introduction (Pinky & Zainab), explanation (word wall, sentence formula, teacher modelling, shared practice, CFU), practice (mandatory task, sample sentences, differentiation) and conclusion (thumbs-up/down AFL, exit ticket, homework). A **from-scratch** design — own palette, own layout, and **every illustration hand-drawn as inline SVG** (sun mascot, rainbow, name-tag, cake, family, heart, schoolhouse, apple, thumbs, Pinky). No template, no benchmark, no dataset, no AI image model. Source: [lesson-113087-full.html](lesson-113087-full.html).
+
 ### English — Descriptive Sentences (Grade 1) — original design, hand-coded SVG art
 <img src="assets/generated/english-descriptive-sentences.png" width="480" alt="Code-rendered Grade 1 English lesson on descriptive sentences, with a colour-coded word wall and hand-coded SVG icons">
 
