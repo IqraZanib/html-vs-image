@@ -44,6 +44,11 @@ See **[docs/comparison.html](docs/comparison.html)** — a side-by-side comparis
 
 English · Grade One · Comprehension (Word Meanings) · 23 students. The **complete** lesson plan (Lesson ID 113087) — every section rendered in one colourful, UI/UX-driven poster: objectives, resources + gesture notes, introduction (Pinky & Zainab), explanation (word wall, sentence formula, teacher modelling, shared practice, CFU), practice (mandatory task, sample sentences, differentiation) and conclusion (thumbs-up/down AFL, exit ticket, homework). A **from-scratch** design — own palette, own layout, and **every illustration hand-drawn as inline SVG** (sun mascot, rainbow, name-tag, cake, family, heart, schoolhouse, apple, thumbs, Pinky). No template, no benchmark, no dataset, no AI image model. Source: [lesson-113087-full.html](lesson-113087-full.html).
 
+### Urdu &amp; Sindhi — Lesson 113087 · Descriptive Sentences (Grade 1) — RTL, full plan
+<img src="assets/generated/lesson-113087-descriptive-sentences-urdu.png" width="380" alt="Full Grade 1 lesson plan 113087 translated to Urdu, right-to-left, Noto Nastaliq Urdu"> <img src="assets/generated/lesson-113087-descriptive-sentences-sindhi.png" width="380" alt="Full Grade 1 lesson plan 113087 translated to Sindhi, right-to-left, Noto Naskh Arabic">
+
+The same complete Lesson 113087 in **Urdu** (Noto Nastaliq Urdu) and **Sindhi** (Noto Naskh Arabic) — full right-to-left layout, large clear script, every section translated. Same from-scratch colourful design with hand-drawn inline SVG; no template, no benchmark, no AI image model. Sources: [lesson-113087-ur.html](lesson-113087-ur.html) · [lesson-113087-sd.html](lesson-113087-sd.html) (built from [scratch-multilang.js](scratch-multilang.js)). _Sindhi text is machine-translated — recommend a native-speaker review before classroom use._
+
 ### English — Descriptive Sentences (Grade 1) — original design, hand-coded SVG art
 <img src="assets/generated/english-descriptive-sentences.png" width="480" alt="Code-rendered Grade 1 English lesson on descriptive sentences, with a colour-coded word wall and hand-coded SVG icons">
 

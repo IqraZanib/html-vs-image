@@ -1,0 +1,211 @@
+<!DOCTYPE html><html lang="ur" dir="rtl"><head><meta charset="UTF-8"><title>Lesson 113087 — ur</title>
+<style>
+  :root{--paper:#fffdf3;--sky:#5ec6ff;--sky-soft:#e9f7ff;--sky-bd:#bfe9ff;--sun:#ffcf33;--sun-soft:#fff6d6;--sun-bd:#ffe79e;
+    --coral:#ff6f61;--coral-soft:#ffe6e2;--coral-bd:#ffc7c0;--mint:#2fd0a6;--mint-soft:#dcfbf1;--mint-bd:#b7f3e3;
+    --grape:#9b6bff;--grape-soft:#efe6ff;--grape-bd:#d9c8ff;--ink:#33334d;--ink-soft:#5a5a72;--font:"Noto Nastaliq Urdu","Noto Naskh Arabic",serif;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--font);color:var(--ink);background:#eae4cf;direction:rtl;text-align:right;line-height:2;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  .sheet{width:960px;margin:0 auto;padding:30px 34px 40px;
+    background:radial-gradient(circle at 1px 1px, rgba(190,175,120,.16) 1.5px, transparent 0) 0 0/26px 26px, var(--paper);}
+  b{font-weight:700;color:var(--coral)}
+  .banner{position:relative;border-radius:28px;padding:22px 26px;overflow:hidden;background:linear-gradient(225deg,var(--sky-soft),#f3fbff);border:3px solid var(--sky-bd);display:flex;align-items:center;gap:20px;}
+  .banner .rainbow{position:absolute;left:-30px;top:-54px;transform:scaleX(-1)}
+  .banner .txt{position:relative;z-index:2;flex:1}
+  .kicker{display:inline-block;background:var(--coral);color:#fff;font-weight:700;font-size:15px;padding:5px 16px;border-radius:20px}
+  .banner h1{font-size:40px;line-height:1.6;margin-top:8px;text-shadow:2px 2px 0 #fff}
+  .banner h1 .hl{color:var(--coral)}
+  .banner .sub{font-size:18px;color:var(--ink-soft);margin-top:6px;font-weight:700}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .meta span{background:#fff;border:2px solid var(--sky-bd);color:var(--ink);font-size:15px;font-weight:700;padding:5px 13px;border-radius:14px}
+  .meta span b{color:var(--sky)}
+  .sec{margin-top:22px}
+  .sec-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .sec-num{width:42px;height:42px;border-radius:14px;color:#fff;font-size:22px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:0 4px 0 rgba(0,0,0,.08);font-family:"Noto Sans",sans-serif}
+  .sec-title{font-size:26px;font-weight:700}
+  .time{margin-inline-start:auto;background:#fff;border:2px solid #e7dcb6;color:var(--ink-soft);font-size:15px;font-weight:700;padding:5px 14px;border-radius:16px;white-space:nowrap}
+  .c1 .sec-num{background:var(--coral)}.c2 .sec-num{background:var(--sun);color:#7a5b00}.c3 .sec-num{background:var(--sky)}.c4 .sec-num{background:var(--grape)}.c5 .sec-num{background:var(--mint)}.c6 .sec-num{background:#ff9f43}
+  .panel{background:#fff;border:3px solid #f0e8cd;border-radius:20px;padding:20px 22px}
+  .panel + .panel{margin-top:12px}
+  .lead{font-size:19px;font-weight:700}
+  .tag-apply{display:inline-block;background:var(--grape);color:#fff;font-size:14px;font-weight:700;padding:3px 12px;border-radius:12px;margin-inline-start:6px}
+  .subh{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px}
+  .list{list-style:none}
+  .list li{font-size:17px;padding-inline-start:24px;position:relative;margin-bottom:7px;font-weight:600;color:#44445c}
+  .list li::before{content:"●";position:absolute;inset-inline-start:4px;color:var(--sky);font-size:11px;top:10px}
+  .note{background:var(--sun-soft);border:2px solid var(--sun-bd);border-inline-start:7px solid var(--sun);border-radius:14px;padding:14px 18px;margin-top:14px}
+  .note .subh{color:#8a6d00}
+  .note p{font-size:16.5px;font-weight:600;color:#5f5320}
+  .story{display:flex;gap:16px;align-items:center}
+  .story + .story{margin-top:12px}
+  .story .pic{flex:0 0 auto;width:92px;height:92px;border-radius:20px;display:flex;align-items:center;justify-content:center}
+  .story .bubble{flex:1;background:#fff;border:2.5px solid #eee3c4;border-radius:18px;padding:14px 18px;font-size:17px;font-weight:600}
+  .greet{font-size:19px;font-weight:700;color:#1f7fb8;margin-bottom:12px;line-height:1.9}
+  .wordgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  .wcard{border-radius:20px;padding:16px 8px 14px;text-align:center;border:3px solid}
+  .wcard:nth-child(1){background:var(--sky-soft);border-color:var(--sky-bd)}.wcard:nth-child(2){background:var(--sun-soft);border-color:var(--sun-bd)}.wcard:nth-child(3){background:var(--grape-soft);border-color:var(--grape-bd)}.wcard:nth-child(4){background:var(--coral-soft);border-color:var(--coral-bd)}.wcard:nth-child(5){background:var(--mint-soft);border-color:var(--mint-bd)}
+  .wcard .disc{width:58px;height:58px;border-radius:50%;background:#fff;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 7px rgba(0,0,0,.08)}
+  .wcard .w{font-size:22px;font-weight:700}
+  .wcard .m{font-size:14px;color:var(--ink-soft);margin-top:6px;font-weight:600;line-height:1.7}
+  .formula{background:#fff;border:3px dashed var(--sky);border-radius:20px;padding:18px;margin-top:12px}
+  .frow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+  .fb{color:#fff;border-radius:15px;padding:11px 20px;text-align:center;box-shadow:0 4px 0 rgba(0,0,0,.08)}
+  .fb.a{background:var(--sky)}.fb.b{background:var(--grape)}.fb.c{background:var(--mint)}
+  .fb .v{font-size:20px;font-weight:700}
+  .plus{font-size:26px;font-weight:900;color:var(--sun);font-family:"Noto Sans",sans-serif}
+  .step{display:flex;gap:12px;margin-top:14px}
+  .step .badge{flex:0 0 auto;width:96px;min-height:52px;border-radius:14px;color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px}
+  .step .badge.md{background:var(--grape)}.step .badge.sp{background:var(--mint)}
+  .step .body{flex:1;background:#faf7ee;border:2px solid #eee3c4;border-radius:14px;padding:12px 16px;font-size:16.5px;font-weight:600}
+  .qa3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+  .qa{background:#fff;border:2.5px solid var(--sky-bd);border-radius:16px;padding:14px}
+  .qa .q{font-size:16px;font-weight:700}
+  .qa .ans{margin-top:10px;background:var(--mint);color:#fff;font-size:17px;font-weight:700;border-radius:10px;padding:7px 10px;text-align:center}
+  .samp{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:12px}
+  .scard{background:#fff;border:2.5px solid #eee3c4;border-radius:16px;overflow:hidden;text-align:center}
+  .scard .top{height:56px;display:flex;align-items:center;justify-content:center}
+  .scard .s{font-size:15px;font-weight:700;padding:10px 8px 12px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+  .diff{border-radius:16px;padding:16px 18px}
+  .diff.s{background:var(--sky-soft);border:2.5px solid var(--sky-bd)}.diff.a{background:var(--grape-soft);border:2.5px solid var(--grape-bd)}
+  .diff .subh{margin-bottom:8px}.diff.s .subh{color:#1f7fb8}.diff.a .subh{color:var(--grape)}
+  .diff p{font-size:16px;font-weight:600}
+  .afl-note{font-size:16.5px;font-weight:600;color:var(--ink-soft);margin-bottom:12px}
+  .grow{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:14px;margin-bottom:9px}
+  .grow.up{background:var(--mint-soft)}.grow.down{background:var(--coral-soft)}
+  .grow .t{flex:1;font-size:18px;font-weight:700}
+  .vb{flex:0 0 auto;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+  .vb.u{background:var(--mint)}.vb.d{background:var(--coral)}
+  .exit{background:var(--sky-soft);border:2.5px solid var(--sky-bd);border-radius:16px;padding:14px 18px;margin-top:12px;display:flex;gap:14px;align-items:center}
+  .exit .subh{color:#1f7fb8;margin:0}.exit p{font-size:16.5px;font-weight:600}
+  .closing{margin-top:12px;display:flex;align-items:center;gap:16px;background:var(--grape-soft);border:3px solid var(--grape-bd);border-radius:20px;padding:18px 22px}
+  .closing h4{font-size:21px;color:var(--grape)}.closing p{font-size:17px;color:var(--ink-soft);font-weight:600;margin-top:6px}
+  .sig{text-align:center;font-size:12px;color:#b9ad82;margin-top:24px;direction:ltr;font-family:"Noto Sans",sans-serif}
+</style></head><body>
+<div class="sheet">
+  <svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="s-nametag" viewBox="0 0 64 64"><rect x="8" y="16" width="48" height="34" rx="7" fill="#5ec6ff"/><rect x="8" y="16" width="48" height="11" rx="6" fill="#3aa8e8"/><circle cx="32" cy="13" r="4" fill="#33334d"/><line x1="32" y1="13" x2="32" y2="20" stroke="#33334d" stroke-width="3"/><circle cx="25" cy="33" r="5" fill="#fff"/><path d="M18 42a7 7 0 0 1 14 0" fill="#fff"/><line x1="38" y1="32" x2="50" y2="32" stroke="#fff" stroke-width="3" stroke-linecap="round"/><line x1="38" y1="40" x2="47" y2="40" stroke="#fff" stroke-width="3" stroke-linecap="round"/></symbol>
+  <symbol id="s-cake" viewBox="0 0 64 64"><path d="M16 34h32l-4 18a4 4 0 0 1-4 4H24a4 4 0 0 1-4-4z" fill="#ff9a8b"/><path d="M14 34c0-9 8-14 18-14s18 5 18 14z" fill="#fff3c9" stroke="#f0a500" stroke-width="3"/><circle cx="24" cy="30" r="3" fill="#ff6f61"/><circle cx="34" cy="27" r="3" fill="#9b6bff"/><circle cx="42" cy="31" r="3" fill="#2fd0a6"/><rect x="30" y="8" width="4" height="12" fill="#5ec6ff"/><path d="M32 2c3 3 3 6 0 8-3-2-3-5 0-8z" fill="#ffcf33"/></symbol>
+  <symbol id="s-family" viewBox="0 0 64 64"><circle cx="16" cy="18" r="8" fill="#9b6bff"/><rect x="8" y="28" width="16" height="22" rx="8" fill="#9b6bff"/><circle cx="48" cy="18" r="8" fill="#5ec6ff"/><rect x="40" y="28" width="16" height="22" rx="8" fill="#5ec6ff"/><circle cx="32" cy="26" r="6" fill="#ff6f61"/><rect x="26" y="34" width="12" height="16" rx="6" fill="#ff6f61"/></symbol>
+  <symbol id="s-heart" viewBox="0 0 64 64"><path d="M32 54S8 40 8 24a12 12 0 0 1 24-4 12 12 0 0 1 24 4c0 16-24 30-24 30z" fill="#ff6f61"/><path d="M20 26a8 8 0 0 1 8-6" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M50 14l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#ffcf33"/></symbol>
+  <symbol id="s-school" viewBox="0 0 64 64"><rect x="14" y="30" width="36" height="24" rx="3" fill="#2fd0a6"/><path d="M10 30L32 14l22 16z" fill="#ff6f61"/><rect x="28" y="40" width="8" height="14" fill="#fff"/><rect x="18" y="35" width="7" height="7" rx="1.5" fill="#fff"/><rect x="39" y="35" width="7" height="7" rx="1.5" fill="#fff"/><rect x="31" y="6" width="2.5" height="9" fill="#33334d"/><path d="M33.5 6l8 3-8 3z" fill="#ffcf33"/></symbol>
+  <symbol id="s-apple" viewBox="0 0 64 64"><path d="M32 20c-4-6-14-6-18 0-5 8-1 26 6 32 3 3 5 3 8 1 3 2 5 2 8-1 7-6 11-24 6-32-4-6-14-6-18 0z" fill="#ff6f61"/><rect x="30" y="10" width="3" height="10" rx="1.5" fill="#8a5a2b"/><path d="M33 14c5-4 9-2 9-2s-2 6-8 6z" fill="#2fd0a6"/></symbol>
+  <symbol id="s-up" viewBox="0 0 64 64"><path d="M20 28h6v28h-6z" fill="#fff"/><path d="M28 28l4-14a4 4 0 0 1 8 0l-2 12h14a5 5 0 0 1 5 6l-4 18a6 6 0 0 1-6 5H28z" fill="#fff"/></symbol>
+  <symbol id="s-down" viewBox="0 0 64 64"><path d="M44 36h-6V8h6z" fill="#fff"/><path d="M36 36l-4 14a4 4 0 0 1-8 0l2-12H12a5 5 0 0 1-5-6l4-18a6 6 0 0 1 6-5h19z" fill="#fff"/></symbol>
+  <symbol id="s-girl" viewBox="0 0 64 64"><circle cx="32" cy="30" r="26" fill="#ffe3df"/><path d="M14 34c0-14 8-22 18-22s18 8 18 22c0 3-1 5-3 6-2-6-6-9-15-9s-13 3-15 9c-2-1-3-3-3-6z" fill="#6a4a3a"/><circle cx="32" cy="33" r="12" fill="#f4c28e"/><circle cx="27" cy="32" r="1.6" fill="#33334d"/><circle cx="37" cy="32" r="1.6" fill="#33334d"/><path d="M28 38q4 3 8 0" stroke="#c0392b" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="24" cy="36" r="3" fill="#ff9a8b" opacity=".6"/><circle cx="40" cy="36" r="3" fill="#ff9a8b" opacity=".6"/></symbol>
+  <symbol id="s-board" viewBox="0 0 64 64"><rect x="8" y="10" width="48" height="36" rx="4" fill="#2f6b4f"/><rect x="8" y="10" width="48" height="36" rx="4" fill="none" stroke="#8a5a2b" stroke-width="4"/><path d="M18 22h20M18 30h26M18 38h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><rect x="24" y="48" width="16" height="6" fill="#8a5a2b"/></symbol>
+</defs></svg>
+  <div class="banner">
+  <svg class="rainbow" width="220" height="170" viewBox="0 0 220 170" fill="none">
+    <path d="M14 170a92 92 0 0 1 184 0" stroke="#ff6f61" stroke-width="12"/>
+    <path d="M32 170a74 74 0 0 1 148 0" stroke="#ffcf33" stroke-width="12"/>
+    <path d="M50 170a56 56 0 0 1 112 0" stroke="#2fd0a6" stroke-width="12"/>
+    <path d="M68 170a38 38 0 0 1 76 0" stroke="#5ec6ff" stroke-width="12"/></svg>
+  <svg width="104" height="104" viewBox="0 0 132 132" style="flex:0 0 auto">
+    <g stroke="#f0a500" stroke-width="7" stroke-linecap="round"><line x1="66" y1="8" x2="66" y2="24"/><line x1="66" y1="108" x2="66" y2="124"/><line x1="8" y1="66" x2="24" y2="66"/><line x1="108" y1="66" x2="124" y2="66"/><line x1="24" y1="24" x2="36" y2="36"/><line x1="96" y1="96" x2="108" y2="108"/><line x1="108" y1="24" x2="96" y2="36"/><line x1="36" y1="96" x2="24" y2="108"/></g>
+    <circle cx="66" cy="66" r="42" fill="#ffcf33" stroke="#f0a500" stroke-width="5"/>
+    <circle cx="52" cy="60" r="6" fill="#33334d"/><circle cx="80" cy="60" r="6" fill="#33334d"/>
+    <path d="M50 78q16 16 32 0" stroke="#33334d" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <circle cx="44" cy="74" r="6" fill="#ff9a8b" opacity=".6"/><circle cx="88" cy="74" r="6" fill="#ff9a8b" opacity=".6"/></svg>
+    <div class="txt">
+      <span class="kicker">فہم — الفاظ کے معنی</span>
+      <h1>میرے بولنے والے الفاظ</h1>
+      <div class="sub">پانچ خاص الفاظ سے اپنے بارے میں بتائیں</div>
+      <div class="meta">
+        <span><b>سبق نمبر</b> 113087</span>
+        <span><b>مضمون</b> انگریزی</span>
+        <span><b>جماعت</b> اول</span>
+        <span><b>طلبہ</b> ۲۳ طلبہ</span>
+        <span><b>دورانیہ</b> ۴۰ منٹ</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec c1"><div class="sec-head"><div class="sec-num">1</div><div class="sec-title">🎯 مقاصد</div><div class="time">۲ منٹ</div></div>
+    <div class="panel"><p class="lead">طلبہ ۵ ہدف الفاظ — نام، عمر، خاندان، پسند، اسکول — کو وضاحتی جملوں میں استعمال کر سکیں گے۔<span class="tag-apply">اطلاق</span></p></div></div>
+
+  <div class="sec c2"><div class="sec-head"><div class="sec-num">2</div><div class="sec-title">💡 وسائل اور اُستاد کی معاونت</div><div class="time">—</div></div>
+    <div class="panel">
+      <div class="subh">🧰 وسائل</div>
+      <ul class="list"><li>وائٹ بورڈ اور مارکر</li><li>۵ ہدف الفاظ کے فلیش کارڈ سادہ تصویروں کے ساتھ (مثلاً ”پسند“ کے لیے تھمز اپ، ”اسکول“ کے لیے عمارت)</li></ul>
+      <div class="subh" style="margin-top:12px">🔑 ہدف الفاظ</div>
+      <ul class="list"><li>نام · عمر · خاندان · پسند · اسکول</li></ul>
+      <div class="note"><div class="subh">👩‍🏫 اُستاد کے لیے نوٹ — اشاروں سے معنی سمجھائیں</div><p>”نام“ کے لیے اپنی طرف اشارہ کریں · ”عمر“ کے لیے انگلیاں اٹھائیں · ”خاندان“ کے لیے خود کو بازوؤں میں لپیٹیں · ”پسند“ کے لیے تھمز اپ کریں · ”اسکول“ کے لیے ہاتھوں سے سر پر چھت بنائیں۔</p></div>
+    </div></div>
+
+  <div class="sec c3"><div class="sec-head"><div class="sec-num">3</div><div class="sec-title">🚀 تعارف</div><div class="time">۵ منٹ</div></div>
+    <div class="panel">
+      <div class="greet">👋 ”صبح بخیر، بچو! آج ہم سیکھیں گے کہ اپنی تحریر میں کچھ نئے طاقتور الفاظ کیسے استعمال کریں!“</div>
+      <div class="story"><div class="pic" style="background:var(--coral-soft)"><svg width="62" height="62"><use href="#s-girl"/></svg></div>
+        <div class="bubble"><b>ایک مختصر کہانی:</b> ایک دفعہ کا ذکر ہے، پنکی نامی ایک چھوٹی لڑکی پڑھنے لکھنے کے لیے ایک بڑی عمارت میں گئی۔ وہاں اپنے دوستوں کے ساتھ کھیل کر وہ بہت خوش ہوئی! بتا سکتے ہو وہ کہاں تھی؟ جی ہاں — اسکول میں!</div></div>
+      <div class="story"><div class="pic" style="background:var(--grape-soft)"><svg width="60" height="60"><use href="#s-family"/></svg></div>
+        <div class="bubble">زینب کا ایک بڑا گھر ہے جہاں وہ اپنی ماں، باپ اور چھوٹے بھائی کے ساتھ رہتی ہے۔ زینب جن کے ساتھ رہتی ہے وہ کون ہیں؟ ہم انہیں کیا کہتے ہیں؟ (خاندان!)</div></div>
+    </div></div>
+
+  <div class="sec c4"><div class="sec-head"><div class="sec-num">4</div><div class="sec-title">🧠 وضاحت اور تدریس</div><div class="time">۱۵ منٹ</div></div>
+    <div class="panel">
+      <div class="subh">📋 بورڈ پر ۵ ہدف الفاظ اور اُن کے معنی لکھیں</div>
+      <div class="wordgrid">
+        <div class="wcard"><div class="disc"><svg width="34" height="34"><use href="#s-nametag"/></svg></div><div class="w">نام</div><div class="m">جس نام سے لوگ آپ کو پکارتے ہیں</div></div>
+        <div class="wcard"><div class="disc"><svg width="34" height="34"><use href="#s-cake"/></svg></div><div class="w">عمر</div><div class="m">آپ کتنے سال کے ہیں</div></div>
+        <div class="wcard"><div class="disc"><svg width="36" height="36"><use href="#s-family"/></svg></div><div class="w">خاندان</div><div class="m">جن کے ساتھ آپ رہتے ہیں</div></div>
+        <div class="wcard"><div class="disc"><svg width="34" height="34"><use href="#s-heart"/></svg></div><div class="w">پسند</div><div class="m">جو چیز آپ کو خوش کرتی ہے</div></div>
+        <div class="wcard"><div class="disc"><svg width="36" height="36"><use href="#s-school"/></svg></div><div class="w">اسکول</div><div class="m">جہاں آپ سیکھنے جاتے ہیں</div></div>
+      </div>
+      <div class="subh" style="margin-top:16px">🧩 جملے کا فارمولا</div>
+      <div class="formula"><div class="frow">
+        <div class="fb a"><div class="v">کون / کیا</div></div><div class="plus">+</div>
+        <div class="fb b"><div class="v">عمل</div></div><div class="plus">+</div>
+        <div class="fb c"><div class="v">تفصیل</div></div>
+      </div></div>
+      <div class="step"><div class="badge md">اُستاد کا نمونہ</div><div class="body">”میں ’پسند‘ لفظ استعمال کرنا چاہتا ہوں۔ میں کسی ایسے کام کے بارے میں سوچ رہا ہوں جو مجھے اچھا لگتا ہے۔ کون؟ میں۔ عمل؟ پسند کرنا۔ تفصیل؟ اچھی تصویریں بنانا۔ تو میرا جملہ ہے: مجھے اچھی تصویریں بنانا پسند ہے۔“</div></div>
+      <div class="step"><div class="badge sp">مشترکہ مشق</div><div class="body">”آئیے ’اسکول‘ کے لیے جملہ بناتے ہیں۔ بلال کہتا ہے وہ اسکول جاتا ہے۔ کون؟ بلال۔ عمل؟ جاتا ہے۔ تفصیل؟ ایک بڑا اسکول۔ شاباش — بلال ایک بڑے اسکول جاتا ہے۔“</div></div>
+    </div>
+    <div class="panel">
+      <div class="subh">✅ سمجھ کی جانچ (CFU)</div>
+      <div class="qa3">
+        <div class="qa"><div class="q">سوال ۱: کون سا لفظ اُن لوگوں کے لیے ہے جن کے ساتھ آپ رہتے ہیں؟</div><div class="ans">خاندان</div></div>
+        <div class="qa"><div class="q">سوال ۲: اگر میں کہوں ”میں چھ سال کا ہوں“، تو میں کس لفظ کی بات کر رہا ہوں؟</div><div class="ans">عمر</div></div>
+        <div class="qa"><div class="q">سوال ۳: ہمارے فارمولے میں ”کون/کیا“ کے بعد کیا آتا ہے؟</div><div class="ans">عمل</div></div>
+      </div>
+    </div></div>
+
+  <div class="sec c5"><div class="sec-head"><div class="sec-num">5</div><div class="sec-title">✍️ مشق</div><div class="time">۱۵ منٹ</div></div>
+    <div class="panel">
+      <p class="lead">لازمی کام: تمام طلبہ ”کون/کیا + عمل + تفصیل“ فارمولے کے مطابق پانچوں ہدف الفاظ کے اپنے جملے کاپیوں میں لکھیں۔</p>
+      <div class="note"><div class="subh">👩‍🏫 اُستاد کے لیے نوٹ</div><p>اپنی کلاس کے مطابق جوڑوں میں (سوچ بچار) یا انفرادی طور پر (توجہ سے لکھائی) کام کروائیں۔</p></div>
+      <div class="subh" style="margin-top:14px">🌟 اُستاد کی معاونت — نمونہ جملے</div>
+      <div class="samp">
+        <div class="scard"><div class="top" style="background:var(--sky-soft)"><svg width="30" height="30"><use href="#s-nametag"/></svg></div><div class="s">میرا نام علی ہے۔</div></div>
+        <div class="scard"><div class="top" style="background:var(--sun-soft)"><svg width="30" height="30"><use href="#s-cake"/></svg></div><div class="s">میری عمر چھ سال ہے۔</div></div>
+        <div class="scard"><div class="top" style="background:var(--grape-soft)"><svg width="32" height="32"><use href="#s-family"/></svg></div><div class="s">میرا خاندان کھیلنا پسند کرتا ہے۔</div></div>
+        <div class="scard"><div class="top" style="background:var(--coral-soft)"><svg width="30" height="30"><use href="#s-apple"/></svg></div><div class="s">مجھے سیب کھانا پسند ہے۔</div></div>
+        <div class="scard"><div class="top" style="background:var(--mint-soft)"><svg width="32" height="32"><use href="#s-school"/></svg></div><div class="s">میرے اسکول میں ایک بڑا پارک ہے۔</div></div>
+      </div>
+      <div class="subh" style="margin-top:14px">🪜 درجہ بندی</div>
+      <div class="two">
+        <div class="diff s"><div class="subh">🐣 کمزور طلبہ کے لیے</div><p>بورڈ پر جملے کا آغاز لکھ دیں: ”میرا نام ______۔“ · ”مجھے ______ پسند ہے۔“</p></div>
+        <div class="diff a"><div class="subh">🚀 ہونہار طلبہ کے لیے</div><p>انہیں چیلنج دیں کہ ایک جملے میں دو ہدف الفاظ استعمال کریں: ”میرے خاندان کو میرا اسکول پسند ہے۔“</p></div>
+      </div>
+    </div></div>
+
+  <div class="sec c6"><div class="sec-head"><div class="sec-num">6</div><div class="sec-title">🏁 اختتام</div><div class="time">۳ منٹ</div></div>
+    <div class="panel">
+      <div class="subh">👍👎 جانچ — تھمز اپ / تھمز ڈاؤن</div>
+      <div class="afl-note">ہر جملہ سنیں۔ اگر ہدف لفظ درست استعمال ہوا ہو تو تھمز اپ، اگر غلط ہو تو تھمز ڈاؤن!</div>
+      <div class="grow down"><div class="t">میں ناشتے میں اپنا نام کھاتا ہوں۔</div><div class="vb d"><svg width="20" height="20"><use href="#s-down"/></svg></div></div>
+      <div class="grow up"><div class="t">میرا خاندان میرے گھر میں رہتا ہے۔</div><div class="vb u"><svg width="20" height="20"><use href="#s-up"/></svg></div></div>
+      <div class="grow down"><div class="t">میں عمر سال کا ہوں۔</div><div class="vb d"><svg width="20" height="20"><use href="#s-down"/></svg></div></div>
+      <div class="grow up"><div class="t">مجھے کھیل کھیلنا پسند ہے۔</div><div class="vb u"><svg width="20" height="20"><use href="#s-up"/></svg></div></div>
+      <div class="grow down"><div class="t">میں رات کو اپنے اسکول میں سوتا ہوں۔</div><div class="vb d"><svg width="20" height="20"><use href="#s-down"/></svg></div></div>
+      <div class="exit"><div class="pic" style="flex:0 0 auto;width:54px;height:54px;border-radius:14px;background:var(--sky-soft);display:flex;align-items:center;justify-content:center"><svg width="34" height="34"><use href="#s-board"/></svg></div>
+        <div><div class="subh">🎟️ اخراجی ٹکٹ</div><p>۲–۳ طلبہ سے اُن کا پسندیدہ اپنا جملہ کلاس کے سامنے بلند آواز میں پڑھوائیں۔</p></div></div>
+    </div>
+    <div class="closing">
+      <svg width="56" height="56" viewBox="0 0 64 64" style="flex:0 0 auto"><path d="M32 4l8 18 20 2-15 13 5 20-18-11-18 11 5-20L4 24l20-2z" fill="#ffcf33" stroke="#f0a500" stroke-width="3"/></svg>
+      <div><h4>🏠 اختتام اور ہوم ورک</h4><p>اپنے خاندان کی تصویر بنائیں اور ہمارے فارمولے سے اُن کے بارے میں ایک جملہ لکھیں۔ آج آپ سب نے بہت محنت کی — شاباش، بچو!</p></div>
+    </div></div>
+
+  <div class="sig">Lesson Plan 113087 (ur) · hand-written HTML + CSS + hand-drawn SVG — no template, no benchmark, no AI image model</div>
+</div>
+</body></html>
