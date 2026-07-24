@@ -44,7 +44,9 @@ async function htmlToPdf(html, options = {}) {
   try {
     await page.setContent(html, { waitUntil: 'networkidle', timeout });
     await page.evaluate(async () => { await document.fonts.ready; });
-    const buf = await page.pdf({ ...DEFAULT_PDF, ...pdfOptions });
+    const merged = { ...DEFAULT_PDF, ...pdfOptions,
+      margin: { ...DEFAULT_PDF.margin, ...(pdfOptions.margin || {}) } };
+    const buf = await page.pdf(merged);
     return buf;
   } finally {
     await page.close();

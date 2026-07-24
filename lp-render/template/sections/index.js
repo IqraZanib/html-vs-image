@@ -4,9 +4,10 @@ const { icon } = require('../icons');
 const { SECTION_ACCENT } = require('../tokens');
 
 // Shared coloured-header wrapper every renderer uses.
-function sectionShell(section, iconName, innerHtml) {
+function sectionShell(section, iconName, innerHtml, ctx) {
   const accent = SECTION_ACCENT[section.type] || '--ink';
-  const title = esc(section.title || defaultTitle(section.type));
+  const localizedTitle = ctx && ctx.labels ? ctx.labels.titles[section.type] : undefined;
+  const title = esc(section.title || localizedTitle || defaultTitle(section.type));
   const time = section.time ? `<span class="time">${esc(section.time)}</span>` : '';
   return `<section class="section"><div class="sec-head">` +
     `<div class="sec-disc" style="background:var(${accent})">${icon(iconName, 22)}</div>` +

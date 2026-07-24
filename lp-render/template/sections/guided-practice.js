@@ -3,9 +3,10 @@ const { esc } = require('../shell');
 const { icon, hasIcon } = require('../icons');
 const { sectionShell } = require('./index');
 
-module.exports = function guidedPractice(section, _ctx) {
+module.exports = function guidedPractice(section, ctx) {
+  const L = (ctx && ctx.labels) || require('../labels').resolveLabels('en');
   const task = section.task ? `<p class="lead">${esc(section.task)}</p>` : '';
-  const note = section.note ? `<div class="note"><div class="nt">Teacher note</div><p>${esc(section.note)}</p></div>` : '';
+  const note = section.note ? `<div class="note"><div class="nt">${esc(L.teacherNote)}</div><p>${esc(section.note)}</p></div>` : '';
   const samples = (section.samples || []).length
     ? `<div class="grid5" style="margin-top:12px">` + section.samples.map((s) => {
         const top = s.icon && hasIcon(s.icon) ? `<div class="top">${icon(s.icon, 30)}</div>` : '<div class="top"></div>';
@@ -14,8 +15,8 @@ module.exports = function guidedPractice(section, _ctx) {
   const d = section.differentiation || {};
   const diff = (d.struggling || d.advanced)
     ? `<div class="two" style="margin-top:12px">` +
-      (d.struggling ? `<div class="diff s"><div class="subh">For struggling students</div><p>${esc(d.struggling)}</p></div>` : '') +
-      (d.advanced ? `<div class="diff a"><div class="subh">For advanced students</div><p>${esc(d.advanced)}</p></div>` : '') +
+      (d.struggling ? `<div class="diff s"><div class="subh">${esc(L.struggling)}</div><p>${esc(d.struggling)}</p></div>` : '') +
+      (d.advanced ? `<div class="diff a"><div class="subh">${esc(L.advanced)}</div><p>${esc(d.advanced)}</p></div>` : '') +
       `</div>` : '';
-  return sectionShell(section, 'pencil', `<div class="panel">${task}${note}${samples}${diff}</div>`);
+  return sectionShell(section, 'pencil', `<div class="panel">${task}${note}${samples}${diff}</div>`, ctx);
 };

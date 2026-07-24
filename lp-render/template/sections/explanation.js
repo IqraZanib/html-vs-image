@@ -17,7 +17,7 @@ function formula(f) {
   const bits = [];
   f.parts.forEach((p, i) => {
     if (i > 0) bits.push('<div class="plus">+</div>');
-    bits.push(`<div class="fb"><div class="l">${esc(p.label)}</div><div class="v">${esc(p.value)}</div></div>`);
+    bits.push(`<div class="fb"><div class="l">${esc(p.label || '')}</div><div class="v">${esc(p.value || '')}</div></div>`);
   });
   return `<div class="formula">${bits.join('')}</div>`;
 }
@@ -28,16 +28,17 @@ function steps(list) {
   ).join('');
 }
 
-function cfu(list) {
+function cfu(list, L) {
   if (!list || !list.length) return '';
   const cards = list.map((c) =>
     `<div class="qa"><div class="q">${esc(c.q)}</div><div class="a">${esc(c.a)}</div></div>`
   ).join('');
-  return `<div class="subh" style="margin-top:14px">Check for understanding</div><div class="qa3">${cards}</div>`;
+  return `<div class="subh" style="margin-top:14px">${esc(L.cfu)}</div><div class="qa3">${cards}</div>`;
 }
 
-module.exports = function explanation(section, _ctx) {
+module.exports = function explanation(section, ctx) {
+  const L = (ctx && ctx.labels) || require('../labels').resolveLabels('en');
   const inner = `<div class="panel">${wordWall(section.wordWall)}${formula(section.formula)}` +
-    `${steps(section.steps)}${cfu(section.cfu)}</div>`;
-  return sectionShell(section, 'lightbulb', inner);
+    `${steps(section.steps)}${cfu(section.cfu, L)}</div>`;
+  return sectionShell(section, 'lightbulb', inner, ctx);
 };
