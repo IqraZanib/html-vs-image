@@ -22,16 +22,26 @@ function fontFaceCss() {
   if (_cache) return _cache;
   const faces = [];
   for (const { family, pkg, script } of FAMILIES) {
+    let produced = 0;
     for (const weight of WEIGHTS) {
       const file = resolveFont(pkg, new RegExp(`${script}-${weight}-normal\\.woff2$`));
-      if (!file) continue;
+      if (!file) continue; // a specific weight may legitimately be absent
       const b64 = fs.readFileSync(file).toString('base64');
       faces.push(
         `@font-face{font-family:'${family}';font-weight:${weight};font-display:swap;` +
         `src:url(data:font/woff2;base64,${b64}) format('woff2');}`
       );
+      produced += 1;
+    }
+    if (produced === 0) {
+      throw new Error(
+        `lp-render fonts: no woff2 found for "${family}" in ${pkg}/files ` +
+        `(looked for /${script}-(${WEIGHTS.join('|')})-normal\\.woff2/). Is the @fontsource package installed?`
+      );
     }
   }
+  // Cached process-wide for the tool's lifetime (fonts are static assets;
+  // repeated calls reuse the same base64 without re-reading disk).
   _cache = faces.join('\n');
   return _cache;
 }
