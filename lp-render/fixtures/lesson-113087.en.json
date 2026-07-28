@@ -1,0 +1,52 @@
+{
+  "meta": { "id": "113087", "subject": "English", "grade": "One", "locale": "en",
+    "title": "Descriptive Sentences", "subtitle": "Writing with target words",
+    "durationMin": 40, "classSize": 23, "type": "Comprehension (Word Meanings)" },
+  "sections": [
+    { "type": "objectives", "time": "2 min",
+      "items": [ { "text": "Students will use 5 target words (name, age, family, like, school) in descriptive sentences.", "tag": "Apply" } ] },
+    { "type": "materials",
+      "resources": ["Whiteboard and markers", "Flashcards of the 5 target words with simple icons"],
+      "targetWords": ["name", "age", "family", "like", "school"],
+      "note": { "title": "Teacher note - gestures", "body": "Point to yourself for name, hold up fingers for age, hug your arms for family, thumbs up for like, make a roof over your head for school." } },
+    { "type": "introduction", "time": "5 min", "greeting": "Good morning, class! Today we learn some powerful new words.",
+      "stories": [
+        { "label": "A short story", "text": "A little girl named Pinky went to a big building to read and write. Where was she? At school!", "icon": "school" },
+        { "text": "Zainab lives with her mother, father and baby brother. What do we call them? Family!", "icon": "family" } ] },
+    { "type": "explanation", "time": "15 min",
+      "wordWall": [
+        { "word": "name", "meaning": "what people call you", "icon": "nametag" },
+        { "word": "age", "meaning": "how many years old you are", "icon": "cake" },
+        { "word": "family", "meaning": "the people you live with", "icon": "family" },
+        { "word": "like", "meaning": "something that makes you happy", "icon": "heart" },
+        { "word": "school", "meaning": "the place where you go to learn", "icon": "school" } ],
+      "formula": { "parts": [ { "label": "WHO/WHAT", "value": "Who / What" }, { "label": "ACTION", "value": "Action" }, { "label": "DESCRIPTION", "value": "Description" } ] },
+      "steps": [
+        { "label": "Teacher Model", "body": "I like to paint nice pictures. Who? I. Action? like. Description? to paint nice pictures." },
+        { "label": "Shared Practice", "body": "Bilal goes to a big school. Who? Bilal. Action? goes to. Description? a big school." } ],
+      "cfu": [
+        { "q": "Which word means the people you live with?", "a": "Family" },
+        { "q": "\"I am six years old.\" Which word is this?", "a": "Age" },
+        { "q": "In the formula, what comes after Who/What?", "a": "Action" } ] },
+    { "type": "guided_practice", "time": "15 min",
+      "task": "All students write original sentences for all 5 target words using Who/What + Action + Description.",
+      "note": "Work in pairs (brainstorming) or individually (focused writing) based on your class.",
+      "samples": [
+        { "text": "My name is Ali.", "icon": "nametag" },
+        { "text": "My age is six.", "icon": "cake" },
+        { "text": "My family loves to play.", "icon": "family" },
+        { "text": "I like to eat apples.", "icon": "apple" },
+        { "text": "My school has a big park.", "icon": "school" } ],
+      "differentiation": { "struggling": "Provide sentence starters: \"My name ____.\" \"I like ____.\"", "advanced": "Use two target words in one sentence: \"My family likes my school.\"" } },
+    { "type": "assessment", "time": "3 min",
+      "afl": { "instruction": "Thumbs up if the target word is used correctly, thumbs down if wrong.",
+        "items": [
+          { "text": "I eat my name for breakfast.", "verdict": "down" },
+          { "text": "My family lives in my house.", "verdict": "up" },
+          { "text": "I am age years old.", "verdict": "down" },
+          { "text": "I like to play games.", "verdict": "up" },
+          { "text": "I sleep in my school at night.", "verdict": "down" } ] },
+      "exitTicket": "Have 2-3 students read their favourite sentence aloud.",
+      "homework": "Draw your family and write one sentence about them using the formula." }
+  ]
+}

@@ -1,22 +1,15 @@
 {
-  "name": "html-vs-image",
+  "name": "lp-render",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "lp-render/index.js",
   "scripts": {
-    "test": "node --test",
-    "render": "node render.js",
-    "benchmark": "node scripts/run-benchmark.js"
+    "test": "node --test lp-render/test/",
+    "test:smoke": "node --test lp-render/test/render.smoke.test.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.111.0",
     "@fontsource/noto-naskh-arabic": "^5.2.11",
     "@fontsource/noto-nastaliq-urdu": "^5.2.8",
     "@fontsource/noto-sans": "^5.2.10",
-    "express": "^5.2.1",
-    "puppeteer": "^24.43.1"
+    "playwright-core": "^1.48.0"
   }
 }

@@ -1,0 +1,21 @@
+{
+  "meta": { "id": "113087", "subject": "انگریزی", "grade": "اول", "locale": "ur",
+    "title": "میرے بولنے والے الفاظ", "subtitle": "پانچ خاص الفاظ سے اپنے بارے میں بتائیں",
+    "durationMin": 40, "classSize": 23, "type": "فہم — الفاظ کے معنی" },
+  "sections": [
+    { "type": "objectives", "time": "۲ منٹ",
+      "items": [ { "text": "طلبہ ۵ ہدف الفاظ (نام، عمر، خاندان، پسند، اسکول) کو وضاحتی جملوں میں استعمال کر سکیں گے۔", "tag": "اطلاق" } ] },
+    { "type": "materials",
+      "resources": ["وائٹ بورڈ اور مارکر", "۵ ہدف الفاظ کے فلیش کارڈ"],
+      "targetWords": ["نام", "عمر", "خاندان", "پسند", "اسکول"],
+      "note": { "title": "اُستاد کے لیے نوٹ", "body": "اشاروں سے معنی سمجھائیں۔" } },
+    { "type": "explanation", "time": "۱۵ منٹ",
+      "wordWall": [
+        { "word": "نام", "meaning": "جس نام سے لوگ آپ کو پکارتے ہیں", "icon": "nametag" },
+        { "word": "عمر", "meaning": "آپ کتنے سال کے ہیں", "icon": "cake" },
+        { "word": "خاندان", "meaning": "جن کے ساتھ آپ رہتے ہیں", "icon": "family" },
+        { "word": "پسند", "meaning": "جو چیز آپ کو خوش کرتی ہے", "icon": "heart" },
+        { "word": "اسکول", "meaning": "جہاں آپ سیکھنے جاتے ہیں", "icon": "school" } ],
+      "formula": { "parts": [ { "label": "WHO", "value": "کون / کیا" }, { "label": "ACTION", "value": "عمل" }, { "label": "DESC", "value": "تفصیل" } ] } }
+  ]
+}
