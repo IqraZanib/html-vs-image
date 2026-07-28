@@ -7,7 +7,9 @@ async function renderLessonPlanPdf(lesson, opts = {}) {
   const { ok, errors } = validateLesson(lesson);
   if (!ok) throw new Error(`Invalid lesson: ${errors.join('; ')}`);
   const html = buildLessonPlanHtml(lesson, opts);
-  return htmlToPdf(html, { pdfOptions: { format: 'A4', printBackground: true } });
+  // Default to content-fit so the PDF has no empty space; callers can pass
+  // pageMode: 'a4' for fixed A4 pages.
+  return htmlToPdf(html, { pageMode: opts.pageMode || 'fit', pdfOptions: { printBackground: true } });
 }
 
 module.exports = { renderLessonPlanPdf, buildLessonPlanHtml, validateLesson, htmlToPdf, closeBrowser };

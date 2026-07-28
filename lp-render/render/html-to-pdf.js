@@ -37,17 +37,37 @@ async function getBrowser() {
 const DEFAULT_PDF = { format: 'A4', printBackground: true,
   margin: { top: '0', right: '0', bottom: '0', left: '0' } };
 
+// A4 width at 96dpi, used for the content-fit layout width.
+const FIT_WIDTH_PX = 794;
+
+// pageMode:
+//   'a4'  (default) — fixed A4 pages; matches rumi's primitive exactly.
+//   'fit'           — one page sized to the content, so the PDF has NO empty
+//                     space anywhere (no fixed-page bottom gaps, no blank tail).
 async function htmlToPdf(html, options = {}) {
-  const { timeout = 30000, pdfOptions = {} } = options;
+  const { timeout = 30000, pdfOptions = {}, pageMode = 'a4' } = options;
   const browser = await getBrowser();
   const page = await browser.newPage();
   try {
+    if (pageMode === 'fit') {
+      await page.setViewportSize({ width: FIT_WIDTH_PX, height: 1123 });
+    }
     await page.setContent(html, { waitUntil: 'networkidle', timeout });
     await page.evaluate(async () => { await document.fonts.ready; });
+    if (pageMode === 'fit') {
+      const height = await page.evaluate(() => document.documentElement.scrollHeight);
+      return await page.pdf({
+        width: `${FIT_WIDTH_PX}px`,
+        height: `${height}px`,
+        printBackground: true,
+        margin: { top: '0', right: '0', bottom: '0', left: '0' },
+        pageRanges: '1',
+        ...pdfOptions,
+      });
+    }
     const merged = { ...DEFAULT_PDF, ...pdfOptions,
       margin: { ...DEFAULT_PDF.margin, ...(pdfOptions.margin || {}) } };
-    const buf = await page.pdf(merged);
-    return buf;
+    return await page.pdf(merged);
   } finally {
     await page.close();
   }

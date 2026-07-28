@@ -1,0 +1,6 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="100,70 130,180 70,180" fill="#FF8C00"/>
+  <line x1="90" y1="100" x2="100" y2="130" stroke="#CC6600" stroke-width="2"/>
+  <line x1="110" y1="100" x2="100" y2="130" stroke="#CC6600" stroke-width="2"/>
+  <path d="M100,70 Q80,50 90,30 Q100,45 100,60 Q100,45 110,30 Q120,50 100,70 Z" fill="#4CAF50"/>
+</svg>

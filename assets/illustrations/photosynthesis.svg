@@ -1,0 +1,18 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="150" cy="35" r="18" fill="#FFD700"/>
+  <g stroke="#FFA500" stroke-width="3">
+    <line x1="150" y1="10" x2="150" y2="2"/>
+    <line x1="170" y1="20" x2="178" y2="12"/>
+  </g>
+  <line x1="140" y1="45" x2="105" y2="80" stroke="#FFA000" stroke-width="2" stroke-dasharray="4,3"/>
+  <rect x="95" y="150" width="10" height="35" fill="#795548"/>
+  <circle cx="100" cy="120" r="45" fill="#4CAF50"/>
+  <path d="M60,175 Q80,150 100,150 Q60,150 40,165 Q45,180 60,175 Z" fill="#2E7D32"/>
+  <path d="M140,175 Q120,150 100,150 Q140,150 160,165 Q155,180 140,175 Z" fill="#2E7D32"/>
+  <line x1="50" y1="100" x2="20" y2="90" stroke="#03A9F4" stroke-width="2"/>
+  <text x="10" y="85" font-size="10" fill="#0288D1">CO2</text>
+  <line x1="150" y1="120" x2="180" y2="130" stroke="#8BC34A" stroke-width="2"/>
+  <text x="165" y="145" font-size="10" fill="#558B2F">O2</text>
+  <line x1="100" y1="185" x2="100" y2="195" stroke="#2196F3" stroke-width="3"/>
+  <text x="85" y="197" font-size="9" fill="#1565C0">water</text>
+</svg>
