@@ -1,0 +1,7 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect x="20" y="35" width="160" height="105" rx="4" fill="#2E7D32" stroke="#5D4037" stroke-width="8"/>
+  <text x="45" y="95" font-size="26" fill="#FFFFFF" font-family="Comic Sans MS, cursive">ABC</text>
+  <rect x="70" y="150" width="60" height="8" fill="#8D6E63"/>
+  <line x1="60" y1="140" x2="30" y2="185" stroke="#5D4037" stroke-width="6"/>
+  <line x1="140" y1="140" x2="170" y2="185" stroke="#5D4037" stroke-width="6"/>
+</svg>
