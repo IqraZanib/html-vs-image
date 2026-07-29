@@ -24,15 +24,27 @@ const BODY = {
   thumbdown: `<path d="M44 36h-6V8h6z" fill="#fff"/><path d="M36 36l-4 14a4 4 0 0 1-8 0l2-12H12a5 5 0 0 1-5-6l4-18a6 6 0 0 1 6-5h19z" fill="#fff"/>`,
 };
 
-const ICON_NAMES = Object.keys(BODY);
+// Larger illustration set generated from assets/illustrations/*.svg. Each entry
+// is { vb: viewBox, body: inner markup }; names here never shadow BODY (the
+// generator skips any name already defined above).
+const EXTRA = require('./icons-extra');
+
+const ICON_NAMES = [...Object.keys(BODY), ...Object.keys(EXTRA)];
 
 function hasIcon(name) {
-  return Object.prototype.hasOwnProperty.call(BODY, name);
+  return Object.prototype.hasOwnProperty.call(BODY, name)
+    || Object.prototype.hasOwnProperty.call(EXTRA, name);
 }
 
 function icon(name, size = 24) {
-  if (!hasIcon(name)) return '';
-  return `<svg width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true">${BODY[name]}</svg>`;
+  if (Object.prototype.hasOwnProperty.call(BODY, name)) {
+    return `<svg width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true">${BODY[name]}</svg>`;
+  }
+  if (Object.prototype.hasOwnProperty.call(EXTRA, name)) {
+    const e = EXTRA[name];
+    return `<svg width="${size}" height="${size}" viewBox="${e.vb}" aria-hidden="true">${e.body}</svg>`;
+  }
+  return '';
 }
 
 module.exports = { icon, hasIcon, ICON_NAMES };
