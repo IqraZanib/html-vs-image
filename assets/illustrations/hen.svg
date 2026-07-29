@@ -1,9 +1,32 @@
 <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <ellipse cx="100" cy="120" rx="45" ry="40" fill="#FFFFFF"/>
-  <circle cx="140" cy="80" r="25" fill="#FFFFFF"/>
-  <polygon points="160,78 175,82 160,88" fill="#FB8C00"/>
-  <path d="M132,58 Q140,45 148,58" fill="#E53935"/>
-  <circle cx="148" cy="75" r="3" fill="#222"/>
-  <polygon points="90,150 100,175 110,150" fill="#FB8C00"/>
-  <polygon points="60,145 65,60 90,120" fill="#FDD835"/>
+  <!-- body -->
+  <ellipse cx="100" cy="125" rx="48" ry="40" fill="#FFFFFF" stroke="#3E2723" stroke-width="3"/>
+  <!-- tail feathers -->
+  <path d="M55,105 Q30,85 35,55 Q50,75 65,95 Z" fill="#FFFFFF" stroke="#3E2723" stroke-width="3"/>
+  <path d="M60,120 Q40,110 35,90 Q55,95 68,110 Z" fill="#FFFFFF" stroke="#3E2723" stroke-width="3"/>
+  <!-- head -->
+  <circle cx="148" cy="85" r="26" fill="#FFFFFF" stroke="#3E2723" stroke-width="3"/>
+  <!-- comb -->
+  <path d="M132,62 Q135,50 142,58 Q145,48 150,58 Q155,48 160,60" fill="#E53935" stroke="#B71C1C" stroke-width="1.5"/>
+  <!-- wattle -->
+  <path d="M140,100 Q138,112 148,112 Q150,104 145,98 Z" fill="#E53935"/>
+  <!-- beak -->
+  <polygon points="172,85 190,90 172,95" fill="#FB8C00" stroke="#E65100" stroke-width="1.5"/>
+  <!-- eye -->
+  <circle cx="152" cy="80" r="4" fill="#212121"/>
+  <!-- legs -->
+  <g stroke="#FB8C00" stroke-width="5" stroke-linecap="round">
+    <line x1="90" y1="163" x2="88" y2="188"/>
+    <line x1="120" y1="163" x2="122" y2="188"/>
+  </g>
+  <g stroke="#FB8C00" stroke-width="3" stroke-linecap="round">
+    <line x1="88" y1="188" x2="78" y2="192"/>
+    <line x1="88" y1="188" x2="88" y2="195"/>
+    <line x1="88" y1="188" x2="98" y2="192"/>
+    <line x1="122" y1="188" x2="112" y2="192"/>
+    <line x1="122" y1="188" x2="122" y2="195"/>
+    <line x1="122" y1="188" x2="132" y2="192"/>
+  </g>
+  <!-- wing -->
+  <path d="M85,110 Q110,120 95,150 Q75,140 78,115 Z" fill="#EEEEEE" stroke="#3E2723" stroke-width="2"/>
 </svg>
