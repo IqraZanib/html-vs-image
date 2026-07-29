@@ -26,9 +26,14 @@ differentiation, generic`. See `fixtures/lesson-113087.en.json` for a full examp
   (`sd`) render right-to-left; `sd`/`ar` UI chrome labels are machine-provided — have a native
   speaker review them before using those locales in production.
 - **Icons — library only, never irrelevant:** every illustration comes from the built-in SVG
-  icon library. If a topic or list item has **no matching icon in the library, none is added**
-  (`icon()` returns `''` and each renderer guards with `hasIcon()`), so a wrong/irrelevant icon
-  is never inserted. Section-type icons (objectives, materials, …) are always present.
+  icon library (~95 icons: 18 tuned inline UI icons + a generated illustration set covering
+  animals, fruits, vegetables, people/community helpers, transport, weather, shapes, household
+  items, and science diagrams). A lesson references one by name via an `icon` field. If a topic
+  or list item has **no matching icon, none is added** (`icon()` returns `''` and each renderer
+  guards with `hasIcon()`), so a wrong/irrelevant icon is never inserted. Section-type icons
+  (objectives, materials, …) are always present. The illustration set is generated from
+  `assets/illustrations/*.svg` into `template/icons-extra.js` via `node scripts/gen-icons-extra.js`
+  — add an SVG there and regenerate to extend the library.
 - **No empty space:** `renderLessonPlanPdf` defaults to `pageMode: 'fit'` — a **single page sized
   to the content**, so the PDF has **no blank space anywhere** (no fixed-page bottom gaps, no
   empty tail). Pass `{ pageMode: 'a4' }` for fixed A4 pages instead.
