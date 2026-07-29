@@ -16,8 +16,8 @@ const { ok, errors } = validateLesson(lesson);
 
 Input schema: `{ meta: { id, subject, grade, locale, title, subtitle?, durationMin?, classSize?, type? },
 sections: [ { type, title?, time?, ...typed } ] }`. Section types: `objectives, materials,
-introduction, explore, explanation, guided_practice, assessment, differentiation, generic`.
-See `fixtures/lesson-113087.en.json` for a full example.
+introduction, explore, explanation, picture_equation, guided_practice, assessment,
+differentiation, generic`. See `fixtures/lesson-113087.en.json` for a full example.
 
 ## Generation policy
 
@@ -32,6 +32,17 @@ See `fixtures/lesson-113087.en.json` for a full example.
 - **No empty space:** `renderLessonPlanPdf` defaults to `pageMode: 'fit'` — a **single page sized
   to the content**, so the PDF has **no blank space anywhere** (no fixed-page bottom gaps, no
   empty tail). Pass `{ pageMode: 'a4' }` for fixed A4 pages instead.
+- **Maths LPs — show equations as counted objects:** for any Mathematics lesson (addition,
+  subtraction, counting, …) use a **`picture_equation`** section so the operation is drawn with
+  **repeated icons**, not just text — e.g. `5 🍎 − 2 = 3` renders five apples, a minus sign, two
+  apples, `=`, three apples, with the number sentence beneath. Use a countable item icon from the
+  library (`apple`, `star`) and set `op` to `"-"` (default) or `"+"`. This concrete visual is far
+  clearer for early grades than the text `5 − 2 = 3` alone.
+  ```jsonc
+  { "type": "picture_equation", "title": "See It — Take Away",
+    "equations": [ { "icon": "apple", "a": 5, "op": "-", "b": 2, "result": 3 } ] }
+  ```
+  (Counts are capped at 20 per group to keep the row readable.)
 
 ## Test
 
