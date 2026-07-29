@@ -49,6 +49,21 @@ differentiation, generic`. See `fixtures/lesson-113087.en.json` for a full examp
   ```
   (Counts are capped at 20 per group to keep the row readable.)
 
+## Generate a PDF (CLI)
+
+```bash
+node scripts/render-lesson.js <lesson.json> [--locale=en|ur|sd|ar] [--a4] [--out=path.pdf]
+# or: npm run render -- <lesson.json> [flags]
+
+# examples
+node scripts/render-lesson.js lp-render/fixtures/lesson-113087.en.json
+node scripts/render-lesson.js my-lesson.json --locale=ur --out=out/urdu.pdf
+node scripts/render-lesson.js my-lesson.json --a4          # fixed A4 pages (default is content-fit)
+```
+
+Defaults: `locale` from `meta.locale`, output next to the input as `<name>.<locale>.pdf`,
+content-fit page (no blank space). Programmatic use is the `renderLessonPlanPdf` API below.
+
 ## Test
 
 ```bash

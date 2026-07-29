@@ -4,7 +4,8 @@
   "main": "lp-render/index.js",
   "scripts": {
     "test": "node --test lp-render/test/",
-    "test:smoke": "node --test lp-render/test/render.smoke.test.js"
+    "test:smoke": "node --test lp-render/test/render.smoke.test.js",
+    "render": "node scripts/render-lesson.js"
   },
   "dependencies": {
     "@fontsource/noto-naskh-arabic": "^5.2.11",
