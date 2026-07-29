@@ -1,4 +1,11 @@
 <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <rect x="30" y="90" width="140" height="35" rx="17" fill="#7CB342" transform="rotate(-8 100 107)"/>
-  <line x1="45" y1="95" x2="155" y2="120" stroke="#558B2F" stroke-width="2"/>
+  <rect x="25" y="90" width="150" height="38" rx="19" fill="#7CB342" stroke="#33691E" stroke-width="3" transform="rotate(-6 100 109)"/>
+  <g stroke="#33691E" stroke-width="2" transform="rotate(-6 100 109)">
+    <line x1="45" y1="95" x2="42" y2="123"/>
+    <line x1="70" y1="93" x2="67" y2="125"/>
+    <line x1="95" y1="92" x2="93" y2="126"/>
+    <line x1="120" y1="93" x2="118" y2="125"/>
+    <line x1="145" y1="95" x2="143" y2="123"/>
+  </g>
+  <ellipse cx="30" cy="107" rx="7" ry="17" fill="#AED581" stroke="#33691E" stroke-width="2" transform="rotate(-6 100 109)"/>
 </svg>

@@ -1,5 +1,6 @@
 <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <path d="M45,110 Q100,60 155,110 Z" fill="#EF5350"/>
-  <ellipse cx="100" cy="112" rx="55" ry="10" fill="#E53935"/>
-  <path d="M140,105 Q175,105 180,120 Q160,125 140,115 Z" fill="#EF5350"/>
+  <path d="M40,115 Q100,55 160,115 Q160,120 155,122 L45,122 Q40,120 40,115 Z" fill="#EF5350" stroke="#B71C1C" stroke-width="3"/>
+  <path d="M60,118 Q100,90 140,118" stroke="#B71C1C" stroke-width="2" fill="none"/>
+  <path d="M148,116 Q188,112 195,128 Q188,135 150,128 Z" fill="#EF5350" stroke="#B71C1C" stroke-width="3"/>
+  <circle cx="100" cy="65" r="5" fill="#B71C1C"/>
 </svg>

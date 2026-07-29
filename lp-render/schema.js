@@ -2,7 +2,7 @@
 
 const SECTION_TYPES = [
   'objectives', 'materials', 'introduction', 'explore',
-  'explanation', 'guided_practice', 'assessment', 'differentiation', 'generic',
+  'explanation', 'picture_equation', 'guided_practice', 'assessment', 'differentiation', 'generic',
 ];
 
 const LOCALES = ['en', 'ur', 'sd', 'ar'];
