@@ -76,6 +76,14 @@ b{font-weight:700;color:var(--coral)}
 .eq-group{display:inline-flex;gap:4px;flex-wrap:wrap;align-items:center;justify-content:center}
 .eq-op{font-size:32px;font-weight:900;color:var(--coral);line-height:1}
 .eq-cap{text-align:center;font-size:20px;font-weight:800;color:var(--ink);margin-top:8px;font-variant-numeric:tabular-nums}
+.pcards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.pcard{background:#fff;border:2px solid var(--sky-bd);border-radius:16px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.pcard img{width:100%;height:140px;object-fit:cover;display:block}
+.pcard.icon{border-color:var(--sun-bd)}
+.pcard .pc-ic{display:flex;justify-content:center;align-items:center;height:140px;background:var(--sun-soft)}
+.pc-cap{padding:9px 12px;text-align:center}
+.pc-lab{font-size:19px;font-weight:800;color:var(--ink)}
+.pc-note{font-size:12px;color:var(--ink-soft);font-weight:700;margin-top:2px}
 `;
 
 function buildShell({ headerHtml = '', bodyHtml = '', locale = 'en', title = '' } = {}) {

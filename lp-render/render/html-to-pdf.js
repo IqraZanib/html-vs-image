@@ -55,13 +55,14 @@ async function htmlToPdf(html, options = {}) {
     await page.setContent(html, { waitUntil: 'networkidle', timeout });
     await page.evaluate(async () => { await document.fonts.ready; });
     if (pageMode === 'fit') {
-      const height = await page.evaluate(() => document.documentElement.scrollHeight);
+      const height = Math.ceil(await page.evaluate(() => document.documentElement.scrollHeight));
+      // Override the shell's `@page{size:A4}` with a single content-sized page so
+      // Chromium does NOT paginate at A4 boundaries (which clipped tall lessons).
+      await page.addStyleTag({ content: `@page{size:${FIT_WIDTH_PX}px ${height}px;margin:0}` });
       return await page.pdf({
-        width: `${FIT_WIDTH_PX}px`,
-        height: `${height}px`,
+        preferCSSPageSize: true,
         printBackground: true,
         margin: { top: '0', right: '0', bottom: '0', left: '0' },
-        pageRanges: '1',
         ...pdfOptions,
       });
     }

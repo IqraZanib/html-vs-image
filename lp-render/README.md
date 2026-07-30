@@ -16,15 +16,59 @@ const { ok, errors } = validateLesson(lesson);
 
 Input schema: `{ meta: { id, subject, grade, locale, title, subtitle?, durationMin?, classSize?, type? },
 sections: [ { type, title?, time?, ...typed } ] }`. Section types: `objectives, materials,
-introduction, explore, explanation, picture_equation, guided_practice, assessment,
+introduction, explore, explanation, picture_equation, picture_cards, guided_practice, assessment,
 differentiation, generic`. See `fixtures/lesson-113087.en.json` for a full example.
+
+## Dynamic images (icons + Openverse photos)
+
+Resolve a lesson's image hints into inline SVG icons (library) or real Creative-Commons
+photos (Openverse) **before** rendering — a pre-render, network-only step. The renderer
+stays network-free.
+
+```js
+const { resolveImages, renderLessonPlanPdf } = require('./lp-render');
+
+const { lesson, report } = await resolveImages(contentJson, { source: 'wikimedia', cache: r2Cache });
+const pdf = await renderLessonPlanPdf(lesson);   // Buffer — no network
+```
+
+A `picture_cards` section carries the hints; each card resolves to an icon, a photo, or
+nothing (never an irrelevant filler):
+
+```jsonc
+{ "type": "picture_cards", "title": "Look and name",
+  "cards": [
+    { "query": "apple", "kind": "auto",  "label": "Apple" },   // library icon if it exists, else photo, else blank
+    { "query": "duck",  "kind": "photo", "label": "Duck" },    // force a real photo (falls back to icon → blank)
+    { "query": "sun",   "kind": "icon",  "label": "Sun" }      // library icon only, else blank
+  ] }
+```
+
+- **Source:** default `source: 'wikimedia'` (production). In this sandbox Wikimedia is
+  DNS-blocked, so dev/tests pass `source: 'flickr'` (same code path).
+- **Licensing:** only PD/CC0/CC-BY/CC-BY-SA accepted; attribution is embedded as a credits
+  footer and kept per-image for audit.
+- **Cache:** pass any `{ get, set }` cache via `opts.cache` (default: none; a filesystem and
+  in-memory cache ship in `images/cache.js`; rumi injects an R2-backed one).
+- **Offline-safe:** `resolveImages` never throws — a failed photo degrades to an icon, then
+  to blank. See `docs/image-sourcing-guidelines.md`.
 
 ## Generation policy
 
+Governed by **[../docs/image-sourcing-guidelines.md](../docs/image-sourcing-guidelines.md)**
+(v1). The rules below are the parts already enforced by this module.
+
+- **Relevance over decoration (§1):** an image is only inserted when it actually represents
+  the concept. There is no "fill the space" path — `icon()` returns `''` and renderers guard
+  with `hasIcon()`, so an irrelevant visual is never added; the slot stays empty instead.
 - **Locale / Palestine:** the module renders whatever `meta.locale` says. **For the Palestine
   deployment, generate lesson-plan PDFs in English** (`locale: 'en'`). Urdu (`ur`) and Sindhi
   (`sd`) render right-to-left; `sd`/`ar` UI chrome labels are machine-provided — have a native
   speaker review them before using those locales in production.
+- **Cultural sensitivity (§5):** where the lesson allows a choice, prefer culturally neutral /
+  regionally appropriate visuals and avoid distressing or contextually insensitive imagery —
+  simple, calm, unambiguous illustrations over complex realistic scenes. (Curation is manual
+  today; the icon library is deliberately simple line-art.)
 - **Icons — library only, never irrelevant:** every illustration comes from the built-in SVG
   icon library (~95 icons: 18 tuned inline UI icons + a generated illustration set covering
   animals, fruits, vegetables, people/community helpers, transport, weather, shapes, household
@@ -48,6 +92,21 @@ differentiation, generic`. See `fixtures/lesson-113087.en.json` for a full examp
     "equations": [ { "icon": "apple", "a": 5, "op": "-", "b": 2, "result": 3 } ] }
   ```
   (Counts are capped at 20 per group to keep the row readable.)
+
+## Generate a PDF (CLI)
+
+```bash
+node scripts/render-lesson.js <lesson.json> [--locale=en|ur|sd|ar] [--a4] [--out=path.pdf]
+# or: npm run render -- <lesson.json> [flags]
+
+# examples
+node scripts/render-lesson.js lp-render/fixtures/lesson-113087.en.json
+node scripts/render-lesson.js my-lesson.json --locale=ur --out=out/urdu.pdf
+node scripts/render-lesson.js my-lesson.json --a4          # fixed A4 pages (default is content-fit)
+```
+
+Defaults: `locale` from `meta.locale`, output next to the input as `<name>.<locale>.pdf`,
+content-fit page (no blank space). Programmatic use is the `renderLessonPlanPdf` API below.
 
 ## Test
 

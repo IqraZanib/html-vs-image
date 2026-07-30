@@ -1,0 +1,63 @@
+{
+  "meta": { "id": "wc-001", "subject": "Science", "grade": "Four", "locale": "en",
+    "title": "The Water Cycle", "subtitle": "How water travels around our world",
+    "durationMin": 40, "classSize": 28, "type": "Concept — Earth & Water" },
+  "sections": [
+    { "type": "objectives", "time": "2 min",
+      "items": [
+        { "text": "Students will name the five steps of the water cycle: evaporation, transpiration, condensation, precipitation, collection.", "tag": "Remember" },
+        { "text": "Students will explain that the sun's heat drives the whole cycle.", "tag": "Understand" },
+        { "text": "Students will trace water's journey on a simple diagram, in the correct order.", "tag": "Apply" }
+      ] },
+    { "type": "materials",
+      "resources": ["Water-cycle diagram on the board", "A clear glass jar, warm water, a small plate, and 3–4 ice cubes (mini demo)", "Five step cards: Evaporation · Transpiration · Condensation · Precipitation · Collection"],
+      "targetWords": ["evaporation", "transpiration", "condensation", "precipitation", "collection"],
+      "note": { "title": "Teacher note — gestures", "body": "Wiggle fingers upward for evaporation (rising vapour), flutter fingertips up from an open palm for transpiration (a leaf letting go of water), cup hands together for condensation (a cloud forming), flutter fingers downward for precipitation (rain), and rest both palms flat for collection (water gathering in rivers and seas)." } },
+    { "type": "introduction", "time": "5 min",
+      "greeting": "Good morning, class! Water never sits still — it is always on a journey. Let's find out where it goes.",
+      "stories": [
+        { "label": "Think", "text": "On a hot day Amir spills a little water on the ground. An hour later it is gone — the ground is dry! Where did the water go?", "icon": "sunny" },
+        { "label": "Our map for today", "text": "This picture shows water's journey: up from the sea as invisible vapour, into clouds, down as rain, and back to the rivers — again and again. Today we follow every step.", "icon": "water_cycle" }
+      ] },
+    { "type": "explanation", "time": "15 min",
+      "wordWall": [
+        { "word": "Evaporation", "meaning": "the sun heats water in seas and rivers; it turns into invisible vapour and rises", "icon": "sunny" },
+        { "word": "Transpiration", "meaning": "plants release water vapour into the air through their leaves", "icon": "tree" },
+        { "word": "Condensation", "meaning": "high in the cool sky the vapour turns back into tiny droplets that form clouds", "icon": "cloudy" },
+        { "word": "Precipitation", "meaning": "clouds grow heavy and the water falls as rain, snow or hail", "icon": "rainy" },
+        { "word": "Collection", "meaning": "the fallen water gathers in rivers, lakes and seas — ready to rise again", "icon": "water_cycle" }
+      ],
+      "steps": [
+        { "label": "Watch — mini demo", "body": "Pour warm water into the jar, rest the plate on top, and place ice cubes on the plate. Soon droplets form under the cool plate and 'rain' back down — evaporation, condensation and precipitation in one jar." },
+        { "label": "Trace the journey", "body": "On the diagram point in order: the sun heats the sea (evaporation) and plants breathe out vapour (transpiration) → vapour rises and cools into a cloud (condensation) → the cloud rains over the hills (precipitation) → water runs back to the river and sea (collection) → and the sun starts it all again." }
+      ],
+      "cfu": [
+        { "q": "What gives water the energy to rise into the sky?", "a": "The sun's heat (evaporation)." },
+        { "q": "How do plants add water to the air?", "a": "Through their leaves (transpiration)." },
+        { "q": "Name one form of precipitation.", "a": "Rain, snow or hail." }
+      ] },
+    { "type": "guided_practice", "time": "13 min",
+      "task": "In pairs, put the five step cards in the correct order and label a blank water-cycle diagram with arrows showing the direction of water's journey.",
+      "note": "Circulate and ask each pair to say the cycle aloud, pointing to each arrow.",
+      "samples": [
+        { "text": "1. Evaporation — the sun lifts water up.", "icon": "sunny" },
+        { "text": "2. Transpiration — plants breathe out vapour.", "icon": "tree" },
+        { "text": "3. Condensation — vapour makes clouds.", "icon": "cloudy" },
+        { "text": "4. Precipitation — rain falls down.", "icon": "rainy" },
+        { "text": "5. Collection — water gathers, then rises again.", "icon": "water_cycle" }
+      ],
+      "differentiation": { "struggling": "Give the five cards pre-labelled; students only place the arrows in order.", "advanced": "Add an extra arrow for runoff — water sliding off the land back into rivers before it collects." } },
+    { "type": "assessment", "time": "5 min",
+      "afl": { "instruction": "Thumbs up if the statement is true, thumbs down if it is wrong.",
+        "items": [
+          { "text": "The sun's heat makes water evaporate.", "verdict": "up" },
+          { "text": "Plants give off water vapour through their leaves.", "verdict": "up" },
+          { "text": "Clouds are made of smoke.", "verdict": "down" },
+          { "text": "Rain, snow and hail are all precipitation.", "verdict": "up" },
+          { "text": "Once water falls as rain, the cycle stops forever.", "verdict": "down" },
+          { "text": "Water collects in rivers and seas, then rises again.", "verdict": "up" }
+        ] },
+      "exitTicket": "Each student says the five steps in order to a partner before leaving.",
+      "homework": "Draw the water cycle at home. Label the five steps and draw arrows to show the direction water travels." }
+  ]
+}
