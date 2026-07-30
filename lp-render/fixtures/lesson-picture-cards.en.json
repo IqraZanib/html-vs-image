@@ -1,0 +1,16 @@
+{
+  "meta": { "id": "pc-001", "subject": "Science", "grade": "One", "locale": "en",
+    "title": "Things That Start With B", "subtitle": "Real photos + icons",
+    "durationMin": 30, "classSize": 24, "type": "Vocabulary" },
+  "sections": [
+    { "type": "objectives", "time": "2 min",
+      "items": [ { "text": "Students will name common objects and living things.", "tag": "Understand" } ] },
+    { "type": "picture_cards", "title": "Look and name", "time": "10 min",
+      "cards": [
+        { "query": "apple", "kind": "auto", "label": "Apple" },
+        { "query": "duck", "kind": "photo", "label": "Duck", "note": "a farm bird" },
+        { "query": "cow", "kind": "photo", "label": "Cow", "note": "gives us milk" },
+        { "query": "banana", "kind": "auto", "label": "Banana" }
+      ] }
+  ]
+}

@@ -19,6 +19,40 @@ sections: [ { type, title?, time?, ...typed } ] }`. Section types: `objectives, 
 introduction, explore, explanation, picture_equation, guided_practice, assessment,
 differentiation, generic`. See `fixtures/lesson-113087.en.json` for a full example.
 
+## Dynamic images (icons + Openverse photos)
+
+Resolve a lesson's image hints into inline SVG icons (library) or real Creative-Commons
+photos (Openverse) **before** rendering — a pre-render, network-only step. The renderer
+stays network-free.
+
+```js
+const { resolveImages, renderLessonPlanPdf } = require('./lp-render');
+
+const { lesson, report } = await resolveImages(contentJson, { source: 'wikimedia', cache: r2Cache });
+const pdf = await renderLessonPlanPdf(lesson);   // Buffer — no network
+```
+
+A `picture_cards` section carries the hints; each card resolves to an icon, a photo, or
+nothing (never an irrelevant filler):
+
+```jsonc
+{ "type": "picture_cards", "title": "Look and name",
+  "cards": [
+    { "query": "apple", "kind": "auto",  "label": "Apple" },   // library icon if it exists, else photo, else blank
+    { "query": "duck",  "kind": "photo", "label": "Duck" },    // force a real photo (falls back to icon → blank)
+    { "query": "sun",   "kind": "icon",  "label": "Sun" }      // library icon only, else blank
+  ] }
+```
+
+- **Source:** default `source: 'wikimedia'` (production). In this sandbox Wikimedia is
+  DNS-blocked, so dev/tests pass `source: 'flickr'` (same code path).
+- **Licensing:** only PD/CC0/CC-BY/CC-BY-SA accepted; attribution is embedded as a credits
+  footer and kept per-image for audit.
+- **Cache:** pass any `{ get, set }` cache via `opts.cache` (default: none; a filesystem and
+  in-memory cache ship in `images/cache.js`; rumi injects an R2-backed one).
+- **Offline-safe:** `resolveImages` never throws — a failed photo degrades to an icon, then
+  to blank. See `docs/image-sourcing-guidelines.md`.
+
 ## Generation policy
 
 Governed by **[../docs/image-sourcing-guidelines.md](../docs/image-sourcing-guidelines.md)**
