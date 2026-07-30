@@ -17,6 +17,7 @@ function sectionShell(section, iconName, innerHtml, ctx) {
 const DEFAULT_TITLES = {
   objectives: 'Objectives', materials: 'Resources & Support', introduction: 'Introduction',
   explore: 'Explore', explanation: 'Explanation & Teaching', picture_equation: 'See It — Picture Maths',
+  picture_cards: 'Pictures',
   guided_practice: 'Guided Practice',
   assessment: 'Assessment & Wrap-up', differentiation: 'Differentiation', generic: 'Section',
 };
@@ -34,6 +35,7 @@ const RENDERERS = {
   introduction: require('./introduction'),
   explanation: require('./explanation'),
   picture_equation: require('./picture-equation'),
+  picture_cards: require('./picture-cards'),
   guided_practice: require('./guided-practice'),
   assessment: require('./assessment'),
   differentiation: require('./differentiation'),

@@ -20,6 +20,7 @@ const SECTION_ACCENT = {
   explore: '--sky',
   explanation: '--grape',
   picture_equation: '--sky',
+  picture_cards: '--sky',
   guided_practice: '--mint',
   assessment: '--amber',
   differentiation: '--grape',
