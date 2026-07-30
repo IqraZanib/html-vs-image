@@ -21,10 +21,20 @@ differentiation, generic`. See `fixtures/lesson-113087.en.json` for a full examp
 
 ## Generation policy
 
+Governed by **[../docs/image-sourcing-guidelines.md](../docs/image-sourcing-guidelines.md)**
+(v1). The rules below are the parts already enforced by this module.
+
+- **Relevance over decoration (§1):** an image is only inserted when it actually represents
+  the concept. There is no "fill the space" path — `icon()` returns `''` and renderers guard
+  with `hasIcon()`, so an irrelevant visual is never added; the slot stays empty instead.
 - **Locale / Palestine:** the module renders whatever `meta.locale` says. **For the Palestine
   deployment, generate lesson-plan PDFs in English** (`locale: 'en'`). Urdu (`ur`) and Sindhi
   (`sd`) render right-to-left; `sd`/`ar` UI chrome labels are machine-provided — have a native
   speaker review them before using those locales in production.
+- **Cultural sensitivity (§5):** where the lesson allows a choice, prefer culturally neutral /
+  regionally appropriate visuals and avoid distressing or contextually insensitive imagery —
+  simple, calm, unambiguous illustrations over complex realistic scenes. (Curation is manual
+  today; the icon library is deliberately simple line-art.)
 - **Icons — library only, never irrelevant:** every illustration comes from the built-in SVG
   icon library (~95 icons: 18 tuned inline UI icons + a generated illustration set covering
   animals, fruits, vegetables, people/community helpers, transport, weather, shapes, household
