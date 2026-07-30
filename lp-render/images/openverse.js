@@ -1,17 +1,19 @@
 'use strict';
+const http = require('node:http');
 const https = require('node:https');
 const { isAllowedLicense } = require('./license');
 
 const API = 'https://api.openverse.org/v1/images/';
 
 // Default network fetch. Resolves { statusCode, body } where body is a string
-// unless binary:true (then a Buffer). Follows one level of redirects.
-function defaultFetch(url, { binary = false, timeout = 12000, userAgent = 'TaleemabadLP/1.0 (educational)' } = {}) {
+// unless binary:true (then a Buffer). Follows at most one level of redirects.
+function defaultFetch(url, { binary = false, timeout = 12000, userAgent = 'TaleemabadLP/1.0 (educational)', redirectsLeft = 1 } = {}) {
   return new Promise((resolve, reject) => {
-    const req = https.get(url, { headers: { 'User-Agent': userAgent } }, (r) => {
-      if (r.statusCode >= 300 && r.statusCode < 400 && r.headers.location) {
+    const transport = url.startsWith('https:') ? https : http;
+    const req = transport.get(url, { headers: { 'User-Agent': userAgent } }, (r) => {
+      if (r.statusCode >= 300 && r.statusCode < 400 && r.headers.location && redirectsLeft > 0) {
         r.resume();
-        return resolve(defaultFetch(r.headers.location, { binary, timeout, userAgent }));
+        return resolve(defaultFetch(r.headers.location, { binary, timeout, userAgent, redirectsLeft: redirectsLeft - 1 }));
       }
       const chunks = [];
       r.on('data', (d) => chunks.push(d));
