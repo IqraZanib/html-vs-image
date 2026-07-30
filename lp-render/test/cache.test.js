@@ -19,8 +19,12 @@ test('MemoryImageCache round-trips and misses to null', async () => {
 
 test('FsImageCache round-trips through disk and misses to null', async () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'lpcache-'));
-  const c = new FsImageCache(dir);
-  assert.strictEqual(await c.get('missing'), null);
-  await c.set('wikimedia:cc0:cow', { title: 'A cow', dataUri: 'data:...' });
-  assert.deepStrictEqual(await c.get('wikimedia:cc0:cow'), { title: 'A cow', dataUri: 'data:...' });
+  try {
+    const c = new FsImageCache(dir);
+    assert.strictEqual(await c.get('missing'), null);
+    await c.set('wikimedia:cc0:cow', { title: 'A cow', dataUri: 'data:...' });
+    assert.deepStrictEqual(await c.get('wikimedia:cc0:cow'), { title: 'A cow', dataUri: 'data:...' });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });

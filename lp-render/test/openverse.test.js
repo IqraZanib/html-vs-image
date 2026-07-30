@@ -17,7 +17,7 @@ function makeFetch(searchJson, bytesByUrl) {
   fetchImpl.calls = calls;
   return fetchImpl;
 }
-const bigJpeg = Buffer.alloc(50000, 1); // passes 4KB..2.2MB byte check
+const bigJpeg = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff]), Buffer.alloc(50000, 1)]); // passes 4KB..2.2MB byte check + mime sniff
 
 test('returns a record for the first license-valid, large-enough result', async () => {
   const search = { results: [
@@ -66,4 +66,34 @@ test('returns null when the API call throws', async () => {
 test('returns null when there are no results', async () => {
   const rec = await searchImage('duck', { fetchImpl: makeFetch({ results: [] }, {}), source: 'flickr' });
   assert.strictEqual(rec, null);
+});
+
+test('sniffs the real MIME from magic bytes rather than hardcoding jpeg', async () => {
+  const pngBytes = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47]), Buffer.alloc(50000, 1)]);
+  const search = { results: [
+    { url: 'http://img/ok.png', title: 'A Duck', creator: 'Jo', license: 'by', width: 1200, height: 800 },
+  ] };
+  const rec = await searchImage('duck', { fetchImpl: makeFetch(search, { 'http://img/ok.png': pngBytes }), source: 'flickr' });
+  assert.ok(rec);
+  assert.match(rec.dataUri, /^data:image\/png;base64,/);
+});
+
+test('rejects a non-raster (e.g. SVG) download instead of mislabeling it', async () => {
+  const svgBytes = Buffer.concat([Buffer.from('<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg">'), Buffer.alloc(50000, 32)]);
+  const search = { results: [
+    { url: 'http://img/ok.svg', title: 'A Duck', creator: 'Jo', license: 'by', width: 1200, height: 800 },
+  ] };
+  const rec = await searchImage('duck', { fetchImpl: makeFetch(search, { 'http://img/ok.svg': svgBytes }), source: 'flickr' });
+  assert.strictEqual(rec, null);
+});
+
+test('prefers the thumbnail URL over the full-size url when downloading', async () => {
+  const search = { results: [
+    { url: 'http://img/full.tiff', thumbnail: 'http://img/thumb.jpg', title: 'A Duck', creator: 'Jo', license: 'by', width: 1200, height: 800 },
+  ] };
+  const fetchImpl = makeFetch(search, { 'http://img/thumb.jpg': bigJpeg });
+  const rec = await searchImage('duck', { fetchImpl, source: 'flickr' });
+  assert.ok(rec);
+  assert.ok(fetchImpl.calls.includes('http://img/thumb.jpg'));
+  assert.ok(!fetchImpl.calls.includes('http://img/full.tiff'));
 });

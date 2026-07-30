@@ -16,7 +16,7 @@ const { ok, errors } = validateLesson(lesson);
 
 Input schema: `{ meta: { id, subject, grade, locale, title, subtitle?, durationMin?, classSize?, type? },
 sections: [ { type, title?, time?, ...typed } ] }`. Section types: `objectives, materials,
-introduction, explore, explanation, picture_equation, guided_practice, assessment,
+introduction, explore, explanation, picture_equation, picture_cards, guided_practice, assessment,
 differentiation, generic`. See `fixtures/lesson-113087.en.json` for a full example.
 
 ## Dynamic images (icons + Openverse photos)

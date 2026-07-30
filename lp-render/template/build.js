@@ -18,11 +18,16 @@ function buildHeader(meta, labels) {
 
 function collectCredits(lesson) {
   const out = [];
+  const seen = new Set();
   for (const s of (lesson.sections || [])) {
     if (!s || s.type !== 'picture_cards' || !Array.isArray(s.cards)) continue;
     for (const c of s.cards) {
       const a = c && c._resolved && c._resolved.mode === 'photo' && c._resolved.attribution;
-      if (a) out.push(a);
+      if (!a) continue;
+      const key = `${a.title || ''}|${a.creator || ''}|${a.source || ''}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(a);
     }
   }
   return out;

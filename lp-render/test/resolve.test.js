@@ -7,7 +7,7 @@ const { MemoryImageCache, cacheKey } = require('../images/cache');
 // 'apple' and 'duck' are real library icons; 'zzz_nope' is not.
 const photoRec = { dataUri: 'data:image/jpeg;base64,AAAA', title: 'T', creator: 'C', license: 'CC by 2.0', source: 'flickr', sourceUrl: 'http://l' };
 const lesson = (cards) => ({ meta: { title: 'x', locale: 'en' }, sections: [{ type: 'picture_cards', cards }] });
-const resolved = (out) => out.lesson.sections[0].cards.map((c) => c._resolved);
+const resolved = (out) => out.lesson.sections[0].cards.map((c) => c && c._resolved);
 
 test('kind:icon uses a library icon, or blank when none matches', async () => {
   const out = await resolveImages(lesson([{ query: 'apple', kind: 'icon' }, { query: 'zzz_nope', kind: 'icon' }]),
@@ -70,4 +70,12 @@ test('never throws when the fetch throws (offline) and reports each card', async
   assert.strictEqual(out.report[0].used, 'none');
   // input untouched
   assert.strictEqual('_resolved' in input.sections[0].cards[0], false);
+});
+
+test('skips malformed (null) cards without throwing, still resolves valid ones', async () => {
+  const out = await resolveImages(lesson([null, { query: 'apple', kind: 'icon' }]),
+    { searchImpl: async () => { throw new Error('must not fetch'); } });
+  assert.strictEqual(out.lesson.sections[0].cards[0], null);
+  assert.deepStrictEqual(resolved(out)[1], { mode: 'icon', iconName: 'apple' });
+  assert.strictEqual(out.report.length, 1);
 });

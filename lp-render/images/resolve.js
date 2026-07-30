@@ -49,6 +49,7 @@ async function resolveImages(lesson, opts = {}) {
   for (const section of (out.sections || [])) {
     if (!section || section.type !== 'picture_cards' || !Array.isArray(section.cards)) continue;
     for (const card of section.cards) {
+      if (!card || typeof card !== 'object') continue;
       const { r, tried, used, reason } = await resolveCard(card, opts);
       card._resolved = r;
       const entry = { query: card.query, kind: card.kind || 'auto', tried, used, reason };

@@ -24,6 +24,15 @@ function defaultFetch(url, { binary = false, timeout = 12000, userAgent = 'Talee
   });
 }
 
+function sniffImageMime(buf) {
+  if (!Buffer.isBuffer(buf) || buf.length < 12) return null;
+  if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'image/jpeg';
+  if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) return 'image/png';
+  if (buf.toString('ascii', 0, 3) === 'GIF') return 'image/gif';
+  if (buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') return 'image/webp';
+  return null;
+}
+
 async function withRetry(fn, retries) {
   let lastErr;
   for (let i = 0; i <= retries; i++) {
@@ -54,15 +63,18 @@ async function searchImage(query, opts = {}) {
     if (!isAllowedLicense(r.license)) continue;
     const w = Number(r.width), h = Number(r.height);
     if (w && h && Math.min(w, h) < minSide) continue;
+    const downloadUrl = r.thumbnail || r.url;
     let buf;
     try {
-      const res = await withRetry(() => fetchImpl(r.url, { binary: true, timeout, userAgent }), retries);
+      const res = await withRetry(() => fetchImpl(downloadUrl, { binary: true, timeout, userAgent }), retries);
       if (res.statusCode && res.statusCode !== 200) continue;
       buf = res.body;
     } catch (_) { continue; }
     if (!Buffer.isBuffer(buf) || buf.length < 4000 || buf.length > 2_200_000) continue;
+    const mime = sniffImageMime(buf);
+    if (!mime) continue;
     return {
-      dataUri: `data:image/jpeg;base64,${buf.toString('base64')}`,
+      dataUri: `data:${mime};base64,${buf.toString('base64')}`,
       title: (r.title || '').trim(),
       creator: (r.creator || 'unknown').trim(),
       license: (`CC ${r.license || ''} ${r.license_version || ''}`).trim(),
@@ -73,4 +85,4 @@ async function searchImage(query, opts = {}) {
   return null;
 }
 
-module.exports = { searchImage, defaultFetch };
+module.exports = { searchImage, defaultFetch, sniffImageMime };
