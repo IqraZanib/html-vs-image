@@ -32,6 +32,10 @@ const { lesson, report } = await resolveImages(contentJson, { source: 'wikimedia
 const pdf = await renderLessonPlanPdf(lesson);   // Buffer — no network
 ```
 
+From the CLI, add `--images` to run that pre-step automatically (icons + Openverse photos), e.g.
+`node scripts/render-lesson.js my-lesson.json --images --source=flickr`. Without `--images`, `picture_cards`
+photos are skipped and only library icons / pre-resolved content render.
+
 A `picture_cards` section carries the hints; each card resolves to an icon, a photo, or
 nothing (never an irrelevant filler):
 
@@ -96,13 +100,16 @@ Governed by **[../docs/image-sourcing-guidelines.md](../docs/image-sourcing-guid
 ## Generate a PDF (CLI)
 
 ```bash
-node scripts/render-lesson.js <lesson.json> [--locale=en|ur|sd|ar] [--a4] [--out=path.pdf]
+node scripts/render-lesson.js <lesson.json> [--locale=en|ur|sd|ar] [--a4] [--images [--source=wikimedia|flickr]] [--out=path.pdf]
 # or: npm run render -- <lesson.json> [flags]
 
 # examples
 node scripts/render-lesson.js lp-render/fixtures/lesson-113087.en.json
 node scripts/render-lesson.js my-lesson.json --locale=ur --out=out/urdu.pdf
 node scripts/render-lesson.js my-lesson.json --a4          # fixed A4 pages (default is content-fit)
+node scripts/render-lesson.js my-lesson.json --images      # resolve picture_cards → dataset icons + Openverse photos
+node scripts/render-lesson.js my-lesson.json --images --source=flickr   # local/sandbox (Wikimedia blocked there)
+node scripts/render-lesson.js my-lesson.json --auto-images --source=flickr   # AUTO-detect photo concepts from the text, then fetch
 ```
 
 Defaults: `locale` from `meta.locale`, output next to the input as `<name>.<locale>.pdf`,

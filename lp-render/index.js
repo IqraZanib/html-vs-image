@@ -3,6 +3,7 @@ const { validateLesson } = require('./schema');
 const { buildLessonPlanHtml } = require('./template/build');
 const { htmlToPdf, closeBrowser } = require('./render/html-to-pdf');
 const { resolveImages } = require('./images/resolve');
+const { autoImages, autoImageCards } = require('./images/auto');
 
 async function renderLessonPlanPdf(lesson, opts = {}) {
   const { ok, errors } = validateLesson(lesson);
@@ -13,4 +14,4 @@ async function renderLessonPlanPdf(lesson, opts = {}) {
   return htmlToPdf(html, { pageMode: opts.pageMode || 'fit', pdfOptions: { printBackground: true } });
 }
 
-module.exports = { renderLessonPlanPdf, resolveImages, buildLessonPlanHtml, validateLesson, htmlToPdf, closeBrowser };
+module.exports = { renderLessonPlanPdf, resolveImages, autoImages, autoImageCards, buildLessonPlanHtml, validateLesson, htmlToPdf, closeBrowser };
