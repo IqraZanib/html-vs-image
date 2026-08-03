@@ -84,6 +84,26 @@ b{font-weight:700;color:var(--coral)}
 .pc-cap{padding:9px 12px;text-align:center}
 .pc-lab{font-size:19px;font-weight:800;color:var(--ink)}
 .pc-note{font-size:12px;color:var(--ink-soft);font-weight:700;margin-top:2px}
+.pv-grid{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.pv-wrap{display:inline-block;background:#fff;border:2px solid #e6ecf5;border-radius:14px;padding:12px 14px}
+.pv-table{display:flex;gap:10px;align-items:flex-start}
+.pv-col{display:flex;flex-direction:column;align-items:center;min-width:74px}
+.pv-h{color:#fff;font-size:12px;font-weight:800;padding:3px 10px;border-radius:8px;white-space:nowrap}
+.pv-blocks{display:flex;align-items:flex-end;justify-content:center;min-height:52px;margin:8px 0;padding:2px}
+.pv-empty{color:#9aa3b5;font-weight:800;font-size:18px}
+.pv-d{font-size:26px;font-weight:800;color:var(--ink);border-top:2px solid #e6ecf5;width:100%;text-align:center;padding-top:4px}
+.pv-cap{text-align:center;font-size:14px;font-weight:800;color:#1f7fb8;margin-top:8px}
+.pv-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;font-weight:700;color:var(--ink-soft);margin-top:10px}
+.pv-legend span{display:flex;align-items:center;gap:6px}
+.pv-sw{width:14px;height:14px;border-radius:3px;display:inline-block}
+.pv-wrap.discs{display:block}
+.pv-wrap.discs .pv-table{gap:6px}
+.pv-col.disc{min-width:88px}
+.pv-h.dh{font-size:10px;white-space:normal;line-height:1.15;text-align:center;min-height:26px;display:flex;align-items:center;justify-content:center}
+.pv-discs{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-content:flex-start;min-height:52px;margin:8px 0;padding:2px;max-width:84px}
+.pv-disc{width:16px;height:16px;border-radius:50%;display:inline-block;box-shadow:inset 0 -2px 3px rgba(0,0,0,.18)}
+.pv-eq{text-align:center;font-size:15px;font-weight:800;color:var(--ink);margin-top:12px;font-variant-numeric:tabular-nums;line-height:1.7}
+.pv-eq b{color:#1f7fb8}
 `;
 
 function buildShell({ headerHtml = '', bodyHtml = '', locale = 'en', title = '' } = {}) {

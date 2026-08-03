@@ -16,8 +16,15 @@ const { ok, errors } = validateLesson(lesson);
 
 Input schema: `{ meta: { id, subject, grade, locale, title, subtitle?, durationMin?, classSize?, type? },
 sections: [ { type, title?, time?, ...typed } ] }`. Section types: `objectives, materials,
-introduction, explore, explanation, picture_equation, picture_cards, guided_practice, assessment,
-differentiation, generic`. See `fixtures/lesson-113087.en.json` for a full example.
+introduction, explore, explanation, picture_equation, picture_cards, place_value, guided_practice,
+assessment, differentiation, generic`. See `fixtures/lesson-113087.en.json` for a full example.
+
+**Maths place value** — the `place_value` section draws deterministic base-ten charts (never AI/photo):
+`{ "type": "place_value", "style": "blocks|discs", "numbers": [ { "value": 342, "columns": ["H","T","O"], "caption": "…" } ] }`.
+`blocks` (default) draws base-ten flats/rods/cubes for Hundreds/Tens/Ones (≤999); `discs` draws
+colour-coded number discs across up to seven columns (`M, HTh, TTh, Th, H, T, O`) and prints the
+auto-computed expanded-form equation. See `fixtures/lesson-109713.en.json` (blocks) and
+`fixtures/lesson-118255.en.json` (7-digit discs).
 
 ## Dynamic images (icons + Openverse photos)
 

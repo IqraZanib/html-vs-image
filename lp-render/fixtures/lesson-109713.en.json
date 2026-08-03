@@ -1,0 +1,60 @@
+{
+  "meta": { "id": "109713", "subject": "Maths", "grade": "Two", "locale": "en",
+    "title": "Place Value — Hundreds, Tens & Ones", "subtitle": "Reading & writing 2- and 3-digit numbers (up to 999)",
+    "durationMin": 40, "classSize": 34, "type": "Concept — Place value & number names" },
+  "sections": [
+    { "type": "objectives", "time": "2 min",
+      "items": [
+        { "text": "Students will read and write 2- and 3-digit numbers (up to 999) using hundreds, tens and ones, write them in expanded form and number names, and count forward and backward by 1s from a given number.", "tag": "Apply" }
+      ] },
+    { "type": "introduction", "time": "5 min",
+      "greeting": "Draw a table with three columns — Hundreds, Tens, Ones — and write 123 above it.",
+      "stories": [
+        { "label": "Point & ask", "text": "Which digit shows hundreds? Which shows tens? Which shows ones? Let a few students answer.", "icon": "blackboard" },
+        { "label": "Think", "text": "If I have 1 hundred, 2 tens and 3 ones, how many blocks do I have in all? Today we learn to read and write numbers using hundreds, tens and ones — and say their number names." }
+      ] },
+    { "type": "place_value", "title": "Hook — build 123 on the place-value table", "time": "5 min",
+      "numbers": [ { "value": 123, "columns": ["H", "T", "O"], "caption": "1 hundred + 2 tens + 3 ones = 123" } ] },
+    { "type": "explanation", "time": "15 min",
+      "steps": [
+        { "label": "Place", "body": "In 342, 3 is in the hundreds place, 4 is in the tens place, and 2 is in the ones place." },
+        { "label": "Expanded", "body": "342 = 3 hundreds + 4 tens + 2 ones = 300 + 40 + 2. We write 300 because 3 hundreds means 3 × 100." },
+        { "label": "Value", "body": "The value of 3 is 300, the value of 4 is 40, and the value of 2 is 2 — because of the place they are in." },
+        { "label": "Number names", "body": "4 tens is Forty, 5 ones is Five, so we say “Forty-five”. Read 72 as “Seventy-two” — tens numbers (20–90) usually end with “ty”." }
+      ],
+      "cfu": [
+        { "q": "What is the value of 4 in 342?", "a": "40" },
+        { "q": "How do we write 45 in words?", "a": "Forty-five" },
+        { "q": "6 hundreds, 0 tens and 2 ones = which number?", "a": "602" }
+      ] },
+    { "type": "place_value", "title": "See it in the place-value tables",
+      "numbers": [
+        { "value": 342, "columns": ["H", "T", "O"], "caption": "342 = 3 hundreds + 4 tens + 2 ones" },
+        { "value": 45, "columns": ["T", "O"], "caption": "4 tens + 5 ones = Forty-five" }
+      ] },
+    { "type": "generic", "title": "Practice — solve in notebooks (with answers)", "time": "15 min",
+      "body": "Students solve individually, then check together. Walk around; sit beside strugglers and ask leading questions like “Which place is this digit in?” or “What is the tens word here?”",
+      "items": [
+        "Q1: 602 = ___ hundreds, ___ tens, ___ ones  →  6 hundreds, 0 tens, 2 ones",
+        "Q2: 602 in expanded form  →  600 + 0 + 2",
+        "Q3: the digit 6 in 602 is in the ___ place  →  hundreds",
+        "Q4: the digit 0 in 602 is in the ___ place  →  tens",
+        "Q5: the digit 2 in 602 is in the ___ place  →  ones",
+        "Q6: the value of 6 in 602  →  600",
+        "Q7: the value of 0 in 602  →  0",
+        "Q8: the value of 2 in 602  →  2",
+        "Q9: count backward — 602, ___, ___, ___, 598  →  601, 600, 599",
+        "Q10: count forward — 602, ___, ___, ___, 606  →  603, 604, 605",
+        "Q11: 72 in words  →  seventy-two",
+        "Q12: 27 in words  →  twenty-seven",
+        "Q13: 90 in words  →  ninety",
+        "Q14: 13 in words  →  thirteen",
+        "Q15: 38 in words  →  thirty-eight"
+      ] },
+    { "type": "generic", "title": "Conclusion — quick verbal quiz", "time": "3 min",
+      "items": [
+        "What is the value of 7 in 745?  →  700 (7 is in the hundreds place)",
+        "How do we write 83 in words?  →  Eighty-three"
+      ] }
+  ]
+}
