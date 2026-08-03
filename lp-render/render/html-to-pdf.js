@@ -55,7 +55,10 @@ async function htmlToPdf(html, options = {}) {
     await page.setContent(html, { waitUntil: 'networkidle', timeout });
     await page.evaluate(async () => { await document.fonts.ready; });
     if (pageMode === 'fit') {
-      const height = Math.ceil(await page.evaluate(() => document.documentElement.scrollHeight));
+      // +2px guard: print layout can round a hair taller than the measured
+      // scrollHeight, which would spill into a second (blank) page. The tiny
+      // buffer keeps tall lessons on a single page with no visible gap.
+      const height = Math.ceil(await page.evaluate(() => document.documentElement.scrollHeight)) + 2;
       // Override the shell's `@page{size:A4}` with a single content-sized page so
       // Chromium does NOT paginate at A4 boundaries (which clipped tall lessons).
       await page.addStyleTag({ content: `@page{size:${FIT_WIDTH_PX}px ${height}px;margin:0}` });
