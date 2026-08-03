@@ -1,6 +1,12 @@
 # Dependencies
 node_modules/
 
+# Secrets — never commit API keys (.env, .env-api, etc.)
+.env
+.env.*
+.env-api
+*.env
+
 # Generated output (root) — regenerated on every run
 /lesson-plan.png
 
