@@ -10,21 +10,24 @@
 //   node scripts/render-lesson.js my-lesson.json --locale=ur --out=out/urdu.pdf
 //   node scripts/render-lesson.js my-lesson.json --a4        # fixed A4 pages (default is content-fit, no blank space)
 //   node scripts/render-lesson.js my-lesson.json --images    # resolve picture_cards via dataset icons + Openverse photos first
-//   node scripts/render-lesson.js my-lesson.json --images --source=flickr   # dev/sandbox (Wikimedia is blocked there)
+//   node scripts/render-lesson.js my-lesson.json --auto-images --source=flickr   # AUTO-detect photo-worthy concepts, then fetch
 //
 // --images runs the resolveImages pre-step so picture_cards `{query, kind}` hints become inline
-// SVG icons (library) or real Creative-Commons photos (Openverse). Without it, picture_cards
-// photos are skipped (only pre-resolved/icon content renders). Default source is `wikimedia`
-// (production); pass --source=flickr for local/sandbox where Wikimedia Commons is unreachable.
+// SVG icons (library) or real Creative-Commons photos (Openverse).
+// --auto-images additionally SCANS the lesson content first and auto-adds a picture_cards
+// section for the concrete real-world concepts it finds (animals, fruits, places, …) — no manual
+// hints needed. It implies --images. Default source is `wikimedia` (production); pass
+// --source=flickr for local/sandbox where Wikimedia Commons is unreachable.
 const fs = require('node:fs');
 const path = require('node:path');
-const { renderLessonPlanPdf, resolveImages, validateLesson, closeBrowser } = require('../lp-render');
+const { renderLessonPlanPdf, resolveImages, autoImages, validateLesson, closeBrowser } = require('../lp-render');
 
 function parseArgs(argv) {
   const args = { _: [] };
   for (const a of argv) {
     if (a === '--a4') args.a4 = true;
     else if (a === '--images') args.images = true;
+    else if (a === '--auto-images') { args.autoImages = true; args.images = true; }
     else if (a.startsWith('--locale=')) args.locale = a.slice('--locale='.length);
     else if (a.startsWith('--source=')) args.source = a.slice('--source='.length);
     else if (a.startsWith('--out=')) args.out = a.slice('--out='.length);
@@ -53,11 +56,16 @@ function parseArgs(argv) {
   const opts = { locale };
   if (args.a4) opts.pageMode = 'a4';
 
-  // Optional pre-step: resolve picture_cards image hints into dataset icons + Openverse photos.
+  // Optional pre-steps: auto-detect photo-worthy concepts, then resolve image hints.
   let lessonToRender = lesson;
+  if (args.autoImages) {
+    const { lesson: withCards, cards } = await autoImages(lesson);
+    lessonToRender = withCards;
+    console.log(`Auto-detected ${cards.length} photo concept(s): ${cards.map((c) => c.query).join(', ') || '(none)'}`);
+  }
   if (args.images) {
     const source = args.source || 'wikimedia';
-    const { lesson: enriched, report } = await resolveImages(lesson, { source });
+    const { lesson: enriched, report } = await resolveImages(lessonToRender, { source });
     lessonToRender = enriched;
     const tally = report.reduce((m, r) => { m[r.used] = (m[r.used] || 0) + 1; return m; }, {});
     console.log(`Resolved images (source=${source}): ${report.length} card(s) → ${JSON.stringify(tally)}`);

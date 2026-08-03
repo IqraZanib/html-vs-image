@@ -109,6 +109,7 @@ node scripts/render-lesson.js my-lesson.json --locale=ur --out=out/urdu.pdf
 node scripts/render-lesson.js my-lesson.json --a4          # fixed A4 pages (default is content-fit)
 node scripts/render-lesson.js my-lesson.json --images      # resolve picture_cards → dataset icons + Openverse photos
 node scripts/render-lesson.js my-lesson.json --images --source=flickr   # local/sandbox (Wikimedia blocked there)
+node scripts/render-lesson.js my-lesson.json --auto-images --source=flickr   # AUTO-detect photo concepts from the text, then fetch
 ```
 
 Defaults: `locale` from `meta.locale`, output next to the input as `<name>.<locale>.pdf`,
