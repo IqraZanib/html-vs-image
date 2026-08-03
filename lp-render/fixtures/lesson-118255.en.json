@@ -1,0 +1,46 @@
+{
+  "meta": { "id": "118255", "subject": "Maths", "grade": "Five", "locale": "en",
+    "title": "Place Value & Expanded Form — 7-Digit Numbers", "subtitle": "Number discs + place-value charts (up to millions)",
+    "durationMin": 40, "type": "Pictorial & Abstract" },
+  "sections": [
+    { "type": "objectives", "time": "2 min",
+      "items": [
+        { "text": "Students will write 7-digit numbers in expanded form using number discs and place-value charts.", "tag": "Analyse" }
+      ] },
+    { "type": "materials",
+      "resources": ["Whiteboard and markers", "Student notebooks", "A 7-column place-value chart (Millions … Ones)"],
+      "note": { "title": "Misconception alert — missing zeros", "body": "Students often miss zeros in expanded form (e.g. writing 20,000 instead of 200,000) because they lose track of the place-value columns. Correction: “Look at our drawing — it shows 2 discs in the Hundred Thousands column, and each disc is worth 100,000, making it 200,000.”" } },
+    { "type": "introduction", "time": "5 min",
+      "greeting": "Today we learn to break 7-digit numbers into expanded form using number discs — so we can read large amounts, like the cost of building a new hospital in our city.",
+      "stories": [
+        { "label": "Recall", "text": "Remember the base-ten blocks from yesterday? How can we show that as a simple drawing today? — We can draw circles or dots inside a place-value chart.", "icon": "blackboard" },
+        { "label": "Try it", "text": "Imagine Ali has 3,000,000 Rupees. In the air, draw the discs for this number in the Millions column. Ready? Go!" }
+      ] },
+    { "type": "place_value", "style": "discs", "title": "The board — 5,234,678 as discs + expanded form", "time": "3 min",
+      "numbers": [ { "value": 5234678, "columns": ["M", "HTh", "TTh", "Th", "H", "T", "O"] } ] },
+    { "type": "explanation", "time": "15 min",
+      "steps": [
+        { "label": "Look (45s)", "body": "Give students 45 seconds to study the chart and think about what it represents." },
+        { "label": "Count each column", "body": "With Bunty, count the discs column by column: Millions → 5,000,000; Hundred Thousands → + 200,000; Ten Thousands → + 30,000; Thousands → + 4,000; and so on — each disc translates to the number with exactly the right zeros." },
+        { "label": "Combine", "body": "Add all the expanded parts together to get the standard form: 5,234,678." }
+      ],
+      "cfu": [
+        { "q": "Which part of the drawing shows 200,000?", "a": "The 2 discs in the Hundred Thousands column." },
+        { "q": "If Bunty adds one more disc to the Thousands column, what does that column become?", "a": "5,000 instead of 4,000." },
+        { "q": "How does drawing discs help avoid missing zeros?", "a": "You read the exact place-value heading, so you know how many zeros belong to that column." }
+      ] },
+    { "type": "guided_practice", "time": "17 min",
+      "task": "In pairs, one student is the “drawer” and the other the “writer”. The drawer draws the number discs for 6,781,234 in a place-value chart; the writer writes the expanded-form equation underneath. Then switch roles for 3,210,456.",
+      "note": "Individual (Page 6): imagine counting bricks to build a new school in Lahore — draw the discs and write 7,654,321 in expanded form.",
+      "differentiation": { "struggling": "Provide a pre-drawn 7-column place-value chart for students to draw their discs into.", "advanced": "Write a number greater than 7,654,321 and prove it by drawing the discs for the Millions and Hundred Thousands columns." } },
+    { "type": "assessment", "time": "3 min",
+      "afl": { "instruction": "Thumbs up for True, thumbs down for False.",
+        "items": [
+          { "text": "3 discs in the Hundred Thousands column equals 30,000.", "verdict": "down" },
+          { "text": "Expanded form helps us see the value of each digit in a big number.", "verdict": "up" },
+          { "text": "7,000,000 has six zeros.", "verdict": "up" },
+          { "text": "If I have 0 discs in the Tens column, I write nothing for the Tens place in my standard number.", "verdict": "down" }
+        ] },
+      "exitTicket": "Ask: Where else in your neighbourhood do you see numbers like this? (property prices, bank boards, population signs)." }
+  ]
+}
