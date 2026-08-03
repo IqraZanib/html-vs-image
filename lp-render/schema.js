@@ -2,7 +2,7 @@
 
 const SECTION_TYPES = [
   'objectives', 'materials', 'introduction', 'explore',
-  'explanation', 'picture_equation', 'picture_cards', 'guided_practice', 'assessment', 'differentiation', 'generic',
+  'explanation', 'picture_equation', 'picture_cards', 'place_value', 'guided_practice', 'assessment', 'differentiation', 'generic',
 ];
 
 const LOCALES = ['en', 'ur', 'sd', 'ar'];
@@ -37,6 +37,17 @@ function validateLesson(lesson) {
           s.cards.forEach((c, j) => {
             if (!c || typeof c !== 'object' || !c.query) {
               errors.push(`sections[${i}].cards[${j}].query is required`);
+            }
+          });
+        }
+      }
+      if (s.type === 'place_value') {
+        if (!Array.isArray(s.numbers) || s.numbers.length === 0) {
+          errors.push(`sections[${i}].numbers must be a non-empty array`);
+        } else {
+          s.numbers.forEach((n, j) => {
+            if (!n || typeof n !== 'object' || !Number.isFinite(Number(n.value))) {
+              errors.push(`sections[${i}].numbers[${j}].value must be a number`);
             }
           });
         }
