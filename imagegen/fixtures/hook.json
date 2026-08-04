@@ -1,0 +1,3 @@
+{ "subject": "English", "grade": "1", "region": "pk", "topic": "Letter Sounds",
+  "blocks": [ { "type": "HOOK_STORY", "text": "Ali and Sara ride the ABC-Express train; each carriage has a letter that makes a sound.",
+    "characters": [ { "name": "Ali", "role": "student, boy" }, { "name": "Sara", "role": "student, girl" } ] } ] }

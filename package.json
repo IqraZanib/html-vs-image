@@ -5,7 +5,8 @@
   "scripts": {
     "test": "node --test lp-render/test/",
     "test:smoke": "node --test lp-render/test/render.smoke.test.js",
-    "render": "node scripts/render-lesson.js"
+    "render": "node scripts/render-lesson.js",
+    "test:imagegen": "node --test imagegen/test/"
   },
   "dependencies": {
     "@fontsource/noto-naskh-arabic": "^5.2.11",
