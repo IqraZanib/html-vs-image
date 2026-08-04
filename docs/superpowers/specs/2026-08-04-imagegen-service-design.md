@@ -139,7 +139,7 @@ to accept; escalate one tier only on fail.** `nano-banana-2` (8cr) is a last res
 
 | Category | Primary (cheapest) | Escalation ladder (on VLM fail) |
 |---|---|---|
-| `decorative_scene` (text-in-image NOT critical) | `bytedance/seedream-v4-text-to-image` (5cr) | → `nano-banana-2-lite` (4cr, alt) → `nano-banana-2` (8cr) |
+| `decorative_scene` (text-in-image NOT critical) | `nano-banana-2-lite` (4cr) | → `bytedance/seedream-v4-text-to-image` (5cr) → `nano-banana-2` (8cr) |
 | `labeled_diagram` (legible labels critical) | `bytedance/seedream-v4-text-to-image` (5cr) | → `gpt-image-2-text-to-image` (6cr) → `nano-banana-2` (8cr) |
 | `structured`, `icon_or_motif`, `unknown` | *(no generation)* | — |
 
@@ -235,6 +235,8 @@ classifier or templates.
   enriched-content when available (classifier keys off block labels, so this is low-risk).
 - Character-consistency uses prompt-pinning + a stable seed. If kie.ai models expose reference-image
   conditioning, that can be added later behind the same `characters.js` interface.
-- `decorative_scene` model default (`seedream-v4`) is chosen from the diagram/label benchmark; a small
-  hook-scene benchmark (character warmth/consistency) can refine it — proposed as an early implementation
-  step, ~20–30 credits.
+- `decorative_scene` default is **locked from a real hook-scene benchmark** (2026-08-04, 26.5 credits, 5
+  models): a Pakistani train hook-scene generated across the cheap tier, each VLM-scored for
+  warmth/characters/cultural-grounding/appropriateness and visually reviewed. Winner = **`nano-banana-2-lite`
+  (4cr, ~14s)** — cheapest AND best-looking; `seedream-v4` (5cr) fallback; `grok-imagine` rejected on
+  latency (196s); `nano-banana-2` (8cr) gave no quality gain. Samples in `docs/benchmark-samples/hook_*`.
