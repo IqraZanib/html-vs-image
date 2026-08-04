@@ -3,10 +3,17 @@ const { defaultFetch } = require('./kie/client');
 
 const VLM_URL = 'https://api.kie.ai/gpt-5-2/v1/chat/completions';
 
-// Ask GPT-5.2 vision whether the generated image meets the expectation and is
-// classroom-appropriate. Returns { pass, reason }; fails closed on any error.
-async function checkImage({ apiKey, imageUrl, expectation, fetchImpl = defaultFetch } = {}) {
-  const ask = `This image is meant to be: ${expectation}. It must be relevant, warm, and appropriate for a primary-school classroom. Reply with JSON only: {"pass": true|false, "reason": "one short sentence"}.`;
+// Ask GPT-5.2 vision whether the generated image is CORRECT for teaching and
+// safe against human values. Returns { pass, reason }; fails closed on any
+// error. `policy` is extra reviewer guidance (read from RULES.md by the caller).
+async function checkImage({ apiKey, imageUrl, expectation, policy = '', fetchImpl = defaultFetch } = {}) {
+  const ask = `You are a strict reviewer of teaching images for a school classroom.
+The image is intended to show: ${expectation}
+Approve (pass:true) ONLY if EVERY check passes:
+1. Correctness — it accurately depicts the intended subject. Nothing is wrong, mislabeled, or anatomically/factually incorrect. Any text or labels in the image must be spelled correctly and point to the right part.
+2. Teaching value — it is clear, relevant and genuinely useful for teaching this concept to students.
+3. Human values — it contains NOTHING against human values: no violence, gore, weapons, blood, nudity or sexual content, hate/discriminatory symbols, harmful stereotypes, frightening imagery, substance use, or culturally/religiously offensive content. It is respectful, safe and inclusive.
+${policy ? 'Additional policy from the rules file:\n' + policy + '\n' : ''}If you are uncertain about ANY check, fail. Reply with JSON only: {"pass": true|false, "reason": "one short sentence"}.`;
   const body = JSON.stringify({
     messages: [{ role: 'user', content: [
       { type: 'text', text: ask },

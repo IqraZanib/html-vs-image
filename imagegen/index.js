@@ -39,7 +39,7 @@ async function resolveSegmentImages(segment = {}, opts = {}) {
       if (!gen.ok) { report.push({ blockType: block.type, model, event: 'gen_fail', error: gen.error }); continue; }
       if (typeof gen.creditsConsumed === 'number') budget.spend(gen.creditsConsumed);
 
-      const gate = await gateImpl({ apiKey, imageUrl: gen.url, expectation });
+      const gate = await gateImpl({ apiKey, imageUrl: gen.url, expectation, policy: opts.gatePolicy });
       report.push({ blockType: block.type, model, credits: gen.creditsConsumed, gate: gate.pass, reason: gate.reason });
       if (gate.pass) {
         const asset = { url: gen.url, model };
