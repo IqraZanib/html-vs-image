@@ -50,7 +50,7 @@ a.dl{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--signal)}
     <div class="hint">Paste a content JSON, or raw lesson text (it is auto-structured, keeping its own words, before rendering). Images already in the store are restored free; new ones are generated via kie.ai and saved.</div>
   </section>
   <section class="panel">
-    <div class="phead"><h2>Rendered lesson</h2><a class="dl" id="dl" href="#" download="lesson.png" style="display:none">Download PNG ↓</a></div>
+    <div class="phead"><h2>Rendered lesson</h2><a class="dl" id="dl" href="#" download="lesson.pdf" style="display:none">Download PDF ↓</a></div>
     <div class="out" id="out"><div class="placeholder" id="ph">The rendered lesson image will appear here.</div></div>
     <div class="statusbar" id="status">
       <span class="chip ok" id="c-ok" style="display:none"></span>
@@ -78,7 +78,8 @@ $('run').onclick=async()=>{
     if(j.structured){ $('content').value=j.structured; } // show the structured JSON the render used
     $('ph').style.display='none';
     const img=new Image(); img.src=j.png; $('out').appendChild(img);
-    $('dl').href=j.png; $('dl').style.display='';
+    if(j.pdf){ $('dl').href=j.pdf; $('dl').download='lesson.pdf'; $('dl').textContent='Download PDF ↓'; $('dl').style.display=''; }
+    else { $('dl').href=j.png; $('dl').download='lesson.png'; $('dl').textContent='Download PNG ↓'; $('dl').style.display=''; }
     const s=j.stats||{};
     if(s.restored){ $('c-ok').textContent=s.restored+' restored'; $('c-ok').style.display=''; }
     if(s.generated){ $('c-gen').textContent=s.generated+' generated'; $('c-gen').style.display=''; }

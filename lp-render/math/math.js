@@ -57,14 +57,29 @@ function renderMath(tex, { display = true, engine = 'katex' } = {}) {
 }
 
 // Render a string that may contain inline $...$ / display $$...$$ math; the
-// non-math parts are HTML-escaped, the math parts are rendered by the engine.
+// non-math parts are HTML-escaped, then light markdown is applied: **bold** (an
+// inline sub-heading in the same size), stripped # heading markers, "- " list
+// dashes to bullets, and real line breaks for \n. The math parts are rendered by
+// the engine.
+function mdInline(escaped) {
+  return escaped
+    .replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>')      // **bold** -> bold (inline sub-heading)
+    .replace(/(^|\n)\s*#{1,6}\s*/g, '$1')            // drop leading #, ##, … heading markers
+    .replace(/(^|\n)\s*[-*]\s+/g, '$1• ')            // "- item" / "* item" -> bullet
+    .replace(/\n/g, '<br>');                          // newlines -> line breaks
+}
 function richText(raw, { engine = 'katex' } = {}) {
   const s = String(raw == null ? '' : raw);
   return s.split(/(\$\$[^$]+\$\$|\$[^$]+\$)/g).map((p) => {
     if (/^\$\$[^$]+\$\$$/.test(p)) return renderMath(p.slice(2, -2), { display: true, engine });
     if (/^\$[^$]+\$$/.test(p)) return renderMath(p.slice(1, -1), { display: false, engine });
-    return esc(p);
+    return mdInline(esc(p));
   }).join('');
 }
 
-module.exports = { renderMath, renderKatex, renderMathjaxSvg, katexCss, richText };
+// Strip markdown noise from a heading/label so "## **Journey**" renders as "Journey".
+function cleanHeading(raw) {
+  return String(raw == null ? '' : raw).replace(/[*_`#]+/g, '').replace(/\s+/g, ' ').trim();
+}
+
+module.exports = { renderMath, renderKatex, renderMathjaxSvg, katexCss, richText, cleanHeading };

@@ -7,20 +7,34 @@ const { esc } = require('../template/shell');
 const { icon, hasIcon } = require('../template/icons');
 const { headerMotifs, headTwinkle, sparkle } = require('./motifs');
 const { accentFor } = require('./theme');
-const { renderMath, richText, katexCss } = require('../math/math');
+const { renderMath, richText, katexCss, cleanHeading } = require('../math/math');
 
 const ALPHA = 'abcdefghijklmnopqrstuvwxyz';
 const mark = (kind, i) => (kind === 'alpha' ? ALPHA[i] + ')' : kind === 'num' ? String(i + 1) : '•');
+
+// small helpers for per-lesson character variation
+function seedOf(str) { let h = 0; for (const c of String(str)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; }
+function rotate(arr, k) { const n = arr.length; if (!n) return arr.slice(); const s = ((k % n) + n) % n; return arr.slice(s).concat(arr.slice(0, s)); }
 
 function disc(accent, section, i) {
   const inner = section.icon && hasIcon(section.icon) ? icon(section.icon, 24) : sparkle('#fff');
   return `<div class="s-disc" style="background:var(${accent})">${inner}</div>`;
 }
 
+// A section header — cleaned of markdown. Returns '' for an empty heading so no
+// blank header space is reserved.
 function sectionHead(accent, section, i) {
-  const time = section.time ? `<div class="s-time">${esc(section.time)}</div>` : '';
+  const title = cleanHeading(section.heading);
+  if (!title) return '';
+  const time = section.time ? `<div class="s-time">${esc(cleanHeading(section.time))}</div>` : '';
   const twinkle = `<div class="s-deco">${headTwinkle(i)}</div>`;
-  return `<div class="s-head">${disc(accent, section, i)}<div class="s-title">${esc(section.heading || '')}</div>${twinkle}${time}</div>`;
+  return `<div class="s-head">${disc(accent, section, i)}<div class="s-title">${esc(title)}</div>${twinkle}${time}</div>`;
+}
+
+// Faint decorative icons behind the title block (like a lesson-plan letterhead).
+function headerBg() {
+  const ic = (n, cls) => (hasIcon(n) ? `<div class="hb ${cls}">${icon(n, 60)}</div>` : '');
+  return `<div class="hbwrap">${ic('blackboard', 'b1')}${ic('books', 'b2')}${ic('target', 'b3')}${ic('pencil', 'b4')}</div>`;
 }
 
 function renderBody(section, accent, images) {
@@ -38,13 +52,13 @@ function renderBody(section, accent, images) {
     case 'text':
       return `<div class="d-text">${richText(section.body, { engine: section.engine })}</div>`;
     case 'note': {
-      const nt = section.label ? `<span class="nt" style="color:var(${accent})">${esc(section.label)}</span>` : '';
+      const nt = section.label ? `<span class="nt" style="color:var(${accent})">${esc(cleanHeading(section.label))}</span>` : '';
       return `<div class="d-note" style="background:linear-gradient(90deg,${soft},#fff);border-inline-start:5px solid var(${accent})">${nt}${richText(section.body, { engine: section.engine })}</div>`;
     }
     case 'math':
-      return `<div class="d-math">${(section.items || []).map((it) => `<div class="d-mrow">${it.label ? `<div class="d-mlabel">${esc(it.label)}</div>` : ''}<div class="d-mformula">${renderMath(it.tex, { display: true, engine: section.engine })}</div></div>`).join('')}</div>`;
+      return `<div class="d-math">${(section.items || []).map((it) => `<div class="d-mrow">${it.label ? `<div class="d-mlabel">${esc(cleanHeading(it.label))}</div>` : ''}<div class="d-mformula">${renderMath(it.tex, { display: true, engine: section.engine })}</div></div>`).join('')}</div>`;
     case 'chips':
-      return `<div class="d-chips">${(section.items || []).map((c) => `<span class="d-chip" style="background:${soft};color:var(${accent})">${esc(c)}</span>`).join('')}</div>`;
+      return `<div class="d-chips">${(section.items || []).map((c) => `<span class="d-chip" style="background:${soft};color:var(${accent})">${esc(cleanHeading(c))}</span>`).join('')}</div>`;
     case 'steps':
       return `<div class="d-steps">${(section.items || []).map((s, i) => `<div class="d-step"><div class="n" style="background:var(${accent})">${i + 1}</div><div><div class="st-label">${richText(s.label, { engine: section.engine })}</div><div class="st-body">${richText(s.body, { engine: section.engine })}</div></div></div>`).join('')}</div>`;
     case 'qa': {
@@ -52,12 +66,12 @@ function renderBody(section, accent, images) {
       return `<div class="d-qa">${(section.items || []).map((qa, i) => `<div class="d-qc"><div class="d-q" data-mark="${esc(mark(km, i))}" style="color:var(${accent})">${richText(qa.q, { engine: section.engine })}</div>${qa.a ? `<div class="d-a">${richText(qa.a, { engine: section.engine })}</div>` : ''}</div>`).join('')}</div>`;
     }
     case 'fields':
-      return `<div class="d-fields">${(section.items || []).map((f) => `<div class="d-field"><b>${esc(f.label)}</b>${esc(f.value || '')}</div>`).join('')}</div>`;
+      return `<div class="d-fields">${(section.items || []).map((f) => `<div class="d-field"><b>${esc(cleanHeading(f.label))}</b>${esc(f.value || '')}</div>`).join('')}</div>`;
     case 'images': {
       const cards = (section.imageIds || [])
         .map((id) => images[id])
         .filter((im) => im && im.dataUri)
-        .map((im) => `<div class="d-img${im.cover ? ' cover' : ''}"><img src="${im.dataUri}" alt="${esc(im.label || '')}"><div class="cap">${esc(im.label || '')}</div></div>`);
+        .map((im) => `<div class="d-img${im.cover ? ' cover' : ''}"><img src="${im.dataUri}" alt="${esc(cleanHeading(im.label || ''))}"><div class="cap">${esc(cleanHeading(im.label || ''))}</div></div>`);
       if (!cards.length) return '';
       const n = Math.min(cards.length, 3);
       return `<div class="d-imgrow n${n}">${cards.join('')}</div>`;
@@ -68,14 +82,21 @@ function renderBody(section, accent, images) {
 }
 
 const TEACHER_POOL = ['teacher', 'teacher_coral', 'teacher_purple'];
-const first = (ids, cast) => ids.find((x) => cast[x]) || null;
+
+// Pick the first preferred character the cast has AND that this lesson hasn't used
+// yet, so no two sections in one LP show the same figure (R9). Only if every option
+// is already used do we allow a repeat.
+function pickAvailable(prefs, cast, used) {
+  for (const id of prefs) if (cast[id] && !used.has(id)) return id;
+  for (const id of prefs) if (cast[id]) return id;
+  return null;
+}
 
 // Decide which cast character (if any) accompanies a section that has no relevant
-// real image (RULES R8, R9). Presentation varies by section: a teacher at the
-// board for step-by-step development, students sitting and listening for the
-// intro, a discussing pair for activities, simple pointing figures elsewhere —
-// and repeated teachers rotate through colour variants so they never look the same.
-function pickCharacter(section, cast, rot) {
+// real image (RULES R8, R9). Presentation varies by section, repeated teachers
+// rotate colours, and the whole ordering is offset by a per-lesson seed so a maths
+// plan and a science plan don't show the same faces. No figure repeats within one LP.
+function pickCharacter(section, cast, rot, used) {
   if (section.character === false) return null;
   if (typeof section.character === 'string') return cast[section.character] ? section.character : null;
   if (section.type === 'images' || section.type === 'fields' || section.type === 'chips') return null;
@@ -84,14 +105,15 @@ function pickCharacter(section, cast, rot) {
   const eligible = section.type === 'text' || section.type === 'note' || section.type === 'steps' ||
     (section.type === 'bullets' && /activit|practic|experiment|assess|quiz|exam|partner|group|discuss/i.test(h));
   if (!eligible) return null;
-  const teacher = () => { const p = TEACHER_POOL.filter((x) => cast[x]); return p.length ? p[(rot.t++) % p.length] : null; };
-  let id = null;
-  if (isActivity) id = first(['students_pair', 'students_sitting'], cast);
-  else if (section.type === 'steps' || /develop|explanation|board|model answer|demonstrat/i.test(h)) id = cast.teacher_board ? 'teacher_board' : teacher();
-  else if (/introduc/i.test(h)) id = cast.students_sitting ? 'students_sitting' : teacher();
-  else if (/assess|quiz|exam/i.test(h)) id = first(['boy', 'girl', 'students_sitting'], cast);
-  else { const opt = ['girl', 'boy'][(rot.n++) % 2]; id = cast[opt] ? opt : teacher(); }
-  return id || first(['teacher', 'girl', 'boy', 'students_pair'], cast);
+  const teachers = rotate(TEACHER_POOL, rot.seed + rot.t++);     // varied per lesson
+  const kids = rotate(['girl', 'boy'], rot.seed + rot.n++);
+  let prefs;
+  if (isActivity) prefs = ['students_pair', 'students_sitting', ...teachers, ...kids];
+  else if (section.type === 'steps' || /develop|explanation|board|model answer|demonstrat/i.test(h)) prefs = ['teacher_board', ...teachers, 'students_sitting', ...kids];
+  else if (/introduc/i.test(h)) prefs = ['students_sitting', ...kids, ...teachers];
+  else if (/assess|quiz|exam/i.test(h)) prefs = [...kids, 'students_sitting', ...teachers];
+  else prefs = [...kids, ...teachers, 'students_pair'];
+  return pickAvailable(prefs, cast, used);
 }
 
 // Estimate a section's rendered content height so the character can be sized to
@@ -121,30 +143,33 @@ function charSize(section, charId) {
 
 function renderDecorativeLesson(content, images = {}, cast = {}) {
   const meta = content.meta || {};
-  const chips = (meta.chips || []).map((c) => `<span><b>${esc(c.label)}</b>${esc(c.value)}</span>`).join('');
+  const chips = (meta.chips || []).map((c) => `<span><b>${esc(cleanHeading(c.label))}</b>${esc(cleanHeading(c.value))}</span>`).join('');
   const headerHtml =
-    `<div class="lp-header">${headerMotifs()}` +
-    `<h1>${esc(meta.title || '')}</h1>` +
-    (meta.subtitle ? `<div class="sub">${esc(meta.subtitle)}</div>` : '') +
+    `<div class="lp-header">${headerBg()}${headerMotifs()}` +
+    `<h1>${esc(cleanHeading(meta.title))}</h1>` +
+    (meta.subtitle ? `<div class="sub">${esc(cleanHeading(meta.subtitle))}</div>` : '') +
     (chips ? `<div class="meta">${chips}</div>` : '') +
     `</div>`;
 
   let placed = 0;
-  const rot = { n: 0, t: 0 };
+  const rot = { n: 0, t: 0, seed: seedOf(`${meta.id || ''}|${meta.subject || ''}|${meta.title || ''}`) };
+  const used = new Set(); // no character repeats within one lesson
   const sections = (content.sections || []).map((section, i) => {
     const accent = accentFor(i);
     const body = renderBody(section, accent, images);
     if (body === '') return '';
-    const charId = pickCharacter(section, cast, rot);
+    const head = sectionHead(accent, section, i);
+    const charId = pickCharacter(section, cast, rot, used);
     if (charId) {
+      used.add(charId);
       const side = placed % 2 === 0 ? 'left' : 'right';
       placed++;
       const { h, w } = charSize(section, charId);
       const fig = `<div class="char-fig ${side}" style="width:${w}px"><img src="${cast[charId]}" alt="" style="max-height:${h}px"></div>`;
       const inner = side === 'left' ? `${fig}<div class="char-body">${body}</div>` : `<div class="char-body">${body}</div>${fig}`;
-      return `<section class="section">${sectionHead(accent, section, i)}<div class="panel has-char" style="--acc:var(${accent})">${inner}</div></section>`;
+      return `<section class="section">${head}<div class="panel has-char" style="--acc:var(${accent})">${inner}</div></section>`;
     }
-    return `<section class="section">${sectionHead(accent, section, i)}<div class="panel" style="--acc:var(${accent})">${body}</div></section>`;
+    return `<section class="section">${head}<div class="panel" style="--acc:var(${accent})">${body}</div></section>`;
   }).join('');
 
   const body = `<div class="body">${sections}</div>`;
