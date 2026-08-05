@@ -46,8 +46,8 @@ a.dl{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--signal)}
   <section class="panel left">
     <div class="phead"><h2>Content (JSON)</h2>
       <div class="tools"><button id="sample">Load sample</button><button id="run" class="primary">Render →</button></div></div>
-    <textarea id="content" spellcheck="false" placeholder="Paste a lesson content JSON here, then press Render…"></textarea>
-    <div class="hint">Images are restored from the shared store when they already exist (no credits). New images are generated via kie.ai and saved to the store.</div>
+    <textarea id="content" spellcheck="false" placeholder="Paste a lesson content JSON — or just raw lesson text — then press Render…"></textarea>
+    <div class="hint">Paste a content JSON, or raw lesson text (it is auto-structured, keeping its own words, before rendering). Images already in the store are restored free; new ones are generated via kie.ai and saved.</div>
   </section>
   <section class="panel">
     <div class="phead"><h2>Rendered lesson</h2><a class="dl" id="dl" href="#" download="lesson.png" style="display:none">Download PNG ↓</a></div>
@@ -75,6 +75,7 @@ $('run').onclick=async()=>{
     const j=await res.json();
     if(j.logs&&j.logs.length){ $('log').textContent=j.logs.join('\n'); $('log').style.display=''; }
     if(!j.ok){ $('ph').innerHTML='<span style="color:var(--signal)">Error:</span> '+(j.error||'render failed'); return; }
+    if(j.structured){ $('content').value=j.structured; } // show the structured JSON the render used
     $('ph').style.display='none';
     const img=new Image(); img.src=j.png; $('out').appendChild(img);
     $('dl').href=j.png; $('dl').style.display='';

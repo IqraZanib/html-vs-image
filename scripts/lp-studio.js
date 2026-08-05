@@ -9,6 +9,7 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const { renderLessonImage } = require('../lp-render/pipeline');
+const { structureLesson } = require('../lp-render/structure');
 
 const ROOT = path.resolve(__dirname, '..');
 // Load the kie.ai key from the git-ignored .env-api if it isn't already in the env.
@@ -39,9 +40,23 @@ const server = http.createServer((req, res) => {
       const logs = []; const log = (m) => logs.push(m);
       try {
         const { content } = JSON.parse(body);
-        const parsed = typeof content === 'string' ? JSON.parse(content) : content;
+        let parsed; let structured = null;
+        if (typeof content !== 'string') {
+          parsed = content;
+        } else {
+          try {
+            parsed = JSON.parse(content);
+          } catch (_) {
+            // Not JSON — treat the paste as a raw lesson plan and structure it.
+            log('Input is not JSON — treating it as a raw lesson plan and structuring it…');
+            if (!process.env.KIE_API_KEY) throw new Error('Raw text needs a kie.ai key to auto-structure. Paste a content JSON instead, or start the server with KIE_API_KEY set.');
+            parsed = await structureLesson(content, { apiKey: process.env.KIE_API_KEY });
+            structured = JSON.stringify(parsed, null, 2);
+            log('Structured the raw text into a content JSON (kept its own words).');
+          }
+        }
         const { png, stats } = await renderLessonImage(parsed, { log });
-        send(res, 200, 'application/json', JSON.stringify({ ok: true, png: 'data:image/png;base64,' + png.toString('base64'), logs, stats }));
+        send(res, 200, 'application/json', JSON.stringify({ ok: true, png: 'data:image/png;base64,' + png.toString('base64'), logs, stats, structured }));
       } catch (e) {
         send(res, 200, 'application/json', JSON.stringify({ ok: false, error: e.message, logs }));
       }
