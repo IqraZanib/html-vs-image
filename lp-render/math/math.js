@@ -62,11 +62,15 @@ function renderMath(tex, { display = true, engine = 'katex' } = {}) {
 // dashes to bullets, and real line breaks for \n. The math parts are rendered by
 // the engine.
 function mdInline(escaped) {
-  return escaped
+  let s = escaped
     .replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>')      // **bold** -> bold (inline sub-heading)
     .replace(/(^|\n)\s*#{1,6}\s*/g, '$1')            // drop leading #, ##, … heading markers
     .replace(/(^|\n)\s*[-*]\s+/g, '$1• ')            // "- item" / "* item" -> bullet
     .replace(/\n/g, '<br>');                          // newlines -> line breaks
+  // A short "Label:" at the start of a line is a sub-heading — bold the label.
+  // (Requires whitespace/end after the colon, so times "40:00" and urls "http://" don't match.)
+  s = s.replace(/(^|<br>)(\s*)([^:<>\n]{2,42}):(?=\s|<br>|$)/g, '$1$2<b>$3:</b>');
+  return s;
 }
 function richText(raw, { engine = 'katex' } = {}) {
   const s = String(raw == null ? '' : raw);

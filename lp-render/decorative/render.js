@@ -151,6 +151,10 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     (chips ? `<div class="meta">${chips}</div>` : '') +
     `</div>`;
 
+  // Track which images a section actually displays, so none are silently missing.
+  const referenced = new Set();
+  for (const s of (content.sections || [])) if (s && s.type === 'images' && Array.isArray(s.imageIds)) s.imageIds.forEach((id) => referenced.add(id));
+
   let placed = 0;
   let prevHeading = '';
   const rot = { n: 0, t: 0, seed: seedOf(`${meta.id || ''}|${meta.subject || ''}|${meta.title || ''}`) };
@@ -177,7 +181,16 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     return `<section class="section">${head}<div class="panel" style="--acc:var(${accent})">${body}</div></section>`;
   }).join('');
 
-  const body = `<div class="body">${sections}</div>`;
+  // Safety net (R12): any generated image not shown by an images section is
+  // appended, so a declared image is never silently missing from the render.
+  const leftover = Object.keys(images).filter((id) => images[id] && images[id].dataUri && !referenced.has(id));
+  let extra = '';
+  if (leftover.length) {
+    const body2 = renderBody({ type: 'images', imageIds: leftover }, accentFor((content.sections || []).length), images);
+    if (body2) extra = `<section class="section"><div class="panel">${body2}</div></section>`;
+  }
+
+  const body = `<div class="body">${sections}${extra}</div>`;
   // KaTeX-rendered math needs its stylesheet; MathJax output is self-contained SVG.
   const headCss = /class="katex"/.test(body) ? katexCss() : '';
   return { headerHtml, bodyHtml: body, headCss };
