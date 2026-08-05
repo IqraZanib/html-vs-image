@@ -7,6 +7,7 @@ const { esc } = require('../template/shell');
 const { icon, hasIcon } = require('../template/icons');
 const { headerMotifs, headTwinkle, sparkle } = require('./motifs');
 const { accentFor } = require('./theme');
+const { renderMath, richText, katexCss } = require('../math/math');
 
 const ALPHA = 'abcdefghijklmnopqrstuvwxyz';
 const mark = (kind, i) => (kind === 'alpha' ? ALPHA[i] + ')' : kind === 'num' ? String(i + 1) : '•');
@@ -29,24 +30,26 @@ function renderBody(section, accent, images) {
       const km = section.marker || 'dot';
       const lis = (section.items || []).map((it, i) => {
         const tag = it.tag ? `<span class="d-tag" style="background:${soft};color:var(${accent})">${esc(it.tag)}</span>` : '';
-        return `<li data-mark="${esc(mark(km, i))}" style="background:${soft}">${esc(it.text)}${tag}</li>`;
+        return `<li data-mark="${esc(mark(km, i))}" style="background:${soft}">${richText(it.text, { engine: section.engine })}${tag}</li>`;
       }).join('');
       const lead = section.lead ? `<div class="d-lead">${esc(section.lead)}</div>` : '';
       return `${lead}<ul class="d-bullets" style="--m:var(${accent})">${lis}</ul>`;
     }
     case 'text':
-      return `<div class="d-text">${esc(section.body || '')}</div>`;
+      return `<div class="d-text">${richText(section.body, { engine: section.engine })}</div>`;
     case 'note': {
       const nt = section.label ? `<span class="nt" style="color:var(${accent})">${esc(section.label)}</span>` : '';
-      return `<div class="d-note" style="background:linear-gradient(90deg,${soft},#fff);border-inline-start:5px solid var(${accent})">${nt}${esc(section.body || '')}</div>`;
+      return `<div class="d-note" style="background:linear-gradient(90deg,${soft},#fff);border-inline-start:5px solid var(${accent})">${nt}${richText(section.body, { engine: section.engine })}</div>`;
     }
+    case 'math':
+      return `<div class="d-math">${(section.items || []).map((it) => `<div class="d-mrow">${it.label ? `<div class="d-mlabel">${esc(it.label)}</div>` : ''}<div class="d-mformula">${renderMath(it.tex, { display: true, engine: section.engine })}</div></div>`).join('')}</div>`;
     case 'chips':
       return `<div class="d-chips">${(section.items || []).map((c) => `<span class="d-chip" style="background:${soft};color:var(${accent})">${esc(c)}</span>`).join('')}</div>`;
     case 'steps':
-      return `<div class="d-steps">${(section.items || []).map((s, i) => `<div class="d-step"><div class="n" style="background:var(${accent})">${i + 1}</div><div><div class="st-label">${esc(s.label || '')}</div><div class="st-body">${esc(s.body || '')}</div></div></div>`).join('')}</div>`;
+      return `<div class="d-steps">${(section.items || []).map((s, i) => `<div class="d-step"><div class="n" style="background:var(${accent})">${i + 1}</div><div><div class="st-label">${richText(s.label, { engine: section.engine })}</div><div class="st-body">${richText(s.body, { engine: section.engine })}</div></div></div>`).join('')}</div>`;
     case 'qa': {
       const km = section.marker || 'alpha';
-      return `<div class="d-qa">${(section.items || []).map((qa, i) => `<div class="d-qc"><div class="d-q" data-mark="${esc(mark(km, i))}" style="color:var(${accent})">${esc(qa.q)}</div>${qa.a ? `<div class="d-a">${esc(qa.a)}</div>` : ''}</div>`).join('')}</div>`;
+      return `<div class="d-qa">${(section.items || []).map((qa, i) => `<div class="d-qc"><div class="d-q" data-mark="${esc(mark(km, i))}" style="color:var(${accent})">${richText(qa.q, { engine: section.engine })}</div>${qa.a ? `<div class="d-a">${richText(qa.a, { engine: section.engine })}</div>` : ''}</div>`).join('')}</div>`;
     }
     case 'fields':
       return `<div class="d-fields">${(section.items || []).map((f) => `<div class="d-field"><b>${esc(f.label)}</b>${esc(f.value || '')}</div>`).join('')}</div>`;
@@ -144,7 +147,10 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     return `<section class="section">${sectionHead(accent, section, i)}<div class="panel" style="--acc:var(${accent})">${body}</div></section>`;
   }).join('');
 
-  return { headerHtml, bodyHtml: `<div class="body">${sections}</div>` };
+  const body = `<div class="body">${sections}</div>`;
+  // KaTeX-rendered math needs its stylesheet; MathJax output is self-contained SVG.
+  const headCss = /class="katex"/.test(body) ? katexCss() : '';
+  return { headerHtml, bodyHtml: body, headCss };
 }
 
 module.exports = { renderDecorativeLesson };

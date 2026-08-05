@@ -115,9 +115,9 @@ const CONCEPT_TO_BLOCK = { diagram: 'DIAGRAM', scene: 'HOOK_STORY', photo: 'HOOK
   const cast = await ensureCast({ apiKey: process.env.KIE_API_KEY, gatePolicy });
 
   // ---- render (generic; content words verbatim)
-  const { headerHtml, bodyHtml } = renderDecorativeLesson(content, imagesMap, cast);
+  const { headerHtml, bodyHtml, headCss } = renderDecorativeLesson(content, imagesMap, cast);
   let html = buildShell({ headerHtml, bodyHtml, locale, title: meta.title || contentId });
-  html = html.replace('</head>', `<style>${THEME_CSS}</style></head>`);
+  html = html.replace('</head>', `<style>${THEME_CSS}</style>${headCss ? `<style>${headCss}</style>` : ''}</head>`);
 
   const outPng = outArg || path.join(ROOT, 'assets/generated', `${contentId}.${locale}.png`);
   const outPdf = outPng.replace(/\.png$/i, '.pdf');

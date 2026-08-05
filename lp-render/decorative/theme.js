@@ -94,6 +94,15 @@ body{background:#eef2fb;color:var(--ink);font-family:var(--font),'Baloo 2','Popp
 .char-fig.right img{transform:scaleX(-1)}
 .char-body{flex:1;min-width:0}
 
+/* math (KaTeX / MathJax — code-rendered, never image-gen) */
+.d-math{display:grid;gap:12px}
+.d-mrow{background:#fbfcff;border:1px solid var(--line);border-radius:12px;padding:15px 16px;text-align:center}
+.d-mlabel{font-size:12px;font-weight:800;color:var(--muted);margin-bottom:9px;text-transform:uppercase;letter-spacing:.03em}
+.d-mformula{overflow-x:auto}
+.d-mformula .katex{font-size:1.5em}
+.d-mformula svg{max-width:100%;height:auto;vertical-align:middle}
+.d-text .katex,.d-note .katex{font-size:1.05em}
+
 /* images */
 .d-imgrow{display:grid;gap:14px}
 .d-imgrow.n1{grid-template-columns:1fr}

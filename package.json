@@ -12,6 +12,8 @@
     "@fontsource/noto-naskh-arabic": "^5.2.11",
     "@fontsource/noto-nastaliq-urdu": "^5.2.8",
     "@fontsource/noto-sans": "^5.2.10",
+    "katex": "^0.18.1",
+    "mathjax-full": "^3.2.1",
     "playwright-core": "^1.48.0"
   }
 }
