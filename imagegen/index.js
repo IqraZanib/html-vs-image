@@ -17,14 +17,13 @@ async function resolveSegmentImages(segment = {}, opts = {}) {
     cache = new MemoryAssetCache(), budget = new BudgetGuard(),
   } = opts;
 
-  const images = [];
   const report = [];
-  for (const block of (segment.blocks || [])) {
+
+  // Resolve one block's image (classify -> ladder -> generate -> gate -> cache).
+  const resolveOne = async (block) => {
     const { category, needsImage, reason } = classifyBlock(block, segment);
-    if (!needsImage) {
-      images.push({ blockType: block.type, category, needsImage: false, model: null, asset: null, reason });
-      continue;
-    }
+    if (!needsImage) return { blockType: block.type, category, needsImage: false, model: null, asset: null, reason };
+
     // A block may force a specific model (e.g. an open-weight flux/qwen); otherwise
     // walk the category's cost-ascending ladder. Either way the gate still decides.
     const ladder = block.model ? [block.model] : route(category).ladder;
@@ -55,12 +54,13 @@ async function resolveSegmentImages(segment = {}, opts = {}) {
       }
     }
 
-    if (resolved) {
-      images.push({ blockType: block.type, category, needsImage: true, model: resolved.model, asset: resolved.asset, reason: resolved.reason, creditsConsumed: resolved.credits });
-    } else {
-      images.push({ blockType: block.type, category, needsImage: true, model: null, asset: null, reason: 'fallback: no model passed the quality gate' });
-    }
-  }
+    return resolved
+      ? { blockType: block.type, category, needsImage: true, model: resolved.model, asset: resolved.asset, reason: resolved.reason, creditsConsumed: resolved.credits }
+      : { blockType: block.type, category, needsImage: true, model: null, asset: null, reason: 'fallback: no model passed the quality gate' };
+  };
+
+  // Blocks are independent, so resolve them concurrently (output order preserved).
+  const images = await Promise.all((segment.blocks || []).map(resolveOne));
   return { images, report };
 }
 

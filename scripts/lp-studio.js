@@ -55,7 +55,7 @@ const server = http.createServer((req, res) => {
           structured = JSON.stringify(parsed, null, 2);
           log('Structured the input into a content JSON (kept its own words).');
         }
-        const { png, stats } = await renderLessonImage(parsed, { log });
+        const { png, stats } = await renderLessonImage(parsed, { log, pdf: false }); // interface only needs the PNG
         send(res, 200, 'application/json', JSON.stringify({ ok: true, png: 'data:image/png;base64,' + png.toString('base64'), logs, stats, structured }));
       } catch (e) {
         send(res, 200, 'application/json', JSON.stringify({ ok: false, error: e.message, logs }));

@@ -58,7 +58,7 @@ async function screenshot(html) {
 // shared asset store when possible (no credits); anything new is generated, gated,
 // and saved to the store for next time.
 async function renderLessonImage(content, opts = {}) {
-  const { apiKey = process.env.KIE_API_KEY, fresh = false, log = () => {} } = opts;
+  const { apiKey = process.env.KIE_API_KEY, fresh = false, log = () => {}, pdf: wantPdf = true } = opts;
   const gatePolicy = readSkills(log);
   const meta = content.meta || {};
   const locale = meta.locale || 'en';
@@ -103,8 +103,13 @@ async function renderLessonImage(content, opts = {}) {
   let html = buildShell({ headerHtml, bodyHtml, locale, title: meta.title || contentId });
   html = html.replace('</head>', `<style>${THEME_CSS}</style>${headCss ? `<style>${headCss}</style>` : ''}</head>`);
 
-  const pdf = await htmlToPdf(html, { pageMode: 'fit', pdfOptions: { printBackground: true } });
-  await closeBrowser();
+  // The PDF is a second full Chromium render; skip it when only the PNG is needed
+  // (e.g. the web interface) to roughly halve the render step.
+  let pdf = null;
+  if (wantPdf) {
+    pdf = await htmlToPdf(html, { pageMode: 'fit', pdfOptions: { printBackground: true } });
+    await closeBrowser();
+  }
   const png = await screenshot(html);
   return { png, pdf, html, contentId, locale, stats: statsOut };
 }
