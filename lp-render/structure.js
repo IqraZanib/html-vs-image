@@ -47,6 +47,28 @@ const PART_NOTE = `
 
 IMPORTANT: The text below is ONE PART of a larger lesson. Output ONLY {"sections":[...], "images":[...]} for THIS part — do NOT include "meta". Follow all the same rules (verbatim words, section types, image rules). Never refuse; structure exactly what is here.`;
 
+// Pull the actual lesson text out of an arbitrary JSON blob (an API/LLM response
+// with the lesson buried in a text field, wrapped in model/usage/token metadata),
+// so that noise never reaches the render. Plain text (or a real content JSON) is
+// returned unchanged.
+function extractLessonText(raw) {
+  let obj;
+  try { obj = JSON.parse(raw); } catch (_) { return String(raw); } // not JSON → already text
+  if (typeof obj === 'string') return obj;
+  if (obj && typeof obj === 'object' && Array.isArray(obj.sections)) return String(raw); // already our schema
+  const strings = [];
+  (function walk(v) {
+    if (v == null) return;
+    if (typeof v === 'string') { if (v.trim()) strings.push(v); return; }
+    if (Array.isArray(v)) { v.forEach(walk); return; }
+    if (typeof v === 'object') { Object.keys(v).forEach((k) => walk(v[k])); }
+  })(obj);
+  if (!strings.length) return String(raw);
+  // Lesson content is the long prose; metadata (model names, urls, ids) is short.
+  const long = strings.filter((s) => s.trim().length > 150);
+  return (long.length ? long : [strings.sort((a, b) => b.length - a.length)[0]]).join('\n\n');
+}
+
 // One model call → parsed JSON object, or null on refusal / no-JSON / an {error} reply.
 async function callStructure(text, system, { apiKey, fetchImpl = defaultFetch }) {
   const body = JSON.stringify({
@@ -127,7 +149,7 @@ async function structureChunked(text, { apiKey, fetchImpl, maxChars }) {
 // (or a refusal) fall back to chunked structuring so any size converts smoothly.
 async function structureLesson(raw, { apiKey, fetchImpl = defaultFetch, maxChars = 4500 } = {}) {
   if (!apiKey) throw new Error('structuring needs a kie.ai API key');
-  const text = String(raw);
+  const text = extractLessonText(String(raw)); // strip API/metadata wrappers first
   if (text.length <= maxChars) {
     const single = await callStructure(text, SYSTEM, { apiKey, fetchImpl });
     if (single && Array.isArray(single.sections) && single.sections.length) return normalize(single);
@@ -135,4 +157,4 @@ async function structureLesson(raw, { apiKey, fetchImpl = defaultFetch, maxChars
   return structureChunked(text, { apiKey, fetchImpl, maxChars });
 }
 
-module.exports = { structureLesson, splitIntoChunks };
+module.exports = { structureLesson, splitIntoChunks, extractLessonText };
