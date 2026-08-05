@@ -152,13 +152,18 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     `</div>`;
 
   let placed = 0;
+  let prevHeading = '';
   const rot = { n: 0, t: 0, seed: seedOf(`${meta.id || ''}|${meta.subject || ''}|${meta.title || ''}`) };
   const used = new Set(); // no character repeats within one lesson
   const sections = (content.sections || []).map((section, i) => {
     const accent = accentFor(i);
     const body = renderBody(section, accent, images);
     if (body === '') return '';
-    const head = sectionHead(accent, section, i);
+    // A heading that repeats the previous one (e.g. a phase split across structuring
+    // chunks) is shown once — the rest render as a continuation, no repeated header.
+    const title = cleanHeading(section.heading);
+    const head = (title && title !== prevHeading) ? sectionHead(accent, section, i) : '';
+    if (title) prevHeading = title;
     const charId = pickCharacter(section, cast, rot, used);
     if (charId) {
       used.add(charId);
