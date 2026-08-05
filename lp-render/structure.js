@@ -35,7 +35,8 @@ Hard rules:
 - Use the lesson's OWN words and headings VERBATIM. Do NOT summarize, reword, translate, or invent content. If the lesson is in Urdu/Swahili/etc, keep that language and set locale accordingly (default "en").
 - Pick the section "type" that best fits each part of the source (objectives->bullets, resources->chips, steps->steps, questions->qa or bullets, conclusion/notes->note, forms->fields).
 - Formulas: put standalone formulas in a "math" section as LaTeX "tex"; for a formula inside a sentence, keep it inline using $...$ in the text.
-- Images: add 0-3 entries ONLY for concrete things the lesson actually names that benefit from a picture (a chart/diagram it references -> concept "diagram"; an illustrative scene/resource -> concept "scene"). Write a clear prompt describing exactly that. If nothing visual is named, use an empty images array.
+- Images: add 0-3 entries ONLY for concrete things the lesson actually names that benefit from a picture (a chart/diagram it references -> concept "diagram"; an illustrative scene/resource -> concept "scene"). If nothing visual is named, use an empty images array.
+- Image prompts must describe the SUBJECT plainly. Do NOT over-specify style or details the model may not honour ("plain background", "flat cartoon", "speed lines", "no face"): the quality gate compares the image to its prompt, so an over-specified prompt makes a good image fail. Keep prompts subject-focused.
 - IMPORTANT: if you declare any images, you MUST also add exactly ONE "images" section, placed where the pictures belong (e.g. right after the introduction), whose "imageIds" list every declared image id. Declared images that no section references are wasted, so never leave them out.
 - Every "id" (meta.id, image ids) must be unique kebab-case.`;
 

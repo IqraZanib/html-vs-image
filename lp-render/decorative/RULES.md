@@ -69,6 +69,37 @@ Clear visual hierarchy, generous spacing, readable contrast, consistent section
 cards, a coherent colour theme, and correct reading direction for the language.
 Styling is the renderer's job; wording is not.
 
+## R11 — Give the pipeline a proper structure, or structure it first
+The renderer needs a content object with a `sections` array. Raw lesson text — or a
+JSON in any other shape (a lesson buried in a text field, an API/response dump) —
+must be structured into the schema first, keeping the lesson's own words, never
+rendered as-is. Content with no recognisable sections renders blank; detect that and
+structure it before rendering rather than emitting an empty page.
+
+## R12 — Never orphan an image
+Every image the content declares must be placed in an `images` section so it actually
+appears in the render. Generating an image and then not displaying it wastes credits.
+When structuring content, always add the `images` section that lists the image ids.
+
+## R13 — Prompt for the subject, not a rigid style
+Image prompts must describe the subject plainly. Do not over-specify style or details
+the model may not honour ("plain background", "flat cartoon", "speed lines", "no
+face"): the quality gate compares the image against its prompt, so an over-specified
+prompt makes a perfectly good image fail for a detail it was never going to match.
+Keep prompts subject-focused; let the house style come from the scaffold, not the ask.
+
+## R14 — Formulas are code, never pictures
+Never image-generate mathematical notation or formulas — image models drift (a broken
+radical, a misplaced fraction bar, a stray bracket). Render every formula with the
+code engines: a `math` section (KaTeX or MathJax) for display formulas, inline `$…$`
+for a formula inside a sentence.
+
+## R15 — Reuse before you spend; never leave a blank
+Check the shared asset store before generating — an image already made for the same
+prompt is restored for free, so identical requests never cost twice. Retry a transient
+generation failure before giving up. If an image still cannot be produced, fall back to
+a character (R8); never leave a section visually empty.
+
 ## GATE_POLICY
 - The image must be correct for the exact concept named in the content. For a labeled
   diagram, every label must be spelled correctly and point to the right part; reject
