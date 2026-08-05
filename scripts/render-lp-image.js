@@ -88,7 +88,7 @@ const CONCEPT_TO_BLOCK = { diagram: 'DIAGRAM', scene: 'HOOK_STORY', photo: 'HOOK
     const segment = {
       subject: meta.subject || (meta.chips || []).map((c) => c.value).join(' '),
       grade: meta.grade || '', region: meta.region || 'pk',
-      blocks: toGen.map((im) => ({ type: CONCEPT_TO_BLOCK[im.concept] || 'HOOK_STORY', text: im.prompt, characters: im.characters })),
+      blocks: toGen.map((im) => ({ type: CONCEPT_TO_BLOCK[im.concept] || 'HOOK_STORY', text: im.prompt, characters: im.characters, model: im.model })),
     };
     const { images } = await resolveSegmentImages(segment, { apiKey, region: segment.region, gatePolicy });
     for (let i = 0; i < toGen.length; i++) {

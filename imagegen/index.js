@@ -25,7 +25,9 @@ async function resolveSegmentImages(segment = {}, opts = {}) {
       images.push({ blockType: block.type, category, needsImage: false, model: null, asset: null, reason });
       continue;
     }
-    const { ladder } = route(category);
+    // A block may force a specific model (e.g. an open-weight flux/qwen); otherwise
+    // walk the category's cost-ascending ladder. Either way the gate still decides.
+    const ladder = block.model ? [block.model] : route(category).ladder;
     const prompt = resolvePrompt({ category, subject: segment.subject, block, region, grade: segment.grade });
     const expectation = block.text || segment.topic || category;
 
@@ -35,7 +37,11 @@ async function resolveSegmentImages(segment = {}, opts = {}) {
       const cached = await cache.get(key);
       if (cached) { resolved = { model, asset: cached, credits: 0, reason: 'cache' }; break; }
 
-      const gen = await generateImpl({ apiKey, model, prompt });
+      let gen = null;
+      for (let attempt = 0; attempt < 3; attempt++) { // retry transient gen failures (some models are flaky)
+        gen = await generateImpl({ apiKey, model, prompt });
+        if (gen.ok) break;
+      }
       if (!gen.ok) { report.push({ blockType: block.type, model, event: 'gen_fail', error: gen.error }); continue; }
       if (typeof gen.creditsConsumed === 'number') budget.spend(gen.creditsConsumed);
 
