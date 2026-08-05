@@ -40,20 +40,20 @@ const server = http.createServer((req, res) => {
       const logs = []; const log = (m) => logs.push(m);
       try {
         const { content } = JSON.parse(body);
-        let parsed; let structured = null;
-        if (typeof content !== 'string') {
-          parsed = content;
-        } else {
-          try {
-            parsed = JSON.parse(content);
-          } catch (_) {
-            // Not JSON — treat the paste as a raw lesson plan and structure it.
-            log('Input is not JSON — treating it as a raw lesson plan and structuring it…');
-            if (!process.env.KIE_API_KEY) throw new Error('Raw text needs a kie.ai key to auto-structure. Paste a content JSON instead, or start the server with KIE_API_KEY set.');
-            parsed = await structureLesson(content, { apiKey: process.env.KIE_API_KEY });
-            structured = JSON.stringify(parsed, null, 2);
-            log('Structured the raw text into a content JSON (kept its own words).');
-          }
+        let parsed = null; let structured = null;
+        // First, try to read the paste as a ready content JSON.
+        if (typeof content !== 'string') parsed = content;
+        else { try { parsed = JSON.parse(content); } catch (_) { parsed = null; } }
+        // A usable content JSON MUST have a sections array. Anything else — raw
+        // lesson text, or a JSON in some other shape (an API dump, a blob with the
+        // lesson inside a text field) — is structured into the schema first.
+        if (!parsed || !Array.isArray(parsed.sections)) {
+          log('Input is not a lesson content JSON — structuring it into the schema first…');
+          if (!process.env.KIE_API_KEY) throw new Error('Structuring needs a kie.ai key. Paste a content JSON (with a "sections" array), or start the server with KIE_API_KEY set.');
+          const raw = typeof content === 'string' ? content : JSON.stringify(content);
+          parsed = await structureLesson(raw, { apiKey: process.env.KIE_API_KEY });
+          structured = JSON.stringify(parsed, null, 2);
+          log('Structured the input into a content JSON (kept its own words).');
         }
         const { png, stats } = await renderLessonImage(parsed, { log });
         send(res, 200, 'application/json', JSON.stringify({ ok: true, png: 'data:image/png;base64,' + png.toString('base64'), logs, stats, structured }));

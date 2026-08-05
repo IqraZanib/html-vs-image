@@ -61,5 +61,26 @@
     "model": "nano-banana-2",
     "concept": "scene",
     "prompt": "A kettle with water boiling and steam rising, used to demonstrate evaporation in a classroom."
+  },
+  "78ddcf1199df3107": {
+    "file": "78ddcf1199df3107.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Grade 1 pupils using stones and fingers to combine two groups of objects to learn addition from 1 to 10."
+  },
+  "d6e2ffd0af7152fe": {
+    "file": "d6e2ffd0af7152fe.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Concrete to Pictorial to Abstract addition diagram showing stones, drawings of circles, and the equation 3 + 2 = 5."
+  },
+  "88fad65a8849a8bb": {
+    "file": "88fad65a8849a8bb.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "A simple educational illustration for Grade 1 math: Ali has 4 mangoes and Fatima gives him 2 more mangoes. Show the two groups of mangoes clearly with a child-friendly classroom style."
   }
 }
