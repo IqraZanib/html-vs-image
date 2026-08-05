@@ -1,0 +1,346 @@
+{
+  "meta": {
+    "id": "lesson-big-demo",
+    "locale": "en",
+    "subject": "SCIENCE",
+    "grade": "GRADE 5",
+    "region": "pk",
+    "title": "GRADE 5 SCIENCE UNIT: THE HUMAN BODY SYSTEMS",
+    "subtitle": "Key Inquiry: How do body systems keep us alive?",
+    "chips": [
+      {
+        "label": "Key Inquiry",
+        "value": "How do body systems keep us alive?"
+      }
+    ]
+  },
+  "images": [],
+  "sections": [
+    {
+      "heading": "Learning Objectives",
+      "type": "bullets",
+      "marker": "alpha",
+      "items": [
+        {
+          "text": "Name the major body systems."
+        },
+        {
+          "text": "Describe the function of each."
+        },
+        {
+          "text": "Appreciate keeping the body healthy."
+        }
+      ]
+    },
+    {
+      "heading": "Resources",
+      "type": "chips",
+      "items": [
+        "Chart of body systems",
+        "model skeleton",
+        "flashcards",
+        "textbook"
+      ]
+    },
+    {
+      "heading": "Digestive System",
+      "type": "images",
+      "imageIds": [
+        "c0-digestive-system-chart",
+        "c0-respiratory-system-chart",
+        "c0-circulatory-system-chart"
+      ]
+    },
+    {
+      "heading": "Introduction",
+      "type": "text",
+      "body": "Learners study the digestive system and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body."
+    },
+    {
+      "heading": "Digestive System",
+      "type": "steps",
+      "items": [
+        {
+          "label": "Step 1",
+          "body": "Study the chart of the digestive system and name its parts."
+        },
+        {
+          "label": "Step 2",
+          "body": "In groups, discuss how the digestive system works."
+        },
+        {
+          "label": "Step 3",
+          "body": "Search for ways to keep the digestive system healthy."
+        }
+      ]
+    },
+    {
+      "heading": "Worked notes",
+      "type": "text",
+      "body": "The Digestive System has several important parts, each with a special job that helps the body function well. The Digestive System has several important parts, each with a special job that helps the body function well. The Digestive System has several important parts, each with a special job that helps the body function well. The Digestive System has several important parts, each with a special job that helps the body function well. The Digestive System has several important parts, each with a special job that helps the body function well. The Digestive System has several important parts, each with a special job that helps the body function well. The Digestive System has several important parts, each with a special job that helps the body function well. The Digestive System has several important parts, each with a special job that helps the body function well."
+    },
+    {
+      "heading": "Assessment",
+      "type": "qa",
+      "marker": "alpha",
+      "items": [
+        {
+          "q": "Name 2 parts of the digestive system."
+        },
+        {
+          "q": "What is its main job?"
+        }
+      ]
+    },
+    {
+      "heading": "Introduction",
+      "type": "text",
+      "body": "Learners study the respiratory system and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body."
+    },
+    {
+      "heading": "Respiratory System",
+      "type": "steps",
+      "items": [
+        {
+          "label": "Step 1",
+          "body": "Study the chart of the respiratory system and name its parts."
+        },
+        {
+          "label": "Step 2",
+          "body": "In groups, discuss how the respiratory system works."
+        },
+        {
+          "label": "Step 3",
+          "body": "Search for ways to keep the respiratory system healthy."
+        }
+      ]
+    },
+    {
+      "heading": "Worked notes",
+      "type": "text",
+      "body": "The Respiratory System has several important parts, each with a special job that helps the body function well. The Respiratory System has several important parts, each with a special job that helps the body function well. The Respiratory System has several important parts, each with a special job that helps the body function well. The Respiratory System has several important parts, each with a special job that helps the body function well. The Respiratory System has several important parts, each with a special job that helps the body function well. The Respiratory System has several important parts, each with a special job that helps the body function well. The Respiratory System has several important parts, each with a special job that helps the body function well. The Respiratory System has several important parts, each with a special job that helps the body function well."
+    },
+    {
+      "heading": "Assessment",
+      "type": "qa",
+      "marker": "alpha",
+      "items": [
+        {
+          "q": "Name 2 parts of the respiratory system."
+        },
+        {
+          "q": "What is its main job?"
+        }
+      ]
+    },
+    {
+      "heading": "Introduction",
+      "type": "text",
+      "body": "Learners study the circulatory system and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body."
+    },
+    {
+      "heading": "Circulatory System",
+      "type": "steps",
+      "items": [
+        {
+          "label": "Step 1",
+          "body": "Study the chart of the circulatory system and name its parts."
+        },
+        {
+          "label": "Step 2",
+          "body": "In groups, discuss how the circulatory system works."
+        },
+        {
+          "label": "Step 3",
+          "body": "Search for ways to keep the circulatory system healthy."
+        }
+      ]
+    },
+    {
+      "heading": "Worked notes",
+      "type": "text",
+      "body": "The Circulatory System has several important parts, each with a special job that helps the body function well. The Circulatory System has several important parts, each with a special job that helps the body function well. The Circulatory System has several important parts, each with a special job that helps the body function well. The Circulatory System has several important parts, each with a special job that helps the body function well. The Circulatory System has several important parts, each with a special job that helps the body function well. The Circulatory System has several important parts, each with a special job that helps the body function well. The Circulatory System has several important parts, each with a special job that helps the body function well. The Circulatory System has several important parts, each with a special job that helps the body function well."
+    },
+    {
+      "heading": "Assessment",
+      "type": "qa",
+      "marker": "alpha",
+      "items": [
+        {
+          "q": "1) Name 2 parts of the circulatory system."
+        },
+        {
+          "q": "2) What is its main job?"
+        }
+      ]
+    },
+    {
+      "heading": "Skeletal System",
+      "type": "text",
+      "body": ""
+    },
+    {
+      "heading": "Introduction",
+      "type": "text",
+      "body": "Learners study the skeletal system and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body."
+    },
+    {
+      "heading": "",
+      "type": "images",
+      "imageIds": [
+        "c1-skeletal-system-chart",
+        "c1-muscular-system-chart",
+        "c1-nervous-system-chart"
+      ]
+    },
+    {
+      "heading": "Steps",
+      "type": "steps",
+      "items": [
+        {
+          "label": "Step 1",
+          "body": "Study the chart of the skeletal system and name its parts."
+        },
+        {
+          "label": "Step 2",
+          "body": "In groups, discuss how the skeletal system works."
+        },
+        {
+          "label": "Step 3",
+          "body": "Search for ways to keep the skeletal system healthy."
+        }
+      ]
+    },
+    {
+      "heading": "Worked notes",
+      "type": "text",
+      "body": "The Skeletal System has several important parts, each with a special job that helps the body function well. The Skeletal System has several important parts, each with a special job that helps the body function well. The Skeletal System has several important parts, each with a special job that helps the body function well. The Skeletal System has several important parts, each with a special job that helps the body function well. The Skeletal System has several important parts, each with a special job that helps the body function well. The Skeletal System has several important parts, each with a special job that helps the body function well. The Skeletal System has several important parts, each with a special job that helps the body function well. The Skeletal System has several important parts, each with a special job that helps the body function well."
+    },
+    {
+      "heading": "Assessment",
+      "type": "qa",
+      "marker": "alpha",
+      "items": [
+        {
+          "q": "1) Name 2 parts of the skeletal system."
+        },
+        {
+          "q": "2) What is its main job?"
+        }
+      ]
+    },
+    {
+      "heading": "Muscular System",
+      "type": "text",
+      "body": ""
+    },
+    {
+      "heading": "Introduction",
+      "type": "text",
+      "body": "Learners study the muscular system and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body."
+    },
+    {
+      "heading": "Steps",
+      "type": "steps",
+      "items": [
+        {
+          "label": "Step 1",
+          "body": "Study the chart of the muscular system and name its parts."
+        },
+        {
+          "label": "Step 2",
+          "body": "In groups, discuss how the muscular system works."
+        },
+        {
+          "label": "Step 3",
+          "body": "Search for ways to keep the muscular system healthy."
+        }
+      ]
+    },
+    {
+      "heading": "Worked notes",
+      "type": "text",
+      "body": "The Muscular System has several important parts, each with a special job that helps the body function well. The Muscular System has several important parts, each with a special job that helps the body function well. The Muscular System has several important parts, each with a special job that helps the body function well. The Muscular System has several important parts, each with a special job that helps the body function well. The Muscular System has several important parts, each with a special job that helps the body function well. The Muscular System has several important parts, each with a special job that helps the body function well. The Muscular System has several important parts, each with a special job that helps the body function well. The Muscular System has several important parts, each with a special job that helps the body function well."
+    },
+    {
+      "heading": "Assessment",
+      "type": "qa",
+      "marker": "alpha",
+      "items": [
+        {
+          "q": "1) Name 2 parts of the muscular system."
+        },
+        {
+          "q": "2) What is its main job?"
+        }
+      ]
+    },
+    {
+      "heading": "Nervous System",
+      "type": "text",
+      "body": ""
+    },
+    {
+      "heading": "Introduction",
+      "type": "text",
+      "body": "Learners study the nervous system and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body. and discuss its role in the body."
+    },
+    {
+      "heading": "Steps",
+      "type": "steps",
+      "items": [
+        {
+          "label": "Step 1",
+          "body": "Study the chart of the nervous system and name its parts."
+        },
+        {
+          "label": "Step 2",
+          "body": "In groups, discuss how the nervous system works."
+        },
+        {
+          "label": "Step 3",
+          "body": "Search for ways to keep the nervous system healthy."
+        }
+      ]
+    },
+    {
+      "heading": "Worked notes",
+      "type": "text",
+      "body": "The Nervous System has several important parts, each with a special job that helps the body function well. The Nervous System has several important parts, each with a special job that helps the body function well. The Nervous System has several important parts, each with a special job that helps the body function well. The Nervous System has several important parts, each with a special job that helps the body function well. The Nervous System has several important parts, each with a special job that helps the body function well. The Nervous System has several important parts, each with a special job that helps the body function well. The Nervous System has several important parts, each with a special job that helps the body function well. The Nervous System has several important parts, each with a special job that helps the body function well."
+    },
+    {
+      "heading": "Assessment",
+      "type": "qa",
+      "marker": "alpha",
+      "items": [
+        {
+          "q": "1) Name 2 parts of the nervous system."
+        },
+        {
+          "q": "2) What is its main job?"
+        }
+      ]
+    },
+    {
+      "heading": "End of Unit Assessment",
+      "type": "note",
+      "body": "Answer all questions. Write full sentences and show your reasoning clearly for each answer. Write full sentences and show your reasoning clearly for each answer. Write full sentences and show your reasoning clearly for each answer. Write full sentences and show your reasoning clearly for each answer. Write full sentences and show your reasoning clearly for each answer. Write full sentences and show your reasoning clearly for each answer. Write full sentences and show your reasoning clearly for each answer. Write full sentences and show your reasoning clearly for each answer. Write full sentences and show your reasoning clearly for each answer. Write full sentences and show your reasoning clearly for each answer."
+    },
+    {
+      "heading": "Scoring Guide",
+      "type": "bullets",
+      "marker": "dot",
+      "items": [
+        {
+          "text": "18-20 Excellent"
+        },
+        {
+          "text": "14-17 Good"
+        },
+        {
+          "text": "10-13 Needs review"
+        }
+      ]
+    }
+  ]
+}
