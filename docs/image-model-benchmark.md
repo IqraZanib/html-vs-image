@@ -120,3 +120,24 @@ image-gen output is allowed into the final PDF, with retry/fallback on fail.
 - **Ideogram v3** errored both runs — retry with corrected params before adopting; not a verified option yet.
 - Imagen4 (`google/imagen4`, `google/imagen4-ultra`) and GPT Image-2 exist but were not benchmarked this pass.
 - Pricing numbers are derived from live `creditsConsumed`, not kie.ai's published price list.
+
+## Correction — open-weight models re-tested (character task)
+
+An earlier pass wrongly concluded the open-weight models were unreliable. A proper
+re-run (same schoolboy character prompt) shows **both work**:
+
+| Model | Licensing | Credits | Latency | Background | Verdict |
+|---|---|---|---|---|---|
+| `nano-banana-2-lite` | proprietary | **4** | ~17s | pure white | shipped — cheapest + blends into panels |
+| `flux-2/pro-text-to-image` | **open-weight** | 5 | 24–83s (variable) | pure white | works 3/3; good art; slow |
+| `qwen2/text-to-image` | **open-weight** | 5.6 | **~10s** (fastest) | tinted (blue) | works; good art; bg needs keying |
+
+Key fixes to the earlier mistakes:
+- **Qwen2 works** — its `image_size` takes **ratio strings** (`'1:1'`, `'3:4'`), **not** the
+  fal-style names (`portrait_4_3`, `square_hd`) that were tried first and rejected.
+- **FLUX-2/pro is not flaky** — 3/3 runs succeeded; the earlier single timeout was transient.
+  It is just slow and high-variance in latency.
+
+So the reason we ship `nano-banana-2-lite` for characters is **cost (4cr) + a pure-white
+background** (which the panel-blend needs), not any failure of the open-weight models.
+Both `flux-2/pro` and `qwen2` are registered in `models.config.js` as usable alternatives.
