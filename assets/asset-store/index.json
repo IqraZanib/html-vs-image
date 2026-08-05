@@ -1,0 +1,37 @@
+{
+  "3531b9000d8a36c0": {
+    "file": "3531b9000d8a36c0.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "a clear educational labeled chart of the human breathing system for a Grade 5 Science lesson, clearly labelling the nose, the trachea (wind pipe), the two lungs, and the diaphragm, flat infographic style, correct anatomy, plain background"
+  },
+  "fb5c2db48240c64b": {
+    "file": "fb5c2db48240c64b.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "clear simple educational pictures of the human lungs and the human nose side by side, labelled, correct anatomy, flat illustration, plain background, suitable for a Grade 5 Science classroom"
+  },
+  "9aebaed02219d9e6": {
+    "file": "9aebaed02219d9e6.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "a clear educational science diagram of a lung model made with balloons: a plastic bottle with two balloons inside representing the two lungs and a stretched rubber sheet at the bottom representing the diaphragm, with a simple arrow showing air moving in and out, labelled 'balloons = lungs' and 'rubber sheet = diaphragm', flat infographic style, correct and simple, plain background"
+  },
+  "34f43d25885a1f3a": {
+    "file": "34f43d25885a1f3a.png",
+    "mime": "image/png",
+    "model": "flux-2/pro-text-to-image",
+    "concept": "scene",
+    "prompt": "a happy child athlete running in a race on a school sports field, smiling, bright cheerful flat cartoon illustration, plain simple background"
+  },
+  "b87d75babac36448": {
+    "file": "b87d75babac36448.jpg",
+    "mime": "image/jpeg",
+    "model": "qwen2/text-to-image",
+    "concept": "scene",
+    "prompt": "a cheerful child riding a bicycle on a countryside road, smiling, colourful illustration for a children's maths lesson"
+  }
+}
