@@ -55,7 +55,17 @@ const server = http.createServer((req, res) => {
           structured = JSON.stringify(parsed, null, 2);
           log('Structured the input into a content JSON (kept its own words).');
         }
-        const { png, pdf, stats } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)
+        const { png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)
+        // Keep every rendered lesson in the repo (pdf + png + the content JSON used).
+        try {
+          const dir = path.join(ROOT, 'assets/generated/lessons');
+          fs.mkdirSync(dir, { recursive: true });
+          const base = path.join(dir, `${contentId}.${locale || 'en'}`);
+          if (pdf) fs.writeFileSync(`${base}.pdf`, pdf);
+          fs.writeFileSync(`${base}.png`, png);
+          fs.writeFileSync(`${base}.json`, JSON.stringify(parsed, null, 2));
+          log(`Saved to assets/generated/lessons/${contentId}.${locale || 'en'}.{pdf,png,json}`);
+        } catch (e) { log(`(could not save to repo: ${e.message})`); }
         send(res, 200, 'application/json', JSON.stringify({
           ok: true,
           png: 'data:image/png;base64,' + png.toString('base64'),

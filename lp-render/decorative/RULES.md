@@ -100,6 +100,35 @@ prompt is restored for free, so identical requests never cost twice. Retry a tra
 generation failure before giving up. If an image still cannot be produced, fall back to
 a character (R8); never leave a section visually empty.
 
+## R16 — Clean the source's formatting
+Strip markdown that would otherwise print as literal symbols: `#`/`##` heading
+markers and `*` are removed, `**bold**` becomes real bold, a leading `- ` becomes a
+bullet, and `\n` becomes a real line break. Headings, labels and captions are cleaned
+of markdown too — a reader should never see a stray `#` or `*`.
+
+## R17 — Bold inline sub-headings; don't promote them
+A short label at the start of a line — `**Bold:**` or `Somo:` (a word/phrase followed
+by a colon) — is a sub-heading. Render it **bold in the same font and size**. It is not
+a new section: it gets no icon disc and no separate heading band.
+
+## R18 — Show a repeated heading once
+When a phase is split (for example across structuring chunks) two sections can carry
+the same heading. Show the heading once; the following same-heading section renders as
+a continuation, with no repeated header.
+
+## R19 — Every declared image is shown; not every heading needs one
+An image named in the content must appear — if no section references it, append it so
+it is never silently missing. Conversely, only place images where they help the page;
+a heading with no fitting image is fine, and images must never overflow their box.
+
+## R20 — Vary the faces
+No character repeats within one lesson, and different lessons/subjects draw a different
+cast (seeded by the lesson) so a maths plan and a science plan never look identical.
+
+## R21 — Deliverable and polish
+The final deliverable is a PDF. Keep spacing tight (no dead space), centre image
+captions, and give the title block faint letterhead icons.
+
 ## GATE_POLICY
 - The image must be correct for the exact concept named in the content. For a labeled
   diagram, every label must be spelled correctly and point to the right part; reject

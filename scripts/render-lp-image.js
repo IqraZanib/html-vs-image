@@ -24,7 +24,7 @@ const { renderLessonImage, ROOT } = require('../lp-render/pipeline');
   const content = JSON.parse(fs.readFileSync(input, 'utf8'));
   const { png, pdf, contentId, locale, stats } = await renderLessonImage(content, { apiKey: process.env.KIE_API_KEY, fresh, log: (m) => console.log(m) });
 
-  const outPng = outArg || path.join(ROOT, 'assets/generated', `${contentId}.${locale}.png`);
+  const outPng = outArg || path.join(ROOT, 'assets/generated/lessons', `${contentId}.${locale}.png`);
   const outPdf = outPng.replace(/\.png$/i, '.pdf');
   fs.mkdirSync(path.dirname(outPng), { recursive: true });
   fs.writeFileSync(outPng, png);

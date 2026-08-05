@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 'use strict';
+// LEGACY renderer — NOT part of the current decorative pipeline. The active tool is
+// scripts/render-lp-image.js (see docs/ARCHITECTURE.md). This uses the original
+// lp-render template (renderLessonPlanPdf) and is kept for reference only.
+//
 // Generate a lesson-plan PDF from a lesson JSON file, using the lp-render module.
 //
 // Usage:

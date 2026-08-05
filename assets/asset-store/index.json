@@ -82,5 +82,75 @@
     "model": "nano-banana-2",
     "concept": "scene",
     "prompt": "A simple educational illustration for Grade 1 math: Ali has 4 mangoes and Fatima gives him 2 more mangoes. Show the two groups of mangoes clearly with a child-friendly classroom style."
+  },
+  "5ad97a65923e9e67": {
+    "file": "5ad97a65923e9e67.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mawe ya Juma, mawe ya Asha, and jumla ya mawe showing 3 + 2 = 5 on a board"
+  },
+  "ce854b05b97016c6": {
+    "file": "ce854b05b97016c6.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Michoro ya kuongeza kwa kutumia vikundi vya duara: OO + OOO, OOOO + O, na OOOOO + OO."
+  },
+  "792340987d59d4a5": {
+    "file": "792340987d59d4a5.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mchoro wa kujumlisha mawe 3 na mawe 2 kuwa mawe 5"
+  },
+  "9ea2b407c231a5bc": {
+    "file": "9ea2b407c231a5bc.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Plus sign and equal sign in a simple addition equation"
+  },
+  "713f25dc10835e6b": {
+    "file": "713f25dc10835e6b.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Two students using bottle caps to practice addition"
+  },
+  "67c8c57f2234ed51": {
+    "file": "67c8c57f2234ed51.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Mbuzi 3 kwenye zizi na mama anaongeza mbuzi 3 wengine"
+  },
+  "5d8c34171b77d845": {
+    "file": "5d8c34171b77d845.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Mawe na vidole yanayotumika kuunganisha makundi mawili ya vitu."
+  },
+  "cc93aab8f0bd2949": {
+    "file": "cc93aab8f0bd2949.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "3 + 2 = 5 addition equation with plus sign and equal sign"
+  },
+  "3ee4f59562769e62": {
+    "file": "3ee4f59562769e62.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "students using bottle caps for addition practice"
+  },
+  "fdb5a75c7fb1f0eb": {
+    "file": "fdb5a75c7fb1f0eb.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mchoro unaoonyesha mawe 3 yakijumlishwa na mawe 2 kupata mawe 5."
   }
 }
