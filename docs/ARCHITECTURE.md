@@ -76,6 +76,9 @@ producing a match score.
 - `npm run test:visual` — compare against goldens. Passes only if **every fixture
   matches ≥ 95%**.
 - `npm run test:visual:update` — (re)write the goldens after an intended change.
+- `npm run diff -- <old.png> <new.png>` — compare two images of the same content
+  ("this version was like this — now it's like this"): prints a match score and writes
+  a `[ OLD | NEW | CHANGES ]` composite that paints every changed pixel red.
 
 **Workflow rule:** obvious layout defects (page padding/margins, a section clipping or
 leaking across a page break, empty pages) are fixed first, then the visual score must be

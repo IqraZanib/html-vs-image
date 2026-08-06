@@ -9,7 +9,8 @@
     "studio": "node scripts/lp-studio.js",
     "test:imagegen": "node --test imagegen/test/",
     "test:visual": "node scripts/visual-regression.js",
-    "test:visual:update": "node scripts/visual-regression.js --update"
+    "test:visual:update": "node scripts/visual-regression.js --update",
+    "diff": "node scripts/visual-diff.js"
   },
   "dependencies": {
     "@fontsource/noto-naskh-arabic": "^5.2.11",
