@@ -1,0 +1,115 @@
+{
+  "meta": {
+    "id": "lesson-speed-demo",
+    "locale": "en",
+    "subject": "Mathematics",
+    "grade": "Grade 6",
+    "region": "pk",
+    "title": "Speed, Distance and Time",
+    "subtitle": "Two open-weight illustrations + code-rendered formulas",
+    "chips": [
+      {
+        "label": "Subject",
+        "value": "Mathematics"
+      },
+      {
+        "label": "Grade",
+        "value": "Grade 6"
+      },
+      {
+        "label": "Topic",
+        "value": "Speed, Distance & Time"
+      }
+    ]
+  },
+  "images": [
+    {
+      "id": "athlete",
+      "concept": "scene",
+      "model": "flux-2/pro-text-to-image",
+      "label": "Speed on the track",
+      "prompt": "a happy child athlete running in a race on a school sports field, smiling, bright cheerful flat cartoon illustration, plain simple background"
+    },
+    {
+      "id": "cyclist",
+      "concept": "scene",
+      "model": "qwen2/text-to-image",
+      "label": "A cyclist covering distance",
+      "prompt": "a cheerful child riding a bicycle on a countryside road, smiling, colourful illustration for a children's maths lesson"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Lesson Learning Outcomes",
+      "type": "bullets",
+      "marker": "alpha",
+      "icon": "target",
+      "time": "2 min",
+      "lead": "By the end of the lesson, the learner should be able to:",
+      "items": [
+        {
+          "text": "Explain what speed means in everyday life."
+        },
+        {
+          "text": "Use the relationship between speed, distance and time."
+        },
+        {
+          "text": "Solve simple problems to find speed, distance or time."
+        }
+      ]
+    },
+    {
+      "heading": "Speed in real life",
+      "type": "images",
+      "icon": "star",
+      "imageIds": [
+        "athlete",
+        "cyclist"
+      ]
+    },
+    {
+      "heading": "Key formulas",
+      "type": "math",
+      "icon": "lightbulb",
+      "engine": "katex",
+      "items": [
+        {
+          "label": "Speed",
+          "tex": "v = \\dfrac{d}{t}"
+        },
+        {
+          "label": "Distance",
+          "tex": "d = v \\times t"
+        },
+        {
+          "label": "Time",
+          "tex": "t = \\dfrac{d}{v}"
+        }
+      ]
+    },
+    {
+      "heading": "Worked example",
+      "type": "text",
+      "icon": "blackboard",
+      "body": "A car travels $d = 120$ km in $t = 2$ hours. Its speed is $v = \\dfrac{d}{t} = \\dfrac{120}{2} = 60$ km/h."
+    },
+    {
+      "heading": "Assessment Questions",
+      "type": "bullets",
+      "marker": "alpha",
+      "icon": "pencil",
+      "time": "5 min",
+      "items": [
+        {
+          "text": "Write the formula for speed."
+        },
+        {
+          "text": "A cyclist covers $30$ km in $3$ hours. Find the speed $v = \\dfrac{d}{t}$."
+        },
+        {
+          "text": "If $v = 50$ km/h and $t = 4$ hours, find the distance $d = v \\times t$."
+        }
+      ]
+    }
+  ]
+}

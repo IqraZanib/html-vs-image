@@ -1,0 +1,410 @@
+{
+  "meta": {
+    "id": "herufi-mwambatano-mb-nd-ngw",
+    "locale": "sw",
+    "subject": "language",
+    "grade": "Grade 3",
+    "region": "pk",
+    "title": "Herufi Mwambatano (mb, nd, ngw)",
+    "subtitle": "Lesson 1",
+    "chips": [
+      {
+        "label": "Somo",
+        "value": "Kiswahili"
+      },
+      {
+        "label": "Mada",
+        "value": "Herufi Mwambatano (mb, nd, ngw)"
+      },
+      {
+        "label": "Muda",
+        "value": "Lesson 1 (approx. 50-60 minutes)"
+      }
+    ]
+  },
+  "images": [
+    {
+      "id": "c0-herufi-mwambatano-diagram",
+      "concept": "diagram",
+      "label": "Herufi Mwambatano",
+      "prompt": "Labelled diagram showing mb, nd, and ngw with the example words mbuzi, mbegu, ndoo, ndizi, and ngwena."
+    },
+    {
+      "id": "c0-mbuzi-na-ndizi-scene",
+      "concept": "scene",
+      "label": "Mbuzi na ndizi",
+      "prompt": "Pakistani teacher showing pictures of a goat and bananas to primary school children during a Kiswahili lesson."
+    },
+    {
+      "id": "c1-mbuzi-ndizi-ngwena-objects",
+      "concept": "scene",
+      "label": "Picha za mbuzi, ndizi na ngwena",
+      "prompt": "Pakistani classroom learning scene showing a goat, bananas, and a crocodile for learning herufi mwambatano"
+    },
+    {
+      "id": "c1-assessment-picture-matching",
+      "concept": "diagram",
+      "label": "Picha za Mbuzi, Ndizi, Ndoo, Mbegu, Ngwena",
+      "prompt": "Labelled diagram showing a goat, bananas, a bucket, seeds, and a crocodile"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Weekly Pacing & Progress Monitoring",
+      "type": "fields",
+      "items": [
+        {
+          "label": "Day",
+          "value": "1-1"
+        },
+        {
+          "label": "Focus / Sub-topic",
+          "value": "Utambulisho wa Herufi Mwambatano (mb, nd, ngw)"
+        },
+        {
+          "label": "Key Activity",
+          "value": "Kusoma na kuandika maneno yenye herufi mwambatano kupitia picha na mazoezi ya kitabu."
+        },
+        {
+          "label": "Success Criteria",
+          "value": "Naweza kutambua, kutamka na kuandika maneno yenye herufi mwambatano mb, nd, na ngw."
+        }
+      ]
+    },
+    {
+      "heading": "Weekly Pacing & Progress Monitoring",
+      "type": "note",
+      "label": "Kumbuka",
+      "body": "Mwalimu anapaswa kukagua uwezo wa mwanafunzi kutofautisha sauti za herufi moja (mfano: 'n') na herufi mwambatano (mfano: 'nd'). Ikiwa mwanafunzi anasoma \"n-doo\" badala ya \"ndoo\", anahitaji msaada wa ziada wa phonics (sauti)."
+    },
+    {
+      "heading": "Learning Objectives & Success Criteria",
+      "type": "bullets",
+      "marker": "num",
+      "lead": "Learning Objectives:",
+      "items": [
+        {
+          "text": "Mwanafunzi aweza kutambua na kutamka herufi mwambatano (mb, nd, ngw) katika maneno mbalimbali."
+        },
+        {
+          "text": "Mwanafunzi aweza kuandika maneno na sentensi rahisi zinazotumia herufi mwambatano kwa usahihi."
+        },
+        {
+          "text": "Mwanafunzi aweza kutofautisha maneno yenye herufi mwambatano na yale yasiyo nayo."
+        }
+      ]
+    },
+    {
+      "heading": "Learning Objectives & Success Criteria",
+      "type": "bullets",
+      "marker": "dot",
+      "lead": "Success Criteria:",
+      "items": [
+        {
+          "text": "Naweza kutaja mifano mitatu ya maneno yenye herufi mwambatano."
+        },
+        {
+          "text": "Naweza kusoma maneno yenye mb, nd, na ngw bila kukosea."
+        },
+        {
+          "text": "Naweza kuandika maneno ya herufi mwambatano yanayopatikana kwenye kurasa 3-6 za kitabu."
+        }
+      ]
+    },
+    {
+      "heading": "Chapter Overview & Materials",
+      "type": "fields",
+      "items": [
+        {
+          "label": "Grade",
+          "value": "Grade 3"
+        },
+        {
+          "label": "Subject",
+          "value": "Kiswahili"
+        },
+        {
+          "label": "Total Duration",
+          "value": "Lesson 1 (approx. 50-60 minutes)"
+        },
+        {
+          "label": "Prerequisites",
+          "value": "Ujuzi wa kusoma herufi mmoja mmoja (alphabets) na uwezo wa kusoma maneno rahisi ya silabi mbili."
+        }
+      ]
+    },
+    {
+      "heading": "Chapter Overview & Materials",
+      "type": "chips",
+      "items": [
+        "Kitabu cha mwanafunzi (kurasa 3-6).",
+        "Chaki na ubao.",
+        "Kadi za maneno (Flashcards) zenye maneno: mbuzi, mbegu, ndoo, ndizi, ngwena.",
+        "Picha za vitu hivyo (mbuzi, ndizi, n.k)."
+      ]
+    },
+    {
+      "heading": "Chapter Overview & Materials",
+      "type": "bullets",
+      "marker": "dot",
+      "lead": "Teacher Preparation Checklist:",
+      "items": [
+        {
+          "text": "Andaa kadi za maneno na picha."
+        },
+        {
+          "text": "Hakikisha ubao safi na umechora jedwali la herufi mwambatano."
+        },
+        {
+          "text": "Pitia mazoezi ya kurasa 3-6 ili kuandaa majibu ya mfano."
+        }
+      ]
+    },
+    {
+      "heading": "Lesson Plans",
+      "type": "images",
+      "imageIds": [
+        "c0-herufi-mwambatano-diagram",
+        "c0-mbuzi-na-ndizi-scene"
+      ]
+    },
+    {
+      "heading": "Lesson Plans",
+      "type": "steps",
+      "items": [
+        {
+          "label": "Oral Language (10 minutes)",
+          "body": "Engage: Mwalimu anaanza kwa kuonyesha picha ya mbuzi na ndizi.\nTeacher says: \"Jamani, angalieni picha hizi. Huyu ni nani? (Wanafunzi: Mbuzi!). Na hii ni nini? (Wanafunzi: Ndizi!). Je, mnasikia sauti gani mwanzoni mwa neno 'Mbuzi'? Ni 'm' peke yake au kuna kitu kingine?\"\nDiscussion: Mwalimu anaongoza majadiliano kuhusu jinsi herufi mbili zinavyoungana kutengeneza sauti moja.\nTeacher says: \"Katika lugha yetu ya Kiswahili, kuna herufi zinazopenda kushikana mkono na kusomwa pamoja. Hizi tunaziita Herufi Mwambatano (Consonant Blends/Clusters). Leo tutajifunza mb, nd, na ngw.\"\nBoard Content (Engage):\nHERUFI MWAMBATANO\n-----------------\nmb + nd + ngw\nMifano:\nMbuzi (mb)\nNdoo (nd)\nNgwena (ngw)"
+        },
+        {
+          "label": "Reading (15 minutes)",
+          "body": "Shared Reading: Mwalimu anawaongoza wanafunzi kufungua vitabu vyao kurasa 3-4. Mwalimu anasoma maneno yaliyopo na wanafunzi wanakariri kwa sauti.\nGuiding Questions:\n1. \"Ni herufi gani zinazounda sauti 'mb' katika neno mbegu?\" (Jibu: m na b).\n2. \"Je, neno 'ndizi' linaanza na herufi gani?\" (Jibu: nd).\n3. \"Kuna tofauti gani kati ya sauti 'n' na sauti 'nd'?\" (Jibu: 'n' ni sauti moja, 'nd' ni sauti mbili zinazosomwa pamoja).\nTeacher Dialogue:\nTeacher says: \"Sasa, hebu tuangalie neno 'ngwena' ukurasa wa 5. Someni kwa sauti pamoja... ngwena!\"\nStudent: \"Ngwena!\"\nTeacher says: \"Safi sana! Je, 'ngw' inatamkwa kama herufi moja au tatu?\"\nStudent: \"Tatu!\"\nTeacher says: \"Sahihi, lakini tunazisoma kwa pamoja kama sauti moja.\"\nBoard Content (Explore):\nSOMA NA TAMKA\n------------\nmb --> mbuzi, mbegu\nnd --> ndoo, ndizi\nngw --> ngwena"
+        },
+        {
+          "label": "Word Work (10 minutes)",
+          "body": "Phonics Focus: Mwalimu anaandika maneno ubaoni na kuwapigia mstari herufi mwambatano.\nTeacher says: \"Tutaangalia jinsi herufi hizi zinavyokaa ndani ya neno. Angalieni ubaoni.\""
+        }
+      ]
+    },
+    {
+      "heading": "Writing (10 minutes)",
+      "type": "steps",
+      "items": [
+        {
+          "label": "Guided Writing",
+          "body": "Mwalimu anaandika sentensi rahisi ubaoni na wanafunzi wanaiga."
+        },
+        {
+          "label": "Board Content (Practice)",
+          "body": "ANDIKA SENTENSI\n--------------\n1. Mbuzi anakula mbegu.\n2. Mama ana ndoo ya maji.\n3. Ndizi ni tamu sana.\n4. Ngwena ana ngozi ngumu."
+        },
+        {
+          "label": "Independent Practice",
+          "body": "Wanafunzi wanafanya mazoezi yaliyopo kwenye kitabu kurasa 5-6."
+        },
+        {
+          "label": "Exercise 1 (Page 5)",
+          "body": "Jaza herufi mwambatano inayokosekana (mfano: _ _ uzi, _ _ oo)."
+        },
+        {
+          "label": "Exercise 2 (Page 6)",
+          "body": "Tunga sentensi moja kwa kila neno: mbegu, ndizi, ngwena."
+        },
+        {
+          "label": "Scaffolding (Struggling Learners)",
+          "body": "Kwa wanafunzi wanaoshindwa, mwalimu anawapa kadi za herufi (m, b, n, d, g, w) na kuwaomba waziunganishe kutengeneza 'mb', 'nd', na 'ngw' kabla ya kuandika neno zima."
+        },
+        {
+          "label": "Extension Challenge (Advanced Learners)",
+          "body": "\"Tafuta maneno mengine mawili ya herufi mwambatano ambayo hayapo kwenye kitabu (mfano: mbwa, ndoto) na uyaandike.\""
+        }
+      ]
+    },
+    {
+      "heading": "",
+      "type": "images",
+      "imageIds": [
+        "c1-mbuzi-ndizi-ngwena-objects"
+      ]
+    },
+    {
+      "heading": "Sharing/Closure (5 minutes)",
+      "type": "steps",
+      "items": [
+        {
+          "label": "Sharing",
+          "body": "Wanafunzi wawili wanaitwa mbele kusoma sentensi walizoandika."
+        },
+        {
+          "label": "Exit Ticket",
+          "body": "Swali: \"Taja neno moja lenye herufi mwambatano 'nd'.\"\nJibu: (Mfano: ndizi, ndoo, ndoto)."
+        },
+        {
+          "label": "Homework",
+          "body": "Kamilisha mazoezi ya kurasa 6, sehemu ya C (Kutunga sentensi).\nTafuta picha ya kitu kimoja kinachoanza na 'mb' nyumbani na uandike jina lake."
+        },
+        {
+          "label": "Cross-Curricular Link",
+          "body": "Sanaa (Art): Wanafunzi wanaweza kuchora picha ya mbuzi au ndizi na kuandika jina lake chini kwa herufi kubwa, wakipiga rangi tofauti kwenye herufi mwambatano."
+        }
+      ]
+    },
+    {
+      "heading": "Answer Key for Practice Problems",
+      "type": "bullets",
+      "marker": "dot",
+      "items": [
+        {
+          "text": "Exercise 1 (Page 5) - Fill in the blanks:"
+        },
+        {
+          "text": "MODEL ANSWER:\n1. mbuzi\n2. ndoo\n3. ngwena\n4. mbegu\n5. ndizi"
+        },
+        {
+          "text": "Exercise 2 (Page 6) - Sentence Construction:"
+        },
+        {
+          "text": "MODEL ANSWER:\n1. Mbegu: Mbegu zinamea.\n2. Ndizi: Ninapenda kula ndizi.\n3. Ngwena: Ngwena anaishi majini."
+        }
+      ]
+    },
+    {
+      "heading": "End-of-Chapter Assessment Worksheet",
+      "type": "fields",
+      "items": [
+        {
+          "label": "Jina la Mwanafunzi",
+          "value": "__________________________"
+        },
+        {
+          "label": "Tarehe",
+          "value": "__________"
+        },
+        {
+          "label": "Darasa",
+          "value": "__________"
+        },
+        {
+          "label": "Chapter Assessment",
+          "value": "Herufi Mwambatano (mb, nd, ngw)"
+        },
+        {
+          "label": "Alama za Jumla",
+          "value": "/20"
+        }
+      ]
+    },
+    {
+      "heading": "",
+      "type": "images",
+      "imageIds": [
+        "c1-assessment-picture-matching"
+      ]
+    },
+    {
+      "heading": "Sehemu A: Tambua Herufi (Alama 5)",
+      "type": "bullets",
+      "marker": "num",
+      "lead": "Zungushia herufi mwambatano katika maneno yafuatayo:",
+      "items": [
+        {
+          "text": "Mbuzi"
+        },
+        {
+          "text": "Ndoo"
+        },
+        {
+          "text": "Ngwena"
+        },
+        {
+          "text": "Mbegu"
+        },
+        {
+          "text": "Ndizi"
+        }
+      ]
+    },
+    {
+      "heading": "Sehemu B: Jaza Nafasi (Alama 5)",
+      "type": "bullets",
+      "marker": "num",
+      "lead": "Tumia (mb, nd, ngw) kujaza nafasi zilizo wazi:",
+      "items": [
+        {
+          "text": "____izi (Tunda la njano)"
+        },
+        {
+          "text": "____egu (Hupandwa shambani)"
+        },
+        {
+          "text": "____oo (Huchukulia maji)"
+        },
+        {
+          "text": "____ena (Mnyama wa majini)"
+        },
+        {
+          "text": "____uzi (Mnyama anayetoa maziwa)"
+        }
+      ]
+    },
+    {
+      "heading": "Sehemu C: Unganisha (Alama 5)",
+      "type": "bullets",
+      "marker": "num",
+      "lead": "Unganisha neno na picha yake (Mwalimu aweke picha pembeni):",
+      "items": [
+        {
+          "text": "Mbuzi → [Picha ya Mbuzi]"
+        },
+        {
+          "text": "Ndizi → [Picha ya Ndizi]"
+        },
+        {
+          "text": "Ndoo → [Picha ya Ndoo]"
+        },
+        {
+          "text": "Mbegu → [Picha ya Mbegu]"
+        },
+        {
+          "text": "Ngwena → [Picha ya Ngwena]"
+        }
+      ]
+    },
+    {
+      "heading": "Sehemu D: Tunga Sentensi (Alama 5)",
+      "type": "bullets",
+      "marker": "num",
+      "lead": "Tunga sentensi moja kwa kutumia maneno haya:",
+      "items": [
+        {
+          "text": "Ndizi: ____________________________________________________"
+        },
+        {
+          "text": "Mbuzi: ____________________________________________________"
+        }
+      ]
+    },
+    {
+      "heading": "FOR TEACHER ONLY — ANSWER KEY",
+      "type": "bullets",
+      "marker": "dot",
+      "items": [
+        {
+          "text": "Sehemu A:\n1. mbuzi, 2. ndoo, 3. ngwena, 4. mbegu, 5. ndizi (Alama 1 kila moja)"
+        },
+        {
+          "text": "Sehemu B:\n6. ndizi, 7. mbegu, 8. ndoo, 9. ngwena, 10. mbuzi (Alama 1 kila moja)"
+        },
+        {
+          "text": "Sehemu C:\n(Kulinganisha picha na maneno kwa usahihi) (Alama 1 kila moja)"
+        },
+        {
+          "text": "Sehemu D:\n(Sentensi yoyote sahihi ya kisarufi) (Alama 2.5 kila moja)"
+        },
+        {
+          "text": "Scoring Guide:\n18 - 20: Excellent (Hajahitaji msaada)\n14 - 17: Good (Anajua, anahitaji mazoezi kidogo)\n10 - 13: Needs Review (Anahitaji kurudiwa mada)\nChini ya 10: Re-teach (Mwalimu arudie mada kwa mwanafunzi huyu)"
+        }
+      ]
+    }
+  ]
+}
