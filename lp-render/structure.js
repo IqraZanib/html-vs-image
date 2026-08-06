@@ -16,7 +16,7 @@ Output ONLY the JSON object — no markdown, no prose, no code fences.
 
 Shape:
 {
-  "meta": { "id": kebab-case string, "locale": "en"|"ur"|"sd"|"ar", "subject": string, "grade": string,
+  "meta": { "id": kebab-case string, "locale": a language code matching the lesson ("en","ur","sd","ar","sw",…), "subject": string, "grade": string,
             "region": "pk", "title": string, "subtitle": string,
             "chips": [ { "label": string, "value": string } ] },
   "images": [ { "id": string, "concept": "diagram"|"scene", "label": string, "prompt": string } ],
@@ -66,11 +66,40 @@ const KEY_LABEL = {
   multigrade: 'Multigrade', g1: 'Grade 1', g2: 'Grade 2', g3: 'Grade 3',
   teachers_corner: "Teacher's corner",
 };
+// Parse JSON even if it's lightly broken: try as-is, then unescape a doubly-escaped
+// JSON string (\" and \n), then treat it as a quoted string. Returns null if none work.
+function looseParse(raw, depth = 0) {
+  let v = null;
+  try { v = JSON.parse(raw); } catch (_) {
+    try { v = JSON.parse(raw.replace(/\\r/g, '').replace(/\\t/g, '\t').replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\')); } catch (_) { return null; }
+  }
+  // Double-encoded: a parse that yields a JSON-looking string — parse again.
+  if (typeof v === 'string' && depth < 3 && /[{[]/.test(v)) { const inner = looseParse(v, depth + 1); if (inner != null) return inner; }
+  return v;
+}
+// Last resort when JSON can't be parsed at all (e.g. literal newlines inside a
+// string value): pull the biggest "text"/"content"/"body" field out by hand, so a
+// metadata-wrapped blob never gets echoed into the render verbatim.
+function textFromBlob(raw) {
+  for (const k of ['text', 'content', 'body']) {
+    const i = raw.lastIndexOf(`"${k}"`);
+    if (i < 0) continue;
+    const c = raw.indexOf(':', i);
+    if (c < 0) continue;
+    let s = raw.slice(c + 1).replace(/^\s+/, '');
+    if (s[0] === '"') s = s.slice(1);
+    const end = s.lastIndexOf('"');
+    if (end > 0) s = s.slice(0, end);
+    s = s.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\"/g, '"').trim();
+    if (s.length > 40) return s;
+  }
+  return String(raw);
+}
 function extractLessonText(raw) {
-  let obj;
-  try { obj = JSON.parse(raw); } catch (_) { return String(raw); } // not JSON → already text
+  const obj = looseParse(String(raw));
+  if (obj == null) return textFromBlob(String(raw)); // unparseable → salvage the lesson text
   if (typeof obj === 'string') return obj;
-  if (obj && typeof obj === 'object' && Array.isArray(obj.sections)) return String(raw); // already our schema
+  if (typeof obj === 'object' && Array.isArray(obj.sections)) return String(raw); // already our schema
 
   // Flatten the JSON to readable "key: value" lines, keeping EVERY string field of
   // the lesson (short and long) and dropping only metadata keys / bare numbers &
@@ -184,9 +213,20 @@ async function structureChunked(text, { apiKey, fetchImpl, maxChars }) {
 
 // Structure any lesson to the content JSON. Small inputs go in one call; large ones
 // (or a refusal) fall back to chunked structuring so any size converts smoothly.
+// Surface a language/region hint from the raw blob so the structurer sets the right
+// locale (→ region cast + cultural grounding), even though those keys are metadata.
+function langRegionHint(raw) {
+  const s = String(raw);
+  const lang = (s.match(/"language"\s*:\s*"([A-Za-z-]{2,8})"/) || [])[1];
+  const region = (s.match(/"region"\s*:\s*"([^"]{2,40})"/) || [])[1];
+  const bits = [];
+  if (lang) bits.push(`Lesson language code: ${lang}`);
+  if (region) bits.push(`Region: ${region}`);
+  return bits.length ? bits.join('. ') + '.\n\n' : '';
+}
 async function structureLesson(raw, { apiKey, fetchImpl = defaultFetch, maxChars = 4500 } = {}) {
   if (!apiKey) throw new Error('structuring needs a kie.ai API key');
-  const text = extractLessonText(String(raw)); // strip API/metadata wrappers first
+  const text = langRegionHint(String(raw)) + extractLessonText(String(raw)); // hint + stripped lesson
   if (text.length <= maxChars) {
     const single = await callStructure(text, SYSTEM, { apiKey, fetchImpl });
     if (single && Array.isArray(single.sections) && single.sections.length) return normalize(single);
