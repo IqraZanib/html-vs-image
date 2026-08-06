@@ -83,7 +83,7 @@ async function renderLessonImage(content, opts = {}) {
     const imgRegion = ({ sw: 'ke', ar: 'ye' })[locale] || meta.region || 'pk';
     const segment = {
       subject: meta.subject || (meta.chips || []).map((c) => c.value).join(' '),
-      grade: meta.grade || '', region: imgRegion,
+      grade: meta.grade || '', region: imgRegion, locale,
       blocks: toGen.map(({ im }) => ({ type: CONCEPT_TO_BLOCK[im.concept] || 'HOOK_STORY', text: im.prompt, characters: im.characters, model: im.model })),
     };
     const { images } = await resolveSegmentImages(segment, { apiKey, region: segment.region, gatePolicy });

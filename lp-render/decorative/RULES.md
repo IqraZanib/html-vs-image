@@ -188,6 +188,17 @@ Constraints while doing so:
 - this is a **print/PDF-only** adjustment — the on-screen preview and the visual-regression
   goldens must not change (implemented via `@media print` in `theme.js`).
 
+## R28 — In-image text is in the lesson's language
+Any text that appears INSIDE a generated image — a diagram's part labels, a chart's
+headers — must be written in the lesson's own language and script, never English (unless
+the lesson is English). Arabic → Arabic labels (right-to-left), Kiswahili → Kiswahili,
+and so on. An English label inside an Arabic or Kiswahili lesson image is a defect: it
+breaks the teacher's "apnaniyat" and makes the picture uninformative for the class. This
+is enforced two ways — the structurer states the label language in each diagram prompt,
+and the image-prompt builder appends the locale's script directive
+(`imagegen/prompts/build.js` → `labeled_diagram`). Prefer a LABELLED, content-specific
+diagram over a vague decorative picture, so the image actually teaches.
+
 ## GATE_POLICY
 - The image must be correct for the exact concept named in the content. For a labeled
   diagram, every label must be spelled correctly and point to the right part; reject
