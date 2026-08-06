@@ -152,10 +152,17 @@ each labelled by name, the parts of a plant, a process), not decorative filler a
 never irrelevant. Label what teaches vocabulary or parts. A book does not put a picture
 on every page — 1–3 well-chosen, representative images per lesson is plenty.
 
-## R25 — Paginate long content; number the pages
+## R25 — Paginate long content; number the pages; clean page flow
 The deliverable is a PDF. When content is long, split it across readable A4 pages
 rather than one endless strip; keep the font size readable. Every page shows its number
-at the top as "current / total". Sections never split awkwardly across a page break.
+at the top as "current / total". Page flow must look clean:
+- give every page breathing room at the top — content is never flush against the top
+  boundary (it sits below the page-number band);
+- never strand a heading alone at the bottom of a page (a heading stays with the start
+  of its content);
+- never split a single card, image, step or bullet across two pages;
+- but do let a long section continue onto the next page so pages fill up — no large
+  empty gap at the bottom of a page.
 
 ## R26 — Colour only for what matters
 Use colour to signal what is important — the title, section headings, and emphasis

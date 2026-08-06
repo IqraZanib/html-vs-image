@@ -44,7 +44,12 @@ body{background:#eef2fb;color:var(--ink);font-family:var(--font),'Baloo 2','Popp
 
 /* sections */
 .body{padding:18px 26px 2px}
-.section{margin:0 0 15px;break-inside:avoid;page-break-inside:avoid}
+/* Page flow: sections may span pages so pages fill (no big bottom gap), but a heading
+   never strands at a page bottom and no card/image/step/bullet is split across pages. */
+.section{margin:0 0 15px;break-inside:auto;page-break-inside:auto}
+.s-head{break-after:avoid;page-break-after:avoid}
+.panel.has-char{break-inside:avoid;page-break-inside:avoid}
+.d-img,.d-mrow,.d-step,.d-qc,.d-field,.d-bullets li,.char-fig,.d-chip{break-inside:avoid;page-break-inside:avoid}
 .s-head{display:flex;align-items:center;gap:11px;margin:0 0 8px}
 .s-disc{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;
   box-shadow:0 6px 14px rgba(0,0,0,.14);flex:0 0 auto;font-size:22px}

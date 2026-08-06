@@ -77,9 +77,9 @@ async function htmlToPdf(html, options = {}) {
       return await page.pdf({
         format: 'A4', printBackground: true,
         displayHeaderFooter: true, headerTemplate: header, footerTemplate: '<div></div>',
-        margin: { top: '13mm', right: '0', bottom: '8mm', left: '0' },
+        margin: { top: '16mm', right: '0', bottom: '12mm', left: '0' },
         ...pdfOptions,
-        margin: { top: '13mm', right: '0', bottom: '8mm', left: '0', ...(pdfOptions.margin || {}) },
+        margin: { top: '16mm', right: '0', bottom: '12mm', left: '0', ...(pdfOptions.margin || {}) },
       });
     }
     const merged = { ...DEFAULT_PDF, ...pdfOptions,
