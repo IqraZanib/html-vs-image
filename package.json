@@ -5,8 +5,11 @@
   "scripts": {
     "test": "node --test lp-render/test/",
     "test:smoke": "node --test lp-render/test/render.smoke.test.js",
-    "render": "node scripts/render-lesson.js",
-    "test:imagegen": "node --test imagegen/test/"
+    "render": "node scripts/render-lp-image.js",
+    "studio": "node scripts/lp-studio.js",
+    "test:imagegen": "node --test imagegen/test/",
+    "test:visual": "node scripts/visual-regression.js",
+    "test:visual:update": "node scripts/visual-regression.js --update"
   },
   "dependencies": {
     "@fontsource/noto-naskh-arabic": "^5.2.11",

@@ -44,11 +44,12 @@ body{background:#eef2fb;color:var(--ink);font-family:var(--font),'Baloo 2','Popp
 
 /* sections */
 .body{padding:18px 26px 2px}
-/* Page flow: sections may span pages so pages fill (no big bottom gap), but a heading
-   never strands at a page bottom and no card/image/step/bullet is split across pages. */
-.section{margin:0 0 15px;break-inside:auto;page-break-inside:auto}
+/* Page flow: a section stays whole on one page — it never splits or clips across a
+   page break. A section taller than a page still breaks (Chromium falls back), but
+   then its cards/images/steps/bullets are each kept intact and the heading stays put. */
+.section{margin:0 0 15px;break-inside:avoid;page-break-inside:avoid}
 .s-head{break-after:avoid;page-break-after:avoid}
-.panel.has-char{break-inside:avoid;page-break-inside:avoid}
+.panel{break-inside:avoid;page-break-inside:avoid}
 .d-img,.d-mrow,.d-step,.d-qc,.d-field,.d-bullets li,.char-fig,.d-chip{break-inside:avoid;page-break-inside:avoid}
 .s-head{display:flex;align-items:center;gap:11px;margin:0 0 8px}
 .s-disc{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;

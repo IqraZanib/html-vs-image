@@ -187,5 +187,103 @@
     "model": "nano-banana-2",
     "concept": "diagram",
     "prompt": "جدول يوضح أبي وأمي وأحمد وسبأ وإيمان"
+  },
+  "a8601e28c4781ba5": {
+    "file": "a8601e28c4781ba5.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "رسمة قلب كبير وبداخله كلمة أسرتي"
+  },
+  "edf633841bf60908": {
+    "file": "edf633841bf60908.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "مخطط مُسمى يوضح: أبي، أمي، أحمد، سبأ، إيمان"
+  },
+  "abae60389e9fac92": {
+    "file": "abae60389e9fac92.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Diagramu yenye mawe yanayoonyesha 3 + 2 = 5 kwa wanafunzi wa Pakistan"
+  },
+  "08bdfa38f3348d6c": {
+    "file": "08bdfa38f3348d6c.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Labelled diagram showing stones used to demonstrate 3 + 2 = 5 for pupils in a Kenyan classroom"
+  },
+  "c791170753559dd1": {
+    "file": "c791170753559dd1.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "Watoto wa Kenya wakitumia mawe kujumlisha makundi mawili ya mawe darasani"
+  },
+  "933ffb2539b9d406": {
+    "file": "933ffb2539b9d406.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Labelled diagram showing the equation 3 + 2 = 5 with the plus sign and equal sign explained using groups of objects for Pakistani primary school learners"
+  },
+  "5b2ad2e8a68fe772": {
+    "file": "5b2ad2e8a68fe772.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "Watoto wa Kenya wakijumlisha makundi mawili ya mawe darasani"
+  },
+  "c656a80bf9e6988d": {
+    "file": "c656a80bf9e6988d.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Watoto wa Kenya/Tanzania darasani wakitumia mawe madogo kuunganisha makundi mawili ya vitu na kuhesabu jumla."
+  },
+  "27dae0a3ed72a5e3": {
+    "file": "27dae0a3ed72a5e3.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mchoro wa mawe matatu pamoja na mawe mawili ukionyesha 3 + 2 = 5."
+  },
+  "0c23978f293c52db": {
+    "file": "0c23978f293c52db.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "scene",
+    "prompt": "Wanafunzi wa Tanzania au Kenya katika darasa wakijumlisha vitu kwa kuweka mawe 4 upande mmoja na vifuniko 3 vya chupa upande mwingine, kisha kuhesabu jumla 7."
+  },
+  "7a837dc059072606": {
+    "file": "7a837dc059072606.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mchoro wa kielimu unaoonyesha hesabu 3 + 2 = 5, ikiwa na vikundi vitatu na viwili vya vitu vinavyowekwa pamoja ili kuonyesha jumla ya tano."
+  },
+  "226887ba6b3f1b56": {
+    "file": "226887ba6b3f1b56.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "مخطط مُسمّى يوضح: أبي، أمي، أحمد، سبأ، إيمان"
+  },
+  "e2a2892bffb5c39d": {
+    "file": "e2a2892bffb5c39d.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mchoro wa hisabati unaoonyesha alama ya kujumlisha +, alama ya usawa =, na mfano 3 + 2 = 5"
+  },
+  "662eefce4e005ad4": {
+    "file": "662eefce4e005ad4.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Watoto wa Tanzania/Kenya darasani wakitumia mawe kuunganisha makundi mawili ya vitu na kuhesabu jumla"
   }
 }

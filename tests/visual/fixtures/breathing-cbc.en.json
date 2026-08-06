@@ -1,0 +1,148 @@
+{
+  "meta": {
+    "id": "lesson-breathing-cbc",
+    "locale": "en",
+    "subject": "Science and Technology",
+    "grade": "Grade 5",
+    "region": "pk",
+    "title": "The Breathing System",
+    "subtitle": "Grade 5 Lesson Plan",
+    "chips": [
+      { "label": "Learning Area", "value": "Science and Technology" },
+      { "label": "Strand", "value": "Living things and their environment" },
+      { "label": "Sub Strand", "value": "The Breathing System" },
+      { "label": "Year", "value": "2026" }
+    ]
+  },
+  "images": [
+    {
+      "id": "chart",
+      "concept": "diagram",
+      "label": "Chart, Model of the breathing system",
+      "prompt": "a clear educational labeled chart of the human breathing system for a Grade 5 Science lesson, clearly labelling the nose, the trachea (wind pipe), the two lungs, and the diaphragm, flat infographic style, correct anatomy, plain background"
+    },
+    {
+      "id": "lungs_nose",
+      "concept": "diagram",
+      "label": "Pictures of lungs and nose",
+      "prompt": "clear simple educational pictures of the human lungs and the human nose side by side, labelled, correct anatomy, flat illustration, plain background, suitable for a Grade 5 Science classroom"
+    },
+    {
+      "id": "balloons",
+      "concept": "diagram",
+      "label": "Balloons",
+      "prompt": "a clear educational science diagram of a lung model made with balloons: a plastic bottle with two balloons inside representing the two lungs and a stretched rubber sheet at the bottom representing the diaphragm, with a simple arrow showing air moving in and out, labelled 'balloons = lungs' and 'rubber sheet = diaphragm', flat infographic style, correct and simple, plain background"
+    }
+  ],
+  "sections": [
+    {
+      "id": "admin",
+      "heading": "Administrative details",
+      "type": "fields",
+      "icon": "checklist",
+      "items": [
+        { "label": "School", "value": "" },
+        { "label": "Date", "value": "" },
+        { "label": "Term", "value": "" },
+        { "label": "Time", "value": "" },
+        { "label": "Roll (Boys / Girls / Total)", "value": "" },
+        { "label": "Teacher's name", "value": "" },
+        { "label": "Gender", "value": "" },
+        { "label": "TSC No.", "value": "" }
+      ]
+    },
+    {
+      "id": "llo",
+      "heading": "Lesson Learning Outcomes",
+      "type": "bullets",
+      "marker": "alpha",
+      "icon": "target",
+      "time": "2 min",
+      "lead": "By the end of the lesson, the learner should be able to:",
+      "items": [
+        { "text": "Identify the main parts of the human breathing system from a chart." },
+        { "text": "Describe the functions of each part of the human breathing system to peers." },
+        { "text": "Appreciate the need for maintaining a healthy breathing system for a healthy living." }
+      ]
+    },
+    {
+      "id": "kiq",
+      "heading": "Key inquiry question",
+      "type": "bullets",
+      "marker": "dot",
+      "icon": "lightbulb",
+      "items": [
+        { "text": "How does the breathing system help us stay alive?" },
+        { "text": "What makes up the human breathing system?" }
+      ]
+    },
+    {
+      "id": "resources",
+      "heading": "Learning resources",
+      "type": "chips",
+      "icon": "toolbox",
+      "items": [
+        "Chart, Model of the breathing system",
+        "Pictures of lungs and nose",
+        "Balloons",
+        "Flashcards",
+        "Textbook (Indicate the title and page, both the teacher's and the learner's book)",
+        "An internet enabled digital device"
+      ]
+    },
+    {
+      "id": "visuals",
+      "heading": "The Breathing System",
+      "type": "images",
+      "icon": "heart",
+      "imageIds": ["chart", "lungs_nose", "balloons"]
+    },
+    {
+      "id": "introduction",
+      "heading": "Introduction",
+      "type": "text",
+      "icon": "star",
+      "body": "Learners are guided to carry out an activity on breathing in and out. They will then respond to oral questions about the body parts that help in breathing."
+    },
+    {
+      "id": "development",
+      "heading": "LESSON DEVELOPMENT",
+      "type": "steps",
+      "icon": "blackboard",
+      "time": "18 min",
+      "items": [
+        { "label": "Step 1", "body": "Learners are guided to study the chart on human breathing system. They will then explain the functions of the nose, trachea (wind pipe), lungs and the diaphragm. This will nurture the core competency of learning to learn and creativity and imagination." },
+        { "label": "Step 2", "body": "learners are guided to discuss in groups on how to label the parts of the human breathing system. This will develop the core value of love and respect as the learners use etiquette in their discussion." },
+        { "label": "Step 3", "body": "learners are guided to search from a digital device the ways of maintaining a healthy breathing system. This will nurture the core competency of digital literacy." }
+      ]
+    },
+    {
+      "id": "conclusion",
+      "heading": "Conclusion",
+      "type": "note",
+      "icon": "heart",
+      "body": "Learners are guided to respond to oral questions on how to keep their breathing system healthy. This will nurture the PCI of safety as learners mention aspects such as avoiding smoking."
+    },
+    {
+      "id": "assessment",
+      "heading": "Assessment Questions (to be captured in the teacher's notes)",
+      "type": "bullets",
+      "marker": "alpha",
+      "icon": "pencil",
+      "time": "5 min",
+      "items": [
+        { "text": "Name 4 parts of the human breathing system" },
+        { "text": "What is the work of the lungs" },
+        { "text": "Why is the nose important in breathing" },
+        { "text": "State 2 ways of keeping the breathing system healthy" }
+      ]
+    },
+    {
+      "id": "extended",
+      "heading": "Extended Activity",
+      "type": "note",
+      "icon": "books",
+      "body": "Learners to draw and label the human Breathing System in their exercise books and write 3 ways of caring for it."
+    }
+  ]
+}

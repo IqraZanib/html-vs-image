@@ -66,6 +66,22 @@ docs/
   image-model-benchmark.md   measured model cost/quality/speed + open-weight re-test
 ```
 
+## Visual regression
+
+`scripts/visual-regression.js` renders every fixture in `tests/visual/fixtures/`
+(deterministically — images from the store, cached cast, no model calls) and
+compares each PNG against a committed golden in `tests/visual/golden/`, pixel-for-pixel,
+producing a match score.
+
+- `npm run test:visual` — compare against goldens. Passes only if **every fixture
+  matches ≥ 95%**.
+- `npm run test:visual:update` — (re)write the goldens after an intended change.
+
+**Workflow rule:** obvious layout defects (page padding/margins, a section clipping or
+leaking across a page break, empty pages) are fixed first, then the visual score must be
+**≥ 95%** before a render is shown to a human for feedback. A score below 95% means a
+regression slipped in — fix it before asking.
+
 ## Skills, and how they are wired
 
 `lp-render/decorative/RULES.md` is the single skills file (R1–R21 + a `GATE_POLICY`

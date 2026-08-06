@@ -1,0 +1,131 @@
+{
+  "meta": {
+    "id": "lesson-repro",
+    "locale": "sw",
+    "subject": "Maths",
+    "grade": "Grade 1",
+    "region": "pk",
+    "title": "Kujumlisha Namba 1-10",
+    "subtitle": "Utangulizi wa Kujumlisha (1-10)",
+    "chips": [
+      {
+        "label": "Darasa",
+        "value": "Grade 1"
+      },
+      {
+        "label": "Somo",
+        "value": "Hisabati (Mathematics)"
+      },
+      {
+        "label": "Muda",
+        "value": "Saa 1 na Dakika 30"
+      }
+    ]
+  },
+  "images": [
+    {
+      "id": "mawe-kujumlisha",
+      "concept": "scene",
+      "label": "Kutumia mawe kujumlisha",
+      "prompt": "Watoto wa Tanzania/Kenya darasani wakitumia mawe kuunganisha makundi mawili ya vitu na kuhesabu jumla"
+    },
+    {
+      "id": "alama-plus-usawa",
+      "concept": "diagram",
+      "label": "Alama ya + na =",
+      "prompt": "Mchoro wa hisabati unaoonyesha alama ya kujumlisha +, alama ya usawa =, na mfano 3 + 2 = 5"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Weekly Pacing & Progress Monitoring",
+      "type": "fields",
+      "items": [
+        {
+          "label": "Day",
+          "value": "1-1"
+        },
+        {
+          "label": "Focus / Sub-topic",
+          "value": "Utangulizi wa Kujumlisha (1-10)"
+        },
+        {
+          "label": "Key Activity",
+          "value": "Kutumia mawe na vidole kuunganisha makundi mawili ya vitu."
+        },
+        {
+          "label": "Success Criteria",
+          "value": "\"Naweza kujumlisha namba mbili ndogo (1-10) kwa kutumia vitu halisi.\""
+        }
+      ]
+    },
+    {
+      "heading": "Kumbukumbu ya Ufuatiliaji wa Maendeleo (Progress Monitoring)",
+      "type": "note",
+      "body": "Mwalimu anapaswa kuangalia kama kila mwanafunzi anaweza kuhesabu vitu viwili tofauti na kuvijumlisha kuwa kundi moja kubwa."
+    },
+    {
+      "heading": "Learning Objectives & Success Criteria",
+      "type": "bullets",
+      "marker": "num",
+      "lead": "Malengo ya Somo:",
+      "items": [
+        {
+          "text": "Mwanafunzi ataelewa maana ya kujumlisha kama kitendo cha kuweka pamoja vitu."
+        },
+        {
+          "text": "Mwanafunzi ataweza kutumia alama ya kujumlisha (+) na alama ya usawa (=) kwa usahihi."
+        },
+        {
+          "text": "Mwanafunzi ataweza kutatua mazoezi ya kujumlisha namba kuanzia 1 hadi 10."
+        }
+      ]
+    },
+    {
+      "heading": "Success Criteria (Vigezo vya Mafanikio)",
+      "type": "bullets",
+      "marker": "dot",
+      "items": [
+        {
+          "text": "\"Naweza kueleza kuwa kujumlisha ni kuweka pamoja.\""
+        },
+        {
+          "text": "\"Naweza kutumia vidole au mawe kupata jibu la jumla.\""
+        }
+      ]
+    },
+    {
+      "heading": "Chapter Overview & Materials",
+      "type": "chips",
+      "items": [
+        "Mawe madogo ya nje.",
+        "vifuniko vya chupa (bottle caps).",
+        "Chaki na ubao."
+      ]
+    },
+    {
+      "heading": "Lesson Plans",
+      "type": "steps",
+      "items": [
+        {
+          "label": "Day 1: Utangulizi wa Kujumlisha Namba 1-10",
+          "body": "#### Engage (10 minutes)\nHook / Warm-Up:\nTeacher says: \"Habari zenu wanafunzi! Leo tutajifunza kitu kipya. Je, mmeshawahi kupewa pipi mbili, kisha mama akawapa pipi nyingine mbili? Leo tutajifunza 'Kujumlisha'.\"\n\n#### Explore (20 minutes)\nMini-Lesson (I Do):\n1. Mwalimu anaita mwanafunzi mmoja (mfano: Juma) na kumpa mawe 3.\n2. Mwalimu anaita mwanafunzi mwingine (mfano: Asha) na kumpa mawe 2.\n3. Mwalimu anawaambia waweke mawe yao yote kwenye sahani moja kubwa.\n4. Mwalimu anawaongoza wanafunzi wote kuhesabu mawe yote kwa sauti: \"Moja, mbili, tatu, nne, tano!\"\n\n#### Explain (15 minutes)\nGuided Practice (We Do): Mwalimu anatambulisha alama ya + na =.\nTeacher says: \"Katika hisabati, tunatumia alama hii + (Plus sign). Na tunatumia alama hii = (Equal sign).\"\nBOARD: 3 + 2 = 5\n\n#### Practice (20 minutes)\nWord Problems (Muktadha wa Kitanzania/Kikenya):\n1. Ali ana maembe 4. Fatima anampa maembe mengine 2. Je, Ali sasa ana maembe mangapi?\nMODEL ANSWER: Ali: 4 + 2 = 6 maembe.\n\n#### Assess & Close (10 minutes)\nExit Ticket: \"Tafuta jibu: 6 + 3 = ?\" MODEL ANSWER: 6 + 3 = 9.\nHomework: Kamilisha Exercise 1.1 nyumbani."
+        }
+      ]
+    },
+    {
+      "heading": "Kutumia mawe kujumlisha",
+      "type": "images",
+      "imageIds": [
+        "mawe-kujumlisha"
+      ]
+    },
+    {
+      "heading": "Alama ya + na =",
+      "type": "images",
+      "imageIds": [
+        "alama-plus-usawa"
+      ]
+    }
+  ]
+}
