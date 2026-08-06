@@ -164,6 +164,13 @@ at the top as "current / total". Page flow must look clean:
 - but do let a long section continue onto the next page so pages fill up — no large
   empty gap at the bottom of a page.
 
+  Implementation caveat: the paginated PDF's top/bottom page margin MUST be set as a CSS
+  `@page{margin:…}` rule in the paged branch, not only via the Playwright `pdf({margin})`
+  option. Chromium gives an explicit `@page` margin precedence over the API option, and the
+  shell ships `@page{margin:0}`; if the paged branch doesn't override it in CSS, every
+  continuation page prints flush to the top edge and the page number overlaps the first
+  section. (See `render/html-to-pdf.js`, `pageMode:'paged'`.)
+
 ## R26 — Colour only for what matters
 Use colour to signal what is important — the title, section headings, and emphasis
 callouts (checkpoints, key notes). Keep everything else on a clean white ground. A
