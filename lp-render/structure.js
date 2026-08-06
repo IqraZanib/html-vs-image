@@ -37,6 +37,7 @@ Section "type" values and their fields:
 Hard rules:
 - Use the lesson's OWN words and headings VERBATIM. Do NOT summarize, reword, translate, or invent content. If the lesson is in Urdu/Swahili/etc, keep that language and set locale accordingly (default "en").
 - Pick the section "type" that best fits each part of the source (objectives->bullets, resources->chips, steps->steps, questions->qa or bullets, conclusion/notes->note, forms->fields, formulas->math).
+- If the input has "## Heading" blocks, each block is ONE section (its heading is that "## Heading"). Fold the block's lines into that section — e.g. a lesson phase with teacher/pupil/board lines becomes a single section (a note or a short steps list), NOT one section per line. Never emit more than a couple of sections per block.
 - Formulas: put standalone formulas in a "math" section as LaTeX "tex"; for a formula inside a sentence, keep it inline using $...$ in the text.
 - Images: add 0-3 entries ONLY for concrete things the lesson actually names that benefit from a picture (a chart/diagram it references -> concept "diagram"; an illustrative scene/resource -> concept "scene"). If nothing visual is named, use an empty images array.
 - Image prompts must describe the SUBJECT plainly. Do NOT over-specify style or details the model may not honour ("plain background", "flat cartoon", "speed lines", "no face"): the quality gate compares the image to its prompt, so an over-specified prompt makes a good image fail. Keep prompts subject-focused.
@@ -51,20 +52,43 @@ IMPORTANT: The text below is ONE PART of a larger lesson. Output ONLY {"sections
 // with the lesson buried in a text field, wrapped in model/usage/token metadata),
 // so that noise never reaches the render. Plain text (or a real content JSON) is
 // returned unchanged.
+const META_KEY = /^(model|models|via|base_url|url|language|region|role|object|finish_reason|id|idx|index|self_hosted|created|choices?|status)$/i;
 function extractLessonText(raw) {
   let obj;
   try { obj = JSON.parse(raw); } catch (_) { return String(raw); } // not JSON → already text
   if (typeof obj === 'string') return obj;
   if (obj && typeof obj === 'object' && Array.isArray(obj.sections)) return String(raw); // already our schema
-  const strings = [];
-  (function walk(v) {
+
+  // Flatten the JSON to readable "key: value" lines, keeping EVERY string field of
+  // the lesson (short and long) and dropping only metadata keys / bare numbers &
+  // booleans (tokens, page, grade, model, urls…). This preserves a richly-structured
+  // lesson (objectives, phases, terms, notes) instead of trimming to a few fields.
+  const HEAD_FIELDS = ['key', 'title', 'name', 'heading', 'phase', 'term', 'step', 'label'];
+  const lines = [];
+  const walk = (v, key) => {
     if (v == null) return;
-    if (typeof v === 'string') { if (v.trim()) strings.push(v); return; }
-    if (Array.isArray(v)) { v.forEach(walk); return; }
-    if (typeof v === 'object') { Object.keys(v).forEach((k) => walk(v[k])); }
-  })(obj);
+    if (typeof v === 'string') { if (v.trim()) lines.push(key ? `${key}: ${v.trim()}` : v.trim()); return; }
+    if (typeof v === 'number' || typeof v === 'boolean') return; // almost always metadata
+    if (Array.isArray(v)) { for (const item of v) { if (item && typeof item === 'object') lines.push(''); walk(item, key); } return; }
+    if (typeof v === 'object') {
+      // Emit a "## Heading" so each item (a phase, a term…) reads as ONE block.
+      const hf = HEAD_FIELDS.find((f) => typeof v[f] === 'string' && v[f].trim());
+      if (hf) lines.push(`## ${v[hf].trim()}`);
+      for (const k of Object.keys(v)) { if (META_KEY.test(k) || k === hf) continue; walk(v[k], k); }
+    }
+  };
+  // API responses usually wrap the lesson under `content`; focus there but keep the
+  // title/subject hints from the top level.
+  const root = (obj && typeof obj.content === 'object' && obj.content) ? obj.content : obj;
+  if (root !== obj) { walk(obj.lesson, 'lesson'); walk(obj.subject_ar || obj.subject, 'subject'); }
+  walk(root, '');
+  const text = lines.join('\n').trim();
+  if (text.length >= 40) return text;
+
+  // Fallback: no structured strings found — take the long prose.
+  const strings = [];
+  (function w(v) { if (typeof v === 'string') { if (v.trim()) strings.push(v); } else if (Array.isArray(v)) v.forEach(w); else if (v && typeof v === 'object') Object.values(v).forEach(w); })(obj);
   if (!strings.length) return String(raw);
-  // Lesson content is the long prose; metadata (model names, urls, ids) is short.
   const long = strings.filter((s) => s.trim().length > 150);
   return (long.length ? long : [strings.sort((a, b) => b.length - a.length)[0]]).join('\n\n');
 }

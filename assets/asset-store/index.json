@@ -152,5 +152,19 @@
     "model": "gpt-image-2-text-to-image",
     "concept": "diagram",
     "prompt": "Mchoro unaoonyesha mawe 3 yakijumlishwa na mawe 2 kupata mawe 5."
+  },
+  "4c31e4edfac15994": {
+    "file": "4c31e4edfac15994.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "عائلة يمنية بسيطة"
+  },
+  "fbf1b44cdf1d1d68": {
+    "file": "fbf1b44cdf1d1d68.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "جدول يوضح أبي، أمي، أحمد، سبأ، إيمان"
   }
 }
