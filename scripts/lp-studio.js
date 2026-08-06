@@ -27,7 +27,7 @@ const SAMPLE_FILE = path.join(ROOT, 'assets/content/lesson-speed-demo.en.json');
 
 function send(res, code, type, body) { res.writeHead(code, { 'Content-Type': type }); res.end(body); }
 
-const server = http.createServer((req, res) => {
+function handler(req, res) {
   if (req.method === 'GET' && (req.url === '/' || req.url === '/index.html')) return send(res, 200, 'text/html; charset=utf-8', PAGE);
   if (req.method === 'GET' && req.url === '/sample') {
     try { return send(res, 200, 'application/json', fs.readFileSync(SAMPLE_FILE, 'utf8')); }
@@ -79,9 +79,25 @@ const server = http.createServer((req, res) => {
     return;
   }
   send(res, 404, 'text/plain', 'not found');
-});
+}
 
-server.listen(PORT, () => {
-  console.log(`LP Studio → http://localhost:${PORT}`);
-  console.log(process.env.KIE_API_KEY ? '(kie.ai key loaded — new images can be generated)' : '(no kie.ai key — store-only: only lessons whose images are already stored will render)');
-});
+// Start on PORT; if it's already in use, quietly try the next few ports instead of
+// crashing with EADDRINUSE. Prints the URL it actually bound to.
+function start(port, attemptsLeft) {
+  const server = http.createServer(handler);
+  server.on('error', (e) => {
+    if (e.code === 'EADDRINUSE' && attemptsLeft > 0) {
+      console.log(`Port ${port} is busy — trying ${port + 1}…`);
+      start(port + 1, attemptsLeft - 1);
+    } else {
+      console.error(`Could not start LP Studio: ${e.message}`);
+      process.exit(1);
+    }
+  });
+  server.listen(port, () => {
+    console.log(`\n  LP Studio → http://localhost:${port}\n`);
+    console.log(process.env.KIE_API_KEY ? '  (kie.ai key loaded — new images can be generated)' : '  (no kie.ai key — store-only: only already-stored images render)');
+    console.log('  Press Ctrl+C to stop.\n');
+  });
+}
+start(Number(PORT) || 5178, 12);
