@@ -66,6 +66,32 @@ docs/
   image-model-benchmark.md   measured model cost/quality/speed + open-weight re-test
 ```
 
+## Rumi integration — the Gamma replacement (`lp-render/adapter.js`)
+
+In rumi's `lesson-plan-generation.worker.js`, Gamma today authors + renders and returns a
+PDF *URL*. Under the sovereignty plan **rumi authors the lesson with its own LLM** and this
+repo renders it — for Kenya (Kiswahili → Kenyan children), Yemen (Arabic → Yemeni children,
+right-to-left in-image labels) and any other language. The whole swap is one call:
+
+```js
+// was: const pdfUrl = await gamma.createAndPoll({ inputText, exportAs: 'pdf', ... });
+//      const pdf = await download(pdfUrl);
+const { renderLessonPdf } = require('lp-render/adapter');
+const { pdf } = await renderLessonPdf(authoredLessonText, { locale: 'sw', apiKey: KIE_API_KEY });
+await whatsapp.sendDocument(pdf, ...);   // pdf is a Buffer — no URL, no download hop
+```
+
+- `input` may be raw authored text (structured via `structure.js`, needs a kie.ai key) or an
+  already-structured content JSON (rendered directly, no key needed if its images are cached).
+- `locale` lets rumi pin the language it already detected, so region + script + labels are right.
+- Returns `{ pdf, png, contentId, locale, stats }` — `pdf`/`png` are Buffers.
+- Everything else in rumi's flow (webhook, queue, intent, Supabase, WhatsApp delivery) is
+  untouched; only the Gamma box is replaced.
+
+**Deployment note:** the shared image store (`assets/asset-store/`) is a local folder. In a
+multi-worker/container deploy, point it at shared object storage (R2/S3) so the cache — and its
+credit savings — is shared across workers instead of re-generated per worker.
+
 ## Visual regression
 
 `scripts/visual-regression.js` renders every fixture in `tests/visual/fixtures/`
