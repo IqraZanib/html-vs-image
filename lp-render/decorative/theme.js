@@ -127,6 +127,16 @@ body{background:#eef2fb;color:var(--ink);font-family:var(--font),'Baloo 2','Popp
 .d-img img{display:block;width:100%;height:230px;object-fit:contain;background:#fff}
 .d-img.cover img{object-fit:cover}
 .d-img .cap{padding:9px 13px;font-size:13px;font-weight:700;color:var(--ink);text-align:center}
+
+/* R27 — no empty pages. In the paginated PDF a short images section can land alone on
+   a page and leave a big empty gap below it. Print-only: let image cards grow to take
+   more of the page height so the page fills smoothly, without ever cropping the image
+   (object-fit:contain). This block affects the PDF ONLY — the on-screen PNG (which is a
+   single full-page screenshot, screen media) is unchanged, so the goldens don't move. */
+@media print{
+  .d-imgrow{gap:16px}
+  .d-img img{height:36vh;min-height:250px;max-height:420px;object-fit:contain}
+}
 `;
 
 // Section accent palette, rotated by index.

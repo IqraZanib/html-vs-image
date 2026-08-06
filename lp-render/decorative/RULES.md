@@ -176,6 +176,18 @@ Use colour to signal what is important — the title, section headings, and emph
 callouts (checkpoints, key notes). Keep everything else on a clean white ground. A
 page drowning in colour is harder to read than white with a few deliberate accents.
 
+## R27 — No empty pages: fill the space smoothly
+Without touching anything else that already works, handle this situation: when a section —
+most often a short **images** section — lands alone on a paginated page and would leave a
+large empty gap below it, arrange and size its content so the page fills smoothly and looks
+intentional. For images specifically, let the image cards grow to take more of the page
+height (in the PDF) instead of sitting as a small strip with white space beneath them.
+Constraints while doing so:
+- never crop or distort an image to fill (grow the card, keep the whole picture — contain);
+- never split a single image, card, step or bullet across a page (R25 still holds);
+- this is a **print/PDF-only** adjustment — the on-screen preview and the visual-regression
+  goldens must not change (implemented via `@media print` in `theme.js`).
+
 ## GATE_POLICY
 - The image must be correct for the exact concept named in the content. For a labeled
   diagram, every label must be spelled correctly and point to the right part; reject
