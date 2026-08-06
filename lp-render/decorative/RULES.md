@@ -13,10 +13,15 @@ Do not shorten, reword, paraphrase, or "improve" the wording. If the content has
 six learning resources, all six appear. If a step has a core-competency note, it
 stays. Nothing is dropped and nothing is condensed.
 
-## R2 — Use the content's own headings and words
+## R2 — Use the content's own headings and words, in the content's language
 Section headings are taken exactly as written in the content (e.g. "Lesson Learning
 Outcomes", "Key inquiry question", "Learning resources", "Extended Activity").
-Do not translate or relabel them. If the content is in Urdu, the output is in Urdu.
+Do not translate or relabel the content itself. If the content is in Urdu/Arabic/etc,
+the whole output is in that language. Everything a reader sees — headings, item
+labels, sub-headings — must be in the content's language: if the source wraps
+non-English content in English field keys (teacher, pupil, board, g1, teachers_corner),
+those short labels are translated into the content's language, never left in English.
+Only the labels are localized; the lesson's own sentences stay verbatim.
 
 ## R3 — Never generate content yourself
 The renderer only styles what it is given. It must not add facts, examples,

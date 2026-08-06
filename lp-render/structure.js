@@ -35,7 +35,8 @@ Section "type" values and their fields:
 - "images":  { "imageIds": [ string ] }  // DISPLAYS images; ids must match entries in the top-level "images" array
 
 Hard rules:
-- Use the lesson's OWN words and headings VERBATIM. Do NOT summarize, reword, translate, or invent content. If the lesson is in Urdu/Swahili/etc, keep that language and set locale accordingly (default "en").
+- Use the lesson's OWN words and headings VERBATIM. Do NOT summarize, reword, translate, or invent content. If the lesson is in Urdu/Swahili/Arabic/etc, keep that language and set locale accordingly (default "en").
+- LANGUAGE OF EVERYTHING A READER SEES: every heading, section title, item label and sub-heading MUST be in the SAME language as the lesson. The source often wraps non-English content in ENGLISH field keys (teacher, pupil, board, checkpoint, objective, g1/g2/g3, teachers_corner, note…). Translate ONLY those short structural labels into the content's language — never leave an English label in a non-English lesson (Arabic e.g. المعلم، التلميذ، السبورة، الهدف، الصف الأول، ركن المعلم). The lesson's own sentences/values stay VERBATIM — do not translate the actual content.
 - Pick the section "type" that best fits each part of the source (objectives->bullets, resources->chips, steps->steps, questions->qa or bullets, conclusion/notes->note, forms->fields, formulas->math).
 - If the input has "## Heading" blocks, each block is ONE section (its heading is that "## Heading"). Fold the block's lines into that section — e.g. a lesson phase with teacher/pupil/board lines becomes a single section (a note or a short steps list), NOT one section per line. Never emit more than a couple of sections per block.
 - Formulas: put standalone formulas in a "math" section as LaTeX "tex"; for a formula inside a sentence, keep it inline using $...$ in the text.
@@ -53,6 +54,16 @@ IMPORTANT: The text below is ONE PART of a larger lesson. Output ONLY {"sections
 // so that noise never reaches the render. Plain text (or a real content JSON) is
 // returned unchanged.
 const META_KEY = /^(model|models|via|base_url|url|language|region|role|object|finish_reason|id|idx|index|self_hosted|created|choices?|status)$/i;
+// Cryptic field keys → a readable English label the structurer can understand and
+// then localise into the content's language (R2). Values are never touched.
+const KEY_LABEL = {
+  today_objective: 'Objective', objective: 'Objective', common_error: 'Common error',
+  wrong: 'Common mistake', right: 'Correct form', note: 'Note', teach_note: 'Teaching note',
+  teacher: 'Teacher', pupil: 'Pupil', board: 'Board', checkpoint: 'Checkpoint',
+  grr: 'Gradual release', time: 'Time', key_terms: 'Key terms', term: 'Term', def: 'Definition',
+  multigrade: 'Multigrade', g1: 'Grade 1', g2: 'Grade 2', g3: 'Grade 3',
+  teachers_corner: "Teacher's corner",
+};
 function extractLessonText(raw) {
   let obj;
   try { obj = JSON.parse(raw); } catch (_) { return String(raw); } // not JSON → already text
@@ -67,7 +78,7 @@ function extractLessonText(raw) {
   const lines = [];
   const walk = (v, key) => {
     if (v == null) return;
-    if (typeof v === 'string') { if (v.trim()) lines.push(key ? `${key}: ${v.trim()}` : v.trim()); return; }
+    if (typeof v === 'string') { if (v.trim()) lines.push(key ? `${KEY_LABEL[key] || key}: ${v.trim()}` : v.trim()); return; }
     if (typeof v === 'number' || typeof v === 'boolean') return; // almost always metadata
     if (Array.isArray(v)) { for (const item of v) { if (item && typeof item === 'object') lines.push(''); walk(item, key); } return; }
     if (typeof v === 'object') {

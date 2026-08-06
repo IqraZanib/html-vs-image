@@ -166,5 +166,26 @@
     "model": "gpt-image-2-text-to-image",
     "concept": "diagram",
     "prompt": "جدول يوضح أبي، أمي، أحمد، سبأ، إيمان"
+  },
+  "f87e572c206b9da0": {
+    "file": "f87e572c206b9da0.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "جدول يوضح: أبي، أمي، أحمد، سبأ، إيمان"
+  },
+  "9a22c577a79f45fb": {
+    "file": "9a22c577a79f45fb.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "صورة لعائلة يمنية بسيطة"
+  },
+  "e50cf6a572a86273": {
+    "file": "e50cf6a572a86273.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "جدول يوضح أبي وأمي وأحمد وسبأ وإيمان"
   }
 }
