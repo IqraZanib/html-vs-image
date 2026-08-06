@@ -1,0 +1,71 @@
+{
+  "meta": {
+    "id": "lesson-math-demo",
+    "locale": "en",
+    "subject": "Mathematics",
+    "grade": "Grade 8",
+    "title": "Quadratic Equations",
+    "subtitle": "Formulas rendered by code — KaTeX & MathJax, never image-gen",
+    "chips": [
+      { "label": "Subject", "value": "Mathematics" },
+      { "label": "Grade", "value": "Grade 8" },
+      { "label": "Topic", "value": "Quadratic Equations" }
+    ]
+  },
+  "images": [],
+  "sections": [
+    {
+      "heading": "Lesson Learning Outcomes",
+      "type": "bullets",
+      "marker": "alpha",
+      "icon": "target",
+      "time": "2 min",
+      "lead": "By the end of the lesson, the learner should be able to:",
+      "items": [
+        { "text": "Recall the standard form of a quadratic equation." },
+        { "text": "Solve a quadratic equation using the quadratic formula." },
+        { "text": "Apply related formulas to real-world problems." }
+      ]
+    },
+    {
+      "heading": "Key formulas",
+      "type": "math",
+      "icon": "lightbulb",
+      "engine": "katex",
+      "items": [
+        { "label": "Standard form", "tex": "ax^2 + bx + c = 0" },
+        { "label": "Quadratic formula", "tex": "x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}" },
+        { "label": "Discriminant", "tex": "\\Delta = b^2 - 4ac" },
+        { "label": "Area of a circle", "tex": "A = \\pi r^2" },
+        { "label": "Pythagoras' theorem", "tex": "a^2 + b^2 = c^2" }
+      ]
+    },
+    {
+      "heading": "Same formula via the MathJax engine (SVG)",
+      "type": "math",
+      "icon": "star",
+      "engine": "mathjax",
+      "items": [
+        { "label": "Quadratic formula — MathJax to self-contained SVG", "tex": "x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}" }
+      ]
+    },
+    {
+      "heading": "Worked example",
+      "type": "text",
+      "icon": "blackboard",
+      "body": "Solve $x^2 - 5x + 6 = 0$. Here $a = 1$, $b = -5$, $c = 6$, so the discriminant is $\\Delta = 25 - 24 = 1$, and the quadratic formula gives $x = 2$ or $x = 3$."
+    },
+    {
+      "heading": "Assessment Questions",
+      "type": "bullets",
+      "marker": "alpha",
+      "icon": "pencil",
+      "time": "5 min",
+      "items": [
+        { "text": "Write the quadratic formula from memory." },
+        { "text": "Solve $x^2 - 7x + 12 = 0$." },
+        { "text": "State the discriminant of $2x^2 + 3x - 5 = 0$." }
+      ]
+    }
+  ]
+}

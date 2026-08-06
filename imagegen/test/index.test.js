@@ -26,15 +26,16 @@ test('generates an image for the hook, skips the structured block', async () => 
   assert.strictEqual(board.asset, null);
 });
 
-test('escalates up the ladder when the gate fails, then succeeds', async () => {
+test('escalates to the safety fallback when the primary fails the gate', async () => {
   const seen = [];
   const generateImpl = async ({ model }) => { seen.push(model); return { ok: true, model, url: `http://img/${model}.png`, creditsConsumed: 5 }; };
-  const gateImpl = async ({ imageUrl }) => ({ pass: imageUrl.includes('seedream'), reason: 'x' });
+  // Scene primary (nano-banana-2-lite) is rejected; only the qwen2 fallback passes.
+  const gateImpl = async ({ imageUrl }) => ({ pass: imageUrl.includes('qwen'), reason: 'x' });
   const { images } = await resolveSegmentImages(segment, { apiKey: 'k', generateImpl, gateImpl, cache: new MemoryAssetCache(), budget: new BudgetGuard(100) });
   const hook = images.find((i) => i.blockType === 'HOOK_STORY');
   assert.strictEqual(seen[0], 'nano-banana-2-lite');
-  assert.strictEqual(hook.model, 'bytedance/seedream-v4-text-to-image');
-  assert.match(hook.asset.url, /seedream/);
+  assert.strictEqual(hook.model, 'qwen2/text-to-image');
+  assert.match(hook.asset.url, /qwen/);
 });
 
 test('falls back (asset null) when the whole ladder fails the gate', async () => {

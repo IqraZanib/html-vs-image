@@ -21,7 +21,9 @@ const TEMPLATES = {
     S.DIAGRAM_STYLE,
     `Diagram of: ${ctx.block.text || ctx.topic}`,
     ctx.grade ? `for grade ${ctx.grade}` : '',
-    'with clear, correctly-spelled text labels for each part',
+    ctx.lang
+      ? `label every part with a short, correctly-spelled text label written in ${ctx.lang} — all in-image text must be in that language, never English`
+      : 'with clear, correctly-spelled text labels for each part',
     S.QUALITY,
     S.NEGATIVE_DIAGRAM,
   ]),

@@ -1,0 +1,289 @@
+{
+  "3531b9000d8a36c0": {
+    "file": "3531b9000d8a36c0.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "a clear educational labeled chart of the human breathing system for a Grade 5 Science lesson, clearly labelling the nose, the trachea (wind pipe), the two lungs, and the diaphragm, flat infographic style, correct anatomy, plain background"
+  },
+  "fb5c2db48240c64b": {
+    "file": "fb5c2db48240c64b.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "clear simple educational pictures of the human lungs and the human nose side by side, labelled, correct anatomy, flat illustration, plain background, suitable for a Grade 5 Science classroom"
+  },
+  "9aebaed02219d9e6": {
+    "file": "9aebaed02219d9e6.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "a clear educational science diagram of a lung model made with balloons: a plastic bottle with two balloons inside representing the two lungs and a stretched rubber sheet at the bottom representing the diaphragm, with a simple arrow showing air moving in and out, labelled 'balloons = lungs' and 'rubber sheet = diaphragm', flat infographic style, correct and simple, plain background"
+  },
+  "34f43d25885a1f3a": {
+    "file": "34f43d25885a1f3a.png",
+    "mime": "image/png",
+    "model": "flux-2/pro-text-to-image",
+    "concept": "scene",
+    "prompt": "a happy child athlete running in a race on a school sports field, smiling, bright cheerful flat cartoon illustration, plain simple background"
+  },
+  "b87d75babac36448": {
+    "file": "b87d75babac36448.jpg",
+    "mime": "image/jpeg",
+    "model": "qwen2/text-to-image",
+    "concept": "scene",
+    "prompt": "a cheerful child riding a bicycle on a countryside road, smiling, colourful illustration for a children's maths lesson"
+  },
+  "e506277180bd3a92": {
+    "file": "e506277180bd3a92.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "A clear educational diagram of the water cycle showing evaporation, condensation, precipitation, and collection with labeled arrows."
+  },
+  "3b088c1a00f5a968": {
+    "file": "3b088c1a00f5a968.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "A kettle with water boiling and steam rising, suitable for a Grade 4 science lesson demonstration."
+  },
+  "f7e8d457bad62c74": {
+    "file": "f7e8d457bad62c74.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "A clear educational diagram of the water cycle showing the stages named in the lesson: evaporation, condensation, and precipitation."
+  },
+  "713ea738a2de2588": {
+    "file": "713ea738a2de2588.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "A kettle with water boiling and steam rising, used to demonstrate evaporation in a classroom."
+  },
+  "78ddcf1199df3107": {
+    "file": "78ddcf1199df3107.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Grade 1 pupils using stones and fingers to combine two groups of objects to learn addition from 1 to 10."
+  },
+  "d6e2ffd0af7152fe": {
+    "file": "d6e2ffd0af7152fe.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Concrete to Pictorial to Abstract addition diagram showing stones, drawings of circles, and the equation 3 + 2 = 5."
+  },
+  "88fad65a8849a8bb": {
+    "file": "88fad65a8849a8bb.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "A simple educational illustration for Grade 1 math: Ali has 4 mangoes and Fatima gives him 2 more mangoes. Show the two groups of mangoes clearly with a child-friendly classroom style."
+  },
+  "5ad97a65923e9e67": {
+    "file": "5ad97a65923e9e67.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mawe ya Juma, mawe ya Asha, and jumla ya mawe showing 3 + 2 = 5 on a board"
+  },
+  "ce854b05b97016c6": {
+    "file": "ce854b05b97016c6.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Michoro ya kuongeza kwa kutumia vikundi vya duara: OO + OOO, OOOO + O, na OOOOO + OO."
+  },
+  "792340987d59d4a5": {
+    "file": "792340987d59d4a5.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mchoro wa kujumlisha mawe 3 na mawe 2 kuwa mawe 5"
+  },
+  "9ea2b407c231a5bc": {
+    "file": "9ea2b407c231a5bc.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Plus sign and equal sign in a simple addition equation"
+  },
+  "713f25dc10835e6b": {
+    "file": "713f25dc10835e6b.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Two students using bottle caps to practice addition"
+  },
+  "67c8c57f2234ed51": {
+    "file": "67c8c57f2234ed51.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Mbuzi 3 kwenye zizi na mama anaongeza mbuzi 3 wengine"
+  },
+  "5d8c34171b77d845": {
+    "file": "5d8c34171b77d845.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Mawe na vidole yanayotumika kuunganisha makundi mawili ya vitu."
+  },
+  "cc93aab8f0bd2949": {
+    "file": "cc93aab8f0bd2949.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "3 + 2 = 5 addition equation with plus sign and equal sign"
+  },
+  "3ee4f59562769e62": {
+    "file": "3ee4f59562769e62.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "students using bottle caps for addition practice"
+  },
+  "fdb5a75c7fb1f0eb": {
+    "file": "fdb5a75c7fb1f0eb.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mchoro unaoonyesha mawe 3 yakijumlishwa na mawe 2 kupata mawe 5."
+  },
+  "4c31e4edfac15994": {
+    "file": "4c31e4edfac15994.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "عائلة يمنية بسيطة"
+  },
+  "fbf1b44cdf1d1d68": {
+    "file": "fbf1b44cdf1d1d68.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "جدول يوضح أبي، أمي، أحمد، سبأ، إيمان"
+  },
+  "f87e572c206b9da0": {
+    "file": "f87e572c206b9da0.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "جدول يوضح: أبي، أمي، أحمد، سبأ، إيمان"
+  },
+  "9a22c577a79f45fb": {
+    "file": "9a22c577a79f45fb.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "صورة لعائلة يمنية بسيطة"
+  },
+  "e50cf6a572a86273": {
+    "file": "e50cf6a572a86273.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "جدول يوضح أبي وأمي وأحمد وسبأ وإيمان"
+  },
+  "a8601e28c4781ba5": {
+    "file": "a8601e28c4781ba5.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "رسمة قلب كبير وبداخله كلمة أسرتي"
+  },
+  "edf633841bf60908": {
+    "file": "edf633841bf60908.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "مخطط مُسمى يوضح: أبي، أمي، أحمد، سبأ، إيمان"
+  },
+  "abae60389e9fac92": {
+    "file": "abae60389e9fac92.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Diagramu yenye mawe yanayoonyesha 3 + 2 = 5 kwa wanafunzi wa Pakistan"
+  },
+  "08bdfa38f3348d6c": {
+    "file": "08bdfa38f3348d6c.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Labelled diagram showing stones used to demonstrate 3 + 2 = 5 for pupils in a Kenyan classroom"
+  },
+  "c791170753559dd1": {
+    "file": "c791170753559dd1.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "Watoto wa Kenya wakitumia mawe kujumlisha makundi mawili ya mawe darasani"
+  },
+  "933ffb2539b9d406": {
+    "file": "933ffb2539b9d406.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Labelled diagram showing the equation 3 + 2 = 5 with the plus sign and equal sign explained using groups of objects for Pakistani primary school learners"
+  },
+  "5b2ad2e8a68fe772": {
+    "file": "5b2ad2e8a68fe772.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "Watoto wa Kenya wakijumlisha makundi mawili ya mawe darasani"
+  },
+  "c656a80bf9e6988d": {
+    "file": "c656a80bf9e6988d.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Watoto wa Kenya/Tanzania darasani wakitumia mawe madogo kuunganisha makundi mawili ya vitu na kuhesabu jumla."
+  },
+  "27dae0a3ed72a5e3": {
+    "file": "27dae0a3ed72a5e3.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mchoro wa mawe matatu pamoja na mawe mawili ukionyesha 3 + 2 = 5."
+  },
+  "0c23978f293c52db": {
+    "file": "0c23978f293c52db.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "scene",
+    "prompt": "Wanafunzi wa Tanzania au Kenya katika darasa wakijumlisha vitu kwa kuweka mawe 4 upande mmoja na vifuniko 3 vya chupa upande mwingine, kisha kuhesabu jumla 7."
+  },
+  "7a837dc059072606": {
+    "file": "7a837dc059072606.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mchoro wa kielimu unaoonyesha hesabu 3 + 2 = 5, ikiwa na vikundi vitatu na viwili vya vitu vinavyowekwa pamoja ili kuonyesha jumla ya tano."
+  },
+  "226887ba6b3f1b56": {
+    "file": "226887ba6b3f1b56.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "مخطط مُسمّى يوضح: أبي، أمي، أحمد، سبأ، إيمان"
+  },
+  "e2a2892bffb5c39d": {
+    "file": "e2a2892bffb5c39d.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mchoro wa hisabati unaoonyesha alama ya kujumlisha +, alama ya usawa =, na mfano 3 + 2 = 5"
+  },
+  "662eefce4e005ad4": {
+    "file": "662eefce4e005ad4.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Watoto wa Tanzania/Kenya darasani wakitumia mawe kuunganisha makundi mawili ya vitu na kuhesabu jumla"
+  }
+}

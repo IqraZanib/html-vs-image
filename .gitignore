@@ -25,3 +25,6 @@ references/source/page-*.png
 # Large base64 build artifacts (regenerate via scripts/build-reference-repro.py)
 references/samples/pinky-day-out-full.html
 references/samples/pinky-day-out-exact.html
+
+# Visual-regression working renders (goldens ARE committed)
+tests/visual/current/

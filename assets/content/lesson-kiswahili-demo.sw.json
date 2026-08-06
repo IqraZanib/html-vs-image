@@ -1,0 +1,21 @@
+{
+  "meta": { "id": "lesson-kiswahili-demo", "locale": "sw", "subject": "Hisabati", "grade": "Darasa la 1",
+    "title": "Kuhesabu 1 hadi 10", "subtitle": "Kuhesabu vitu halisi darasani",
+    "chips": [ { "label": "Somo", "value": "Hisabati" }, { "label": "Darasa", "value": "1" }, { "label": "Muda", "value": "Dakika 40" } ] },
+  "images": [],
+  "sections": [
+    { "heading": "Malengo ya Somo", "type": "bullets", "marker": "alpha", "lead": "Mwisho wa somo, mwanafunzi aweze:", "items": [
+      { "text": "Kuhesabu vitu kutoka 1 hadi 10." },
+      { "text": "Kuandika namba 1 hadi 10." } ] },
+    { "heading": "Utangulizi", "type": "text", "body": "Mwalimu anaonyesha mawe na wanafunzi wanahesabu pamoja kwa sauti." },
+    { "heading": "Hatua za Somo", "type": "steps", "items": [
+      { "label": "Hatua ya 1", "body": "Hesabu mawe kwa sauti pamoja na wanafunzi." },
+      { "label": "Hatua ya 2", "body": "Andika namba ubaoni na wanafunzi waandike madaftarini." } ] },
+    { "heading": "Shughuli ya Wanafunzi", "type": "bullets", "marker": "num", "items": [
+      { "text": "Hesabu vidole vyako kutoka 1 hadi 10." },
+      { "text": "Andika namba 1 hadi 5 kwenye daftari." } ] },
+    { "heading": "Tathmini", "type": "bullets", "marker": "alpha", "items": [
+      { "text": "Hesabu mawe matano." },
+      { "text": "Andika namba tatu." } ] }
+  ]
+}

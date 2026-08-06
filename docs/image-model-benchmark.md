@@ -98,14 +98,27 @@ image-gen output is allowed into the final PDF, with retry/fallback on fail.
 > working substitute on the same provider (no extra vendor). If a specific open-weight VLM is required, it must be
 > hosted elsewhere — flagged as a deviation.
 
-## Recommended router defaults (justified by the above)
+## Router defaults — DIRECT type→model assignment (not a cost climb)
 
-| Category | Primary | Fallback | Rationale |
-|---|---|---|---|
-| notation | **KaTeX** (code, deterministic) | — (no image-gen fallback; code always works) | image-gen drift proven |
-| illustrative | **Seedream v4** (`bytedance/seedream-v4-text-to-image`, 5cr/~14s) | **nano-banana-2** (8cr, top accuracy) | Seedream v4 = cheapest *accurate* + fastest; escalate to nano-banana-2 when max fidelity needed. Sub-5cr models (nano-banana-2-lite/grok/nano-banana) only behind a strict correctness gate. |
-| process | **code flow-template** (HTML/SVG) | nano-banana-2 (only if a bespoke scene is needed) | consistent, cheap, no drift |
-| quality gate | **GPT-5.2 vision** (kie.ai) | — | proven to catch drift, sync, structured output |
+Earlier the router walked a cost-ascending ladder (cheapest first, escalate on gate fail).
+For image types where the cheap model reliably fails (Arabic labels, precise diagrams) that
+just burned credits generating-then-rejecting. The router now sends each type **straight to
+the model that makes it best on the first attempt**, with a single gate-only safety fallback.
+Config: `imagegen/config/models.config.js` (`LADDERS` + `ladderFor`).
+
+| Type | Locale | Primary (1st attempt) | Safety fallback | Rationale |
+|---|---|---|---|---|
+| **notation** | any | **KaTeX** (code) | — | image-gen drift proven; code always correct |
+| **decorative_scene** (children/activity/family, no text) | any | **nano-banana-2-lite** (4cr, ~14s) | **qwen2** (open-weight, ~10s) | cheap, fast, warm art + expressive faces; qwen fast open-weight backup |
+| **labeled_diagram** — Latin script | en, sw, fr… | **Seedream v4** (5cr, ~14s) | **nano-banana-2** (8cr) | best value + accurate Latin labels first-try; escalate for max fidelity |
+| **labeled_diagram** — complex/RTL script | ar, ur, sd, fa, ps | **nano-banana-2** (8cr) | **gpt-image-2** | only the strongest model renders Arabic/Urdu script reliably — top model first is *cheaper in expectation* than letting Seedream fail and climb |
+| **character cast** (single figure, panel-blend) | any | **nano-banana-2-lite** (4cr, pure-white bg) | **flux-2/pro** (open-weight, pure-white) | white bg needed to blend into panels; flux open-weight backup (`decorative/characters.js`) |
+| **process / cycle** | any | **code flow-template** (HTML/SVG) | nano-banana-2 (bespoke only) | consistent, cheap, no drift |
+| **quality gate** | any | **GPT-5.2 vision** (kie.ai) | — | catches drift/label-language errors, sync, structured |
+
+Open-weight models are now live in the routing: **qwen2** (scene fallback) and **flux-2/pro**
+(character fallback). The gate still guards every output; the fallback fires only when the
+primary is rejected, so the common case is a single generation.
 
 ## Cost / async facts (for the router + logging)
 
@@ -120,3 +133,24 @@ image-gen output is allowed into the final PDF, with retry/fallback on fail.
 - **Ideogram v3** errored both runs — retry with corrected params before adopting; not a verified option yet.
 - Imagen4 (`google/imagen4`, `google/imagen4-ultra`) and GPT Image-2 exist but were not benchmarked this pass.
 - Pricing numbers are derived from live `creditsConsumed`, not kie.ai's published price list.
+
+## Correction — open-weight models re-tested (character task)
+
+An earlier pass wrongly concluded the open-weight models were unreliable. A proper
+re-run (same schoolboy character prompt) shows **both work**:
+
+| Model | Licensing | Credits | Latency | Background | Verdict |
+|---|---|---|---|---|---|
+| `nano-banana-2-lite` | proprietary | **4** | ~17s | pure white | shipped — cheapest + blends into panels |
+| `flux-2/pro-text-to-image` | **open-weight** | 5 | 24–83s (variable) | pure white | works 3/3; good art; slow |
+| `qwen2/text-to-image` | **open-weight** | 5.6 | **~10s** (fastest) | tinted (blue) | works; good art; bg needs keying |
+
+Key fixes to the earlier mistakes:
+- **Qwen2 works** — its `image_size` takes **ratio strings** (`'1:1'`, `'3:4'`), **not** the
+  fal-style names (`portrait_4_3`, `square_hd`) that were tried first and rejected.
+- **FLUX-2/pro is not flaky** — 3/3 runs succeeded; the earlier single timeout was transient.
+  It is just slow and high-variance in latency.
+
+So the reason we ship `nano-banana-2-lite` for characters is **cost (4cr) + a pure-white
+background** (which the panel-blend needs), not any failure of the open-weight models.
+Both `flux-2/pro` and `qwen2` are registered in `models.config.js` as usable alternatives.

@@ -17,16 +17,17 @@ async function resolveSegmentImages(segment = {}, opts = {}) {
     cache = new MemoryAssetCache(), budget = new BudgetGuard(),
   } = opts;
 
-  const images = [];
   const report = [];
-  for (const block of (segment.blocks || [])) {
+
+  // Resolve one block's image (classify -> ladder -> generate -> gate -> cache).
+  const resolveOne = async (block) => {
     const { category, needsImage, reason } = classifyBlock(block, segment);
-    if (!needsImage) {
-      images.push({ blockType: block.type, category, needsImage: false, model: null, asset: null, reason });
-      continue;
-    }
-    const { ladder } = route(category);
-    const prompt = resolvePrompt({ category, subject: segment.subject, block, region, grade: segment.grade });
+    if (!needsImage) return { blockType: block.type, category, needsImage: false, model: null, asset: null, reason };
+
+    // A block may force a specific model (e.g. an open-weight flux/qwen); otherwise
+    // walk the category's cost-ascending ladder. Either way the gate still decides.
+    const ladder = block.model ? [block.model] : route(category, segment.locale).ladder;
+    const prompt = resolvePrompt({ category, subject: segment.subject, block, region, grade: segment.grade, locale: segment.locale });
     const expectation = block.text || segment.topic || category;
 
     let resolved = null;
@@ -35,7 +36,11 @@ async function resolveSegmentImages(segment = {}, opts = {}) {
       const cached = await cache.get(key);
       if (cached) { resolved = { model, asset: cached, credits: 0, reason: 'cache' }; break; }
 
-      const gen = await generateImpl({ apiKey, model, prompt });
+      let gen = null;
+      for (let attempt = 0; attempt < 3; attempt++) { // retry transient gen failures (some models are flaky)
+        gen = await generateImpl({ apiKey, model, prompt });
+        if (gen.ok) break;
+      }
       if (!gen.ok) { report.push({ blockType: block.type, model, event: 'gen_fail', error: gen.error }); continue; }
       if (typeof gen.creditsConsumed === 'number') budget.spend(gen.creditsConsumed);
 
@@ -49,12 +54,13 @@ async function resolveSegmentImages(segment = {}, opts = {}) {
       }
     }
 
-    if (resolved) {
-      images.push({ blockType: block.type, category, needsImage: true, model: resolved.model, asset: resolved.asset, reason: resolved.reason, creditsConsumed: resolved.credits });
-    } else {
-      images.push({ blockType: block.type, category, needsImage: true, model: null, asset: null, reason: 'fallback: no model passed the quality gate' });
-    }
-  }
+    return resolved
+      ? { blockType: block.type, category, needsImage: true, model: resolved.model, asset: resolved.asset, reason: resolved.reason, creditsConsumed: resolved.credits }
+      : { blockType: block.type, category, needsImage: true, model: null, asset: null, reason: 'fallback: no model passed the quality gate' };
+  };
+
+  // Blocks are independent, so resolve them concurrently (output order preserved).
+  const images = await Promise.all((segment.blocks || []).map(resolveOne));
   return { images, report };
 }
 

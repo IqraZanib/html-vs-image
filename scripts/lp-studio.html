@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LP Studio</title>
+<style>
+:root{--bg:#eef1f6;--card:#fff;--ink:#14171c;--muted:#5a6472;--line:#dde1e9;--signal:#ff5a36;--open:#0e9c9a;--paid:#d9861f;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1015;--card:#151a21;--ink:#eef1f6;--muted:#9aa6b4;--line:#232a34}}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:12px;padding:14px 22px;border-bottom:1px solid var(--line);background:var(--card)}
+header .dot{width:11px;height:11px;border-radius:3px;background:var(--signal)}
+header b{font-family:var(--mono);font-size:14px}
+header .sub{color:var(--muted);font-size:12.5px;margin-left:2px}
+main{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:0}
+.panel{display:flex;flex-direction:column;min-height:0;min-width:0}
+.panel.left{border-right:1px solid var(--line)}
+.phead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line)}
+.phead h2{margin:0;font-size:13px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tools{display:flex;gap:8px}
+button{font-family:var(--sans);font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--card);color:var(--ink);
+  border-radius:9px;padding:8px 14px;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button.primary{background:var(--signal);border-color:var(--signal);color:#fff}
+button:disabled{opacity:.55;cursor:default}
+textarea{flex:1;width:100%;border:0;resize:none;padding:16px 18px;font-family:var(--mono);font-size:12.5px;line-height:1.6;
+  background:transparent;color:var(--ink);outline:none}
+.out{flex:1;overflow:auto;padding:18px;display:flex;align-items:flex-start;justify-content:center;background:#e9ecf3}
+@media(prefers-color-scheme:dark){.out{background:#0b0e13}}
+.out img{max-width:420px;width:100%;height:auto;border-radius:8px;box-shadow:0 8px 26px rgba(20,30,50,.16);display:block}
+.placeholder{color:var(--muted);font-size:14px;margin:auto;text-align:center;max-width:280px}
+.statusbar{border-top:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card)}
+.chip{font-family:var(--mono);font-size:11px;font-weight:600;border-radius:999px;padding:3px 10px;border:1px solid var(--line)}
+.chip.ok{color:var(--open);border-color:color-mix(in srgb,var(--open) 40%,transparent)}
+.chip.gen{color:var(--paid);border-color:color-mix(in srgb,var(--paid) 40%,transparent)}
+.chip.drop{color:var(--signal);border-color:color-mix(in srgb,var(--signal) 40%,transparent)}
+.log{font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:pre-wrap;max-height:120px;overflow:auto;flex-basis:100%;margin:0}
+.log .err{color:var(--signal)}
+a.dl{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--signal)}
+.spin{width:15px;height:15px;border:2px solid var(--line);border-top-color:var(--signal);border-radius:50%;animation:s .7s linear infinite;display:inline-block;vertical-align:-2px}
+@keyframes s{to{transform:rotate(360deg)}}
+.hint{color:var(--muted);font-size:11.5px;padding:0 18px 12px}
+</style></head>
+<body>
+<header><span class="dot"></span><b>LP Studio</b><span class="sub">paste content · get a lesson image · same pipeline behind it</span></header>
+<main>
+  <section class="panel left">
+    <div class="phead"><h2>Content (JSON)</h2>
+      <div class="tools"><button id="sample">Load sample</button><button id="run" class="primary">Render →</button></div></div>
+    <textarea id="content" spellcheck="false" placeholder="Paste a lesson content JSON — or just raw lesson text — then press Render…"></textarea>
+    <div class="hint">Paste a content JSON, or raw lesson text (it is auto-structured, keeping its own words, before rendering). Images already in the store are restored free; new ones are generated via kie.ai and saved.</div>
+  </section>
+  <section class="panel">
+    <div class="phead"><h2>Rendered lesson</h2><a class="dl" id="dl" href="#" download="lesson.pdf" style="display:none">Download PDF ↓</a></div>
+    <div class="out" id="out"><div class="placeholder" id="ph">The rendered lesson image will appear here.</div></div>
+    <div class="statusbar" id="status">
+      <span class="chip ok" id="c-ok" style="display:none"></span>
+      <span class="chip gen" id="c-gen" style="display:none"></span>
+      <span class="chip drop" id="c-drop" style="display:none"></span>
+      <pre class="log" id="log" style="display:none"></pre>
+    </div>
+  </section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+$('sample').onclick=async()=>{ const r=await fetch('/sample'); $('content').value=await r.text(); };
+$('run').onclick=async()=>{
+  const btn=$('run'); const raw=$('content').value.trim();
+  if(!raw){ $('content').focus(); return; }
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span> Rendering…';
+  $('ph').textContent='Rendering… (generating new images can take a little while)'; $('ph').style.display='';
+  $('out').querySelectorAll('img').forEach(n=>n.remove());
+  ['c-ok','c-gen','c-drop'].forEach(id=>$(id).style.display='none'); $('log').style.display='none'; $('dl').style.display='none';
+  try{
+    const res=await fetch('/render',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:raw})});
+    const j=await res.json();
+    if(j.logs&&j.logs.length){ $('log').textContent=j.logs.join('\n'); $('log').style.display=''; }
+    if(!j.ok){ $('ph').innerHTML='<span style="color:var(--signal)">Error:</span> '+(j.error||'render failed'); return; }
+    if(j.structured){ $('content').value=j.structured; } // show the structured JSON the render used
+    $('ph').style.display='none';
+    const img=new Image(); img.src=j.png; $('out').appendChild(img);
+    if(j.pdf){ $('dl').href=j.pdf; $('dl').download='lesson.pdf'; $('dl').textContent='Download PDF ↓'; $('dl').style.display=''; }
+    else { $('dl').href=j.png; $('dl').download='lesson.png'; $('dl').textContent='Download PNG ↓'; $('dl').style.display=''; }
+    const s=j.stats||{};
+    if(s.restored){ $('c-ok').textContent=s.restored+' restored'; $('c-ok').style.display=''; }
+    if(s.generated){ $('c-gen').textContent=s.generated+' generated'; $('c-gen').style.display=''; }
+    if(s.dropped){ $('c-drop').textContent=s.dropped+' dropped'; $('c-drop').style.display=''; }
+  }catch(e){ $('ph').innerHTML='<span style="color:var(--signal)">Error:</span> '+e.message; }
+  finally{ btn.disabled=false; btn.textContent='Render →'; }
+};
+</script>
+</body></html>

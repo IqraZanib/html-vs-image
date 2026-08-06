@@ -69,6 +69,27 @@ async function htmlToPdf(html, options = {}) {
         ...pdfOptions,
       });
     }
+    if (pageMode === 'paged') {
+      // Multi-page A4 with a "current / total" page-number band at the top of every
+      // page. Sections use break-inside:avoid so they don't split across pages.
+      //
+      // The margin MUST also be set in CSS: Chromium gives an explicit `@page{margin}`
+      // precedence over the pdf() `margin` option, and the shell already ships
+      // `@page{margin:0}`. Without overriding it here, every continuation page prints
+      // flush to the top edge and the page number overlaps the first section. We set
+      // the same values in CSS (later rule wins the cascade) and on the API so the
+      // header band and the content start line agree.
+      const M = { top: '14mm', right: '0', bottom: '12mm', left: '0' };
+      await page.addStyleTag({ content: `@page{size:A4;margin:${M.top} ${M.right} ${M.bottom} ${M.left}}` });
+      const header = '<div style="width:100%;font-family:system-ui,sans-serif;font-size:9px;color:#9aa3b5;'
+        + 'text-align:right;padding:4px 14px 0 0;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>';
+      return await page.pdf({
+        format: 'A4', printBackground: true,
+        displayHeaderFooter: true, headerTemplate: header, footerTemplate: '<div></div>',
+        ...pdfOptions,
+        margin: { ...M, ...(pdfOptions.margin || {}) },
+      });
+    }
     const merged = { ...DEFAULT_PDF, ...pdfOptions,
       margin: { ...DEFAULT_PDF.margin, ...(pdfOptions.margin || {}) } };
     return await page.pdf(merged);
