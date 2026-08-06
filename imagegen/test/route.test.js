@@ -3,17 +3,30 @@ const test = require('node:test');
 const assert = require('node:assert');
 const { route, modelInput } = require('../route');
 
-test('decorative_scene ladder starts at the cheapest (nano-banana-2-lite)', () => {
+test('decorative_scene goes straight to nano-banana-2-lite (qwen2 fallback)', () => {
   const r = route('decorative_scene');
   assert.strictEqual(r.needsImage, true);
   assert.strictEqual(r.ladder[0], 'nano-banana-2-lite');
-  assert.ok(r.ladder.includes('bytedance/seedream-v4-text-to-image'));
+  assert.strictEqual(r.ladder[1], 'qwen2/text-to-image');
 });
 
-test('labeled_diagram ladder starts at seedream-v4', () => {
-  const r = route('labeled_diagram');
+test('Latin-script labeled_diagram goes to seedream-v4 first (nano-banana-2 fallback)', () => {
+  const r = route('labeled_diagram', 'en');
   assert.strictEqual(r.needsImage, true);
   assert.strictEqual(r.ladder[0], 'bytedance/seedream-v4-text-to-image');
+  assert.strictEqual(r.ladder[1], 'nano-banana-2');
+});
+
+test('Kiswahili (Latin) diagram still routes like English', () => {
+  assert.strictEqual(route('labeled_diagram', 'sw').ladder[0], 'bytedance/seedream-v4-text-to-image');
+});
+
+test('Arabic/Urdu (complex script) diagram goes to the strongest model FIRST', () => {
+  for (const loc of ['ar', 'ur']) {
+    const r = route('labeled_diagram', loc);
+    assert.strictEqual(r.ladder[0], 'nano-banana-2', `${loc} should start at nano-banana-2`);
+    assert.strictEqual(r.ladder[1], 'gpt-image-2-text-to-image');
+  }
 });
 
 test('structured / icon / unknown route to no generation', () => {

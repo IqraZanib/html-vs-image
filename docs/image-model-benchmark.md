@@ -98,14 +98,27 @@ image-gen output is allowed into the final PDF, with retry/fallback on fail.
 > working substitute on the same provider (no extra vendor). If a specific open-weight VLM is required, it must be
 > hosted elsewhere — flagged as a deviation.
 
-## Recommended router defaults (justified by the above)
+## Router defaults — DIRECT type→model assignment (not a cost climb)
 
-| Category | Primary | Fallback | Rationale |
-|---|---|---|---|
-| notation | **KaTeX** (code, deterministic) | — (no image-gen fallback; code always works) | image-gen drift proven |
-| illustrative | **Seedream v4** (`bytedance/seedream-v4-text-to-image`, 5cr/~14s) | **nano-banana-2** (8cr, top accuracy) | Seedream v4 = cheapest *accurate* + fastest; escalate to nano-banana-2 when max fidelity needed. Sub-5cr models (nano-banana-2-lite/grok/nano-banana) only behind a strict correctness gate. |
-| process | **code flow-template** (HTML/SVG) | nano-banana-2 (only if a bespoke scene is needed) | consistent, cheap, no drift |
-| quality gate | **GPT-5.2 vision** (kie.ai) | — | proven to catch drift, sync, structured output |
+Earlier the router walked a cost-ascending ladder (cheapest first, escalate on gate fail).
+For image types where the cheap model reliably fails (Arabic labels, precise diagrams) that
+just burned credits generating-then-rejecting. The router now sends each type **straight to
+the model that makes it best on the first attempt**, with a single gate-only safety fallback.
+Config: `imagegen/config/models.config.js` (`LADDERS` + `ladderFor`).
+
+| Type | Locale | Primary (1st attempt) | Safety fallback | Rationale |
+|---|---|---|---|---|
+| **notation** | any | **KaTeX** (code) | — | image-gen drift proven; code always correct |
+| **decorative_scene** (children/activity/family, no text) | any | **nano-banana-2-lite** (4cr, ~14s) | **qwen2** (open-weight, ~10s) | cheap, fast, warm art + expressive faces; qwen fast open-weight backup |
+| **labeled_diagram** — Latin script | en, sw, fr… | **Seedream v4** (5cr, ~14s) | **nano-banana-2** (8cr) | best value + accurate Latin labels first-try; escalate for max fidelity |
+| **labeled_diagram** — complex/RTL script | ar, ur, sd, fa, ps | **nano-banana-2** (8cr) | **gpt-image-2** | only the strongest model renders Arabic/Urdu script reliably — top model first is *cheaper in expectation* than letting Seedream fail and climb |
+| **character cast** (single figure, panel-blend) | any | **nano-banana-2-lite** (4cr, pure-white bg) | **flux-2/pro** (open-weight, pure-white) | white bg needed to blend into panels; flux open-weight backup (`decorative/characters.js`) |
+| **process / cycle** | any | **code flow-template** (HTML/SVG) | nano-banana-2 (bespoke only) | consistent, cheap, no drift |
+| **quality gate** | any | **GPT-5.2 vision** (kie.ai) | — | catches drift/label-language errors, sync, structured |
+
+Open-weight models are now live in the routing: **qwen2** (scene fallback) and **flux-2/pro**
+(character fallback). The gate still guards every output; the fallback fires only when the
+primary is rejected, so the common case is a single generation.
 
 ## Cost / async facts (for the router + logging)
 

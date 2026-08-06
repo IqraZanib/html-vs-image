@@ -199,6 +199,18 @@ and the image-prompt builder appends the locale's script directive
 (`imagegen/prompts/build.js` → `labeled_diagram`). Prefer a LABELLED, content-specific
 diagram over a vague decorative picture, so the image actually teaches.
 
+## R29 — One right model per image type (no cost-climb waste)
+Do not generate with the cheapest model and climb on failure — that burns credits when the
+cheap model reliably fails (e.g. Arabic labels). Send each image type STRAIGHT to the model
+that makes it best on the first attempt, with a single gate-only safety fallback:
+- **scene** (children/activity, no text) → nano-banana-2-lite, fallback qwen2;
+- **labelled diagram, Latin script** (en, sw…) → Seedream v4, fallback nano-banana-2;
+- **labelled diagram, complex/RTL script** (ar, ur, sd, fa, ps) → nano-banana-2 first
+  (the only model that reliably renders the script — cheaper than climbing), fallback gpt-image-2;
+- **character cast** (panel-blend, white bg) → nano-banana-2-lite, fallback flux-2/pro.
+A per-block `model` override always wins. The quality gate still judges every output; the
+fallback fires only if the primary is rejected. Config: `imagegen/config/models.config.js`.
+
 ## GATE_POLICY
 - The image must be correct for the exact concept named in the content. For a labeled
   diagram, every label must be spelled correctly and point to the right part; reject

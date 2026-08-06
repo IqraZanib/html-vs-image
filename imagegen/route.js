@@ -1,8 +1,10 @@
 'use strict';
-const { MODELS, LADDERS } = require('./config/models.config');
+const { MODELS, ladderFor } = require('./config/models.config');
 
-function route(category) {
-  const ladder = LADDERS[category] || [];
+// Resolve which model(s) a category uses. `locale` selects the script-appropriate
+// diagram models (e.g. Arabic → a model that renders Arabic labels first-try).
+function route(category, locale) {
+  const ladder = ladderFor(category, locale);
   return { needsImage: ladder.length > 0, ladder };
 }
 
