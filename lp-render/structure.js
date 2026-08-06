@@ -44,6 +44,7 @@ Hard rules:
 - Image prompts must describe the SUBJECT plainly. Do NOT over-specify style or details the model may not honour ("plain background", "flat cartoon", "speed lines", "no face"): the quality gate compares the image to its prompt, so an over-specified prompt makes a good image fail. Keep prompts subject-focused.
 - Images must be INFORMATIVE and content-relevant, like a good textbook illustration that helps the teacher explain the concept — never decorative or irrelevant filler. For vocabulary/parts, prefer a LABELLED "diagram" (e.g. a family with each member labelled by name: أبي، أمي، أخت …; the parts of a plant; a process). 1–3 well-chosen images per lesson is plenty; not every section needs one.
 - Cultural grounding: any people or places in a prompt must match the lesson's region — Arabic → Yemeni children in a Yemeni setting; Kiswahili → Kenyan children in a Kenyan setting; otherwise Pakistani — so local teachers recognise their own pupils.
+- Where the concept involves children doing something (counting, an activity, a family, playing), prefer a "scene" that SHOWS the region's own children doing it — e.g. "Kenyan children in a classroom counting stones to add 3 + 2 = 5"; "a Yemeni family" — so local children see themselves in the picture. Use a bare labelled diagram only when labelling parts is the actual point.
 - If you declare any images, you MUST also add ONE "images" section whose "imageIds" list every declared image id, placed where the pictures belong.
 - Every "id" must be unique kebab-case.`;
 

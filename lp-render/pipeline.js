@@ -79,9 +79,11 @@ async function renderLessonImage(content, opts = {}) {
 
   if (toGen.length) {
     if (!apiKey) throw new Error(`Need KIE_API_KEY to generate ${toGen.length} new image(s) (or seed the asset store first).`);
+    // Ground generated images in the lesson's region (people/setting): sw→Kenya, ar→Yemen.
+    const imgRegion = ({ sw: 'ke', ar: 'ye' })[locale] || meta.region || 'pk';
     const segment = {
       subject: meta.subject || (meta.chips || []).map((c) => c.value).join(' '),
-      grade: meta.grade || '', region: meta.region || 'pk',
+      grade: meta.grade || '', region: imgRegion,
       blocks: toGen.map(({ im }) => ({ type: CONCEPT_TO_BLOCK[im.concept] || 'HOOK_STORY', text: im.prompt, characters: im.characters, model: im.model })),
     };
     const { images } = await resolveSegmentImages(segment, { apiKey, region: segment.region, gatePolicy });
