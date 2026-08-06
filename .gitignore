@@ -28,3 +28,6 @@ references/samples/pinky-day-out-exact.html
 
 # Visual-regression working renders (goldens ARE committed)
 tests/visual/current/
+
+# stray local archive — never commit
+lp-render.zip
