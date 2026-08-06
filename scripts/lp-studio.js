@@ -95,6 +95,7 @@ function start(port, attemptsLeft) {
     }
   });
   server.listen(port, () => {
+    console.log('\n  LP Studio — build: region-casts + robust-extraction + paginated-pdf (R1–R26)');
     console.log(`\n  LP Studio → http://localhost:${port}\n`);
     console.log(process.env.KIE_API_KEY ? '  (kie.ai key loaded — new images can be generated)' : '  (no kie.ai key — store-only: only already-stored images render)');
     console.log('  Press Ctrl+C to stop.\n');
