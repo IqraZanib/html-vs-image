@@ -98,7 +98,10 @@ async function renderLessonImage(content, opts = {}) {
     log('All content images restored from the store — no credits spent.');
   }
 
-  const cast = await ensureCast({ apiKey, gatePolicy });
+  // Characters are a fallback: only build the (region-appropriate) cast when the
+  // lesson has no content images. Region follows the language (ar→Yemen, sw→Kenya).
+  const anyImage = Object.values(imagesMap).some((im) => im && im.dataUri);
+  const cast = anyImage ? {} : await ensureCast({ apiKey, gatePolicy, locale });
   const { headerHtml, bodyHtml, headCss } = renderDecorativeLesson(content, imagesMap, cast);
   let html = buildShell({ headerHtml, bodyHtml, locale, title: meta.title || contentId });
   html = html.replace('</head>', `<style>${THEME_CSS}</style>${headCss ? `<style>${headCss}</style>` : ''}</head>`);
@@ -107,7 +110,8 @@ async function renderLessonImage(content, opts = {}) {
   // (e.g. the web interface) to roughly halve the render step.
   let pdf = null;
   if (wantPdf) {
-    pdf = await htmlToPdf(html, { pageMode: 'fit', pdfOptions: { printBackground: true } });
+    // The deliverable PDF is paginated into readable A4 pages with page numbers.
+    pdf = await htmlToPdf(html, { pageMode: 'paged', pdfOptions: { printBackground: true } });
     await closeBrowser();
   }
   const png = await screenshot(html);

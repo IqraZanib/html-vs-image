@@ -134,6 +134,34 @@ cast (seeded by the lesson) so a maths plan and a science plan never look identi
 The final deliverable is a PDF. Keep spacing tight (no dead space), centre image
 captions, and give the title block faint letterhead icons.
 
+## R22 — Local children, by the lesson's language
+Characters and any people in images must match the lesson's region so local teachers
+recognise their own pupils: **Arabic → Yemeni** children and setting, **Kiswahili →
+Kenyan** children and setting, otherwise Pakistani. Each region has its own cast,
+generated once and cached.
+
+## R23 — Characters are a fallback, not decoration on every page
+Prefer real, informative content images. Add cartoon characters ONLY when a lesson
+has NO content images at all — then a few characters keep it from looking blank. If
+the lesson already shows content images, add no characters. Never place a character on
+every section, and never repeat one within a lesson.
+
+## R24 — Images must be informative and content-relevant
+Like a textbook: a labelled diagram of the very thing being taught (family members
+each labelled by name, the parts of a plant, a process), not decorative filler and
+never irrelevant. Label what teaches vocabulary or parts. A book does not put a picture
+on every page — 1–3 well-chosen, representative images per lesson is plenty.
+
+## R25 — Paginate long content; number the pages
+The deliverable is a PDF. When content is long, split it across readable A4 pages
+rather than one endless strip; keep the font size readable. Every page shows its number
+at the top as "current / total". Sections never split awkwardly across a page break.
+
+## R26 — Colour only for what matters
+Use colour to signal what is important — the title, section headings, and emphasis
+callouts (checkpoints, key notes). Keep everything else on a clean white ground. A
+page drowning in colour is harder to read than white with a few deliberate accents.
+
 ## GATE_POLICY
 - The image must be correct for the exact concept named in the content. For a labeled
   diagram, every label must be spelled correctly and point to the right part; reject

@@ -69,6 +69,19 @@ async function htmlToPdf(html, options = {}) {
         ...pdfOptions,
       });
     }
+    if (pageMode === 'paged') {
+      // Multi-page A4 with a "current / total" page number band at the top of every
+      // page. Sections use break-inside:avoid so they don't split across pages.
+      const header = '<div style="width:100%;font-family:system-ui,sans-serif;font-size:9px;color:#9aa3b5;'
+        + 'text-align:right;padding:6px 14px 0 0;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>';
+      return await page.pdf({
+        format: 'A4', printBackground: true,
+        displayHeaderFooter: true, headerTemplate: header, footerTemplate: '<div></div>',
+        margin: { top: '13mm', right: '0', bottom: '8mm', left: '0' },
+        ...pdfOptions,
+        margin: { top: '13mm', right: '0', bottom: '8mm', left: '0', ...(pdfOptions.margin || {}) },
+      });
+    }
     const merged = { ...DEFAULT_PDF, ...pdfOptions,
       margin: { ...DEFAULT_PDF.margin, ...(pdfOptions.margin || {}) } };
     return await page.pdf(merged);

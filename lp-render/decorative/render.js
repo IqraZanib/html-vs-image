@@ -44,7 +44,7 @@ function renderBody(section, accent, images) {
       const km = section.marker || 'dot';
       const lis = (section.items || []).map((it, i) => {
         const tag = it.tag ? `<span class="d-tag" style="background:${soft};color:var(${accent})">${esc(it.tag)}</span>` : '';
-        return `<li data-mark="${esc(mark(km, i))}" style="background:${soft}">${richText(it.text, { engine: section.engine })}${tag}</li>`;
+        return `<li data-mark="${esc(mark(km, i))}" style="background:#f6f8fc">${richText(it.text, { engine: section.engine })}${tag}</li>`;
       }).join('');
       const lead = section.lead ? `<div class="d-lead">${esc(section.lead)}</div>` : '';
       return `${lead}<ul class="d-bullets" style="--m:var(${accent})">${lis}</ul>`;
@@ -155,6 +155,10 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
   const referenced = new Set();
   for (const s of (content.sections || [])) if (s && s.type === 'images' && Array.isArray(s.imageIds)) s.imageIds.forEach((id) => referenced.add(id));
 
+  // Characters are a FALLBACK only (R23): if this lesson already shows real content
+  // images, we add no characters at all — the informative images carry it.
+  const hasContentImages = Object.values(images).some((im) => im && im.dataUri);
+
   let placed = 0;
   let prevHeading = '';
   const rot = { n: 0, t: 0, seed: seedOf(`${meta.id || ''}|${meta.subject || ''}|${meta.title || ''}`) };
@@ -168,7 +172,7 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     const title = cleanHeading(section.heading);
     const head = (title && title !== prevHeading) ? sectionHead(accent, section, i) : '';
     if (title) prevHeading = title;
-    const charId = pickCharacter(section, cast, rot, used);
+    const charId = hasContentImages ? null : pickCharacter(section, cast, rot, used);
     if (charId) {
       used.add(charId);
       const side = placed % 2 === 0 ? 'left' : 'right';
