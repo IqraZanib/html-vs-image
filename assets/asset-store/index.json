@@ -286,6 +286,41 @@
     "concept": "scene",
     "prompt": "Watoto wa Tanzania/Kenya darasani wakitumia mawe kuunganisha makundi mawili ya vitu na kuhesabu jumla"
   },
+  "6de6e61ee6e14871": {
+    "file": "6de6e61ee6e14871.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "A cheerful Kenyan boy in a bright school uniform pouring water from a jug into a measuring bucket outdoors, with jerry cans, plastic bottles and cups beside him, warm morning light, friendly"
+  },
+  "83fd46ab2e35f2d1": {
+    "file": "83fd46ab2e35f2d1.jpg",
+    "mime": "image/jpeg",
+    "model": "qwen2/text-to-image",
+    "concept": "scene",
+    "prompt": "Kenyan schoolchildren in uniform pouring water from a bottle into a bucket, smiling"
+  },
+  "babfe30b724eb9e3": {
+    "file": "babfe30b724eb9e3.jpg",
+    "mime": "image/jpeg",
+    "model": "qwen2/text-to-image",
+    "concept": "scene",
+    "prompt": "a one-litre plastic bottle beside a blue bucket being filled with water on a table"
+  },
+  "d54444af76d694ec": {
+    "file": "d54444af76d694ec.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Kenyan Grade 3 learners measuring water with a 1-litre container using buckets, bottles, jerry cans and cups in a classroom."
+  },
+  "a9897f982f88de51": {
+    "file": "a9897f982f88de51.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "diagram",
+    "prompt": "A diagram of a 1-litre container pouring water into a bucket, labelled in English with: 1 litre, bucket, water."
+  },
   "5c8967eb945bd4e0": {
     "file": "5c8967eb945bd4e0.png",
     "mime": "image/png",
