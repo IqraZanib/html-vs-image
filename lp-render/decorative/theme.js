@@ -14,6 +14,8 @@ const THEME_CSS = `
   --c-teal:#1f9091;  --c-teal-ink:#116f6f;  --c-teal-soft:#d5efef;
   --c-green:#7ab23f; --c-green-ink:#568726; --c-green-soft:#e7f3d6;
   --cream:#fdf6e6; --cream-line:#efd9a4;
+  /* neutral "slate" pseudo-accent for admin blocks (e.g. Lesson Details) */
+  --c-slate:#8590a4; --c-slate-ink:#5a6478; --c-slate-soft:#eef0f4;
   --ink:#23314e; --muted:#6b7688; --line:#e9edf3;
   --grey-mark:#aab2bf;
 }
@@ -57,17 +59,17 @@ body{background:#eef1f7;color:var(--ink);font-family:var(--font),'Baloo 2','Popp
 .panel{break-inside:avoid;page-break-inside:avoid}
 .d-img,.d-mrow,.d-step,.d-qc,.d-field,.d-bullets li,.char-fig,.d-chip,.rrow,.srow{break-inside:avoid;page-break-inside:avoid}
 
-/* section header = a coloured tab: accent icon disc + accent title + accent underline */
-.s-head{display:flex;align-items:center;gap:11px;margin:0 0 9px;padding-bottom:7px;border-bottom:2px solid var(--line)}
-.s-disc{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;
-  box-shadow:0 4px 10px rgba(0,0,0,.12);flex:0 0 auto}
-.s-disc svg{width:21px;height:21px;fill:#fff}
-.s-disc svg [fill]:not([fill="none"]){fill:#fff}
-.s-disc svg [stroke]:not([stroke="none"]){stroke:#fff}
-.s-title{font-size:19px;font-weight:800;letter-spacing:.2px}
+/* section header = a solid coloured tab (accent box, WHITE icon + WHITE title) */
+.s-head{display:flex;align-items:center;gap:10px;margin:0 0 10px}
+.s-tab{display:inline-flex;align-items:center;gap:9px;border-radius:12px;padding:8px 16px 8px 12px;
+  color:#fff;box-shadow:0 4px 11px rgba(0,0,0,.13)}
+.s-ic{flex:0 0 auto;width:22px;height:22px;display:flex;align-items:center;justify-content:center}
+.s-ic svg{width:20px;height:20px;fill:#fff}
+.s-ic svg [fill]:not([fill="none"]){fill:#fff}
+.s-ic svg [stroke]:not([stroke="none"]){stroke:#fff}
+.s-title{font-size:17px;font-weight:800;letter-spacing:.2px;color:#fff}
 .s-time{margin-inline-start:auto;background:#fff;border:1px solid var(--line);color:var(--muted);font-size:12px;
-  font-weight:700;padding:3px 12px;border-radius:999px;white-space:nowrap}
-.s-deco{display:none}
+  font-weight:700;padding:4px 12px;border-radius:999px;white-space:nowrap}
 .panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 6px 18px rgba(40,60,120,.06)}
 
 /* 30-second summary — cream card */
@@ -80,11 +82,11 @@ body{background:#eef1f7;color:var(--ink);font-family:var(--font),'Baloo 2','Popp
 
 /* bullets — plain, black text, small neutral markers */
 .d-lead{font-size:14px;font-weight:700;color:var(--muted);margin-bottom:8px}
-.d-bullets{margin:0;padding:0;list-style:none;display:grid;gap:7px}
-.d-bullets li{position:relative;padding:4px 4px 4px 26px;font-size:14.5px;font-weight:600;line-height:1.45;color:var(--ink)}
-.d-bullets li::before{content:attr(data-mark);position:absolute;inset-inline-start:2px;top:3px;min-width:18px;height:18px;
-  border-radius:50%;color:#fff;background:var(--m,var(--grey-mark));font-size:10.5px;font-weight:800;
-  display:flex;align-items:center;justify-content:center;padding:0 3px}
+.d-bullets{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+.d-bullets li{position:relative;padding:2px 2px 2px 24px;font-size:14.5px;font-weight:600;line-height:1.55;color:var(--ink)}
+/* plain marker in the gutter — never a filled disc over the text */
+.d-bullets li::before{content:attr(data-mark);position:absolute;inset-inline-start:2px;top:2px;
+  font-size:13px;font-weight:800;color:var(--muted);line-height:1.55}
 .d-tag{display:inline-block;margin-inline-start:8px;font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;border-radius:999px;padding:2px 9px;vertical-align:middle}
 
 /* plain text / note banner */
@@ -112,10 +114,10 @@ body{background:#eef1f7;color:var(--ink);font-family:var(--font),'Baloo 2','Popp
 .d-a{font-size:12.5px;color:var(--muted);font-weight:600}
 .d-a::before{content:"→ ";color:var(--c-teal-ink);font-weight:800}
 
-/* admin fields */
-.d-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.d-field{background:#fbfcfe;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:12.5px;font-weight:600;color:var(--ink)}
-.d-field b{color:var(--muted);font-weight:800;text-transform:uppercase;font-size:10.5px;letter-spacing:.3px;display:block;margin-bottom:2px}
+/* admin fields — clean form grid (Lesson Details) */
+.d-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 20px}
+.d-field{font-size:13.5px;font-weight:700;color:var(--ink);min-width:0}
+.d-field b{color:var(--muted);font-weight:800;text-transform:uppercase;font-size:10px;letter-spacing:.5px;display:block;margin-bottom:3px}
 
 /* assessment rubric — coloured level badges */
 .d-rubric{display:grid;gap:9px}

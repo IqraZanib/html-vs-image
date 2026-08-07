@@ -16,20 +16,15 @@ const mark = (kind, i) => (kind === 'alpha' ? ALPHA[i] + ')' : kind === 'num' ? 
 function seedOf(str) { let h = 0; for (const c of String(str)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; }
 function rotate(arr, k) { const n = arr.length; if (!n) return arr.slice(); const s = ((k % n) + n) % n; return arr.slice(s).concat(arr.slice(0, s)); }
 
-function disc(accent, section, i) {
-  const inner = section.icon && hasIcon(section.icon) ? icon(section.icon, 24) : sparkle('#fff');
-  return `<div class="s-disc" style="background:var(${accent})">${inner}</div>`;
-}
-
-// A section header — cleaned of markdown. Returns '' for an empty heading so no
-// blank header space is reserved.
+// A section header — a solid coloured tab (accent box) with a WHITE icon + WHITE title.
+// Returns '' for an empty heading so no blank header space is reserved.
 function sectionHead(accent, section, i) {
   const title = cleanHeading(section.heading);
   if (!title) return '';
   const time = section.time ? `<div class="s-time">${esc(cleanHeading(section.time))}</div>` : '';
-  // Coloured "tab": accent icon disc + accent title text + a thin accent underline.
-  return `<div class="s-head" style="border-bottom-color:var(${accent}-soft)">${disc(accent, section, i)}`
-    + `<div class="s-title" style="color:var(${accent}-ink)">${esc(title)}</div>${time}</div>`;
+  const ic = section.icon && hasIcon(section.icon) ? icon(section.icon, 22) : sparkle('#fff');
+  return `<div class="s-head"><div class="s-tab" style="background:var(${accent})">`
+    + `<span class="s-ic">${ic}</span><span class="s-title">${esc(title)}</span></div>${time}</div>`;
 }
 
 // Faint decorative icons behind the title block (like a lesson-plan letterhead).
@@ -190,7 +185,8 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
   const rot = { n: 0, t: 0, seed: seedOf(`${meta.id || ''}|${meta.subject || ''}|${meta.title || ''}`) };
   const used = new Set(); // no character repeats within one lesson
   const sections = (content.sections || []).map((section, i) => {
-    const accent = accentFor(i);
+    // Admin blocks (Lesson Details) use a neutral slate tab, not a warm accent.
+    const accent = section.type === 'fields' ? '--c-slate' : accentFor(i);
     const body = renderBody(section, accent, images);
     if (body === '') return '';
     // A heading that repeats the previous one (e.g. a phase split across structuring

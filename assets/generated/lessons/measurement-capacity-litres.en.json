@@ -31,7 +31,10 @@
 
     { "type": "fields", "heading": "Lesson Details", "icon": "checklist", "items": [
       { "label": "School", "value": "________________" },
+      { "label": "Learning Area", "value": "Mathematics" },
+      { "label": "Grade", "value": "3" },
       { "label": "Date", "value": "________________" },
+      { "label": "Time", "value": "30 minutes" },
       { "label": "Roll", "value": "B ___ G ___ Total ___" },
       { "label": "Teacher's Name", "value": "________________" },
       { "label": "T.S.C No.", "value": "________________" },
