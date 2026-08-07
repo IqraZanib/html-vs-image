@@ -285,5 +285,26 @@
     "model": "nano-banana-2-lite",
     "concept": "scene",
     "prompt": "Watoto wa Tanzania/Kenya darasani wakitumia mawe kuunganisha makundi mawili ya vitu na kuhesabu jumla"
+  },
+  "6de6e61ee6e14871": {
+    "file": "6de6e61ee6e14871.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "A cheerful Kenyan boy in a bright school uniform pouring water from a jug into a measuring bucket outdoors, with jerry cans, plastic bottles and cups beside him, warm morning light, friendly"
+  },
+  "83fd46ab2e35f2d1": {
+    "file": "83fd46ab2e35f2d1.jpg",
+    "mime": "image/jpeg",
+    "model": "qwen2/text-to-image",
+    "concept": "scene",
+    "prompt": "Kenyan schoolchildren in uniform pouring water from a bottle into a bucket, smiling"
+  },
+  "babfe30b724eb9e3": {
+    "file": "babfe30b724eb9e3.jpg",
+    "mime": "image/jpeg",
+    "model": "qwen2/text-to-image",
+    "concept": "scene",
+    "prompt": "a one-litre plastic bottle beside a blue bucket being filled with water on a table"
   }
 }

@@ -1,0 +1,97 @@
+{
+  "meta": {
+    "id": "measurement-capacity-litres",
+    "title": "Grade 3 Mathematics — Measurement: Capacity",
+    "subtitle": "Measuring capacity in litres",
+    "locale": "en",
+    "region": "ke",
+    "subject": "Mathematics",
+    "grade": "3",
+    "banner": "banner-capacity",
+    "footer": "For coaching questions or feedback, WhatsApp: +254 708 474 116\n*Sample corpus-grounded draft*",
+    "chips": [
+      { "label": "Learning Area", "value": "Mathematics" },
+      { "label": "Grade", "value": "3" },
+      { "label": "Time", "value": "30 min" },
+      { "label": "Strand", "value": "Measurement" },
+      { "label": "Sub-Strand", "value": "Capacity" }
+    ]
+  },
+  "images": [
+    { "id": "banner-capacity", "concept": "scene", "label": "", "prompt": "A cheerful Kenyan boy in a bright school uniform pouring water from a jug into a measuring bucket outdoors, with jerry cans, plastic bottles and cups beside him, warm morning light, friendly" },
+    { "id": "img-measure", "concept": "scene", "label": "Learners measure capacity with a 1-litre container", "prompt": "Kenyan schoolchildren in uniform pouring water from a bottle into a bucket, smiling" },
+    { "id": "img-litre", "concept": "scene", "label": "A 1-litre bottle fills a bucket", "prompt": "a one-litre plastic bottle beside a blue bucket being filled with water on a table" }
+  ],
+  "sections": [
+    { "type": "summary", "heading": "30-Second Summary", "icon": "target", "items": [
+      { "icon": "🎯", "label": "What learners will do by end", "body": "Learners will measure capacity in litres using containers found at home and school, and appreciate why measuring capacity matters in everyday life." },
+      { "icon": "⏱️", "label": "Total time / prep time", "body": "30 minutes / prep estimate ≤20% of lesson time." },
+      { "icon": "⭐", "label": "The one thing that must not be skipped", "body": "Every learner personally pours and measures at least one container's capacity using a 1-litre container, not just watches." }
+    ] },
+
+    { "type": "fields", "heading": "Lesson Details", "icon": "checklist", "items": [
+      { "label": "School", "value": "________________" },
+      { "label": "Date", "value": "________________" },
+      { "label": "Roll", "value": "B ___ G ___ Total ___" },
+      { "label": "Teacher's Name", "value": "________________" },
+      { "label": "T.S.C No.", "value": "________________" },
+      { "label": "Gender", "value": "________________" }
+    ] },
+
+    { "type": "bullets", "heading": "Lesson Learning Outcomes", "icon": "target", "marker": "alpha",
+      "lead": "By the end of the lesson, the learner should be able to:",
+      "items": [
+        { "text": "identify the litre as the unit used to measure capacity." },
+        { "text": "measure capacity in litres using a 1-litre container." },
+        { "text": "appreciate measuring the capacity of containers in litres." }
+      ] },
+
+    { "type": "text", "heading": "Key Inquiry Question(s)", "icon": "lightbulb",
+      "body": "How can the capacity of a container be measured?" },
+
+    { "type": "bullets", "heading": "Learning Resources", "icon": "books", "marker": "dot", "items": [
+      { "text": "Concrete objects/counters: various containers (buckets, bottles, jerry cans, cups)" },
+      { "text": "Water or sand for measuring" },
+      { "text": "A 1-litre container (bottle or improvised)" },
+      { "text": "Chalkboard and chalk" }
+    ] },
+
+    { "type": "bullets", "heading": "Introduction", "time": "~ 2 min", "icon": "lightbulb", "marker": "dot", "items": [
+      { "text": "Teacher opens with a real-life example: \"Think about your mother buying milk from a milk vendor at home, or filling a jerry can with water from the tap. How does the vendor or your family know exactly how much milk or water they are getting?\" (Learners respond with their own experiences.)" },
+      { "text": "Assumes ≥70% mastery of comparing objects as \"more than / less than / same as\" from the Mass sub-strand — quick 30-second recall check: \"Which of these two bottles do you think holds more water, and how can you tell just by looking?\" (Learners point and respond.)" }
+    ] },
+
+    { "type": "steps", "heading": "Lesson Development", "time": "~ 20 min", "icon": "blackboard", "items": [
+      { "label": "Teacher models measuring capacity", "body": "Fills a 1-litre bottle with water, pours it into a bucket, and thinks aloud: \"That's 1 litre. I'll pour again and count.\" Ask: \"How many litres do you think this bucket will hold in total?\" Ask: \"What happens to the water level each time I add one more litre?\"" },
+      { "label": "Guided practice", "body": "Teacher and class work together with a jug and several 1-litre bottles. Ask: \"If I have poured 3 litres so far, how many more until we reach 5 litres?\" Learners take turns pouring while the class counts together (builds Communication and Collaboration)." },
+      { "label": "Independent task with a self-check", "body": "Learners work in pairs with improvised containers (cans, sufurias) and water. Ask: \"Which container do you predict holds more, and why?\" Each pair estimates the capacity of their container, then measures it using the 1-litre container and records their finding.\n**Below-target learners:** pair with a full-target learner for one-on-one support, re-doing the last worked example together.\n**Full-target learners:** compose a 2-line word problem about capacity for a partner to solve." }
+    ] },
+
+    { "type": "images", "heading": "Illustration", "icon": "school", "imageIds": ["img-measure", "img-litre"] },
+
+    { "type": "bullets", "heading": "Conclusion", "time": "~ 4 min", "icon": "checklist", "marker": "dot", "items": [
+      { "text": "**Self-prediction check:** Show thumbs — green if you could teach this to a friend, yellow if you need one more example, red if you're still stuck." },
+      { "text": "**Oral questions to summarise the lesson:** What unit do we use to measure capacity? If a bucket holds 5 litres and I pour out 2 litres, how much is left?" }
+    ] },
+
+    { "type": "bullets", "heading": "Extended Activities", "time": "~ 3 min", "icon": "star", "marker": "dot", "items": [
+      { "text": "**Full-target learners:** at home, find three different containers and estimate their capacity in litres, then measure them with a 1-litre bottle and record the results." },
+      { "text": "**Below-target learners:** draw three containers they have at home and guess whether each holds more or less than 1 litre." }
+    ] },
+
+    { "type": "bullets", "heading": "Reflection on the Lesson / Self-Remarks", "icon": "person", "marker": "dot",
+      "lead": "___% of learners were able to measure capacity in litres accurately.",
+      "items": [
+        { "text": "If learners underperform: re-do yesterday's counting warm-up with pebbles before starting today's Steps." },
+        { "text": "If learners exceed expectation early: ask each pair to teach the concept to another pair in their own words." },
+        { "text": "This plan is a recommendation — adapt based on real-time class response." }
+      ] },
+
+    { "type": "rubric", "heading": "Assessment Rubric", "icon": "checklist", "items": [
+      { "level": "Exceeding", "desc": "Measures accurately for all containers, explains process clearly." },
+      { "level": "Meeting", "desc": "Measures accurately for most containers." },
+      { "level": "Approaching", "desc": "Measures with some accuracy, needs prompting." },
+      { "level": "Below", "desc": "Needs significant support to measure or estimate." }
+    ] }
+  ]
+}
