@@ -1,0 +1,326 @@
+{
+  "meta": {
+    "id": "utangulizi-wa-kujumlisha-namba-1-10",
+    "locale": "sw",
+    "subject": "Hisabati",
+    "grade": "Darasa la 1",
+    "region": "pk",
+    "title": "Utangulizi wa Kujumlisha Namba 1-10",
+    "subtitle": "Naweza kujumlisha namba mbili ndogo (1-10) kwa kutumia vitu halisi.",
+    "chips": [
+      {
+        "label": "Muda",
+        "value": "Saa 1 na Dakika 30 (Somo moja refu)"
+      },
+      {
+        "label": "Somo",
+        "value": "Hisabati"
+      }
+    ]
+  },
+  "images": [
+    {
+      "id": "c0-mawe-ya-kujumlisha",
+      "concept": "scene",
+      "label": "Kutumia mawe kujumlisha",
+      "prompt": "Watoto wa Kenya/Tanzania darasani wakitumia mawe madogo kuunganisha makundi mawili ya vitu na kuhesabu jumla."
+    },
+    {
+      "id": "c0-mchoro-wa-3-plus-2",
+      "concept": "diagram",
+      "label": "Mfano wa kujumlisha 3 na 2",
+      "prompt": "Mchoro wa mawe matatu pamoja na mawe mawili ukionyesha 3 + 2 = 5."
+    },
+    {
+      "id": "c1-mawe-na-vifuniko-kujumlisha",
+      "concept": "scene",
+      "label": "Mawe na vifuniko vya chupa",
+      "prompt": "Wanafunzi wa Tanzania au Kenya katika darasa wakijumlisha vitu kwa kuweka mawe 4 upande mmoja na vifuniko 3 vya chupa upande mwingine, kisha kuhesabu jumla 7."
+    },
+    {
+      "id": "c1-alama-za-kujumlisha",
+      "concept": "diagram",
+      "label": "3 + 2 = 5",
+      "prompt": "Mchoro wa kielimu unaoonyesha hesabu 3 + 2 = 5, ikiwa na vikundi vitatu na viwili vya vitu vinavyowekwa pamoja ili kuonyesha jumla ya tano."
+    },
+    {
+      "id": "c2-mbuzi-kwenye-zizi",
+      "concept": "scene",
+      "label": "Mbuzi kwenye zizi",
+      "prompt": "Pakistani children looking at 3 goats in a pen while a mother adds 3 more goats"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Weekly Pacing & Progress Monitoring",
+      "type": "text",
+      "body": "1-1 | Utangulizi wa Kujumlisha (1-10) | Kutumia mawe na vidole kuunganisha makundi mawili ya vitu. | \"Naweza kujumlisha namba mbili ndogo (1-10) kwa kutumia vitu halisi.\""
+    },
+    {
+      "heading": "Kumbukumbu ya Ufuatiliaji wa Maendeleo",
+      "type": "note",
+      "label": "Kumbukumbu ya Ufuatiliaji wa Maendeleo",
+      "body": "Mwalimu anapaswa kuangalia kama kila mwanafunzi anaweza kuhesabu vitu viwili tofauti na kuvijumlisha kuwa kundi moja kubwa. Ikiwa mwanafunzi anashindwa kuhesabu mfululizo (counting on), anahitaji msaada zaidi wa vitu halisi (concrete manipulatives) kabla ya kuhamia kwenye alama za namba."
+    },
+    {
+      "heading": "Malengo ya Somo",
+      "type": "bullets",
+      "marker": "num",
+      "items": [
+        {
+          "text": "Mwanafunzi ataelewa maana ya kujumlisha kama kitendo cha kuweka pamoja vitu."
+        },
+        {
+          "text": "Mwanafunzi ataweza kutumia alama ya kujumlisha (+) na alama ya usawa (=) kwa usahihi."
+        },
+        {
+          "text": "Mwanafunzi ataweza kutatua mazoezi ya kujumlisha namba kuanzia 1 hadi 10."
+        }
+      ]
+    },
+    {
+      "heading": "Success Criteria (Vigezo vya Mafanikio)",
+      "type": "bullets",
+      "marker": "dot",
+      "items": [
+        {
+          "text": "\"Naweza kueleza kuwa kujumlisha ni kuweka pamoja.\""
+        },
+        {
+          "text": "\"Naweza kutumia vidole au mawe kupata jibu la jumla.\""
+        },
+        {
+          "text": "\"Naweza kuandika sentensi ya hesabu (number sentence) kwa kutumia + na =.\""
+        }
+      ]
+    },
+    {
+      "heading": "Chapter Overview & Materials",
+      "type": "chips",
+      "items": [
+        "Mawe madogo ya nje.",
+        "vifuniko vya chupa (bottle caps).",
+        "Vijiti vya mbao au vishikizo vya kiberiti (matchsticks).",
+        "Chaki na ubao."
+      ]
+    },
+    {
+      "heading": "Msamiati Muhimu",
+      "type": "bullets",
+      "marker": "dot",
+      "items": [
+        {
+          "text": "Addition (Kujumlisha) | Kitendo cha kuweka pamoja vitu viwili au zaidi ili kupata jumla."
+        },
+        {
+          "text": "Plus sign (+) (Alama ya kujumlisha) | Alama inayotumika kuonyesha kuwa tunajumlisha."
+        },
+        {
+          "text": "Equal sign (=) (Alama ya usawa) | Alama inayotumika kuonyesha jibu la mwisho."
+        },
+        {
+          "text": "Sum (Jumla) | Jibu linalopatikana baada ya kujumlisha."
+        }
+      ]
+    },
+    {
+      "heading": "Mahitaji ya Awali (Prerequisites)",
+      "type": "bullets",
+      "marker": "dot",
+      "items": [
+        {
+          "text": "Uwezo wa kutambua na kuhesabu namba 1-10."
+        },
+        {
+          "text": "Uwezo wa kuchora vitu rahisi (duara, mstari)."
+        }
+      ]
+    },
+    {
+      "heading": "Orodha ya Maandalizi ya Mwalimu",
+      "type": "bullets",
+      "marker": "dot",
+      "items": [
+        {
+          "text": "Kusanya vifuniko vya chupa 50 na mawe 50."
+        },
+        {
+          "text": "Kuchora mifano ya kwanza kwenye ubao kabla ya wanafunzi kuingia."
+        },
+        {
+          "text": "Kuhakikisha kila mwanafunzi ana nafasi ya kukaa na mwenzake kwa ajili ya kazi ya vikundi."
+        }
+      ]
+    },
+    {
+      "heading": "Day 1: Utangulizi wa Kujumlisha Namba 1-10",
+      "type": "steps",
+      "items": [
+        {
+          "label": "Mbinu ya CPA",
+          "body": "Concrete (Vitu halisi → Mawe/Vidole) → Pictorial (Michoro ubaoni) → Abstract (Alama za namba)."
+        },
+        {
+          "label": "Engage (10 minutes)",
+          "body": "Somo linaanza na wimbo wa namba na mchezo wa \"Kuweka Pamoja\"."
+        },
+        {
+          "label": "Wimbo wa Kujumlisha",
+          "body": "\"Tunaweka pamoja, (piga makofi mara 2) Tunaongeza zaidi, (piga makofi mara 2) Kujumlisha ni nini? (wanafunzi wajibu: NI KUWEKA PAMOJA!)\""
+        },
+        {
+          "label": "Teacher says",
+          "body": "\"Habari zenu wanafunzi! Leo tutajifunza kitu kipya na cha kusisimua sana. Je, mmeshawahi kupewa pipi mbili, kisha mama akawapa pipi nyingine mbili? Je, sasa mna pipi ngapi? Leo tutajifunza jinsi ya kupata jibu hilo kwa kutumia 'Kujumlisha'. Kujumlisha ni nini? Ni kuweka vitu pamoja!\""
+        },
+        {
+          "label": "Explore (20 minutes)",
+          "body": "Mwalimu anatumia mbinu ya Concrete (Vitu halisi). Mwalimu anaita mwanafunzi mmoja (mfano: Juma) na kumpa mawe 3. Mwalimu anaita mwanafunzi mwingine (mfano: Asha) na kumpa mawe 2. Mwalimu anawaambia waweke mawe yao yote kwenye sahani moja kubwa. Mwalimu anawaongoza wanafunzi wote kuhesabu mawe yote kwa sauti: \"Moja, mbili, tatu, nne, tano!\""
+        },
+        {
+          "label": "Teacher says",
+          "body": "\"Tumeona Juma alikuwa na 3, Asha alikuwa na 2. Tulipoweka pamoja, tumepata 5. Hivyo, 3 jumlisha 2 ni sawa na 5.\""
+        }
+      ]
+    },
+    {
+      "heading": "BOARD (Pictorial)",
+      "type": "images",
+      "imageIds": [
+        "c0-mawe-ya-kujumlisha",
+        "c0-mchoro-wa-3-plus-2"
+      ]
+    },
+    {
+      "heading": "Guiding Questions:",
+      "type": "qa",
+      "marker": "alpha",
+      "items": [
+        {
+          "q": "\"Tumeanza na mawe mangapi upande wa kushoto?\"",
+          "a": "Jibu: Matatu"
+        },
+        {
+          "q": "\"Tumeongeza mawe mangapi upande wa kulia?\"",
+          "a": "Jibu: Mawili"
+        },
+        {
+          "q": "\"Tukiyajumlisha yote, tunapata ngapi?\"",
+          "a": "Jibu: Matano"
+        },
+        {
+          "q": "\"Je, idadi imekuwa kubwa zaidi au ndogo zaidi baada ya kuweka pamoja?\"",
+          "a": "Jibu: Imekuwa kubwa zaidi"
+        },
+        {
+          "q": "\"Kama nina kalamu 1 na nikaongeza kalamu 1, nitapata ngapi?\"",
+          "a": "Jibu: Mbili"
+        }
+      ]
+    },
+    {
+      "heading": "Watch out:",
+      "type": "note",
+      "body": "Wanafunzi wengine wanaweza kuhesabu kuanzia 1 kila mara badala ya \"kuhesabu kuendelea\" (counting on). Mwalimu anapaswa kuwafundisha kusema \"Tuna 3... tuseme 4, 5\"."
+    },
+    {
+      "heading": "Explain (15 minutes)",
+      "type": "note",
+      "body": "**Guided Practice (We Do):**\nSasa tunahamia kwenye Abstract (Alama). Mwalimu anatambulisha alama ya `+` na `=`.\n\n**Mwalimu anasema:** \"Katika hisabati, hatuandiki neno 'jumlisha' kila mara. Tunatumia alama hii `+` (Plus sign). Na tunapotaka kuonyesha jibu, tunatumia alama hii `=` (Equal sign).\"\n\n**UBAO (Abstract):**\nMwalimu anaandika hatua kwa hatua:\n3 + 2 = 5\n(3) (jumlisha) (2) (sawa na) (5)\n\n**Kazi ya Mwenza (Partner Work):**\nWanafunzi wanakaa wawili wawili. Kila jozi inapata vifuniko 10 vya chupa.\n- Mwalimu anasema: \"Weka vifuniko 4 upande wa kushoto. Sasa weka 3 upande wa kulia. Jumlisha vyote!\"\n- Wanafunzi wanahesabu na kusema jibu kwa sauti: \"Saba!\"\n\n**Mwalimu anasema:** \"Sasa, hebu jaribuni kuandika hiyo kwenye mchanga au kwenye madaftari yenu kwa kutumia alama ya + na =.\"\n\n**Maelezo ya kuzunguka:** Tembea darasani. Angalia kama wanafunzi wanatumia alama ya `+` katikati ya namba mbili. Ikiwa mwanafunzi anaandika `5 3 + 2`, mrekebishe kwa kumwambia, \"Alama ya jumlisha inakaa katikati ya namba tunazotaka kuunganisha.\""
+    },
+    {
+      "heading": "Practice (20 minutes)",
+      "type": "steps",
+      "items": [
+        {
+          "label": "Independent Practice (You Do):",
+          "body": "Wanafunzi wanafanya mazoezi ya kwenye kitabu (Textbook pages 1-2)."
+        },
+        {
+          "label": "Mazoezi ya Kitabu:",
+          "body": "1. Solve Exercise 1.1, Questions 1-4 (page 1).\n2. Solve Exercise 1.2, Questions 1-2 (page 2)."
+        },
+        {
+          "label": "Word Problems (Muktadha wa Kitanzania/Kikenya):",
+          "body": "(Mwalimu anasoma maswali haya kwa sauti, wanafunzi wanachora na kujibu).\n1. **Swali la 1:** Ali ana maembe 4. Fatima anampa maembe mengine 2. Je, Ali sasa ana maembe mangapi?\n2. **Swali la 2:** Kwenye meza kuna vitabu 5. Mwalimu anaongeza vitabu 3. Je, kuna jumla ya vitabu mangapi mezani?"
+        },
+        {
+          "label": "MODEL ANSWERS:",
+          "body": "1. Ali: 4 + 2 = 6 maembe. (Working: OOOO + OO = OOOOOO)\n2. Vitabu: 5 + 3 = 8 vitabu. (Working: OOOOO + OOO = OOOOOOOO)"
+        },
+        {
+          "label": "Scaffolding (Kwa wanafunzi wanaohitaji msaada):",
+          "body": "- Wape vijiti halisi. Waambie washike vijiti 4 mkono wa kulia na 2 mkono wa kushoto, kisha wavunge vyote pamoja na wahesabu.\n- Tumia \"sentence frames\": \"4 jumlisha 2 ni sawa na ____\"."
+        },
+        {
+          "label": "Extension Challenge (Kwa wanafunzi wanaomaliza haraka):",
+          "body": "\"Kama una pipi 5, na rafiki yako akakupa pipi 5 nyingine, utapata jumla ya ngapi? Je, unaweza kuandika hiyo hesabu ubaoni?\" (Jibu: 5 + 5 = 10)."
+        }
+      ]
+    },
+    {
+      "heading": "Assess & Close (10 minutes)",
+      "type": "note",
+      "body": "**Exit Ticket:**\nKila mwanafunzi anapaswa kujibu swali hili kwenye kipande cha karatasi kabla ya kutoka:\n\"Tafuta jibu: 6 + 3 = ?\"\n**MODEL ANSWER:** 6 + 3 = 9.\n\n**Homework:**\nKamilisha Exercise 1.1, Question 5-6 (page 1) nyumbani.\nZoezi la nyumbani: \"Hesabu vijiko 3 na vijiko 3 jikoni, kisha waambie mzazi wako jumla ni ngapi.\"\n\n**Cross-curricular Link:**\n- **Sanaa (Art):** Wanafunzi wanaweza kuchora matunda mawili tofauti (mfano: ndizi na machungwa) na kuandika jumla ya matunda hayo chini ya mchoro.\n\n**Quick Recap:**\n**Mwalimu anasema:** \"Leo tumejifunza kuwa kujumlisha ni kuweka pamoja. Tumetumia mawe, vidole, na alama ya `+` na `=`. Kumbukeni, kila tunapojumlisha, idadi ya vitu huongezeka! Kesho tutaendelea na namba kubwa zaidi. Kazi nzuri sana!\""
+    },
+    {
+      "heading": "End-of-Chapter Assessment Worksheet",
+      "type": "fields",
+      "items": [
+        {
+          "label": "Jina la Mwanafunzi:",
+          "value": "__________________________"
+        },
+        {
+          "label": "Tarehe:",
+          "value": "__________"
+        },
+        {
+          "label": "Darasa:",
+          "value": "Grade 1"
+        },
+        {
+          "label": "Alama:",
+          "value": "____ / 20"
+        }
+      ]
+    },
+    {
+      "heading": "Chapter Assessment: Kujumlisha Namba 1-10",
+      "type": "steps",
+      "items": [
+        {
+          "label": "Sehemu A: Chora na Jibu (Alama 6)",
+          "body": "*Chora vitu kulingana na namba, kisha tafuta jumla.*\n1. 2 + 3 = ____\n   (Chora hapa: ____________________________________)\n2. 4 + 1 = ____\n   (Chora hapa: ____________________________________)\n3. 5 + 2 = ____\n   (Chora hapa: ____________________________________)"
+        },
+        {
+          "label": "Sehemu B: Jaza Nafasi Zilizo wazi (Alama 6)",
+          "body": "*Tafuta jibu sahihi.*\n4. 3 + 3 = ____\n5. 6 + 2 = ____\n6. 1 + 7 = ____"
+        },
+        {
+          "label": "Sehemu C: Maswali ya Maneno (Alama 8)",
+          "body": "*Soma swali na uandike hesabu yake (Number Sentence).*\n7. Amina ana kalamu 2. Ananunua kalamu nyingine 4. Ana jumla ya kalamu ngapi?\n   Hesabu: ____ + ____ = ____"
+        }
+      ]
+    },
+    {
+      "heading": "8.",
+      "type": "bullets",
+      "marker": "dot",
+      "items": [
+        {
+          "text": "Kuna mbuzi 3 kwenye zizi. Mama anaongeza mbuzi 3 wengine. Je, sasa kuna mbuzi wangapi?"
+        },
+        {
+          "text": "Hesabu: ____ + ____ = ____"
+        }
+      ]
+    },
+    {
+      "heading": "Picha",
+      "type": "images",
+      "imageIds": [
+        "c2-mbuzi-kwenye-zizi"
+      ]
+    }
+  ]
+}

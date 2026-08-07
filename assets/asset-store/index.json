@@ -286,25 +286,144 @@
     "concept": "scene",
     "prompt": "Watoto wa Tanzania/Kenya darasani wakitumia mawe kuunganisha makundi mawili ya vitu na kuhesabu jumla"
   },
-  "6de6e61ee6e14871": {
-    "file": "6de6e61ee6e14871.jpg",
+  "5c8967eb945bd4e0": {
+    "file": "5c8967eb945bd4e0.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي مُسمى يبين قطعة مستقيمة بين نقطتين وشكلاً رباعياً مكوناً من أربعة أضلاع"
+  },
+  "d248c203e504067b": {
+    "file": "d248c203e504067b.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي مُسمى لمكعب ومخروط يوضح الأوجه والقاعدة الدائرية والرأس المدبب"
+  },
+  "90028a430825e457": {
+    "file": "90028a430825e457.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Labelled diagram showing mb, nd, and ngw with the example words mbuzi, mbegu, ndoo, ndizi, and ngwena."
+  },
+  "f33f15adbff84894": {
+    "file": "f33f15adbff84894.jpg",
     "mime": "image/jpeg",
     "model": "nano-banana-2-lite",
     "concept": "scene",
-    "prompt": "A cheerful Kenyan boy in a bright school uniform pouring water from a jug into a measuring bucket outdoors, with jerry cans, plastic bottles and cups beside him, warm morning light, friendly"
+    "prompt": "Pakistani teacher showing pictures of a goat and bananas to primary school children during a Kiswahili lesson."
   },
-  "83fd46ab2e35f2d1": {
-    "file": "83fd46ab2e35f2d1.jpg",
-    "mime": "image/jpeg",
-    "model": "qwen2/text-to-image",
-    "concept": "scene",
-    "prompt": "Kenyan schoolchildren in uniform pouring water from a bottle into a bucket, smiling"
+  "af840d6b6791d53f": {
+    "file": "af840d6b6791d53f.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Labelled diagram showing a goat, bananas, a bucket, seeds, and a crocodile"
   },
-  "babfe30b724eb9e3": {
-    "file": "babfe30b724eb9e3.jpg",
+  "87590c2e6fa4ff99": {
+    "file": "87590c2e6fa4ff99.jpg",
     "mime": "image/jpeg",
-    "model": "qwen2/text-to-image",
+    "model": "nano-banana-2-lite",
     "concept": "scene",
-    "prompt": "a one-litre plastic bottle beside a blue bucket being filled with water on a table"
+    "prompt": "saa ya ukutani inayotumia namba za Kirumi"
+  },
+  "165b297bfa7c7f26": {
+    "file": "165b297bfa7c7f26.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "diagram",
+    "prompt": "alama kuu za Kirumi I, V, X zikiwa zimeonyeshwa pamoja na thamani zake"
+  },
+  "49db8f90ae547610": {
+    "file": "49db8f90ae547610.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Labeled diagram showing Roman numerals I, II, III, IV, V, VI, VII, VIII, IX, X matched with numbers 1 to 10"
+  },
+  "7e137573f2863d07": {
+    "file": "7e137573f2863d07.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "Pakistani primary school children working in pairs using matchsticks to form Roman numerals in a classroom"
+  },
+  "455aeb84f196f3f5": {
+    "file": "455aeb84f196f3f5.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "diagram",
+    "prompt": "Labelled diagram showing Roman numerals I, V, and X with their values 1, 5, and 10"
+  },
+  "0f9eec274412c037": {
+    "file": "0f9eec274412c037.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "diagram",
+    "prompt": "Labelled diagram comparing IV equals 4 and VI equals 6"
+  },
+  "71d7bc76dd051f45": {
+    "file": "71d7bc76dd051f45.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Labelled diagram showing the Roman numerals I to X matched with the numbers 1 to 10."
+  },
+  "4c57c0d70d2bbf6e": {
+    "file": "4c57c0d70d2bbf6e.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "A clock face labelled with Roman numerals I to XII."
+  },
+  "95233ee196fed651": {
+    "file": "95233ee196fed651.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي لشارع يحتوي على رصيف وشارع ورصيف مع خطوط عبور المشاة"
+  },
+  "5141db5647e85b83": {
+    "file": "5141db5647e85b83.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال باكستانيون في طريق آمن يمشون على الرصيف ويساعدون الآخرين ويعبرون من مكان عبور المشاة"
+  },
+  "45313d2c27fac23b": {
+    "file": "45313d2c27fac23b.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي مُسمّى يبين الرصيف والشارع ومكان عبور المشاة بالخطوط البيضاء"
+  },
+  "36f603eb5c2b7fe2": {
+    "file": "36f603eb5c2b7fe2.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "طفل باكستاني يزيل حجراً من الطريق لحماية المارة"
+  },
+  "e500b061ae263542": {
+    "file": "e500b061ae263542.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "A labelled diagram showing Roman numerals I, V, X and examples II, III, IV, VI, IX with their values."
+  },
+  "f44c605d6fa55290": {
+    "file": "f44c605d6fa55290.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "A wall clock using Roman numerals in a classroom."
+  },
+  "aabd9de645d9bd0d": {
+    "file": "aabd9de645d9bd0d.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Labelled diagram showing Roman numerals I to X matched with numbers 1 to 10."
   }
 }

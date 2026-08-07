@@ -1,0 +1,437 @@
+{
+  "meta": {
+    "id": "namba-za-kirumi-i-x",
+    "locale": "sw",
+    "subject": "Mathematics (Hesabu)",
+    "grade": "Grade 4",
+    "region": "pk",
+    "title": "Utambulisho wa Namba za Kirumi I-X",
+    "subtitle": "Lesson 1 (approx. 60-90 minutes)",
+    "chips": [
+      {
+        "label": "Somo",
+        "value": "Mathematics (Hesabu)"
+      },
+      {
+        "label": "Darasa",
+        "value": "Grade 4"
+      },
+      {
+        "label": "Muda",
+        "value": "Lesson 1 (approx. 60-90 minutes)"
+      }
+    ]
+  },
+  "images": [
+    {
+      "id": "c0-saa-ya-kirumi",
+      "concept": "scene",
+      "label": "Saa ya ukutani yenye namba za Kirumi",
+      "prompt": "Pakistani classroom with a wall clock displaying Roman numerals"
+    },
+    {
+      "id": "c0-alama-kuu-za-kirumi",
+      "concept": "diagram",
+      "label": "Alama kuu za Kirumi",
+      "prompt": "Labelled diagram showing Roman numerals I, V, and X with their values 1, 5, and 10"
+    },
+    {
+      "id": "c0-iv-na-vi",
+      "concept": "diagram",
+      "label": "IV na VI",
+      "prompt": "Labelled diagram comparing IV equals 4 and VI equals 6"
+    },
+    {
+      "id": "c1-roman-numerals-1-10-diagram",
+      "concept": "diagram",
+      "label": "Namba za Kirumi",
+      "prompt": "Labelled diagram showing the Roman numerals I to X matched with the numbers 1 to 10."
+    },
+    {
+      "id": "c1-students-making-vii",
+      "concept": "scene",
+      "label": "Partner Work",
+      "prompt": "Pakistani primary school children using matchsticks to make the Roman numeral VII during a classroom activity."
+    },
+    {
+      "id": "c1-roman-clock",
+      "concept": "diagram",
+      "label": "Saa yenye namba za Kirumi",
+      "prompt": "A clock face labelled with Roman numerals I to XII."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Weekly Pacing & Progress Monitoring",
+      "type": "steps",
+      "items": [
+        {
+          "label": "1-1",
+          "body": "Utambulisho wa Namba za Kirumi (I-X) — Kutumia vijiti vya kiberiti/mishale kutengeneza alama za I, V, na X na kubadilisha namba. \"Naweza kubadilisha namba za kawaida (1-10) kuwa namba za Kirumi na kinyume chake.\""
+        }
+      ]
+    },
+    {
+      "heading": "Weekly Pacing & Progress Monitoring",
+      "type": "note",
+      "label": "Ufuatiliaji wa Maendeleo",
+      "body": "Mwalimu anapaswa kukagua kama mwanafunzi anaweza kutofautisha kati ya IV (4) na VI (6). Ikiwa mwanafunzi anachanganya, mwalimu anapaswa kurudia dhana ya \"kupunguza\" (kushoto) na \"kuongeza\" (kulia)."
+    },
+    {
+      "heading": "Learning Objectives & Success Criteria",
+      "type": "bullets",
+      "marker": "num",
+      "lead": "Objectives:",
+      "items": [
+        {
+          "text": "Mwanafunzi aweza kutambua na kuandika alama kuu za Kirumi (I, V, X)."
+        },
+        {
+          "text": "Mwanafunzi aweza kubadilisha namba za Kihindi-Kiarabu (1-10) kuwa namba za Kirumi na kinyume chake kwa usahihi."
+        },
+        {
+          "text": "Mwanafunzi aweza kutumia namba za Kirumi katika mazingira ya kawaida ya maisha."
+        }
+      ]
+    },
+    {
+      "heading": "Learning Objectives & Success Criteria",
+      "type": "bullets",
+      "marker": "dot",
+      "lead": "Success Criteria:",
+      "items": [
+        {
+          "text": "\"Naweza kutaja thamani ya I, V, na X.\""
+        },
+        {
+          "text": "\"Naweza kuandika namba 1 mpaka 10 kwa kutumia alama za Kirumi.\""
+        },
+        {
+          "text": "\"Naweza kueleza kwa nini IV ni 4 na si 6.\""
+        }
+      ]
+    },
+    {
+      "heading": "Chapter Overview & Materials",
+      "type": "fields",
+      "items": [
+        {
+          "label": "Grade",
+          "value": "Grade 4"
+        },
+        {
+          "label": "Subject",
+          "value": "Mathematics (Hesabu)"
+        },
+        {
+          "label": "Total Duration",
+          "value": "Lesson 1 (approx. 60-90 minutes)"
+        }
+      ]
+    },
+    {
+      "heading": "Chapter Overview & Materials",
+      "type": "chips",
+      "items": [
+        "Vijiti vya kiberiti (matchsticks) au vijiti vidogo vya mbao.",
+        "Mifuniko ya chupa (bottle caps) au mawe madogo.",
+        "Chaki na ubao.",
+        "Textbook (Kurasa 20-22)."
+      ]
+    },
+    {
+      "heading": "Lesson Plans",
+      "type": "images",
+      "imageIds": [
+        "c0-saa-ya-kirumi",
+        "c0-alama-kuu-za-kirumi",
+        "c0-iv-na-vi"
+      ]
+    },
+    {
+      "heading": "Lesson Plans",
+      "type": "note",
+      "body": "Grade Guidance: Wanafunzi wa Grade 4 wanaweza kufanya kazi kwa vikundi na kuandika maelezo mafupi. Wanaweza kufuata maelekezo ya hatua tatu (kwa mfano: chukua vijiti $\\rightarrow$ panga $\\rightarrow$ andika).\n\nRigor: Maswali yanajumuisha utambuzi (factual), ulinganishaji (reasoning), na uthibitishaji (justify)."
+    },
+    {
+      "heading": "Engage (10 minutes)",
+      "type": "note",
+      "body": "Hook / Warm-Up:\nMwalimu anaanza kwa kuonyesha picha ya saa ya ukutani inayotumia namba za Kirumi au kuandika \"IV\" na \"VI\" kubwa ubaoni.\n\nActivity: \"Ruka na Hesabu\" (Jump and Count).\nWanafunzi watasimama. Mwalimu anataja namba (mfano: \"Moja!\"), wanafunzi wanaruka mara moja. Mwalimu anataja \"Tano!\", wanafunzi wanaruka mara tano. Kisha mwalimu anasema, \"Leo tutajifunza siri ya jinsi Warumi walivyohesabu bila kutumia namba hizi tunazojua!\"\n\nTeacher says: \"Hujambo wanafunzi! Je, mmewahi kuona namba zinazoonekana kama herufi kwenye saa au kwenye vitabu vya historia? Leo tutagundua ulimwengu wa Namba za Kirumi. Je, tunawezaje kuandika namba 10 bila kutumia namba 1 na 0?\""
+    },
+    {
+      "heading": "BOARD:",
+      "type": "text",
+      "body": "SOMO: NAMBA ZA KIRUMI (I - X)\nLengo: Kubadilisha namba za kawaida kuwa za Kirumi.\nSwali Kuu: Je, alama za herufi zinawezaje kuwa namba?"
+    },
+    {
+      "heading": "Explore (20 minutes)",
+      "type": "steps",
+      "items": [
+        {
+          "label": "Concrete",
+          "body": "Mwalimu anachukua kijiti kimoja cha kiberiti na kuweka mezani. \"Hii ni I (moja).\" Anachukua vijiti vitano na kuvipanga kama herufi 'V'. \"Hii ni V (tano).\" Anachukua vijiti kumi na kuvipanga kama 'X'. \"Hii ni X (kumi).\""
+        },
+        {
+          "label": "Pictorial",
+          "body": "Mwalimu anachora alama hizi ubaoni na kuonyesha thamani zake."
+        },
+        {
+          "label": "Abstract",
+          "body": "Mwalimu anaonyesha sheria ya kuunganisha:\n- Ikiwa I iko kulia ya V $\\rightarrow$ Jumlisha (V + I = 6).\n- Ikiwa I iko kushoto ya V $\\rightarrow$ Toa (V - I = 4)."
+        }
+      ]
+    },
+    {
+      "heading": "BOARD:",
+      "type": "text",
+      "body": "ALAMA KUU:\nI  = 1\nV  = 5\nX  = 10\nSHERIA ZA KUANDIKA:\n1. I + I = II  (1 + 1 = 2)\n2. I + I + I = III (1 + 1 + 1 = 3)\n3. IV = 5 - 1 = 4  (I iko KUSHOTO mwa V)\n4. VI = 5 + 1 = 6  (I iko KULIA mwa V)\n5. IX = 10 - 1 = 9 (I iko KUSHOTO mwa X)"
+    },
+    {
+      "heading": "Guiding Questions:",
+      "type": "qa",
+      "marker": "alpha",
+      "items": [
+        {
+          "q": "\"Kama I ni 1, basi II itakuwa namba gani?\" (Expected: 2)"
+        },
+        {
+          "q": "\"Kama V ni 5, na niongeze I upande wa kulia, napata namba gani?\" (Expected: 6)"
+        },
+        {
+          "q": "\"Tofauti kati ya IV na VI ni nini?\" (Expected: IV ni 4, VI ni 6)"
+        },
+        {
+          "q": "\"Kama nataka kuandika namba 9, nianze na alama gani?\" (Expected: X kisha niongeze I kushoto)"
+        },
+        {
+          "q": "\"Je, tunaweza kuandika IIII kwa ajili ya namba 4?\" (Expected: Hapana, sheria inasema tutumie IV)."
+        }
+      ]
+    },
+    {
+      "heading": "Teacher says:",
+      "type": "note",
+      "body": "\"Angalieni kwa makini, watoto. Katika namba za Kirumi, nafasi ya herufi inaumiza! Ukiiweka herufi ndogo kushoto, unatoa. Ukiiweka kulia, unajumlisha.\""
+    },
+    {
+      "heading": "Watch out:",
+      "type": "note",
+      "body": "Wanafunzi wengi huchanganya IV na VI. Wakiona herufi mbili, wanajumlisha moja kwa moja. Wakumbushe: \"Angalia I iko wapi? Kushoto ni toa, kulia ni jumuisha.\""
+    },
+    {
+      "heading": "Explain (15 minutes)",
+      "type": "steps",
+      "items": [
+        {
+          "label": "Guided Practice (We Do)",
+          "body": "Mwalimu anatumia Textbook ukurasa wa 20-21."
+        },
+        {
+          "label": "BOARD",
+          "body": "TUJARIBE PAMOJA:\nNamba ya Kawaida  --->  Namba ya Kirumi\n---------------------------------------\n1       --->      I\n2       --->      II\n3       --->      III\n4       --->      IV  (5 - 1)\n5       --->      V\n6       --->      VI  (5 + 1)\n7       --->      VII (5 + 2)\n8       --->      VIII(5 + 3)\n9       --->      IX  (10 - 1)\n10      --->      X"
+        },
+        {
+          "label": "Partner Work",
+          "body": "Wanafunzi wanapata vijiti vya kiberiti. Mwalimu anataja namba (mfano: \"Saba!\"), na wanafunzi wanashindana na mwenza wao kutengeneza alama ya VII kwa kutumia vijiti."
+        },
+        {
+          "label": "Teacher says",
+          "body": "\"Sasa, angalieni mwenza wenu. Je, ameweka I kulia ya V? Basi amepata saba. Kama ameweka I kushoto, amepata namba nyingine!\""
+        },
+        {
+          "label": "Circulate notes",
+          "body": "Tembea darasani. Angalia kama wanafunzi wanatumia vijiti kwa usahihi. Kwa wale wanaoshindwa, waulize: \"V ni ngapi? Sasa unataka kufika saba, unahitaji kuongeza ngapi? Ikiwa ni kuongeza, I iwekwe wapi?\""
+        }
+      ]
+    },
+    {
+      "heading": "",
+      "type": "images",
+      "imageIds": [
+        "c1-roman-numerals-1-10-diagram",
+        "c1-students-making-vii"
+      ]
+    },
+    {
+      "heading": "Practice (20 minutes)",
+      "type": "steps",
+      "items": [
+        {
+          "label": "Independent Practice (You Do)",
+          "body": "Wanafunzi wanafanya mazoezi kutoka kwenye Textbook."
+        },
+        {
+          "label": "Kazi ya Kitabu",
+          "body": "1. Kamilisha jedwali kwenye ukurasa wa 21, Exercise 1.1, Maswali 1-10.\n2. Badilisha namba zifuatazo kuwa za Kirumi: 3, 4, 8, 9.\n3. Badilisha namba zifuatazo kuwa za kawaida: VII, IX, II, X."
+        },
+        {
+          "label": "Word Problems (Context ya Tanzania/East Africa)",
+          "body": "1. Juma ana michizi 7 ya ndizi. Andika idadi ya michizi hiyo kwa kutumia namba za Kirumi.\n2. Katika shindano la kukimbia shuleni, Amina alipata nafasi ya 4. Andika nafasi ya Amina kwa namba za Kirumi.\n3. Duka la mama Fatuma lina maua 9 ya waridi. Andika idadi ya maua hayo kwa namba za Kirumi."
+        },
+        {
+          "label": "MODEL ANSWERS",
+          "body": "1. Michizi 7 $\\rightarrow$ **VII**\n2. Nafasi ya 4 $\\rightarrow$ **IV**\n3. Maua 9 $\\rightarrow$ **IX**\n\n*Exercise 1.1 Answers:* 1=I, 2=II, 3=III, 4=IV, 5=V, 6=VI, 7=VII, 8=VIII, 9=IX, 10=X."
+        },
+        {
+          "label": "Scaffolding",
+          "body": "Kwa wanafunzi wanaopata shida, wape \"Cheat Sheet\" ndogo yenye alama I=1, V=5, X=10 na michoro ya vijiti. Waruhusu waendelee kutumia vijiti vya kiberiti hata wakati wa kuandika majibu."
+        },
+        {
+          "label": "Extension Challenge",
+          "body": "\"Kama X ni 10, je, unafikiri namba 11 itaandikawaje? Jaribu kutumia sheria ya kuongeza (kulia).\"\n(Model Answer: XI)"
+        }
+      ]
+    },
+    {
+      "heading": "Assess & Close (10 minutes)",
+      "type": "steps",
+      "items": [
+        {
+          "label": "Exit Ticket",
+          "body": "Karatasi ndogo kwa kila mwanafunzi.\n1. Andika namba 4 kwa Kirumi: _________\n2. Andika namba VIII kwa namba ya kawaida: _________\n\n**MODEL ANSWER:** 1. IV, 2. 8."
+        },
+        {
+          "label": "Homework",
+          "body": "Kamilisha Exercise 1.2, Maswali 1-5 kwenye ukurasa wa 22 wa Textbook. (Kubadilisha namba 1-10 mchanganyiko)."
+        },
+        {
+          "label": "Cross-curricular link",
+          "body": "Sanaa (Art): Mwalimu anawaambia wanafunzi wachore saa kubwa kwenye madaftari yao na badala ya kutumia 1, 2, 3... watumie I, II, III... mpaka XII."
+        },
+        {
+          "label": "Quick Recap",
+          "body": "**Teacher says:** \"Leo tumejifunza kuwa namba za Kirumi hutumia alama chache lakini zina nguvu! Kumbukeni: I ni 1, V ni 5, na X ni 10. Ikiwa herufi ndogo iko kushoto, tunatoa; ikiwa iko kulia, tunajumlisha. Kesho tutaona namba kubwa zaidi!\""
+        }
+      ]
+    },
+    {
+      "heading": "",
+      "type": "images",
+      "imageIds": [
+        "c1-roman-clock"
+      ]
+    },
+    {
+      "heading": "End-of-Chapter Assessment Worksheet",
+      "type": "fields",
+      "items": [
+        {
+          "label": "Jina la Mwanafunzi",
+          "value": "__________________________"
+        },
+        {
+          "label": "Tarehe",
+          "value": "__________"
+        },
+        {
+          "label": "Darasa",
+          "value": "Grade 4"
+        },
+        {
+          "label": "Tathmini ya Sura",
+          "value": "Namba za Kirumi (I-X)"
+        },
+        {
+          "label": "Alama Milango",
+          "value": "/20"
+        }
+      ]
+    },
+    {
+      "heading": "Sehemu A: Utambuzi (Alama 5)",
+      "type": "bullets",
+      "marker": "num",
+      "lead": "*Unganisha namba ya kawaida na namba ya Kirumi inayolingana nayo.*",
+      "items": [
+        {
+          "text": "3  $\\quad \\quad$  A. X"
+        },
+        {
+          "text": "5  $\\quad \\quad$  B. III"
+        },
+        {
+          "text": "10 $\\quad \\quad$  C. V"
+        },
+        {
+          "text": "1  $\\quad \\quad$  D. IX"
+        },
+        {
+          "text": "9  $\\quad \\quad$  E. I"
+        }
+      ]
+    },
+    {
+      "heading": "Sehemu B: Kubadilisha Namba (Alama 6)",
+      "type": "bullets",
+      "marker": "num",
+      "lead": "*Badilisha namba hizi kuwa za Kirumi:*",
+      "items": [
+        {
+          "text": "Namba 4 $\\rightarrow$ __________"
+        },
+        {
+          "text": "Namba 6 $\\rightarrow$ __________"
+        },
+        {
+          "text": "Namba 8 $\\rightarrow$ __________"
+        }
+      ]
+    },
+    {
+      "heading": "Sehemu B",
+      "type": "bullets",
+      "marker": "num",
+      "items": [
+        {
+          "text": "9. VII $\\rightarrow$ __________"
+        },
+        {
+          "text": "10. II $\\rightarrow$ __________"
+        },
+        {
+          "text": "11. IV $\\rightarrow$ __________"
+        }
+      ]
+    },
+    {
+      "heading": "Sehemu C: Utatuzi wa Matatizo (Alama 9)",
+      "type": "bullets",
+      "marker": "num",
+      "items": [
+        {
+          "text": "12. Ali ana vitabu 5 na ananunua vingine 2. Jumla ya vitabu vyake ni 7. Andika jibu kwa namba za Kirumi.\n    Jibu: __________"
+        },
+        {
+          "text": "13. Katika mchezo wa mpira, timu ya shule imefunga mabao 3. Andika idadi ya mabao kwa namba za Kirumi.\n    Jibu: __________"
+        },
+        {
+          "text": "14. Sawa au Si Sawa? \"Namba 4 inaandikwa IIII.\"\n    Jibu: __________ (Eleza kwa nini: ____________________________________)"
+        }
+      ]
+    },
+    {
+      "heading": "FOR TEACHER ONLY — ANSWER KEY",
+      "type": "note",
+      "body": "Sehemu A:\n1-B, 2-C, 3-A, 4-E, 5-D (Alama 1 kila moja)\n\nSehemu B:\n6. IV, 7. VI, 8. VIII, 9. 7, 10. 2, 11. 4 (Alama 1 kila moja)\n\nSehemu C:\n12. VII (Alama 3)\n13. III (Alama 3)\n14. Si Sawa. Sababu: Sherufi I haishauriwi kurudiwa zaidi ya mara tatu; tunatumia IV (5-1). (Alama 3)"
+    },
+    {
+      "heading": "Scoring Guide:",
+      "type": "bullets",
+      "marker": "dot",
+      "items": [
+        {
+          "text": "18 - 20: Excellent (Hajahitaji msaada)"
+        },
+        {
+          "text": "14 - 17: Good (Anajua msingi, anahitaji mazoezi kidogo)"
+        },
+        {
+          "text": "10 - 13: Needs Review (Anachanganya IV na VI)"
+        },
+        {
+          "text": "Chini ya 10: Re-teach (Anahitaji kufundishwa upya kwa kutumia CPA)"
+        }
+      ]
+    }
+  ]
+}
