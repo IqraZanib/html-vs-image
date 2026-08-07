@@ -171,10 +171,27 @@ at the top as "current / total". Page flow must look clean:
   continuation page prints flush to the top edge and the page number overlaps the first
   section. (See `render/html-to-pdf.js`, `pageMode:'paged'`.)
 
-## R26 — Colour only for what matters
-Use colour to signal what is important — the title, section headings, and emphasis
-callouts (checkpoints, key notes). Keep everything else on a clean white ground. A
-page drowning in colour is harder to read than white with a few deliberate accents.
+## R26 — Locked colour theme (warm four-accent, reference-matched)
+This is the FINAL locked colour theme (matches the approved reference template). Warm
+four-accent palette rotated per section, on a clean white ground, navy body text:
+- **Accents rotate amber → red → teal → green** (`--c-amber/red/teal/green`, each with a
+  bright shade for icon discs/badges, a darker `-ink` for title text on white, and a `-soft`
+  for borders/tints). Do not add more hues.
+- **Section headers are coloured "tabs":** an accent icon disc (white icon) + the section
+  title in the accent's `-ink` shade + a thin accent underline; the panel gets a soft accent
+  border.
+- **Body / lead paragraphs → navy ink; bullet text → navy ink** (markers a neutral grey).
+- **Sub-headings — inline `**bold:**` / colon-labels ("Teacher says:", "BOARD:") → near-black
+  bold, never red.** (Global `b{}` in `template/shell.js` is near-black — do not colour it.)
+- **Hero → a full-width scene-image banner** (`meta.banner` → an image id) with the title on
+  a soft dark scrim; falls back to a warm amber→coral gradient when no banner image exists.
+- **30-Second Summary → a cream card** (`type:"summary"`, items `{icon,label,body}`).
+- **Assessment Rubric → coloured level badges** (`type:"rubric"`, items `{level,desc}`):
+  Exceeding=teal ★, Meeting=green ✓, Approaching=amber ▲, Below=red ✕.
+- **Footer** (`meta.footer`) is small muted text, right-aligned.
+Keep colour deliberate — coloured headers/discs/badges carry the palette; everything else
+stays white/very-light. (See `decorative/theme.js` + `accentFor`, `decorative/render.js`,
+`template/shell.js`.)
 
 ## R27 — No empty pages: fill the space smoothly
 Without touching anything else that already works, handle this situation: when a section —
@@ -210,6 +227,21 @@ that makes it best on the first attempt, with a single gate-only safety fallback
 - **character cast** (panel-blend, white bg) → nano-banana-2-lite, fallback flux-2/pro.
 A per-block `model` override always wins. The quality gate still judges every output; the
 fallback fires only if the primary is rejected. Config: `imagegen/config/models.config.js`.
+
+## R30 — The deliverable PDF is pixel-perfect and paginated (default, wired)
+Every LP's PDF — whatever the content — MUST look EXACTLY like the preview and paginate
+cleanly. The pipeline does this by default (`renderLessonImage` → `render/png-to-pdf.js`
+→ `scripts/compose_pdf.py`): screenshot the page at 2×, then slice that image into A4
+pages, cutting ONLY at section or list-item boundaries. Guarantees:
+- identical to the preview PNG (no HTML→PDF drift);
+- a "current / total" page number at the top of every page, with a real top margin;
+- a section (and every bullet / step / rubric row) is NEVER split across a page break;
+- pages fill — a long list continues overleaf rather than leaving a big bottom gap;
+- no blank trailing page.
+Requires `python3` + `pillow` + `img2pdf`. If they are missing the pipeline logs a note
+and falls back to the Chromium vector PDF (`html-to-pdf.js`, `pageMode:'paged'`) so a PDF
+is always produced. This applies to ALL entry points (CLI, LP Studio, the rumi adapter) —
+they all go through `renderLessonImage`.
 
 ## GATE_POLICY
 - The image must be correct for the exact concept named in the content. For a labeled

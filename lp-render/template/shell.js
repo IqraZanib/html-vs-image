@@ -12,7 +12,7 @@ const LAYOUT_CSS = `
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);color:var(--ink);background:#fff;line-height:1.55;
   -webkit-print-color-adjust:exact;print-color-adjust:exact;-webkit-font-smoothing:antialiased}
-b{font-weight:700;color:var(--coral)}
+b{font-weight:700;color:#1f2430}
 .sheet{padding:12mm 12mm 14mm}
 .lp-header{background:linear-gradient(225deg,var(--sky-soft),#f3fbff);border:3px solid var(--sky-bd);
   border-radius:22px;padding:18px 22px;margin-bottom:16px}

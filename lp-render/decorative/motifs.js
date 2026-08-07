@@ -12,21 +12,20 @@ const leaf = (c = '#5bbf7a') =>
 const cloud = (c = '#fff') =>
   `<svg viewBox="0 0 64 40" fill="${c}"><path d="M20 34a12 12 0 0 1 .6-24 15 15 0 0 1 28 3 10 10 0 0 1-2 21z"/></svg>`;
 
-// A small, deterministic scatter of header motifs (no Math.random — stable output).
+// A small, deterministic scatter of header motifs. Monochrome soft-white on the blue
+// hero (UI/UX restraint — no rainbow of colours); reads as subtle frosted texture.
 function headerMotifs() {
+  const w = 'rgba(255,255,255,.9)'; const w2 = 'rgba(255,255,255,.6)';
   return (
-    `<div class="deco deco-leaf l1">${leaf()}</div><div class="deco deco-leaf l2">${leaf('#8be0b0')}</div>` +
     `<div class="deco deco-cloud c1">${cloud('rgba(255,255,255,.85)')}</div>` +
-    `<div class="deco deco-bfly b1">${butterfly()}</div>` +
-    `<div class="deco deco-star s1">${star()}</div>` +
-    `<div class="deco deco-spark k1">${sparkle()}</div><div class="deco deco-spark k2">${sparkle('#ffe9a8')}</div>`
+    `<div class="deco deco-star s1">${star(w)}</div>` +
+    `<div class="deco deco-bfly b1">${star(w2)}</div>` +
+    `<div class="deco deco-spark k1">${sparkle(w)}</div><div class="deco deco-spark k2">${sparkle(w2)}</div>` +
+    `<div class="deco deco-leaf l1">${sparkle(w2)}</div>`
   );
 }
 
-// A tiny twinkle pair for a section header, varied by index so sections differ.
-function headTwinkle(i) {
-  const a = [star(), sparkle('#ffd34e'), butterfly(), leaf(), star('#8be0b0'), sparkle('#ff9ac2')];
-  return a[i % a.length] + a[(i + 3) % a.length];
-}
+// Section headings stay clean — no decorative twinkle clutter next to the title.
+function headTwinkle() { return ''; }
 
 module.exports = { star, sparkle, butterfly, leaf, cloud, headerMotifs, headTwinkle };

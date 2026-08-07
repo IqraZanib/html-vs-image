@@ -11,6 +11,7 @@ const { buildShell } = require('./template/shell');
 const { htmlToPdf, closeBrowser } = require('./index');
 const { THEME_CSS } = require('./decorative/theme');
 const { renderDecorativeLesson } = require('./decorative/render');
+const { htmlToPixelPdf } = require('./render/png-to-pdf');
 const { ensureCast } = require('./decorative/characters');
 const store = require('./store/assets');
 const { resolveSegmentImages } = require('../imagegen');
@@ -108,13 +109,21 @@ async function renderLessonImage(content, opts = {}) {
   let html = buildShell({ headerHtml, bodyHtml, locale, title: meta.title || contentId });
   html = html.replace('</head>', `<style>${THEME_CSS}</style>${headCss ? `<style>${headCss}</style>` : ''}</head>`);
 
-  // The PDF is a second full Chromium render; skip it when only the PNG is needed
-  // (e.g. the web interface) to roughly halve the render step.
+  // The PDF is a second full render; skip it when only the PNG is needed (e.g. the web
+  // interface) to roughly halve the render step.
   let pdf = null;
   if (wantPdf) {
-    // The deliverable PDF is paginated into readable A4 pages with page numbers.
-    pdf = await htmlToPdf(html, { pageMode: 'paged', pdfOptions: { printBackground: true } });
-    await closeBrowser();
+    // Default deliverable (RULES R30): a PIXEL-PERFECT paginated PDF sliced from the 2×
+    // screenshot at section / list-item boundaries, with page numbers — identical to the
+    // preview, no section leaking, real margins. Falls back to the Chromium vector PDF if
+    // python3 + pillow + img2pdf are not available.
+    try {
+      pdf = await htmlToPixelPdf(html);
+    } catch (e) {
+      log(`  (pixel-perfect PDF unavailable — ${e.message}; using vector fallback)`);
+      pdf = await htmlToPdf(html, { pageMode: 'paged', pdfOptions: { printBackground: true } });
+      await closeBrowser();
+    }
   }
   const png = await screenshot(html);
   return { png, pdf, html, contentId, locale, stats: statsOut };

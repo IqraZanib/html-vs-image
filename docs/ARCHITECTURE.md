@@ -66,6 +66,21 @@ docs/
   image-model-benchmark.md   measured model cost/quality/speed + open-weight re-test
 ```
 
+## Pixel-perfect PDF (`npm run pdf -- <content.json> <out.pdf>`)
+
+The default `renderLessonImage` PDF is a second Chromium `page.pdf()` pass, which can
+drift slightly from the preview PNG. For a PDF that looks EXACTLY like the (perfect) PNG,
+`scripts/pdf-from-png.js` screenshots the page at 2× and slices that image into A4 pages,
+cutting **only at section boundaries** so no section is ever split across a page, and
+`scripts/compose_pdf.py` (Python: `pillow` + `img2pdf`) composes each A4 page with a
+`current / total` page-number band and assembles a lossless A4 PDF.
+
+- Guarantees: identical to the PNG, page numbers on every page, real top margin, no
+  section leaking across page breaks, no blank trailing page.
+- Requires Python 3 with `pillow` and `img2pdf` (`pip install pillow img2pdf`).
+- Trade-off vs the Chromium PDF: text is raster (not selectable) and the file is larger,
+  in exchange for a pixel-perfect match to the preview.
+
 ## Rumi integration — the Gamma replacement (`lp-render/adapter.js`)
 
 In rumi's `lesson-plan-generation.worker.js`, Gamma today authors + renders and returns a

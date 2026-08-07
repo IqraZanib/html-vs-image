@@ -10,7 +10,8 @@
     "test:imagegen": "node --test imagegen/test/",
     "test:visual": "node scripts/visual-regression.js",
     "test:visual:update": "node scripts/visual-regression.js --update",
-    "diff": "node scripts/visual-diff.js"
+    "diff": "node scripts/visual-diff.js",
+    "pdf": "node scripts/pdf-from-png.js"
   },
   "dependencies": {
     "@fontsource/noto-naskh-arabic": "^5.2.11",
