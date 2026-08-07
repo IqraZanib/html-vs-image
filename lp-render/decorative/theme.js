@@ -12,7 +12,7 @@ const THEME_CSS = `
   --amber:#f39320; --amber-soft:#ffe7c7;
   /* Restrained scheme (UI/UX): ONE light-blue accent for structure (headings, icon
      discs, numbering), neutral greys for content, near-black bold for sub-headings. */
-  --brand:#4a90d9; --brand-soft:#eef5fc;
+  --brand:#9b82d4; --brand-soft:#f2eefb;
   --grey:#5b6470; --grey-mark:#aab2bf; --grey-soft:#f0f2f6;
   --ink:#1f2430; --muted:#6b7280; --line:#eef0f5;
 }
@@ -21,7 +21,7 @@ body{background:#eef2fb;color:var(--ink);font-family:var(--font),'Baloo 2','Popp
 
 /* hero */
 .lp-header{position:relative;overflow:hidden;margin:0;padding:30px 36px 26px;border:0;border-radius:0 0 28px 28px;
-  background:linear-gradient(135deg,#5aa0e6 0%,#3f7fc4 55%,#2f6fb0 100%);color:#fff}
+  background:linear-gradient(135deg,#b49ee0 0%,#9b82d4 55%,#8468c4 100%);color:#fff}
 .lp-header h1{position:relative;z-index:2;margin:0 0 6px;font-size:38px;font-weight:800;line-height:1.08;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.18)}
 .lp-header .sub{position:relative;z-index:2;font-size:16px;opacity:.95;font-weight:600;color:#fff;margin-top:2px}
 .lp-header .meta{position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
@@ -64,7 +64,7 @@ body{background:#eef2fb;color:var(--ink);font-family:var(--font),'Baloo 2','Popp
    rules; fill:none / stroke:none are preserved so outline icons stay outlines. */
 .s-disc svg [fill]:not([fill="none"]){fill:#fff}
 .s-disc svg [stroke]:not([stroke="none"]){stroke:#fff}
-.s-title{font-size:21px;font-weight:800;letter-spacing:.2px;color:var(--brand)}
+.s-title{font-size:21px;font-weight:800;letter-spacing:.2px;color:var(--ink)}
 .s-time{margin-inline-start:auto;background:#fff;border:1px solid var(--line);color:var(--muted);font-size:12px;
   font-weight:700;padding:4px 12px;border-radius:999px;white-space:nowrap}
 .s-deco{display:flex;gap:6px;align-items:center;opacity:.9}
@@ -74,7 +74,7 @@ body{background:#eef2fb;color:var(--ink);font-family:var(--font),'Baloo 2','Popp
 /* bullets */
 .d-lead{font-size:14px;font-weight:700;color:var(--muted);margin-bottom:10px}
 .d-bullets{margin:0;padding:0;list-style:none;display:grid;gap:9px}
-.d-bullets li{position:relative;padding:10px 14px 10px 40px;border-radius:12px;font-size:14.5px;font-weight:600;line-height:1.4;color:var(--grey)}
+.d-bullets li{position:relative;padding:10px 14px 10px 40px;border-radius:12px;font-size:14.5px;font-weight:600;line-height:1.4;color:var(--ink)}
 .d-bullets li::before{content:attr(data-mark);position:absolute;inset-inline-start:12px;top:10px;width:22px;height:22px;
   border-radius:50%;background:var(--grey-mark);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
 .d-tag{display:inline-block;margin-inline-start:8px;font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;
