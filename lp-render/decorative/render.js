@@ -50,8 +50,9 @@ function renderBody(section, accent, images) {
       const rows = (section.items || []).map((it) => {
         const key = String(it.level || '').toLowerCase().replace(/[^a-z]/g, '');
         const c = COL[key] || accent; const sym = SYM[key] || '•';
+        const lvl = cleanHeading(it.level || '').replace(/^[^\p{L}]+/u, ''); // drop any leading emoji/symbol (the badge already shows one)
         return `<div class="rrow"><div class="ric" style="background:var(${c})">${sym}</div>`
-          + `<div><span class="rlevel">${esc(cleanHeading(it.level || ''))}:</span> `
+          + `<div><span class="rlevel">${esc(lvl)}:</span> `
           + `<span class="rdesc">${richText(it.desc || '', { engine: section.engine })}</span></div></div>`;
       }).join('');
       return `<div class="d-rubric">${rows}</div>`;

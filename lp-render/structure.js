@@ -17,7 +17,9 @@ Output ONLY the JSON object — no markdown, no prose, no code fences.
 Shape:
 {
   "meta": { "id": kebab-case string, "locale": a language code matching the lesson ("en","ur","sd","ar","sw",…), "subject": string, "grade": string,
-            "region": "pk", "title": string, "subtitle": string,
+            "region": "pk"|"ke"|"ye", "title": string, "subtitle": string,
+            "banner": (optional) the id of a "scene" image to show as the top hero banner,
+            "footer": (optional) a short end-of-page line (contact / credit / "sample draft" note),
             "chips": [ { "label": string, "value": string } ] },
   "images": [ { "id": string, "concept": "diagram"|"scene", "label": string, "prompt": string } ],
   "sections": [ { "heading": string, "type": string, ...typeFields } ]
@@ -33,6 +35,8 @@ Section "type" values and their fields:
 - "fields":  { "items": [ { "label": string, "value": string } ] }  // admin/detail forms
 - "math":    { "engine": "katex", "items": [ { "label"?: string, "tex": string } ] }  // formulas as LaTeX
 - "images":  { "imageIds": [ string ] }  // DISPLAYS images; ids must match entries in the top-level "images" array
+- "summary":  { "items": [ { "icon"?: one emoji, "label": string, "body": string } ] }  // an at-a-glance / "30-second summary" card
+- "rubric":   { "items": [ { "level": string, "desc": string } ] }  // an assessment rubric / marking guide (levels)
 
 Hard rules:
 - Use the lesson's OWN words and headings VERBATIM. Do NOT summarize, reword, translate, or invent content. If the lesson is in Urdu/Swahili/Arabic/etc, keep that language and set locale accordingly (default "en").
@@ -47,6 +51,11 @@ Hard rules:
 - Cultural grounding: any people or places in a prompt must match the lesson's region — Arabic → Yemeni children in a Yemeni setting; Kiswahili → Kenyan children in a Kenyan setting; otherwise Pakistani — so local teachers recognise their own pupils.
 - Where the concept involves children doing something (counting, an activity, a family, playing), prefer a "scene" that SHOWS the region's own children doing it — e.g. "Kenyan children in a classroom counting stones to add 3 + 2 = 5"; "a Yemeni family" — so local children see themselves in the picture. Use a bare labelled diagram only when labelling parts is the actual point.
 - If you declare any images, you MUST also add ONE "images" section whose "imageIds" list every declared image id, placed where the pictures belong.
+- 30-SECOND / AT-A-GLANCE SUMMARY: if the source has a short summary box near the top (e.g. "30-Second Summary", "At a glance", "Snapshot") with a few labelled points, emit it as a "summary" section — one item per point, with a fitting emoji in "icon" (e.g. 🎯 for the goal/outcome, ⏱️ for time, ⭐ for the key must-do). Do NOT invent a summary if the source has none.
+- ASSESSMENT RUBRIC: if the source has a rubric / marking guide with levels, emit a "rubric" section — one item per level ("level" + "desc"). Keep the source's level names (e.g. Exceeding / Meeting / Approaching / Below).
+- BANNER: if the lesson has a natural hero scene (a child or children doing the activity), declare ONE "scene" image for it and set meta.banner to that image's id — it becomes the top banner and is NOT listed in any "images" section.
+- FOOTER: if the source ends with a contact line, credit, or "sample/draft" note, put it verbatim in meta.footer (not as a section).
+- REGION: set meta.region from the audience — Kiswahili → "ke", Arabic → "ye", otherwise "pk". If the lesson is English but clearly Kenyan (CBC/KICD, "learner", TSC, sufuria, Kenyan names/places) use "ke"; if clearly Yemeni use "ye". Region drives who appears in the images (Kenyan / Yemeni / Pakistani children).
 - Every "id" must be unique kebab-case.`;
 
 const PART_NOTE = `
@@ -226,14 +235,32 @@ function langRegionHint(raw) {
   if (region) bits.push(`Region: ${region}`);
   return bits.length ? bits.join('. ') + '.\n\n' : '';
 }
+// Make meta.banner always resolve to a real image (the hero would silently fall back
+// to the gradient otherwise). The model sometimes points meta.banner at an id it never
+// declared, or the id gets a per-chunk prefix; here we remap it, and if it still has no
+// image we synthesise a dedicated banner scene so the hero renders.
+function finalizeBanner(content) {
+  const meta = content.meta || (content.meta = {});
+  if (!meta.banner) return content;
+  const images = Array.isArray(content.images) ? content.images : (content.images = []);
+  const ids = new Set(images.map((im) => im && im.id));
+  if (ids.has(meta.banner)) return content;
+  const remap = images.find((im) => im && typeof im.id === 'string' && im.id.endsWith(`-${meta.banner}`));
+  if (remap) { meta.banner = remap.id; return content; }
+  const subj = meta.subject ? `${meta.subject} — ` : '';
+  images.push({ id: meta.banner, concept: 'scene', label: '',
+    prompt: `${subj}children doing the lesson activity: ${meta.title || 'the topic'}` });
+  return content;
+}
+
 async function structureLesson(raw, { apiKey, fetchImpl = defaultFetch, maxChars = 4500 } = {}) {
   if (!apiKey) throw new Error('structuring needs a kie.ai API key');
   const text = langRegionHint(String(raw)) + extractLessonText(String(raw)); // hint + stripped lesson
   if (text.length <= maxChars) {
     const single = await callStructure(text, SYSTEM, { apiKey, fetchImpl });
-    if (single && Array.isArray(single.sections) && single.sections.length) return normalize(single);
+    if (single && Array.isArray(single.sections) && single.sections.length) return finalizeBanner(normalize(single));
   }
-  return structureChunked(text, { apiKey, fetchImpl, maxChars });
+  return finalizeBanner(await structureChunked(text, { apiKey, fetchImpl, maxChars }));
 }
 
 module.exports = { structureLesson, splitIntoChunks, extractLessonText };
