@@ -228,6 +228,21 @@ that makes it best on the first attempt, with a single gate-only safety fallback
 A per-block `model` override always wins. The quality gate still judges every output; the
 fallback fires only if the primary is rejected. Config: `imagegen/config/models.config.js`.
 
+## R30 — The deliverable PDF is pixel-perfect and paginated (default, wired)
+Every LP's PDF — whatever the content — MUST look EXACTLY like the preview and paginate
+cleanly. The pipeline does this by default (`renderLessonImage` → `render/png-to-pdf.js`
+→ `scripts/compose_pdf.py`): screenshot the page at 2×, then slice that image into A4
+pages, cutting ONLY at section or list-item boundaries. Guarantees:
+- identical to the preview PNG (no HTML→PDF drift);
+- a "current / total" page number at the top of every page, with a real top margin;
+- a section (and every bullet / step / rubric row) is NEVER split across a page break;
+- pages fill — a long list continues overleaf rather than leaving a big bottom gap;
+- no blank trailing page.
+Requires `python3` + `pillow` + `img2pdf`. If they are missing the pipeline logs a note
+and falls back to the Chromium vector PDF (`html-to-pdf.js`, `pageMode:'paged'`) so a PDF
+is always produced. This applies to ALL entry points (CLI, LP Studio, the rumi adapter) —
+they all go through `renderLessonImage`.
+
 ## GATE_POLICY
 - The image must be correct for the exact concept named in the content. For a labeled
   diagram, every label must be spelled correctly and point to the right part; reject
