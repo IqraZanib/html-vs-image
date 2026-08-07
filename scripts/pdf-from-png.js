@@ -37,14 +37,20 @@ function apiKey() {
   await page.setContent(html, { waitUntil: 'networkidle' });
   await page.evaluate(async () => { await document.fonts.ready; });
 
-  // Safe cut points = the BOTTOM of the header and of every top-level section (+ footer).
-  // A page may only end at one of these, so a section never splits across pages.
+  // Safe cut points a page may end at. A page never ends mid-item, so nothing is ever
+  // cut in half. We allow breaks (a) at the bottom of the header and each whole section,
+  // and (b) BETWEEN the items of a list-like section (bullets / steps / rubric) so a tall
+  // list fills the page and continues overleaf instead of leaving a big gap.
   const geom = await page.evaluate(() => {
     const y = (el, edge) => el.getBoundingClientRect()[edge] + window.scrollY;
     const cuts = [];
     const header = document.querySelector('.lp-header');
     if (header) cuts.push(y(header, 'bottom'));
-    document.querySelectorAll('.body > .section').forEach((el) => cuts.push(y(el, 'bottom')));
+    document.querySelectorAll('.body > .section').forEach((sec) => {
+      cuts.push(y(sec, 'bottom')); // whole-section break (preferred where it fits)
+      // between-item breaks inside a single-column list — clean gaps, never through an item
+      sec.querySelectorAll('.d-bullets > li, .d-steps > .d-step, .d-rubric > .rrow').forEach((item) => cuts.push(y(item, 'bottom')));
+    });
     const footer = document.querySelector('.lp-footer');
     if (footer) { cuts.push(y(footer, 'top')); cuts.push(y(footer, 'bottom')); }
     return { cuts, height: document.documentElement.scrollHeight, width: document.documentElement.scrollWidth };
