@@ -171,22 +171,27 @@ at the top as "current / total". Page flow must look clean:
   continuation page prints flush to the top edge and the page number overlaps the first
   section. (See `render/html-to-pdf.js`, `pageMode:'paged'`.)
 
-## R26 — Colour only for what matters (one light accent + black text)
-Use ONE light accent colour, not a rotating palette — a page drowning in colour is harder
-to read than white with a few deliberate accents. The scheme:
-- **Main lesson heading (the hero) → light lilac** — the single splash of colour, and a
-  *different* colour from everything below it. Icon discs use the same lilac accent
-  (`--brand`); disc icons are always monochrome white — never multicoloured.
-- **Section heading text → black** (not the accent).
-- **Bullet text → black** (marker circles stay a neutral grey).
-- **Body / lead paragraphs → neutral dark ink, never coloured.**
-- **Sub-headings — including inline `**bold:**` / colon-labels like "Teacher says:",
-  "BOARD:", "MODEL ANSWER:" → black and bold, never red/coral.** (The global `b{}` rule in
-  `template/shell.js` sets bold text to near-black — do not colour it.)
-- **Chips / tags → neutral grey**; the callout note keeps only a thin lilac left border.
-- **Hero → a single lilac gradient** with soft white motifs (no rainbow of decorations).
-Everything else stays on a clean white/very-light ground. Do not reintroduce a
-per-section colour rotation. (See `decorative/theme.js` + `accentFor`, `template/shell.js`.)
+## R26 — Locked colour theme (warm four-accent, reference-matched)
+This is the FINAL locked colour theme (matches the approved reference template). Warm
+four-accent palette rotated per section, on a clean white ground, navy body text:
+- **Accents rotate amber → red → teal → green** (`--c-amber/red/teal/green`, each with a
+  bright shade for icon discs/badges, a darker `-ink` for title text on white, and a `-soft`
+  for borders/tints). Do not add more hues.
+- **Section headers are coloured "tabs":** an accent icon disc (white icon) + the section
+  title in the accent's `-ink` shade + a thin accent underline; the panel gets a soft accent
+  border.
+- **Body / lead paragraphs → navy ink; bullet text → navy ink** (markers a neutral grey).
+- **Sub-headings — inline `**bold:**` / colon-labels ("Teacher says:", "BOARD:") → near-black
+  bold, never red.** (Global `b{}` in `template/shell.js` is near-black — do not colour it.)
+- **Hero → a full-width scene-image banner** (`meta.banner` → an image id) with the title on
+  a soft dark scrim; falls back to a warm amber→coral gradient when no banner image exists.
+- **30-Second Summary → a cream card** (`type:"summary"`, items `{icon,label,body}`).
+- **Assessment Rubric → coloured level badges** (`type:"rubric"`, items `{level,desc}`):
+  Exceeding=teal ★, Meeting=green ✓, Approaching=amber ▲, Below=red ✕.
+- **Footer** (`meta.footer`) is small muted text, right-aligned.
+Keep colour deliberate — coloured headers/discs/badges carry the palette; everything else
+stays white/very-light. (See `decorative/theme.js` + `accentFor`, `decorative/render.js`,
+`template/shell.js`.)
 
 ## R27 — No empty pages: fill the space smoothly
 Without touching anything else that already works, handle this situation: when a section —

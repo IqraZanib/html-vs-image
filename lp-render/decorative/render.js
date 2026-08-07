@@ -27,8 +27,9 @@ function sectionHead(accent, section, i) {
   const title = cleanHeading(section.heading);
   if (!title) return '';
   const time = section.time ? `<div class="s-time">${esc(cleanHeading(section.time))}</div>` : '';
-  const twinkle = `<div class="s-deco">${headTwinkle(i)}</div>`;
-  return `<div class="s-head">${disc(accent, section, i)}<div class="s-title">${esc(title)}</div>${twinkle}${time}</div>`;
+  // Coloured "tab": accent icon disc + accent title text + a thin accent underline.
+  return `<div class="s-head" style="border-bottom-color:var(${accent}-soft)">${disc(accent, section, i)}`
+    + `<div class="s-title" style="color:var(${accent}-ink)">${esc(title)}</div>${time}</div>`;
 }
 
 // Faint decorative icons behind the title block (like a lesson-plan letterhead).
@@ -39,31 +40,51 @@ function headerBg() {
 
 function renderBody(section, accent, images) {
   const soft = `var(${accent}-soft)`;
+  const ink = `var(${accent}-ink)`;
   switch (section.type) {
+    case 'summary': {
+      const rows = (section.items || []).map((it) =>
+        `<div class="srow"><div class="sic">${esc(it.icon || '•')}</div>`
+        + `<div class="stext">${it.label ? `<b>${esc(cleanHeading(it.label))}:</b> ` : ''}${richText(it.body || '', { engine: section.engine })}</div></div>`
+      ).join('');
+      return `<div class="d-summary">${rows}</div>`;
+    }
+    case 'rubric': {
+      const COL = { exceeding: '--c-teal', meeting: '--c-green', approaching: '--c-amber', below: '--c-red' };
+      const SYM = { exceeding: '★', meeting: '✓', approaching: '▲', below: '✕' };
+      const rows = (section.items || []).map((it) => {
+        const key = String(it.level || '').toLowerCase().replace(/[^a-z]/g, '');
+        const c = COL[key] || accent; const sym = SYM[key] || '•';
+        return `<div class="rrow"><div class="ric" style="background:var(${c})">${sym}</div>`
+          + `<div><span class="rlevel">${esc(cleanHeading(it.level || ''))}:</span> `
+          + `<span class="rdesc">${richText(it.desc || '', { engine: section.engine })}</span></div></div>`;
+      }).join('');
+      return `<div class="d-rubric">${rows}</div>`;
+    }
     case 'bullets': {
       const km = section.marker || 'dot';
       const lis = (section.items || []).map((it, i) => {
-        const tag = it.tag ? `<span class="d-tag" style="background:var(--grey-soft);color:var(--grey)">${esc(it.tag)}</span>` : '';
-        return `<li data-mark="${esc(mark(km, i))}" style="background:#f6f8fc">${richText(it.text, { engine: section.engine })}${tag}</li>`;
+        const tag = it.tag ? `<span class="d-tag" style="background:${soft};color:${ink}">${esc(it.tag)}</span>` : '';
+        return `<li data-mark="${esc(mark(km, i))}">${richText(it.text, { engine: section.engine })}${tag}</li>`;
       }).join('');
       const lead = section.lead ? `<div class="d-lead">${esc(section.lead)}</div>` : '';
-      return `${lead}<ul class="d-bullets" style="--m:var(${accent})">${lis}</ul>`;
+      return `${lead}<ul class="d-bullets">${lis}</ul>`;
     }
     case 'text':
       return `<div class="d-text">${richText(section.body, { engine: section.engine })}</div>`;
     case 'note': {
-      const nt = section.label ? `<span class="nt" style="color:var(--ink)">${esc(cleanHeading(section.label))}</span>` : '';
-      return `<div class="d-note" style="background:linear-gradient(90deg,var(--brand-soft),#fff);border-inline-start:5px solid var(--brand)">${nt}${richText(section.body, { engine: section.engine })}</div>`;
+      const nt = section.label ? `<span class="nt" style="color:${ink}">${esc(cleanHeading(section.label))}</span>` : '';
+      return `<div class="d-note" style="background:linear-gradient(90deg,${soft},#fff);border-inline-start:5px solid var(${accent})">${nt}${richText(section.body, { engine: section.engine })}</div>`;
     }
     case 'math':
       return `<div class="d-math">${(section.items || []).map((it) => `<div class="d-mrow">${it.label ? `<div class="d-mlabel">${esc(cleanHeading(it.label))}</div>` : ''}<div class="d-mformula">${renderMath(it.tex, { display: true, engine: section.engine })}</div></div>`).join('')}</div>`;
     case 'chips':
-      return `<div class="d-chips">${(section.items || []).map((c) => `<span class="d-chip" style="background:var(--grey-soft);color:var(--grey)">${esc(cleanHeading(c))}</span>`).join('')}</div>`;
+      return `<div class="d-chips">${(section.items || []).map((c) => `<span class="d-chip" style="background:${soft};color:${ink}">${esc(cleanHeading(c))}</span>`).join('')}</div>`;
     case 'steps':
       return `<div class="d-steps">${(section.items || []).map((s, i) => `<div class="d-step"><div class="n" style="background:var(${accent})">${i + 1}</div><div><div class="st-label">${richText(s.label, { engine: section.engine })}</div><div class="st-body">${richText(s.body, { engine: section.engine })}</div></div></div>`).join('')}</div>`;
     case 'qa': {
       const km = section.marker || 'alpha';
-      return `<div class="d-qa">${(section.items || []).map((qa, i) => `<div class="d-qc"><div class="d-q" data-mark="${esc(mark(km, i))}" style="color:var(--ink)">${richText(qa.q, { engine: section.engine })}</div>${qa.a ? `<div class="d-a">${richText(qa.a, { engine: section.engine })}</div>` : ''}</div>`).join('')}</div>`;
+      return `<div class="d-qa">${(section.items || []).map((qa, i) => `<div class="d-qc"><div class="d-q" data-mark="${esc(mark(km, i))}" style="color:${ink}">${richText(qa.q, { engine: section.engine })}</div>${qa.a ? `<div class="d-a">${richText(qa.a, { engine: section.engine })}</div>` : ''}</div>`).join('')}</div>`;
     }
     case 'fields':
       return `<div class="d-fields">${(section.items || []).map((f) => `<div class="d-field"><b>${esc(cleanHeading(f.label))}</b>${esc(f.value || '')}</div>`).join('')}</div>`;
@@ -144,15 +165,20 @@ function charSize(section, charId) {
 function renderDecorativeLesson(content, images = {}, cast = {}) {
   const meta = content.meta || {};
   const chips = (meta.chips || []).map((c) => `<span><b>${esc(cleanHeading(c.label))}</b>${esc(cleanHeading(c.value))}</span>`).join('');
-  const headerHtml =
-    `<div class="lp-header">${headerBg()}${headerMotifs()}` +
+  const htext =
     `<h1>${esc(cleanHeading(meta.title))}</h1>` +
     (meta.subtitle ? `<div class="sub">${esc(cleanHeading(meta.subtitle))}</div>` : '') +
-    (chips ? `<div class="meta">${chips}</div>` : '') +
-    `</div>`;
+    (chips ? `<div class="meta">${chips}</div>` : '');
+  // A banner image (meta.banner → an image id) becomes the hero background with the
+  // title on a soft dark scrim; otherwise fall back to the warm gradient hero.
+  const bannerImg = meta.banner && images[meta.banner] && images[meta.banner].dataUri;
+  const headerHtml = bannerImg
+    ? `<div class="lp-header banner" style="background-image:url('${bannerImg}')"><div class="lp-htext">${htext}</div></div>`
+    : `<div class="lp-header">${headerBg()}${headerMotifs()}${htext}</div>`;
 
   // Track which images a section actually displays, so none are silently missing.
   const referenced = new Set();
+  if (meta.banner) referenced.add(meta.banner); // shown in the hero, not as a card
   for (const s of (content.sections || [])) if (s && s.type === 'images' && Array.isArray(s.imageIds)) s.imageIds.forEach((id) => referenced.add(id));
 
   // Characters are a FALLBACK only (R23): if this lesson already shows real content
@@ -180,9 +206,9 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
       const { h, w } = charSize(section, charId);
       const fig = `<div class="char-fig ${side}" style="width:${w}px"><img src="${cast[charId]}" alt="" style="max-height:${h}px"></div>`;
       const inner = side === 'left' ? `${fig}<div class="char-body">${body}</div>` : `<div class="char-body">${body}</div>${fig}`;
-      return `<section class="section">${head}<div class="panel has-char" style="--acc:var(${accent})">${inner}</div></section>`;
+      return `<section class="section">${head}<div class="panel has-char" style="border-color:var(${accent}-soft)">${inner}</div></section>`;
     }
-    return `<section class="section">${head}<div class="panel" style="--acc:var(${accent})">${body}</div></section>`;
+    return `<section class="section">${head}<div class="panel" style="border-color:var(${accent}-soft)">${body}</div></section>`;
   }).join('');
 
   // Safety net (R12): any generated image not shown by an images section is
@@ -194,7 +220,8 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     if (body2) extra = `<section class="section"><div class="panel">${body2}</div></section>`;
   }
 
-  const body = `<div class="body">${sections}${extra}</div>`;
+  const footer = meta.footer ? `<div class="lp-footer">${richText(String(meta.footer), {})}</div>` : '';
+  const body = `<div class="body">${sections}${extra}</div>${footer}`;
   // KaTeX-rendered math needs its stylesheet; MathJax output is self-contained SVG.
   const headCss = /class="katex"/.test(body) ? katexCss() : '';
   return { headerHtml, bodyHtml: body, headCss };
