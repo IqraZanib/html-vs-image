@@ -171,10 +171,18 @@ at the top as "current / total". Page flow must look clean:
   continuation page prints flush to the top edge and the page number overlaps the first
   section. (See `render/html-to-pdf.js`, `pageMode:'paged'`.)
 
-## R26 — Colour only for what matters
-Use colour to signal what is important — the title, section headings, and emphasis
-callouts (checkpoints, key notes). Keep everything else on a clean white ground. A
-page drowning in colour is harder to read than white with a few deliberate accents.
+## R26 — Colour only for what matters (one accent + neutrals)
+Use ONE accent colour, not a rotating palette — a page drowning in colour is harder to
+read than white with a few deliberate accents. The scheme:
+- **Section headings and their icon discs → light blue** (the single accent, `--brand`).
+  Disc icons are always monochrome white on the blue disc — never multicoloured.
+- **Bullets → grey** (both the text and the marker); they are content, not structure.
+- **Body / lead paragraphs under a heading → neutral dark ink, never coloured.**
+- **Sub-headings (colon-labels, note labels, Q&A questions, step labels) → near-black and bold**, not coloured.
+- **Chips / tags → neutral grey**; the callout note keeps only a thin light-blue left border.
+- **Hero → a single blue gradient** with soft white motifs (no rainbow of decorations).
+Everything else stays on a clean white/very-light ground. Do not reintroduce a
+per-section colour rotation. (See `decorative/theme.js` + `accentFor`.)
 
 ## R27 — No empty pages: fill the space smoothly
 Without touching anything else that already works, handle this situation: when a section —

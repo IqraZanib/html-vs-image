@@ -43,7 +43,7 @@ function renderBody(section, accent, images) {
     case 'bullets': {
       const km = section.marker || 'dot';
       const lis = (section.items || []).map((it, i) => {
-        const tag = it.tag ? `<span class="d-tag" style="background:${soft};color:var(${accent})">${esc(it.tag)}</span>` : '';
+        const tag = it.tag ? `<span class="d-tag" style="background:var(--grey-soft);color:var(--grey)">${esc(it.tag)}</span>` : '';
         return `<li data-mark="${esc(mark(km, i))}" style="background:#f6f8fc">${richText(it.text, { engine: section.engine })}${tag}</li>`;
       }).join('');
       const lead = section.lead ? `<div class="d-lead">${esc(section.lead)}</div>` : '';
@@ -52,18 +52,18 @@ function renderBody(section, accent, images) {
     case 'text':
       return `<div class="d-text">${richText(section.body, { engine: section.engine })}</div>`;
     case 'note': {
-      const nt = section.label ? `<span class="nt" style="color:var(${accent})">${esc(cleanHeading(section.label))}</span>` : '';
-      return `<div class="d-note" style="background:linear-gradient(90deg,${soft},#fff);border-inline-start:5px solid var(${accent})">${nt}${richText(section.body, { engine: section.engine })}</div>`;
+      const nt = section.label ? `<span class="nt" style="color:var(--ink)">${esc(cleanHeading(section.label))}</span>` : '';
+      return `<div class="d-note" style="background:linear-gradient(90deg,var(--brand-soft),#fff);border-inline-start:5px solid var(--brand)">${nt}${richText(section.body, { engine: section.engine })}</div>`;
     }
     case 'math':
       return `<div class="d-math">${(section.items || []).map((it) => `<div class="d-mrow">${it.label ? `<div class="d-mlabel">${esc(cleanHeading(it.label))}</div>` : ''}<div class="d-mformula">${renderMath(it.tex, { display: true, engine: section.engine })}</div></div>`).join('')}</div>`;
     case 'chips':
-      return `<div class="d-chips">${(section.items || []).map((c) => `<span class="d-chip" style="background:${soft};color:var(${accent})">${esc(cleanHeading(c))}</span>`).join('')}</div>`;
+      return `<div class="d-chips">${(section.items || []).map((c) => `<span class="d-chip" style="background:var(--grey-soft);color:var(--grey)">${esc(cleanHeading(c))}</span>`).join('')}</div>`;
     case 'steps':
       return `<div class="d-steps">${(section.items || []).map((s, i) => `<div class="d-step"><div class="n" style="background:var(${accent})">${i + 1}</div><div><div class="st-label">${richText(s.label, { engine: section.engine })}</div><div class="st-body">${richText(s.body, { engine: section.engine })}</div></div></div>`).join('')}</div>`;
     case 'qa': {
       const km = section.marker || 'alpha';
-      return `<div class="d-qa">${(section.items || []).map((qa, i) => `<div class="d-qc"><div class="d-q" data-mark="${esc(mark(km, i))}" style="color:var(${accent})">${richText(qa.q, { engine: section.engine })}</div>${qa.a ? `<div class="d-a">${richText(qa.a, { engine: section.engine })}</div>` : ''}</div>`).join('')}</div>`;
+      return `<div class="d-qa">${(section.items || []).map((qa, i) => `<div class="d-qc"><div class="d-q" data-mark="${esc(mark(km, i))}" style="color:var(--ink)">${richText(qa.q, { engine: section.engine })}</div>${qa.a ? `<div class="d-a">${richText(qa.a, { engine: section.engine })}</div>` : ''}</div>`).join('')}</div>`;
     }
     case 'fields':
       return `<div class="d-fields">${(section.items || []).map((f) => `<div class="d-field"><b>${esc(cleanHeading(f.label))}</b>${esc(f.value || '')}</div>`).join('')}</div>`;
