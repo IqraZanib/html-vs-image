@@ -10,6 +10,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { renderLessonImage } = require('../lp-render/pipeline');
 const { structureLesson } = require('../lp-render/structure');
+const { condenseToGuide } = require('../lp-render/condense');
 
 const ROOT = path.resolve(__dirname, '..');
 // Load the kie.ai key from the git-ignored .env-api if it isn't already in the env.
@@ -65,7 +66,7 @@ function handler(req, res) {
       const heartbeat = setInterval(() => { try { res.write(' '); } catch (_) { /* client gone */ } }, 15000);
       const finish = (obj) => { clearInterval(heartbeat); res.end(JSON.stringify(obj)); };
       try {
-        const { content, region } = JSON.parse(body);
+        const { content, region, guide2p } = JSON.parse(body);
         let parsed = null; let structured = null;
         // First, try to read the paste as a ready content JSON.
         if (typeof content !== 'string') parsed = content;
@@ -85,6 +86,18 @@ function handler(req, res) {
         // declares), 'default' = force the default theme, '<code>' = that design pack.
         if (region === 'default') { parsed.meta = { ...(parsed.meta || {}) }; delete parsed.meta.region; log('Region: forced default theme (picker).'); }
         else if (region) { parsed.meta = { ...(parsed.meta || {}), region }; log(`Region: "${region}" design pack (picker).`); }
+        // 2-page guide (default ON): condense the full lesson into the design sets'
+        // teacher-facing 12-role template before rendering. Content already in the
+        // guide shape passes through untouched.
+        const looksLikeGuide = Array.isArray(parsed.sections) && parsed.sections.some((x) => x && x.id === 'stage-tamhid');
+        if (guide2p && !looksLikeGuide) {
+          if (!process.env.KIE_API_KEY) throw new Error('The 2-page guide needs a kie.ai key for the condense step.');
+          log('Condensing the full lesson into the 2-page guide template…');
+          const keepRegion = parsed.meta && parsed.meta.region;
+          parsed = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log });
+          if (keepRegion) parsed.meta = { ...(parsed.meta || {}), region: keepRegion };
+          structured = JSON.stringify(parsed, null, 2);
+        }
         const { png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)
         // Keep every rendered lesson in the repo (pdf + png + the content JSON used).
         try {

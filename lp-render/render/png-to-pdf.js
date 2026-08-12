@@ -41,16 +41,15 @@ async function htmlToPixelPdf(html) {
       if (header) cuts.push(y(header, 'bottom'));
       document.querySelectorAll('.body > .section').forEach((sec) => {
         cuts.push(y(sec, 'bottom'));
-        // A card that carries a figure (in-panel illustration or character) is ATOMIC:
-        // offering cuts inside it lets the packer slice through the image — half on
-        // one page, half on the next. Such a section may only break at its bottom.
-        if (sec.querySelector('.panel.has-inline-img, .panel.has-char')) return;
-        // Legal inner boundaries — every block type the renderer emits, so no stretch
-        // of content is taller than a page without a cut candidate inside it.
+        // A card that carries a figure (in-panel illustration or character) must never
+        // be cut THROUGH the figure: inner boundaries are legal only BELOW the
+        // figure's bottom edge. Cards without figures offer all inner boundaries.
+        const fig = sec.querySelector('.d-inline-img, .char-fig');
+        const figBottom = fig ? y(fig, 'bottom') : -Infinity;
         sec.querySelectorAll(
           '.d-bullets > li, .d-steps > .d-step, .d-rubric > .rrow, .d-imgrow, .d-qa, ' +
           '.d-math > .d-mrow, .d-fields, .d-note, .d-text, .d-chips, .d-summary .srow'
-        ).forEach((item) => cuts.push(y(item, 'bottom')));
+        ).forEach((item) => { const b = y(item, 'bottom'); if (b > figBottom + 6) cuts.push(b); });
       });
       const footer = document.querySelector('.lp-footer');
       if (footer) { cuts.push(y(footer, 'top')); cuts.push(y(footer, 'bottom')); }
@@ -80,7 +79,7 @@ async function htmlToPixelPdf(html) {
 // into A4 pages cutting only at the supplied boundaries, page number on every page,
 // top margin band, pages filled (a long section continues overleaf), no blank tail.
 async function composeWithChromium(shotBuf, geom) {
-  const PAGE_H = 1123; const TOP = 34; const BOT = 16;
+  const PAGE_H = 1123; const TOP = 28; const BOT = 12;
   const usable = PAGE_H - TOP - BOT;
   const height = Math.ceil(geom.height);
   const cuts = [...new Set((geom.cuts || []).map((c) => Math.round(c)))].sort((a, b) => a - b)

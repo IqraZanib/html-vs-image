@@ -67,7 +67,7 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 .panel.has-inline-img{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
 .panel.has-inline-img .ii-body{flex:1 1 55%;min-width:0}
 .d-inline-img{flex:0 0 34%;max-width:270px;border:1.5px solid #fff;border-radius:10px;background:#fff;box-shadow:0 2px 8px rgba(20,30,60,.10)}
-.d-inline-img img{background:#fff;max-height:150px}
+.d-inline-img img{background:#fff;max-height:136px}
 .d-inline-img .cap{background:#fff;color:var(--muted);border-top:1px solid var(--line);font-size:10.5px;padding:4px 8px}
 
 /* stage steps: no numbered circles; the LAST item is the amber checkpoint strip */
