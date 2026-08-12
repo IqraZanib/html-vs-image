@@ -51,8 +51,8 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 .hbwrap,.deco{display:none}
 
 /* rhythm */
-.body{padding:8px 22px 2px}
-.section{margin:0 0 6px}
+.body{padding:6px 22px 2px}
+.section{margin:0 0 5px}
 
 /* section anatomy: the title sits ON the card; white pill carries time + GRR marker */
 .s-head{position:relative;gap:8px;margin:0 0 -32px;z-index:2;padding:0 14px;align-items:center;height:32px}
@@ -61,24 +61,24 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 .s-ic{display:none}
 .s-time{position:static;margin-inline-start:auto;background:#fff;border:1px solid var(--line);
   color:var(--navy);font-weight:700;font-size:11px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
-.panel{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:34px 15px 9px;box-shadow:none}
+.panel{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:33px 15px 7px;box-shadow:none}
 
 /* in-card figures: HERO-sized like the pilot — the illustration IS the card's
    main content and the text is the sidebar, not the other way round. Labels
    inside the image must stay readable at print size. */
 .panel.has-inline-img{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-.panel.has-inline-img .ii-body{flex:1 1 46%;min-width:0}
-.d-inline-img{flex:0 0 47%;max-width:380px;border:1.5px solid #fff;border-radius:10px;background:#fff;box-shadow:0 2px 8px rgba(20,30,60,.10)}
-.d-inline-img img{background:#fff;max-height:174px}
-.d-inline-img .cap{background:#fff;color:var(--muted);border-top:1px solid var(--line);font-size:10.5px;padding:4px 8px}
+.panel.has-inline-img .ii-body{flex:1 1 40%;min-width:0}
+.d-inline-img{flex:0 0 54%;max-width:424px;border:1.5px solid #fff;border-radius:10px;background:#fff;box-shadow:0 2px 8px rgba(20,30,60,.10)}
+.d-inline-img img{background:#fff;max-height:215px}
+.d-inline-img .cap{background:#fff;color:var(--muted);border-top:1px solid var(--line);font-size:10.5px;padding:3px 8px}
 
 /* stage steps: no numbered circles; the LAST item is the amber checkpoint strip */
-.d-steps{gap:6px}
+.d-steps{gap:4px}
 .d-step{background:transparent;border:0;padding:2px 0}
 .d-step .n{display:none}
 .d-step .st-label{color:var(--navy);font-size:13.5px}
 .d-step .st-body{font-size:13.5px;line-height:1.55}
-.d-step:last-child{background:var(--cream);border:1px solid var(--cream-line);border-radius:9px;padding:7px 11px;flex-basis:100%}
+.d-step:last-child{background:var(--cream);border:1px solid var(--cream-line);border-radius:9px;padding:5px 10px;flex-basis:100%}
 .d-step:last-child .st-label{color:#8a6d1d}
 .d-step:last-child .st-label::before{content:"✔ "}
 
@@ -94,7 +94,7 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 .d-qc .d-a{color:var(--ink);font-size:13.5px;line-height:1.55}
 .d-qc .d-a::before{content:""}
 .d-note{border-radius:10px;padding:9px 13px;font-size:14px}
-.d-bullets li{font-size:13.5px;line-height:1.5}
+.d-bullets li{font-size:13.5px;line-height:1.44}
 
 /* ── template ROLE map — order-independent via sec-<id> classes (see DESIGN.md).
       Sections without contract ids get only the base skin above. ── */
@@ -102,7 +102,7 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 .section.sec-lesson-line .panel{background:transparent;border:0;box-shadow:none;padding:2px 4px 0}
 .section.sec-lesson-line .d-text{font-size:13.5px;font-weight:700;color:var(--navy)}
 .section.sec-goal .s-head{display:none}
-.section.sec-goal .panel{border:2px solid var(--c-teal);background:#fff;padding:12px 16px}
+.section.sec-goal .panel{border:2px solid var(--c-teal);background:#fff;padding:10px 15px}
 .section.sec-goal .d-note{background:none !important;border:0 !important;color:var(--ink);padding:0;font-size:14px}
 .section.sec-goal .d-note .nt{display:none}
 .section.sec-goal .d-note b{color:var(--c-teal-ink)}
@@ -127,7 +127,7 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 .section.sec-stage-tatbiq .s-title{color:var(--c-green-ink)}
 /* practice/assessment figures a notch smaller than the intro heroes: keeps the
    guide to its 2-page promise while every card stays figure-led */
-.section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:156px}
+.section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:190px}
 .section.sec-stage-tatbiq .panel{background:#e9f2e5;border-color:#cde3c5}
 .section.sec-stage-taqwim .s-title{color:#8a6d1d}
 .section.sec-stage-taqwim .panel{background:var(--cream);border-color:var(--cream-line)}
