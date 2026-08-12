@@ -460,5 +460,208 @@
     "model": "gpt-image-2-text-to-image",
     "concept": "diagram",
     "prompt": "Labelled diagram showing Roman numerals I to X matched with numbers 1 to 10."
+  },
+  "ef17c1c947822f74": {
+    "file": "ef17c1c947822f74.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "a clear educational labeled diagram of the water cycle for a Grade 3 Science lesson: sun shining over a lake, arrows showing evaporation rising, condensation forming clouds, precipitation falling as rain, and collection into a river flowing back to the lake, each stage labelled in simple English (Evaporation, Condensation, Precipitation, Collection), flat infographic style, bright friendly colours, plain background"
+  },
+  "0ffd71241f29098f": {
+    "file": "0ffd71241f29098f.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "a simple educational illustration for Grade 3 Science showing rain falling from grey clouds onto green hills and filling a small river, a village school building in the background, flat illustration style, bright friendly colours, no text labels, plain background"
+  },
+  "32206ed6f44d2bc6": {
+    "file": "32206ed6f44d2bc6.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "a clear educational labeled diagram of the water cycle for a Grade 3 Science lesson in Kiswahili: sun shining over a lake, arrows showing evaporation rising, condensation forming clouds, rain falling, and collection into a river flowing back to the lake, each stage labelled in simple Kiswahili exactly as follows: Mvukizo (evaporation), Mgando (condensation), Mvua (rain), Mkusanyiko (collection), flat infographic style, bright friendly colours, plain background, correct Kiswahili spelling"
+  },
+  "f79caae75225b282": {
+    "file": "f79caae75225b282.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "a simple educational labeled illustration for a Grade 3 Science lesson in Kenya showing rain falling from grey clouds onto green hills and filling a small river, a rural Kenyan village school building with a red roof in the background, acacia trees, with simple Kiswahili labels pointing to each part exactly as follows: Mawingu (clouds), Mvua (rain), Milima (hills), Mto (river), flat illustration style, bright friendly colours, correct Kiswahili spelling, plain background"
+  },
+  "05ad212c3d623c4f": {
+    "file": "05ad212c3d623c4f.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "an educational labeled illustration of a Tanzanian primary school classroom: smiling pupils at wooden desks counting small sticks tied into bundles with string, a friendly teacher pointing at bundles on a table, with simple Kiswahili labels exactly as follows: Fungu la Vijiti (bundle of sticks), Vijiti (loose sticks), Mwalimu (teacher), flat illustration style, bright friendly colours, correct Kiswahili spelling, plain background"
+  },
+  "9df2e5adf9f8f0d8": {
+    "file": "9df2e5adf9f8f0d8.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أسرة يمنية تضم أباً وأماً وثلاثة أطفال: أحمد وسبأ وإيمان، في مشهد عائلي يساعد الطلاب على التعرف على أفراد الأسرة."
+  },
+  "50ec055ba93df691": {
+    "file": "50ec055ba93df691.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي لأب وأم وطفل وطفلتين، مع بطاقات الكلمات: أبي، أمي، أحمد، سبأ، إيمان، وأسهم واضحة للمطابقة، مع كل الكلمات والملصقات داخل الصورة مكتوبة بالعربية."
+  },
+  "b3bcc241c8975ea0": {
+    "file": "b3bcc241c8975ea0.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "مخطط تعليمي على السبورة يوضح الكلمات أَبِي، أُمِّي، أَحْمَد، سَبَأ، إِيمَان مع تفكيك كل كلمة إلى حروفها وعدد الحروف، مع كل الكلمات والعناوين داخل الصورة مكتوبة بالعربية."
+  },
+  "54a2bfd27e1b9b26": {
+    "file": "54a2bfd27e1b9b26.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في الصف الأول الأساسي ينظرون إلى صفحة 32 من كتاب الطالب، مع صور أبي وأمي وأحمد وسبأ وإيمان أمامهم."
+  },
+  "f8c3d8daebf56125": {
+    "file": "f8c3d8daebf56125.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي لعائلة تضم أباً وأماً وطفلاً وطفلتين، مع كل فرد مرتبط بالكلمة المناسبة: أبي، أمي، أحمد، سبأ، إيمان. جميع الكلمات داخل الصورة مكتوبة بالعربية."
+  },
+  "3901f9f46184bdf3": {
+    "file": "3901f9f46184bdf3.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي لعائلة مع صور رجل وامرأة وطفل وبنتين، مع كل صورة مرتبطة بكلمة عربية مكتوبة: أَبِي، أُمِّي، أَحْمَد، سَبَأ، إِيمَان. تكون الكلمات والملصقات داخل الصورة باللغة العربية."
+  },
+  "d7b4976e5bdaab31": {
+    "file": "d7b4976e5bdaab31.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "صور بسيطة لأفراد أسرة: أب، أم، طفل، طفلتان، مع الكلمات أبي، أمي، أحمد، سبأ، إيمان، وكل صورة مرتبطة بالكلمة الصحيحة، مع كل الكلمات والعناوين داخل الصورة باللغة العربية"
+  },
+  "ab3d9e670c60bdbf": {
+    "file": "ab3d9e670c60bdbf.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Pakistani Grade 1 students counting 5 stones together aloud."
+  },
+  "5070de4281e254ca": {
+    "file": "5070de4281e254ca.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في الصف الأول في فصل دراسي ينظرون إلى صفحة 32 في كتابهم، مع صور أبي وأمي وأحمد وسبأ وإيمان، ويشاركون في نشاط التعرف على أفراد الأسرة."
+  },
+  "2fc6d8b8c187352b": {
+    "file": "2fc6d8b8c187352b.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي لعائلة تتكون من أب وأم وطفل وطفلتين، مع كل فرد مرتبط بالكلمة المناسبة: أبي، أمي، أحمد، سبأ، إيمان. يجب أن تكون جميع الكلمات الظاهرة داخل الصورة باللغة العربية."
+  },
+  "8ea3413d5a570e1a": {
+    "file": "8ea3413d5a570e1a.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "صور رجل وامرأة وطفل وطفلتان مع كلمات الأسرة أبي، أمي، أحمد، سبأ، إيمان مرتبطة بالصور، مع كل كلمة مكتوبة باللغة العربية."
+  },
+  "a409eeb1b7585ff4": {
+    "file": "a409eeb1b7585ff4.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي لأفراد أسرة يوضح الأب والأم وأحمد وسبأ وإيمان، مع كل فرد مرفقاً بتسمية عربية واضحة: أبي، أمي، أحمد، سبأ، إيمان. يجب أن تكون جميع الكلمات الظاهرة داخل الصورة باللغة العربية."
+  },
+  "084d9aed8373a080": {
+    "file": "084d9aed8373a080.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "سبورة تعليمية تعرض كلمات أُسْرَتِي: أَبِي، أُمِّي، أَحْمَد، سَبَأ، إِيمَان، مع تفكيك كل كلمة إلى حروفها وعدد الحروف، وكل جزء مُسمّى باللغة العربية."
+  },
+  "55fc15090220c948": {
+    "file": "55fc15090220c948.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رجل، امرأة، طفل، بنتان، مع الكلمات العربية أَحْمَد، أَبِي، أُمِّي، سَبَأ، إِيمَان، مع كل صورة وكلمتها الدالة عليها، وكل الكلمات والملصقات داخل الصورة مكتوبة بالعربية."
+  },
+  "bfb4117f8b4671c7": {
+    "file": "bfb4117f8b4671c7.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "بطاقتان كبيرتان مكتوب عليهما بخط النسخ الواضح: أَحْمَد على البطاقة الأولى و سَبَأ على البطاقة الثانية، ويد طفل تشير إلى بطاقة أَحْمَد، رسم توضيحي مسطح بسيط بألوان دافئة، كل النص بالعربية فقط وبإملاء صحيح"
+  },
+  "6b0f8ccd484ad50a": {
+    "file": "6b0f8ccd484ad50a.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "سبورة خضراء بسيطة وعليها خمس بطاقات بيضاء، على كل بطاقة كلمة واحدة بخط النسخ الكبير الواضح: أَبِي، أُمِّي، أَحْمَد، سَبَأ، إِيمَان، رسم مسطح بسيط، كل النص بالعربية بإملاء صحيح"
+  },
+  "caafb799622bc033": {
+    "file": "caafb799622bc033.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "تمرين وصل بسيط لصف أول: عمود فيه ثلاث كلمات بخط النسخ الواضح: أَبِي، أُمِّي، أَحْمَد، وعمود مقابل فيه ثلاث صور بسيطة: رجل، امرأة، طفل، وخطوط تصل كل كلمة بصورتها الصحيحة، رسم مسطح بألوان دافئة، كل النص بالعربية بإملاء صحيح"
+  },
+  "c0dbd1dfed0cdf5c": {
+    "file": "c0dbd1dfed0cdf5c.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في الصف الثاني الأساسي يمدّون خيوطًا صغيرة بشكل مستقيم بين أيديهم ثم يتركونها تتدلى لتصبح متعرجة، مع معلم يوجّه النشاط."
+  },
+  "4230cc5ef8e74a70": {
+    "file": "4230cc5ef8e74a70.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي يوضح مجسم المكعب ومجسم المخروط، مع كل مجسم مبيّن بوضوح وموسوم باللغة العربية: المكعب، المخروط."
+  },
+  "804eae4a89c11a85": {
+    "file": "804eae4a89c11a85.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي يوضح القطعة المستقيمة والقطعة غير المستقيمة والشكل الرباعي باستخدام نقاط وخطوط وأضلاع، مع كل التسميات باللغة العربية."
+  },
+  "d38defee5cc620ba": {
+    "file": "d38defee5cc620ba.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي يوضح مكعبًا ومخروطًا مع توضيح الوجوه المسطحة والقاعدة الدائرية والرأس المدبب، مع كل التسميات باللغة العربية."
+  },
+  "98a9ae70d008a768": {
+    "file": "98a9ae70d008a768.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في فصل دراسي يطبقون تمارين الأشكال الهندسية والقطع المستقيمة باستخدام المسطرة والنقاط على الورقة والسبورة."
+  },
+  "6ebb82f7eb565389": {
+    "file": "6ebb82f7eb565389.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Diagram showing a straight line segment between two points and a quadrilateral formed by four straight sides, with each part labelled in Arabic: القطعة المستقيمة، الشكل الرباعي."
+  },
+  "8373aba8a7b1c227": {
+    "file": "8373aba8a7b1c227.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Diagram showing a cube and a cone, with each shape labelled in Arabic: المكعب، المخروط، قاعدة دائرية، رأس مدبب."
   }
 }
