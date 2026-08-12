@@ -41,7 +41,16 @@ async function htmlToPixelPdf(html) {
       if (header) cuts.push(y(header, 'bottom'));
       document.querySelectorAll('.body > .section').forEach((sec) => {
         cuts.push(y(sec, 'bottom'));
-        sec.querySelectorAll('.d-bullets > li, .d-steps > .d-step, .d-rubric > .rrow').forEach((item) => cuts.push(y(item, 'bottom')));
+        // A card that carries a figure (in-panel illustration or character) is ATOMIC:
+        // offering cuts inside it lets the packer slice through the image — half on
+        // one page, half on the next. Such a section may only break at its bottom.
+        if (sec.querySelector('.panel.has-inline-img, .panel.has-char')) return;
+        // Legal inner boundaries — every block type the renderer emits, so no stretch
+        // of content is taller than a page without a cut candidate inside it.
+        sec.querySelectorAll(
+          '.d-bullets > li, .d-steps > .d-step, .d-rubric > .rrow, .d-imgrow, .d-qa, ' +
+          '.d-math > .d-mrow, .d-fields, .d-note, .d-text, .d-chips, .d-summary .srow'
+        ).forEach((item) => cuts.push(y(item, 'bottom')));
       });
       const footer = document.querySelector('.lp-footer');
       if (footer) { cuts.push(y(footer, 'top')); cuts.push(y(footer, 'bottom')); }
