@@ -1,41 +1,25 @@
 'use strict';
-// Yemen region theme v4 — full anatomy replication of the approved BLN pilot
-// ("دليل الدرس اليومي", card PROJ-044): thin ministry header strip (no chips), goal
-// text inside a single teal band, خطأ/صواب twins with no heading band + caption line,
-// compact right-anchored stage tabs with FIXED per-stage colours (coral/blue/green/navy
-// — the design set assigns colours by stage, it does not rotate), amber تحقق strips,
-// framed in-card figures, and a full-width footer band. Requires the Yemen guide
-// template section ORDER (see the nth-of-type map below) — reorder sections and the
-// stage colours shift. Loaded only when meta.region === 'ye'; default theme untouched.
-
-// Cairo — the geometric Arabic sans the approved pilot is set in. Embedded from
-// @fontsource/cairo when installed; silently absent otherwise (fonts then fall back
-// to the default Noto Naskh, so machines without the package still render).
+// Yemen region design pack — the definitive theme (single source, no patch layers).
+// Reference: the approved BLN pilot "دليل الدرس اليومي" (card PROJ-044), replicated by
+// measurement (pixel-sampled colours; specimen-selected typography) through Iqra's
+// review rounds of 2026-08-12. Content contract (section ids) in DESIGN.md.
 const fs = require('node:fs');
 const path = require('node:path');
-let CAIRO_FACES = '';
-// Typography: IBM Plex Sans Arabic (reviewer-selected against the pilot from a
-// 5-font specimen). Embedded when the package is installed; silently falls back
-// to Noto Naskh otherwise.
+
+// Typography: IBM Plex Sans Arabic (reviewer-selected). Embedded when the package is
+// installed; silently falls back to Noto Naskh otherwise.
+let FONT_FACES = '';
 try {
-  const nm = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '@fontsource');
-  for (const [family, pkg, weights] of [
-    ['IBM Plex Sans Arabic', 'ibm-plex-sans-arabic', [400, 500, 700]],
-  ]) {
-    const dir = path.join(nm, pkg, 'files');
-    for (const w of weights) {
-      const f = fs.readdirSync(dir).find((x) => x.match(new RegExp(`arabic-${w}-normal\\.woff2$`)));
-      if (f) CAIRO_FACES += `@font-face{font-family:'${family}';font-weight:${w};font-display:swap;src:url(data:font/woff2;base64,${fs.readFileSync(path.join(dir, f)).toString('base64')}) format('woff2');}`;
-    }
+  const dir = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '@fontsource', 'ibm-plex-sans-arabic', 'files');
+  for (const w of [400, 500, 700]) {
+    const f = fs.readdirSync(dir).find((x) => x.endsWith('arabic-' + w + '-normal.woff2'));
+    if (f) FONT_FACES += "@font-face{font-family:'IBM Plex Sans Arabic';font-weight:" + w +
+      ";font-display:swap;src:url(data:font/woff2;base64," +
+      fs.readFileSync(path.join(dir, f)).toString('base64') + ") format('woff2');}";
   }
-} catch (_) { /* packages not installed — keep default fonts */ }
+} catch (_) { /* package not installed — default fonts apply */ }
 
-const THEME_OVERRIDE_CSS = CAIRO_FACES + `
-/* the pilot is set in Cairo (geometric Arabic sans), not Naskh */
-body, .s-title, .lp-header h1, .d-step .st-label, .d-q, .d-note, .d-text, .d-bullets li,
-.d-field, .d-chip, .st-body, .d-a, .d-img .cap, .d-inline-img .cap, .lp-footer, .s-time{
-  font-family:'Cairo','Noto Naskh Arabic','Noto Sans',sans-serif}
-
+const THEME_OVERRIDE_CSS = FONT_FACES + `
 :root{
   --c-amber:#e3a23c; --c-amber-ink:#9a6a12; --c-amber-soft:#fcf0d8;
   --c-red:#e0705a;   --c-red-ink:#c0392b;   --c-red-soft:#fbdfdf;
@@ -46,53 +30,57 @@ body, .s-title, .lp-header h1, .d-step .st-label, .d-q, .d-note, .d-text, .d-bul
   --cream:#fcf0d8; --cream-line:#ecd9a0;
   --ink:#1f2a44; --muted:#6b7280; --line:#e5e7eb;
 }
-/* measured: the pilot page ground is WHITE, cards are white/tinted with borders */
-body{background:#fcfcfc}
+/* measured: WHITE page ground; IBM Plex everywhere */
+body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','Noto Sans',sans-serif}
 .sheet{background:#fcfcfc}
+.s-title,.lp-header h1,.lp-header .sub,.d-step .st-label,.d-q,.d-note,.d-text,.d-bullets li,
+.d-field,.d-chip,.st-body,.d-a,.d-img .cap,.d-inline-img .cap,.lp-footer,.s-time{
+  font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','Noto Sans',sans-serif}
 
-/* header: measured #182448 navy — big title one side, ministry lines the other.
-   The design set has NO hero banner: banner mode is suppressed (navy strip always). */
-.lp-header.banner{background-image:none !important;min-height:0;display:flex}
-.lp-header.banner::after{display:none}
-.lp-header.banner .lp-htext{position:static;padding:0;display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%}
-
-.lp-header{background:var(--navy);border-radius:0;border-bottom:0;padding:24px 28px 22px;min-height:78px;
-  display:flex;align-items:center;justify-content:space-between;gap:16px}
-.lp-header h1{font-size:21px;font-weight:800;margin:0;text-shadow:none;order:1;white-space:nowrap}
+/* header: #182448 ministry strip (~78px) — title at RTL start, ministry lines opposite.
+   The design set has NO hero banner: banner mode is suppressed. */
+.lp-header{background:var(--navy);border-radius:0;border-bottom:4px solid #e3a23c;
+  padding:24px 28px 22px;min-height:78px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.lp-header h1{font-size:25px;font-weight:700;margin:0;text-shadow:none;order:1;white-space:nowrap}
 .lp-header .sub{font-size:12px;font-weight:600;opacity:.92;margin:0;text-shadow:none;order:2;text-align:start;line-height:1.7;max-width:60%}
 .lp-header .meta{display:none}
+.lp-header.banner{background-image:none !important;min-height:78px;padding:24px 28px 22px}
+.lp-header.banner::after{display:none}
+.lp-header.banner .lp-htext{position:static;padding:0;display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%}
+.lp-header.banner h1{white-space:normal;font-size:19px;line-height:1.45}
 .hbwrap,.deco{display:none}
 
+/* rhythm */
 .body{padding:12px 22px 2px}
-.section{margin:0 0 10px}
+.section{margin:0 0 9px}
 
-/* section title sits ON the card (pilot anatomy): transparent head row overlapping */
+/* section anatomy: the title sits ON the card; white pill carries time + GRR marker */
 .s-head{position:relative;gap:8px;margin:0 0 -34px;z-index:2;padding:0 14px;align-items:center;height:34px}
 .s-tab{flex:0 1 auto;background:transparent !important;box-shadow:none;padding:6px 2px}
-.s-title{font-size:15px;font-weight:800}
+.s-title{font-size:15px;font-weight:700}
 .s-ic{display:none}
 .s-time{position:static;margin-inline-start:auto;background:#fff;border:1px solid var(--line);
-  color:var(--navy);font-weight:800;font-size:11px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
-.panel{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:40px 16px 12px;box-shadow:none}
+  color:var(--navy);font-weight:700;font-size:11px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.panel{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:38px 15px 11px;box-shadow:none}
 
-/* stage interiors: white inner cards on the tinted stage card */
+/* in-card figures: white inner frames on the tinted stage cards */
 .panel.has-inline-img{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
 .panel.has-inline-img .ii-body{flex:1 1 55%;min-width:0}
-.d-inline-img{flex:0 0 36%;max-width:270px;border:1.5px solid #fff;border-radius:10px;background:#fff;box-shadow:0 2px 8px rgba(20,30,60,.10)}
-.d-inline-img img{background:#fff;max-height:160px}
+.d-inline-img{flex:0 0 34%;max-width:270px;border:1.5px solid #fff;border-radius:10px;background:#fff;box-shadow:0 2px 8px rgba(20,30,60,.10)}
+.d-inline-img img{background:#fff;max-height:150px}
 .d-inline-img .cap{background:#fff;color:var(--muted);border-top:1px solid var(--line);font-size:10.5px;padding:4px 8px}
 
+/* stage steps: no numbered circles; the LAST item is the amber checkpoint strip */
 .d-steps{gap:6px}
 .d-step{background:transparent;border:0;padding:2px 0}
 .d-step .n{display:none}
 .d-step .st-label{color:var(--navy);font-size:13.5px}
 .d-step .st-body{font-size:13.5px;line-height:1.55}
-/* تحقق strip: measured amber tint #fcf0d8, white pill feel */
 .d-step:last-child{background:var(--cream);border:1px solid var(--cream-line);border-radius:9px;padding:7px 11px;flex-basis:100%}
 .d-step:last-child .st-label{color:#8a6d1d}
 .d-step:last-child .st-label::before{content:"✔ "}
 
-/* أخطاء شائعة twins: white cards, coloured borders + centred coloured headers */
+/* twins: white cards, coloured borders, centred coloured headers */
 .d-qa{grid-template-columns:1fr 1fr;gap:10px}
 .d-qc{border-radius:12px;padding:10px 12px;background:#fff}
 .d-qc:first-child{border:2px solid var(--c-red)}
@@ -104,13 +92,10 @@ body{background:#fcfcfc}
 .d-qc .d-a{color:var(--ink);font-size:13.5px;line-height:1.55}
 .d-qc .d-a::before{content:""}
 .d-note{border-radius:10px;padding:9px 13px;font-size:14px}
-.d-bullets li{font-size:13.5px;line-height:1.55}
+.d-bullets li{font-size:13.5px;line-height:1.5}
 
-/* ── template ROLE map — order-independent: sections are targeted by their id
-      (rendered as a sec-<id> class). The Yemen content contract (DESIGN.md):
-      lesson-line · goal · errors · errors-caption · stage-tamhid · stage-arad ·
-      stage-tatbiq · stage-taqwim · solutions · glossary · multigrade · homework.
-      Sections without these ids get the base Yemen skin only. ── */
+/* ── template ROLE map — order-independent via sec-<id> classes (see DESIGN.md).
+      Sections without contract ids get only the base skin above. ── */
 .section.sec-lesson-line .s-head{display:none}
 .section.sec-lesson-line .panel{background:transparent;border:0;box-shadow:none;padding:2px 4px 0}
 .section.sec-lesson-line .d-text{font-size:13.5px;font-weight:700;color:var(--navy)}
@@ -152,7 +137,7 @@ body{background:#fcfcfc}
 .d-field{font-size:13px}
 .d-field b{font-size:9px}
 
-/* footer: plain thin-rule line (measured — the pilot has NO dark footer band) */
+/* footer: plain thin navy rule (the design set has NO dark footer band) */
 .lp-footer{margin:12px 22px 0;padding:8px 4px 0;background:none;border-top:1.5px solid var(--navy);
   color:var(--navy);font-size:10.5px;text-align:center;font-weight:700}
 .lp-footer b{color:var(--navy)}
