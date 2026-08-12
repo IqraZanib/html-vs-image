@@ -91,6 +91,17 @@ async function renderLessonImage(content, opts = {}) {
       blocks: toGen.map(({ im }) => ({ type: CONCEPT_TO_BLOCK[im.concept] || 'HOOK_STORY', text: im.prompt, characters: im.characters, model: im.model })),
     };
     const { images } = await resolveSegmentImages(segment, { apiKey, region: segment.region, gatePolicy });
+    // One retry pass for gate-dropped figures only: every generation is a fresh
+    // sample, so a second roll rescues most first-pass drops (batch runs showed
+    // ~50% first-pass drop rates). Additive and region-neutral: nothing changes
+    // when the first pass passed everything.
+    const failedIdx = toGen.map((_, i) => i).filter((i) => !(images[i] && images[i].asset && images[i].asset.url));
+    if (failedIdx.length) {
+      log(`  ↻ retrying ${failedIdx.length} gate-dropped image(s) once…`);
+      const retrySeg = { ...segment, blocks: failedIdx.map((i) => segment.blocks[i]) };
+      const { images: retryImages } = await resolveSegmentImages(retrySeg, { apiKey, region: segment.region, gatePolicy });
+      failedIdx.forEach((origI, k) => { if (retryImages[k] && retryImages[k].asset && retryImages[k].asset.url) images[origI] = retryImages[k]; });
+    }
     for (let i = 0; i < toGen.length; i++) {
       const { im, key } = toGen[i]; const got = images[i];
       if (got && got.asset && got.asset.url) {
