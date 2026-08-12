@@ -96,20 +96,41 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
       return it;
     }).filter((it) => it && (it.text || it.body || it.q || it.value || it.label));
   }
-  // Guard the image cache: only keep images whose prompts exist VERBATIM in the source.
-  const srcPrompts = new Set((content.images || []).map((im) => im.prompt));
-  out.images = (out.images || []).filter((im) => srcPrompts.has(im.prompt));
-  const okIds = new Set(out.images.map((im) => im.id));
-  for (const s of out.sections) if (s && s.image && !okIds.has(s.image)) delete s.image;
-  // One figure per stage, no repeats — a duplicated figure teaches nothing twice.
+  // Images are handled DETERMINISTICALLY from the source: the model may pick ids
+  // (via section.image) but code owns the outcome — every kept entry is copied
+  // from the source byte-for-byte (asset-store cache always hits), one figure per
+  // stage with no repeats, and stages the model left bare are auto-assigned:
+  // scenes suit التمهيد, labelled diagrams suit the teaching stages.
+  const srcById = new Map((content.images || []).map((im) => [im.id, im]));
   const seenIm = new Set();
+  const rebuilt = [];
   for (const s of out.sections) {
     if (!s || !s.image) continue;
-    if (seenIm.has(s.image)) delete s.image; else seenIm.add(s.image);
+    const src = srcById.get(s.image);
+    if (!src || seenIm.has(s.image)) { delete s.image; continue; }
+    seenIm.add(s.image);
+    rebuilt.push({ id: src.id, concept: src.concept, label: src.label, prompt: src.prompt });
   }
-  // Drop images no stage references — unreferenced ones would be auto-appended (R12).
-  const used = new Set(out.sections.map((s) => s && s.image).filter(Boolean));
-  out.images = out.images.filter((im) => used.has(im.id));
+  if (srcById.size) {
+    const remaining = (content.images || []).filter((im) => !seenIm.has(im.id));
+    const pick = (pred) => { const i = remaining.findIndex(pred); return i < 0 ? null : remaining.splice(i, 1)[0]; };
+    for (const id of ['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim']) {
+      const sec = out.sections.find((x) => x && x.id === id);
+      if (!sec || sec.image) continue;
+      const im = id === 'stage-tamhid'
+        ? (pick((x) => x.concept === 'scene') || pick(() => true))
+        : (pick((x) => x.concept === 'diagram') || pick(() => true));
+      if (!im) break;
+      sec.image = im.id;
+      rebuilt.push({ id: im.id, concept: im.concept, label: im.label, prompt: im.prompt });
+    }
+    out.images = rebuilt;
+  } else {
+    // Source had no images: allow the model's own (deduped), referenced ones only.
+    const used = new Set(out.sections.map((s) => s && s.image).filter(Boolean));
+    const seen2 = new Set();
+    out.images = (out.images || []).filter((im) => im && used.has(im.id) && !seen2.has(im.id) && seen2.add(im.id));
+  }
   if (out.meta) delete out.meta.banner;
   log(`Condensed to the 2-page guide: ${out.sections.length} sections, ${out.images.length} reused image(s).`);
   return out;
