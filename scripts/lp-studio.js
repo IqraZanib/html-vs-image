@@ -33,13 +33,39 @@ function handler(req, res) {
     try { return send(res, 200, 'application/json', fs.readFileSync(SAMPLE_FILE, 'utf8')); }
     catch (_) { return send(res, 404, 'application/json', '{}'); }
   }
+  if (req.method === 'GET' && req.url === '/regions') {
+    // Region design packs on disk (decorative/regions/<code>/theme.js) — the picker
+    // lists them automatically, so a new pack shows up with no Studio change.
+    const dir = path.join(ROOT, 'lp-render/decorative/regions');
+    let regions = [];
+    try {
+      regions = fs.readdirSync(dir).filter((r) => fs.existsSync(path.join(dir, r, 'theme.js'))).sort()
+        .map((code) => {
+          let name = code.toUpperCase();
+          try {
+            const themePath = require.resolve(path.join(dir, code, 'theme.js'));
+            delete require.cache[themePath];
+            name = require(themePath).REGION_NAME || name;
+          } catch (_) { /* stub without name — code is fine */ }
+          return { code, name };
+        });
+    } catch (_) { /* no regions dir — empty list */ }
+    return send(res, 200, 'application/json', JSON.stringify({ regions }));
+  }
   if (req.method === 'POST' && req.url === '/render') {
     let body = '';
     req.on('data', (d) => { body += d; if (body.length > 5e6) req.destroy(); });
     req.on('end', async () => {
       const logs = []; const log = (m) => logs.push(m);
+      // Proxies and tunnels (Cloudflare et al) kill a response that stays silent for
+      // ~100s, while structure+render+imagegen can take minutes. Send the headers now
+      // and a whitespace heartbeat until the JSON is ready — leading whitespace is
+      // valid JSON, so the client's res.json() parses exactly as before.
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      const heartbeat = setInterval(() => { try { res.write(' '); } catch (_) { /* client gone */ } }, 15000);
+      const finish = (obj) => { clearInterval(heartbeat); res.end(JSON.stringify(obj)); };
       try {
-        const { content } = JSON.parse(body);
+        const { content, region } = JSON.parse(body);
         let parsed = null; let structured = null;
         // First, try to read the paste as a ready content JSON.
         if (typeof content !== 'string') parsed = content;
@@ -55,6 +81,10 @@ function handler(req, res) {
           structured = JSON.stringify(parsed, null, 2);
           log('Structured the input into a content JSON (kept its own words).');
         }
+        // Region override from the Studio picker: '' = auto (whatever the content
+        // declares), 'default' = force the default theme, '<code>' = that design pack.
+        if (region === 'default') { parsed.meta = { ...(parsed.meta || {}) }; delete parsed.meta.region; log('Region: forced default theme (picker).'); }
+        else if (region) { parsed.meta = { ...(parsed.meta || {}), region }; log(`Region: "${region}" design pack (picker).`); }
         const { png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)
         // Keep every rendered lesson in the repo (pdf + png + the content JSON used).
         try {
@@ -66,14 +96,14 @@ function handler(req, res) {
           fs.writeFileSync(`${base}.json`, JSON.stringify(parsed, null, 2));
           log(`Saved to assets/generated/lessons/${contentId}.${locale || 'en'}.{pdf,png,json}`);
         } catch (e) { log(`(could not save to repo: ${e.message})`); }
-        send(res, 200, 'application/json', JSON.stringify({
+        finish({
           ok: true,
           png: 'data:image/png;base64,' + png.toString('base64'),
           pdf: pdf ? 'data:application/pdf;base64,' + pdf.toString('base64') : null,
           logs, stats, structured,
-        }));
+        });
       } catch (e) {
-        send(res, 200, 'application/json', JSON.stringify({ ok: false, error: e.message, logs }));
+        finish({ ok: false, error: e.message, logs });
       }
     });
     return;
