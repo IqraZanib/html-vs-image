@@ -51,23 +51,25 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 .hbwrap,.deco{display:none}
 
 /* rhythm */
-.body{padding:12px 22px 2px}
-.section{margin:0 0 9px}
+.body{padding:8px 22px 2px}
+.section{margin:0 0 6px}
 
 /* section anatomy: the title sits ON the card; white pill carries time + GRR marker */
-.s-head{position:relative;gap:8px;margin:0 0 -34px;z-index:2;padding:0 14px;align-items:center;height:34px}
+.s-head{position:relative;gap:8px;margin:0 0 -32px;z-index:2;padding:0 14px;align-items:center;height:32px}
 .s-tab{flex:0 1 auto;background:transparent !important;box-shadow:none;padding:6px 2px}
 .s-title{font-size:15px;font-weight:700}
 .s-ic{display:none}
 .s-time{position:static;margin-inline-start:auto;background:#fff;border:1px solid var(--line);
   color:var(--navy);font-weight:700;font-size:11px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
-.panel{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:38px 15px 11px;box-shadow:none}
+.panel{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:34px 15px 9px;box-shadow:none}
 
-/* in-card figures: white inner frames on the tinted stage cards */
-.panel.has-inline-img{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
-.panel.has-inline-img .ii-body{flex:1 1 55%;min-width:0}
-.d-inline-img{flex:0 0 34%;max-width:270px;border:1.5px solid #fff;border-radius:10px;background:#fff;box-shadow:0 2px 8px rgba(20,30,60,.10)}
-.d-inline-img img{background:#fff;max-height:136px}
+/* in-card figures: HERO-sized like the pilot — the illustration IS the card's
+   main content and the text is the sidebar, not the other way round. Labels
+   inside the image must stay readable at print size. */
+.panel.has-inline-img{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.panel.has-inline-img .ii-body{flex:1 1 46%;min-width:0}
+.d-inline-img{flex:0 0 47%;max-width:380px;border:1.5px solid #fff;border-radius:10px;background:#fff;box-shadow:0 2px 8px rgba(20,30,60,.10)}
+.d-inline-img img{background:#fff;max-height:174px}
 .d-inline-img .cap{background:#fff;color:var(--muted);border-top:1px solid var(--line);font-size:10.5px;padding:4px 8px}
 
 /* stage steps: no numbered circles; the LAST item is the amber checkpoint strip */
@@ -112,7 +114,7 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 .section.sec-errors .panel.has-inline-img{flex-direction:column}
 .section.sec-errors .panel.has-inline-img .ii-body{flex:none;width:100%}
 .section.sec-errors .d-inline-img{flex:none;width:100%;max-width:100%;display:flex;flex-direction:column;align-items:center;box-shadow:none;border:0;background:transparent}
-.section.sec-errors .d-inline-img img{max-height:132px;width:auto;max-width:96%;border:1px solid var(--line);border-radius:10px}
+.section.sec-errors .d-inline-img img{max-height:126px;width:auto;max-width:96%;border:1px solid var(--line);border-radius:10px}
 .section.sec-errors .d-inline-img .cap{border-top:0;background:transparent}
 .section.sec-errors-caption .s-head{display:none}
 .section.sec-errors-caption .panel{background:transparent;border:0;box-shadow:none;padding:0 6px}
@@ -123,6 +125,9 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 .section.sec-stage-arad .s-title{color:var(--c-blue-ink)}
 .section.sec-stage-arad .panel{background:#e7eef8;border-color:#c9d9ee}
 .section.sec-stage-tatbiq .s-title{color:var(--c-green-ink)}
+/* practice/assessment figures a notch smaller than the intro heroes: keeps the
+   guide to its 2-page promise while every card stays figure-led */
+.section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:156px}
 .section.sec-stage-tatbiq .panel{background:#e9f2e5;border-color:#cde3c5}
 .section.sec-stage-taqwim .s-title{color:#8a6d1d}
 .section.sec-stage-taqwim .panel{background:var(--cream);border-color:var(--cream-line)}
@@ -145,7 +150,7 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 .d-field b{font-size:9px}
 
 /* footer: plain thin navy rule (the design set has NO dark footer band) */
-.lp-footer{margin:12px 22px 0;padding:8px 4px 0;background:none;border-top:1.5px solid var(--navy);
+.lp-footer{margin:8px 22px 0;padding:6px 4px 0;background:none;border-top:1.5px solid var(--navy);
   color:var(--navy);font-size:10.5px;text-align:center;font-weight:700}
 .lp-footer b{color:var(--navy)}
 `;
