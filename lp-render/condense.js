@@ -131,6 +131,18 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
     const seen2 = new Set();
     out.images = (out.images || []).filter((im) => im && used.has(im.id) && !seen2.has(im.id) && seen2.add(im.id));
   }
+  // Structurer labels sometimes carry English scaffolding in parentheses
+  // ("نشاط الاستهلال (Hook)") which would print as the figure caption. Labels are
+  // display-only (the cache key is the prompt), so for non-English lessons strip
+  // any parenthetical that contains Latin letters; pure-Arabic parentheses stay.
+  const guideLocale = String((out.meta && out.meta.locale) || (content.meta && content.meta.locale) || '').toLowerCase();
+  if (guideLocale && !guideLocale.startsWith('en')) {
+    for (const im of out.images) {
+      if (!im || !im.label) continue;
+      const cleaned = String(im.label).replace(/\s*\([^)]*[A-Za-z][^)]*\)/g, ' ').replace(/\s{2,}/g, ' ').trim();
+      if (cleaned) im.label = cleaned;
+    }
+  }
   if (out.meta) delete out.meta.banner;
   log(`Condensed to the 2-page guide: ${out.sections.length} sections, ${out.images.length} reused image(s).`);
   return out;
