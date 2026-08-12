@@ -25,7 +25,7 @@ THE TARGET SHAPE — exactly these 12 sections, with these EXACT "id" values, in
 9  { "id":"solutions",      "heading": answers title + page ref, "type":"bullets", "marker":"num", "items": ≤ 3 items, the source's answer key condensed, each ≤ 28 words — answers MUST stay factually exactly as in the source }
 10 { "id":"glossary",       "heading": vocabulary title (Arabic "مصطلحات"), "type":"fields", "items": 3-4 of the source's key terms, each value ≤ 10 words }
 11 { "id":"multigrade",     "heading": multi-grade title (Arabic "تكييف متعدد الصفوف"), "type":"bullets", "marker":"num", "items": 3 one-line adaptations (lower / this / higher grade), each ≤ 16 words }
-12 { "id":"homework",       "heading": homework+teacher-corner title (Arabic "الواجب المنزلي · ركن المعلم"), "type":"note", "body": the homework (numbered, from source) + the re-teach trigger + one reflection question, ≤ 65 words total }
+12 { "id":"homework",       "heading": homework+teacher-corner title (Arabic "الواجب المنزلي · ركن المعلم"), "type":"note", "body": the homework (numbered, from source) + the re-teach trigger + one reflection question, ≤ 55 words total }
 
 meta: keep the source's locale, subject, grade, region. Set "id" = source id + "-2p".
 If locale is "ar" and region "ye": title "دليل الدرس اليومي", subtitle "الجمهورية اليمنية · وزارة التربية والتعليم · التعليم المجتمعي", footer "للتواصل مع المدرّب الرقمي: 160 661 778 967+ · دليل الدرس اليومي". Otherwise: title = the guide word in the lesson's language, keep source subtitle/footer if any. NEVER set meta.banner. Keep up to 3 short chips.
@@ -40,11 +40,11 @@ HARD RULES:
 - The total body text must fit 2 A4 pages: respect every word budget above; prefer dropping detail over exceeding budgets.
 - The four stage minutes should sum to the source's period length when known.`;
 
-async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log = () => {} } = {}) {
+async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log = () => {}, extra = '' } = {}) {
   const body = JSON.stringify({
     messages: [
       { role: 'system', content: SYSTEM },
-      { role: 'user', content: `Full lesson JSON to condense:\n\n${JSON.stringify(content)}` },
+      { role: 'user', content: `${extra ? extra + '\n\n' : ''}Full lesson JSON to condense:\n\n${JSON.stringify(content)}` },
     ],
   });
   let json;

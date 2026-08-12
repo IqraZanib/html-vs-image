@@ -66,7 +66,10 @@ function handler(req, res) {
       const heartbeat = setInterval(() => { try { res.write(' '); } catch (_) { /* client gone */ } }, 15000);
       const finish = (obj) => { clearInterval(heartbeat); res.end(JSON.stringify(obj)); };
       try {
-        const { content, region, guide2p } = JSON.parse(body);
+        const parsedBody = JSON.parse(body);
+        const { content, region } = parsedBody;
+        // Default ON — clients that predate the checkbox get the 2-page guide too.
+        const guide2p = parsedBody.guide2p !== false;
         let parsed = null; let structured = null;
         // First, try to read the paste as a ready content JSON.
         if (typeof content !== 'string') parsed = content;
@@ -98,7 +101,19 @@ function handler(req, res) {
           if (keepRegion) parsed.meta = { ...(parsed.meta || {}), region: keepRegion };
           structured = JSON.stringify(parsed, null, 2);
         }
-        const { png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)
+        let { png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)
+        // Fit loop: the guide promises 2 pages — if the condensed lesson still paginates
+        // longer, re-condense once with tighter budgets and render again.
+        const pageCount = (buf) => ((buf || '').toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
+        if (guide2p && pdf && pageCount(pdf) > 2 && !looksLikeGuide) {
+          log(`Guide came out ${pageCount(pdf)} pages — re-condensing tighter…`);
+          const keepRegion2 = parsed.meta && parsed.meta.region;
+          parsed = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log,
+            extra: 'The previous attempt was TOO LONG. Cut every word budget by a third; keep only the most essential sentence in each stage body.' });
+          if (keepRegion2) parsed.meta = { ...(parsed.meta || {}), region: keepRegion2 };
+          structured = JSON.stringify(parsed, null, 2);
+          ({ png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }));
+        }
         // Keep every rendered lesson in the repo (pdf + png + the content JSON used).
         try {
           const dir = path.join(ROOT, 'assets/generated/lessons');
