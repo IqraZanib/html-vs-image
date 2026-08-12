@@ -107,6 +107,13 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 .section.sec-errors .s-title{color:#c0392b}
 .section.sec-errors .panel{border:2px solid var(--c-red);background:#fff}
 .section.sec-errors .d-qc{border-width:1.5px;border-radius:10px}
+/* Illustrated errors strip (pilot): the خطأ/صواب twin-board figure spans the card
+   width BELOW the twins instead of squeezing them into a side column. */
+.section.sec-errors .panel.has-inline-img{flex-direction:column}
+.section.sec-errors .panel.has-inline-img .ii-body{flex:none;width:100%}
+.section.sec-errors .d-inline-img{flex:none;width:100%;max-width:100%;display:flex;flex-direction:column;align-items:center;box-shadow:none;border:0;background:transparent}
+.section.sec-errors .d-inline-img img{max-height:132px;width:auto;max-width:96%;border:1px solid var(--line);border-radius:10px}
+.section.sec-errors .d-inline-img .cap{border-top:0;background:transparent}
 .section.sec-errors-caption .s-head{display:none}
 .section.sec-errors-caption .panel{background:transparent;border:0;box-shadow:none;padding:0 6px}
 .section.sec-errors-caption .d-text{font-size:12px;color:var(--muted);text-align:center;font-weight:600}

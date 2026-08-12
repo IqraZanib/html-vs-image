@@ -44,20 +44,43 @@ EDITORIAL RULES — how to choose well (these decide quality; follow them for AN
 - NUMERALS: in Arabic lessons use Eastern Arabic numerals everywhere (٣٢، ٤٥ دقيقة، صفحة ٨٠) — including times, pages and marks.
 - STAGE MINUTES: sum to the source's period length when known.
 
-IMAGES — critical:
-- Choose up to 4 images FROM THE SOURCE's "images" array. COPY each chosen entry EXACTLY — id, concept, label and PROMPT BYTE-FOR-BYTE VERBATIM (any change breaks the image cache). Never write new prompts unless the source has NO images at all (then use an empty array).
-- Selection taste: التمهيد may take a "scene"; العرض and التطبيق prefer labelled "diagram" concepts (they teach); التقويم takes whatever depicts the exit task. Attach via "image": "<id>" on the stage sections (one per stage, best content fit). Do NOT emit any "images"-type section. Labels stay the source's own.
+__IMAGES_BLOCK__
 
 HARD RULES:
 - Everything condensed FROM THE SOURCE ONLY — never invent facts, names, numbers or answers.
 - Keep the lesson's language for ALL reader-visible text. No English scaffolding labels inside a non-English lesson.
 - The total body text must fit 2 A4 pages: respect every word budget; prefer dropping detail over exceeding budgets.`;
 
-async function callOnce(content, { apiKey, fetchImpl, extra }) {
+// Figure policy is part of a REGION'S DESIGN SET, not global editorial policy.
+// Regions whose approved design is figure-rich (every card teaches inside the
+// image — Yemen pilot grammar) opt in here; every other region keeps the
+// conservative contract (reuse the source's figures, author nothing), so a
+// region is never restyled by another region's design decisions.
+const RICH_FIGURE_REGIONS = new Set(['ye']);
+
+const IMAGES_RICH = `IMAGES — the guide is FIGURE-RICH like the approved pilot. A picture must TEACH, never decorate: the explanation happens INSIDE the image, on a teaching surface (chalkboard, notebook page, flashcards, wall chart) that carries THIS lesson's exact words/letters/numbers/answers.
+- EVERY stage section (stage-tamhid, stage-arad, stage-tatbiq, stage-taqwim) carries one figure via "image": "<id>". The "errors" section ALSO carries one: a split twin-board image visualizing the misconception.
+- REUSE FIRST: if a SOURCE image already IS a labelled teaching diagram that fits a stage, reference its id and COPY its entry into "images" EXACTLY — id, concept, label, prompt BYTE-FOR-BYTE (any change breaks the image cache).
+- Otherwise AUTHOR a new entry (fresh id, kebab-case, never colliding with a source id) in the pilot's grammar:
+  * Prompt in English instruction + the lesson's exact Arabic strings quoted. Template: "Flat vector educational illustration, clean textbook style. <the teaching surface and who works at it>. <the lesson's OWN content worked out on that surface — the actual example, decomposition, matching, ordering or answer>. Labelled in Arabic exactly as follows: «…», «…», «…». No other text, no decoration."
+  * LABEL RULES (image models garble long/vocalized Arabic, and garbled labels FAIL the quality gate — these rules are what make the figure generatable): 2–4 labels total; each label ONE or TWO words; STRIP ALL DIACRITICS/tashkeel from labels (write «أبي», never «أَبِي») even when the lesson text carries them; never a sentence, chant line or instruction as a label; never the same word twice; besides the labels, at most ONE short line of text on the teaching surface.
+  * Per stage: stage-tamhid = the named hook object/scene WITH the day's key words written plainly on a board inside it (a chant belongs in the stage BODY, never inside the image); stage-arad = the concept worked on the board with the lesson's real example, kept to ONE worked example; stage-tatbiq = the actual exercise being solved in a pupil's notebook, the real answer visible; stage-taqwim = the exit task being performed.
+  * "errors" figure: "One wide chalkboard split in two halves by a vertical line: one half shows <the lesson's real example done WRONG> under a large red ✗; the other half shows <the CORRECT version> under a large green ✓." Keep each half to ONE word/expression — the two things the lesson distinguishes. Same label rules.
+  * concept: "diagram" for worked/labelled boards (most figures); "scene" only for a stage-tamhid real-world hook — and even then the key fact appears written inside.
+  * label: a short Arabic caption in the lesson's language.
+- One figure per section, no repeats. Do NOT emit any "images"-type section.`;
+
+const IMAGES_REUSE = `IMAGES — critical:
+- Choose up to 4 images FROM THE SOURCE's "images" array. COPY each chosen entry EXACTLY — id, concept, label and PROMPT BYTE-FOR-BYTE VERBATIM (any change breaks the image cache). Never write new prompts unless the source has NO images at all (then use an empty array).
+- Selection taste: التمهيد may take a "scene"; العرض and التطبيق prefer labelled "diagram" concepts (they teach); التقويم takes whatever depicts the exit task. Attach via "image": "<id>" on the stage sections (one per stage, best content fit). Do NOT emit any "images"-type section. Labels stay the source's own.`;
+
+const buildSystem = (richFigures) => SYSTEM.replace('__IMAGES_BLOCK__', richFigures ? IMAGES_RICH : IMAGES_REUSE);
+
+async function callOnce(content, { apiKey, fetchImpl, extra, system }) {
   const body = JSON.stringify({
     temperature: 0.2, // consistency: repeated runs of the same lesson stay close
     messages: [
-      { role: 'system', content: SYSTEM },
+      { role: 'system', content: system },
       { role: 'user', content: `${extra ? extra + '\n\n' : ''}Full lesson JSON to condense:\n\n${JSON.stringify(content)}` },
     ],
   });
@@ -70,13 +93,16 @@ async function callOnce(content, { apiKey, fetchImpl, extra }) {
 }
 
 async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log = () => {}, extra = '' } = {}) {
+  const richFigures = RICH_FIGURE_REGIONS.has(String((content.meta && content.meta.region) || '').toLowerCase());
+  const system = buildSystem(richFigures);
+  if (richFigures) log('Figure policy: rich (region design set) — every card carries a teaching figure.');
   let out;
   try {
-    out = await callOnce(content, { apiKey, fetchImpl, extra });
+    out = await callOnce(content, { apiKey, fetchImpl, extra, system });
   } catch (e) {
     // Models occasionally emit truncated/invalid JSON — one strict retry.
     log(`  (condense output invalid — retrying once: ${e.message})`);
-    out = await callOnce(content, { apiKey, fetchImpl,
+    out = await callOnce(content, { apiKey, fetchImpl, system,
       extra: `${extra ? extra + '\n' : ''}CRITICAL: your previous output was INVALID JSON. Return one complete, valid, parseable JSON object and nothing else.` });
   }
   if (!Array.isArray(out.sections) || out.sections.length < 8) throw new Error('condense: bad guide shape');
@@ -96,41 +122,51 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
       return it;
     }).filter((it) => it && (it.text || it.body || it.q || it.value || it.label));
   }
-  // Images are handled DETERMINISTICALLY from the source: the model may pick ids
-  // (via section.image) but code owns the outcome — every kept entry is copied
-  // from the source byte-for-byte (asset-store cache always hits), one figure per
-  // stage with no repeats, and stages the model left bare are auto-assigned:
-  // scenes suit التمهيد, labelled diagrams suit the teaching stages.
+  // Images are handled DETERMINISTICALLY: the model attaches ids (section.image)
+  // and may AUTHOR pilot-grammar teaching figures, but code owns the outcome.
+  // A referenced id that exists in the SOURCE is copied byte-for-byte (asset-store
+  // cache always hits); an authored id is kept only if its entry is sane (real
+  // prompt + label). One figure per section, no repeats; stages left bare are
+  // auto-assigned from remaining source images (scenes suit التمهيد, labelled
+  // diagrams suit the teaching stages).
   const srcById = new Map((content.images || []).map((im) => [im.id, im]));
+  const outById = new Map((out.images || []).filter((im) => im && im.id).map((im) => [im.id, im]));
   const seenIm = new Set();
   const rebuilt = [];
   for (const s of out.sections) {
     if (!s || !s.image) continue;
+    if (seenIm.has(s.image)) { delete s.image; continue; }
     const src = srcById.get(s.image);
-    if (!src || seenIm.has(s.image)) { delete s.image; continue; }
-    seenIm.add(s.image);
-    rebuilt.push({ id: src.id, concept: src.concept, label: src.label, prompt: src.prompt });
-  }
-  if (srcById.size) {
-    const remaining = (content.images || []).filter((im) => !seenIm.has(im.id));
-    const pick = (pred) => { const i = remaining.findIndex(pred); return i < 0 ? null : remaining.splice(i, 1)[0]; };
-    for (const id of ['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim']) {
-      const sec = out.sections.find((x) => x && x.id === id);
-      if (!sec || sec.image) continue;
-      const im = id === 'stage-tamhid'
-        ? (pick((x) => x.concept === 'scene') || pick(() => true))
-        : (pick((x) => x.concept === 'diagram') || pick(() => true));
-      if (!im) break;
-      sec.image = im.id;
-      rebuilt.push({ id: im.id, concept: im.concept, label: im.label, prompt: im.prompt });
+    if (src) {
+      seenIm.add(s.image);
+      rebuilt.push({ id: src.id, concept: src.concept, label: src.label, prompt: src.prompt });
+      continue;
     }
-    out.images = rebuilt;
-  } else {
-    // Source had no images: allow the model's own (deduped), referenced ones only.
-    const used = new Set(out.sections.map((s) => s && s.image).filter(Boolean));
-    const seen2 = new Set();
-    out.images = (out.images || []).filter((im) => im && used.has(im.id) && !seen2.has(im.id) && seen2.add(im.id));
+    const authored = outById.get(s.image);
+    // Authored figures are a rich-figure-region feature; elsewhere they are only
+    // legal when the source has no images at all (the pre-existing contract).
+    if ((richFigures || !srcById.size)
+        && authored && typeof authored.prompt === 'string' && authored.prompt.trim().length >= 40 && authored.label) {
+      seenIm.add(s.image);
+      rebuilt.push({ id: String(authored.id), concept: authored.concept === 'scene' ? 'scene' : 'diagram',
+        label: String(authored.label), prompt: authored.prompt });
+      continue;
+    }
+    delete s.image;
   }
+  const remaining = (content.images || []).filter((im) => !seenIm.has(im.id));
+  const pick = (pred) => { const i = remaining.findIndex(pred); return i < 0 ? null : remaining.splice(i, 1)[0]; };
+  for (const id of ['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim']) {
+    const sec = out.sections.find((x) => x && x.id === id);
+    if (!sec || sec.image) continue;
+    const im = id === 'stage-tamhid'
+      ? (pick((x) => x.concept === 'scene') || pick(() => true))
+      : (pick((x) => x.concept === 'diagram') || pick(() => true));
+    if (!im) break;
+    sec.image = im.id;
+    rebuilt.push({ id: im.id, concept: im.concept, label: im.label, prompt: im.prompt });
+  }
+  out.images = rebuilt;
   // Structurer labels sometimes carry English scaffolding in parentheses
   // ("نشاط الاستهلال (Hook)") which would print as the figure caption. Labels are
   // display-only (the cache key is the prompt), so for non-English lessons strip
