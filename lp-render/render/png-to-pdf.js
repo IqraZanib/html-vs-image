@@ -45,7 +45,8 @@ async function htmlToPixelPdf(html) {
       });
       const footer = document.querySelector('.lp-footer');
       if (footer) { cuts.push(y(footer, 'top')); cuts.push(y(footer, 'bottom')); }
-      return { cuts, height: document.documentElement.scrollHeight, width: document.documentElement.scrollWidth };
+      return { cuts, height: document.documentElement.scrollHeight, width: document.documentElement.scrollWidth,
+        bg: getComputedStyle(document.body).backgroundColor || '#ffffff' };
     });
     shot = await page.screenshot({ fullPage: true });
   } finally { await browser.close(); }
@@ -58,9 +59,52 @@ async function htmlToPixelPdf(html) {
     execFileSync('python3', [COMPOSER, png, gj, out], { stdio: ['ignore', 'ignore', 'pipe'] });
     return fs.readFileSync(out);
   } catch (e) {
-    const detail = e.stderr ? e.stderr.toString().trim().split('\n').pop() : e.message;
-    throw new Error(`PDF composer failed (need python3 + pillow + img2pdf): ${detail}`);
+    // Python composer unavailable (no pillow/img2pdf on this machine) — compose the
+    // same slices with Chromium instead. Additive fallback: machines with the Python
+    // libs keep the exact path above; only its failure reaches here.
+    fs.rmSync(dir, { recursive: true, force: true });
+    return composeWithChromium(shot, geom);
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+}
+
+// Node/Chromium composer: same contract as compose_pdf.py — slice the 2× screenshot
+// into A4 pages cutting only at the supplied boundaries, page number on every page,
+// top margin band, pages filled (a long section continues overleaf), no blank tail.
+async function composeWithChromium(shotBuf, geom) {
+  const PAGE_H = 1123; const TOP = 34; const BOT = 16;
+  const usable = PAGE_H - TOP - BOT;
+  const height = Math.ceil(geom.height);
+  const cuts = [...new Set((geom.cuts || []).map((c) => Math.round(c)))].sort((a, b) => a - b)
+    .filter((c) => c > 0 && c <= height + 1);
+  const pages = [];
+  let start = 0;
+  while (start < height - 1) {
+    const limit = start + usable;
+    const within = cuts.filter((c) => c > start + 40 && c <= limit);
+    let end = within.length ? within[within.length - 1] : Math.min(limit, height);
+    if (height - end < 48) end = height; // absorb trailing padding — no phantom page
+    pages.push([start, Math.min(end, height)]);
+    start = end;
+  }
+  const b64 = shotBuf.toString('base64');
+  const divs = pages.map(([s, e], i) =>
+    `<div class="pg"><div class="num">${i + 1} / ${pages.length}</div>`
+    + `<div class="clip" style="height:${e - s}px"><img src="data:image/png;base64,${b64}" style="top:${-s}px"></div></div>`).join('');
+  const html = `<!doctype html><html><head><style>
+  @page{size:794px 1123px;margin:0}
+  html,body{margin:0;padding:0}
+  .pg{width:794px;height:${PAGE_H - 2}px;box-sizing:border-box;position:relative;overflow:hidden;page-break-after:always;background:${geom.bg || '#fff'}}
+  .pg:last-child{page-break-after:auto}
+  .num{position:absolute;top:9px;inset-inline-end:16px;font:700 11px system-ui,sans-serif;color:#8a8f98;z-index:2}
+  .clip{position:relative;overflow:hidden;margin-top:${TOP}px;width:794px}
+  .clip img{position:absolute;left:0;width:794px}
+  </style></head><body>${divs}</body></html>`;
+  const browser = await chromium.launch({ executablePath: chromePath(), args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'] });
+  try {
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'load' });
+    return await page.pdf({ width: '794px', height: `${PAGE_H}px`, margin: { top: 0, bottom: 0, left: 0, right: 0 }, printBackground: true });
+  } finally { await browser.close(); }
 }
 
 module.exports = { htmlToPixelPdf };
