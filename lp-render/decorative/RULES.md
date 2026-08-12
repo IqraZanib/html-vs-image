@@ -134,11 +134,12 @@ cast (seeded by the lesson) so a maths plan and a science plan never look identi
 The final deliverable is a PDF. Keep spacing tight (no dead space), centre image
 captions, and give the title block faint letterhead icons.
 
-## R22 — Local children, by the lesson's language
+## R22 — Local children, by the lesson's REGION (language only as fallback)
 Characters and any people in images must match the lesson's region so local teachers
-recognise their own pupils: **Arabic → Yemeni** children and setting, **Kiswahili →
-Kenyan** children and setting, otherwise Pakistani. Each region has its own cast,
-generated once and cached.
+recognise their own pupils. The content's own `meta.region` decides; the language
+mapping (**Arabic → Yemeni**, **Kiswahili → Kenyan**, otherwise Pakistani) applies
+ONLY when no region is declared — a language never implies a country (Kiswahili is
+spoken in Tanzania AND Kenya). Each region has its own cast, generated once and cached.
 
 ## R23 — Characters are a fallback, not decoration on every page
 Prefer real, informative content images. Add cartoon characters ONLY when a lesson
@@ -171,8 +172,13 @@ at the top as "current / total". Page flow must look clean:
   continuation page prints flush to the top edge and the page number overlaps the first
   section. (See `render/html-to-pdf.js`, `pageMode:'paged'`.)
 
-## R26 — Locked colour theme (warm four-accent, reference-matched)
-This is the FINAL locked colour theme (matches the approved reference template). Warm
+## R26 — Locked DEFAULT colour theme (warm four-accent, reference-matched) + region theme packs
+This is the FINAL locked DEFAULT colour theme (matches the approved reference template).
+**Regions with their own approved design set override it via a theme pack**
+(`decorative/regions/<region>/theme.js` — see `decorative/regions/README.md`; selected by `meta.region`, applied as CSS cascade on
+top of this default — e.g. Yemen's pack is reference-matched to the approved BLN pilot
+"دليل الدرس اليومي"). A region pack changes ONLY look (palette, header, panel chrome);
+every other rule in this file still applies. No pack → this default, unchanged. Warm
 four-accent palette rotated per section, on a clean white ground, navy body text:
 - **Accents rotate amber → red → teal → green** (`--c-amber/red/teal/green`, each with a
   bright shade for icon discs/badges, a darker `-ink` for title text on white, and a `-soft`

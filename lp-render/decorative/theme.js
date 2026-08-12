@@ -149,6 +149,13 @@ body{background:#eef1f7;color:var(--ink);font-family:var(--font),'Baloo 2','Popp
 .d-img.cover img{object-fit:cover}
 .d-img .cap{padding:9px 13px;font-size:13px;font-weight:700;color:var(--ink);text-align:center}
 
+/* in-panel figure (section.image) — neutral default; region themes may restyle */
+.panel.has-inline-img{display:flex;gap:14px;align-items:flex-start}
+.panel.has-inline-img .ii-body{flex:1;min-width:0}
+.d-inline-img{flex:0 0 32%;max-width:240px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.d-inline-img img{display:block;width:100%;height:auto;max-height:190px;object-fit:contain;background:#fff}
+.d-inline-img .cap{padding:6px 10px;font-size:11.5px;font-weight:700;color:var(--muted);text-align:center}
+
 /* footer */
 .lp-footer{margin:18px 30px 0;padding-top:11px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);line-height:1.7;text-align:right}
 .lp-footer b{color:var(--c-teal-ink)}

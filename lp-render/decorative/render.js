@@ -176,6 +176,7 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
   const referenced = new Set();
   if (meta.banner) referenced.add(meta.banner); // shown in the hero, not as a card
   for (const s of (content.sections || [])) if (s && s.type === 'images' && Array.isArray(s.imageIds)) s.imageIds.forEach((id) => referenced.add(id));
+  for (const s of (content.sections || [])) if (s && s.image) referenced.add(s.image); // in-panel figures (see below)
 
   // Characters are a FALLBACK only (R23): if this lesson already shows real content
   // images, we add no characters at all — the informative images carry it.
@@ -188,6 +189,9 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
   const sections = (content.sections || []).map((section, i) => {
     // Admin blocks (Lesson Details) use a neutral slate tab, not a warm accent.
     const accent = section.type === 'fields' ? '--c-slate' : accentFor(i);
+    // A section's id becomes a class (sec-<id>) so region packs can style specific
+    // template roles order-independently. Additive: nothing targets these by default.
+    const idCls = section.id ? ` sec-${String(section.id).toLowerCase().replace(/[^a-z0-9_-]/g, '')}` : '';
     const body = renderBody(section, accent, images);
     if (body === '') return '';
     // A heading that repeats the previous one (e.g. a phase split across structuring
@@ -195,6 +199,15 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     const title = cleanHeading(section.heading);
     const head = (title && title !== prevHeading) ? sectionHead(accent, section, i) : '';
     if (title) prevHeading = title;
+    // Optional in-panel illustration: `section.image` names a declared image id and the
+    // figure renders INSIDE the section's panel beside the body (design sets like
+    // Yemen's put an illustration in every stage card). Additive — no existing content
+    // sets it, and sections without it render exactly as before.
+    const inlineIm = section.image && images[section.image] && images[section.image].dataUri ? images[section.image] : null;
+    if (inlineIm) {
+      const fig = `<div class="d-inline-img"><img src="${inlineIm.dataUri}" alt="${esc(cleanHeading(inlineIm.label || ''))}">${inlineIm.label ? `<div class="cap">${esc(cleanHeading(inlineIm.label))}</div>` : ''}</div>`;
+      return `<section class="section${idCls}">${head}<div class="panel has-inline-img" style="border-color:var(${accent}-soft)"><div class="ii-body">${body}</div>${fig}</div></section>`;
+    }
     const charId = hasContentImages ? null : pickCharacter(section, cast, rot, used);
     if (charId) {
       used.add(charId);
@@ -203,9 +216,9 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
       const { h, w } = charSize(section, charId);
       const fig = `<div class="char-fig ${side}" style="width:${w}px"><img src="${cast[charId]}" alt="" style="max-height:${h}px"></div>`;
       const inner = side === 'left' ? `${fig}<div class="char-body">${body}</div>` : `<div class="char-body">${body}</div>${fig}`;
-      return `<section class="section">${head}<div class="panel has-char" style="border-color:var(${accent}-soft)">${inner}</div></section>`;
+      return `<section class="section${idCls}">${head}<div class="panel has-char" style="border-color:var(${accent}-soft)">${inner}</div></section>`;
     }
-    return `<section class="section">${head}<div class="panel" style="border-color:var(${accent}-soft)">${body}</div></section>`;
+    return `<section class="section${idCls}">${head}<div class="panel" style="border-color:var(${accent}-soft)">${body}</div></section>`;
   }).join('');
 
   // Safety net (R12): any generated image not shown by an images section is
