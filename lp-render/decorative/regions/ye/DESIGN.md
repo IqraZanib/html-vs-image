@@ -17,7 +17,11 @@ annotations, not content.
 - Footer: plain thin navy rule + centred line (NOT a dark band)
 
 ## Typography (reviewer-selected via 5-font specimen, 2026-08-12)
-**IBM Plex Sans Arabic** — 400 body (13.5–14px, line-height ≥1.55), 700 headings.
+**Noto Naskh Arabic** — 400 body (13.5–14px, line-height ≥1.55), 700 headings.
+(Reviewer-selected 2026-08-13, replacing IBM Plex Sans Arabic: the design set's lettering
+reads Naskh-style.) Pilot chrome replicated in the theme: dartboard-with-arrow icon on
+the goal card, ملاحظات teacher-notes strip (dotted rules + navy tab) after التقويم, and
+role-coloured card borders (answers teal, glossary navy, multigrade pink, homework amber).
 Embedded from `@fontsource/ibm-plex-sans-arabic` at require-time; falls back to
 Noto Naskh when absent.
 

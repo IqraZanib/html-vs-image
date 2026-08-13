@@ -6,14 +6,14 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-// Typography: IBM Plex Sans Arabic (reviewer-selected). Embedded when the package is
-// installed; silently falls back to Noto Naskh otherwise.
+// Typography: Noto Naskh Arabic (reviewer-selected Naskh style, 2026-08-13 — replaces
+// IBM Plex). Embedded when the package is installed; falls back to system fonts.
 let FONT_FACES = '';
 try {
-  const dir = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '@fontsource', 'ibm-plex-sans-arabic', 'files');
+  const dir = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '@fontsource', 'noto-naskh-arabic', 'files');
   for (const w of [400, 500, 700]) {
     const f = fs.readdirSync(dir).find((x) => x.endsWith('arabic-' + w + '-normal.woff2'));
-    if (f) FONT_FACES += "@font-face{font-family:'IBM Plex Sans Arabic';font-weight:" + w +
+    if (f) FONT_FACES += "@font-face{font-family:'Noto Naskh Arabic';font-weight:" + w +
       ";font-display:swap;src:url(data:font/woff2;base64," +
       fs.readFileSync(path.join(dir, f)).toString('base64') + ") format('woff2');}";
   }
@@ -31,11 +31,11 @@ const THEME_OVERRIDE_CSS = FONT_FACES + `
   --ink:#1f2a44; --muted:#6b7280; --line:#e5e7eb;
 }
 /* measured: WHITE page ground; IBM Plex everywhere */
-body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','Noto Sans',sans-serif}
+body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','Noto Sans',sans-serif}
 .sheet{background:#fcfcfc}
 .s-title,.lp-header h1,.lp-header .sub,.d-step .st-label,.d-q,.d-note,.d-text,.d-bullets li,
 .d-field,.d-chip,.st-body,.d-a,.d-img .cap,.d-inline-img .cap,.lp-footer,.s-time{
-  font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','Noto Sans',sans-serif}
+  font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','Noto Sans',sans-serif}
 
 /* header: #182448 ministry strip (~78px) — title at RTL start, ministry lines opposite.
    The design set has NO hero banner: banner mode is suppressed. */
@@ -52,7 +52,7 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 
 /* rhythm */
 .body{padding:6px 22px 2px}
-.section{margin:0 0 5px}
+.section{margin:0 0 4px}
 
 /* section anatomy: the title sits ON the card; white pill carries time + GRR marker */
 .s-head{position:relative;gap:8px;margin:0 0 -32px;z-index:2;padding:0 14px;align-items:center;height:32px}
@@ -61,7 +61,7 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 .s-ic{display:none}
 .s-time{position:static;margin-inline-start:auto;background:#fff;border:1px solid var(--line);
   color:var(--navy);font-weight:700;font-size:11px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
-.panel{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:33px 15px 7px;box-shadow:none}
+.panel{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:33px 15px 5px;box-shadow:none}
 
 /* in-card figures — the pilot's card anatomy: TEXT | IMAGE | TEXT. Teacher
    actions at the inline start, the hero illustration centred and large, and the
@@ -109,7 +109,9 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 .section.sec-lesson-line .panel{background:transparent;border:0;box-shadow:none;padding:2px 4px 0}
 .section.sec-lesson-line .d-text{font-size:13.5px;font-weight:700;color:var(--navy)}
 .section.sec-goal .s-head{display:none}
-.section.sec-goal .panel{border:2px solid var(--c-teal);background:#fff;padding:10px 15px}
+.section.sec-goal .panel{border:2px solid var(--c-teal);background:#fff;padding:10px 15px;position:relative;padding-left:66px}
+/* pilot: dartboard-with-arrow icon at the goal card's left end */
+.section.sec-goal .panel::before{content:"";position:absolute;left:12px;top:50%;transform:translateY(-50%);width:44px;height:44px;background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='28' cy='36' r='25' fill='%23e0705a'/><circle cx='28' cy='36' r='18.5' fill='%23fff'/><circle cx='28' cy='36' r='12' fill='%23e0705a'/><circle cx='28' cy='36' r='5.5' fill='%23fff'/><path d='M28 36 L50 14' stroke='%23182448' stroke-width='4.5' stroke-linecap='round'/><path d='M50 14 l-1.5 9 M50 14 l-9 1.5' stroke='%23e3a23c' stroke-width='4' stroke-linecap='round'/></svg>") no-repeat center/contain}
 .section.sec-goal .d-note{background:none !important;border:0 !important;color:var(--ink);padding:0;font-size:14px}
 .section.sec-goal .d-note .nt{display:none}
 .section.sec-goal .d-note b{color:var(--c-teal-ink)}
@@ -133,14 +135,28 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 .section.sec-stage-tatbiq .s-title{color:var(--c-green-ink)}
 /* practice/assessment figures a notch smaller than the intro heroes: keeps the
    guide to its 2-page promise while every card stays figure-led */
-.section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:210px}
+.section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:180px}
 .section.sec-stage-tatbiq .panel{background:#e9f2e5;border-color:#cde3c5}
 .section.sec-stage-taqwim .s-title{color:#8a6d1d}
 .section.sec-stage-taqwim .panel{background:var(--cream);border-color:var(--cream-line)}
 .section.sec-stage-taqwim .d-step:last-child{background:#fff;border-color:var(--cream-line)}
+/* pilot chrome: teacher-notes strip after التقويم — dotted ruled lines and the
+   dark ملاحظات tab; pure theme chrome, identical for every lesson */
+.section.sec-stage-taqwim{position:relative}
+.section.sec-stage-taqwim::after{content:"ملاحظات المعلّم بعد الدرس";display:block;margin-top:6px;
+  background-color:#fff;
+  background-image:repeating-linear-gradient(to right,#b9c2d0 0 5px,transparent 5px 11px),repeating-linear-gradient(to right,#b9c2d0 0 5px,transparent 5px 11px);
+  background-size:calc(100% - 120px) 1.5px,calc(100% - 120px) 1.5px;background-repeat:no-repeat,no-repeat;background-position:16px 31px,16px 47px;
+  border:1.5px solid var(--navy);border-radius:12px;padding:6px 14px 27px;min-height:22px;
+  font-weight:700;font-size:13px;color:var(--navy);text-align:start}
+.section.sec-stage-taqwim::before{content:"ملاحظات";position:absolute;bottom:10px;inset-inline-start:10px;
+  background:var(--navy);color:#fff;font-weight:700;font-size:11.5px;padding:5px 12px;border-radius:8px;z-index:1}
 .section.sec-solutions .s-title{color:var(--c-teal-ink)}
-.section.sec-glossary .s-title{color:#5a6478}
-.section.sec-multigrade .s-title{color:var(--c-green-ink)}
+.section.sec-solutions .panel{border-color:var(--c-teal)}
+.section.sec-glossary .s-title{color:var(--navy)}
+.section.sec-glossary .panel{border-color:var(--navy)}
+.section.sec-multigrade .s-title{color:#a94f86}
+.section.sec-multigrade .panel{border-color:#e0a3c6}
 .section.sec-homework .s-title{color:var(--c-amber-ink)}
 .section.sec-homework .panel{background:var(--cream);border-color:var(--cream-line)}
 .section.sec-homework .d-note{background:none !important;border:0 !important}
@@ -156,7 +172,7 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 .d-field b{font-size:9px}
 
 /* footer: plain thin navy rule (the design set has NO dark footer band) */
-.lp-footer{margin:8px 22px 0;padding:6px 4px 0;background:none;border-top:1.5px solid var(--navy);
+.lp-footer{margin:6px 22px 0;padding:5px 4px 0;background:none;border-top:1.5px solid var(--navy);
   color:var(--navy);font-size:10.5px;text-align:center;font-weight:700}
 .lp-footer b{color:var(--navy)}
 `;
