@@ -336,6 +336,21 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:150px}
 .section.sec-stage-taqwim::after{height:40px;background-position:16px 38px,16px 54px}
 
+
+/* ── ROUND 19: the footer band is composer chrome on EVERY page (pilot) — hide
+      the strip-level band; sizes per reviewer ── */
+.lp-footer{display:none}
+.section.sec-errors .d-inline-img img{max-height:190px}
+.section.sec-stage-tamhid .d-inline-img,.section.sec-stage-arad .d-inline-img{min-height:210px}
+.section.sec-solutions .d-bullets li,.section.sec-multigrade .d-bullets li{font-size:15.5px}
+.section.sec-glossary .d-field{font-size:15px}
+.section.sec-homework .d-note{font-size:15px}
+.section.sec-lesson-line .d-text{font-size:15px}
+.d-step .st-body{font-size:17.5px}
+.d-qc .d-a{font-size:17.5px}
+.section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:144px}
+.section.sec-stage-taqwim::after{height:38px;background-position:16px 36px,16px 52px;padding-bottom:14px}
+
 `;
 
 module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom' };

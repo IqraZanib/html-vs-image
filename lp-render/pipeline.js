@@ -153,7 +153,7 @@ async function renderLessonImage(content, opts = {}) {
     // preview, no section leaking, real margins. Falls back to the Chromium vector PDF if
     // python3 + pillow + img2pdf are not available.
     try {
-      pdf = await htmlToPixelPdf(html, regionPageStyle ? { pageStyle: regionPageStyle } : {});
+      pdf = await htmlToPixelPdf(html, regionPageStyle ? { pageStyle: regionPageStyle, footerText: (content.meta && content.meta.footer) || '' } : {});
     } catch (e) {
       log(`  (pixel-perfect PDF unavailable — ${e.message}; using vector fallback)`);
       pdf = await htmlToPdf(html, { pageMode: 'paged', pdfOptions: { printBackground: true } });

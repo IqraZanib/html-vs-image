@@ -79,7 +79,7 @@ async function htmlToPixelPdf(html, opts = {}) {
 // into A4 pages cutting only at the supplied boundaries, page number on every page,
 // top margin band, pages filled (a long section continues overleaf), no blank tail.
 async function composeWithChromium(shotBuf, geom, opts = {}) {
-  const PAGE_H = 1123; const TOP = 28; const BOT = 12;
+  const PAGE_H = 1123; const TOP = 28; const BOT = opts.pageStyle === 'ar-bottom' ? 36 : 12;
   const usable = PAGE_H - TOP - BOT;
   const height = Math.ceil(geom.height);
   const cuts = [...new Set((geom.cuts || []).map((c) => Math.round(c)))].sort((a, b) => a - b)
@@ -98,8 +98,9 @@ async function composeWithChromium(shotBuf, geom, opts = {}) {
   // Page-number chrome is pack-driven: 'ar-bottom' prints the pilot-style
   // «الصفحة ن من م» at the bottom start edge; default keeps the classic top num.
   const arDigits = (v) => String(v).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]);
+  const escText = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
   const numFor = (i, n) => opts.pageStyle === 'ar-bottom'
-    ? `<div class="num ar" dir="rtl">الصفحة ${arDigits(i + 1)} من ${arDigits(n)}</div>`
+    ? `<div class="band" dir="rtl"><span class="bn">الصفحة ${arDigits(i + 1)} من ${arDigits(n)}</span><span class="bc">${escText(opts.footerText)}</span></div>`
     : `<div class="num">${i + 1} / ${n}</div>`;
   const divs = pages.map(([s, e], i) =>
     `<div class="pg">${numFor(i, pages.length)}`
@@ -110,7 +111,9 @@ async function composeWithChromium(shotBuf, geom, opts = {}) {
   .pg{width:794px;height:${PAGE_H - 2}px;box-sizing:border-box;position:relative;overflow:hidden;page-break-after:always;background:${geom.bg || '#fff'}}
   .pg:last-child{page-break-after:auto}
   .num{position:absolute;top:9px;inset-inline-end:16px;font:700 11px system-ui,sans-serif;color:#8a8f98;z-index:2}
-  .num.ar{top:auto;bottom:11px;inset-inline-end:auto;left:22px;font:700 11.5px 'Noto Naskh Arabic',system-ui,sans-serif;color:#182448}
+  .band{position:absolute;left:22px;right:22px;bottom:9px;border-top:2px solid #182448;padding-top:5px;text-align:center;z-index:2;
+    font:700 11.5px 'Noto Naskh Arabic',system-ui,sans-serif;color:#182448}
+  .band .bn{position:absolute;left:0;top:5px}
   .clip{position:relative;overflow:hidden;margin-top:${TOP}px;width:794px}
   .clip img{position:absolute;left:0;width:794px}
   </style></head><body>${divs}</body></html>`;
