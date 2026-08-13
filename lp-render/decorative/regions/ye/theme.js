@@ -127,7 +127,7 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-errors .panel.has-inline-img{display:flex;flex-direction:column}
 .section.sec-errors .panel.has-inline-img .ii-body{display:block;flex:none;width:100%}
 .section.sec-errors .d-inline-img{flex:none;width:100%;max-width:100%;display:flex;flex-direction:column;align-items:center;box-shadow:none;border:0;background:transparent}
-.section.sec-errors .d-inline-img img{max-height:126px;width:auto;max-width:96%;border:1px solid var(--line);border-radius:10px}
+.section.sec-errors .d-inline-img img{max-height:172px;width:auto;max-width:96%;border:1px solid var(--line);border-radius:10px}
 .section.sec-errors .d-inline-img .cap{border-top:0;background:transparent}
 .section.sec-errors-caption .s-head{display:none}
 .section.sec-errors-caption .panel{background:transparent;border:0;box-shadow:none;padding:0 6px}
@@ -162,7 +162,7 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-solutions .panel{border-color:var(--c-teal) !important}
 .section.sec-glossary .s-title{color:var(--navy)}
 .section.sec-glossary .d-fields{display:block}
-.section.sec-glossary .d-field{display:block;padding:5px 2px;border-bottom:1px dashed #c9cfda;font-size:12.5px;font-weight:600;line-height:1.5}
+.section.sec-glossary .d-field{display:block;padding:5px 2px;border-bottom:1px dashed #c9cfda;font-size:13.5px;font-weight:700;line-height:1.5}
 .section.sec-glossary .d-field:last-child{border-bottom:0}
 .section.sec-glossary .d-field b{display:inline;margin-inline-end:6px;font-size:11px}
 .section.sec-multigrade .d-bullets li{font-size:12.5px;line-height:1.5}
@@ -200,8 +200,8 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-multigrade .panel{background:#fdf4f9}
 /* 2) text: a step larger, darker, roomier */
 :root{--ink:#0c1526}
-.d-step .st-body{font-size:14.5px;line-height:1.56;font-weight:700}
-.d-qc .d-a{font-size:14.5px;line-height:1.6;font-weight:700}
+.d-step .st-body{font-size:15px;line-height:1.56;font-weight:700}
+.d-qc .d-a{font-size:15px;line-height:1.6;font-weight:700}
 .d-bullets li{font-size:14.5px;line-height:1.48;font-weight:700}
 .d-note{font-size:15px;font-weight:700}
 .d-text,.d-field{font-weight:700}
@@ -222,10 +222,10 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 /* 5) no dead space around images: on the text-driven cards (تمهيد/عرض) the figure
       absolutely FILLS its stretched column so it can never grow the row; the
       figure-driven cards (تطبيق/تقويم) keep flow layout. */
-.section.sec-stage-tamhid .d-inline-img,.section.sec-stage-arad .d-inline-img{position:relative;align-self:stretch;min-height:252px}
+.section.sec-stage-tamhid .d-inline-img,.section.sec-stage-arad .d-inline-img{position:relative;align-self:stretch;min-height:230px}
 .section.sec-stage-tamhid .d-inline-img img,.section.sec-stage-arad .d-inline-img img{position:absolute;left:0;top:0;width:100%;height:calc(100% - 24px);object-fit:contain;max-height:none}
 .section.sec-stage-tamhid .d-inline-img .cap,.section.sec-stage-arad .d-inline-img .cap{position:absolute;bottom:0;left:0;right:0}
-.section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:185px}
+.section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:172px}
 /* 7) footer: stronger, pilot-proportioned band */
 .lp-footer{border-top:2px solid var(--navy);font-size:11.5px;padding:6px 4px 0;margin:8px 22px 0}
 
@@ -234,7 +234,7 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-solutions .d-bullets,.section.sec-multigrade .d-bullets{gap:5px}
 .section.sec-solutions .d-bullets li,.section.sec-multigrade .d-bullets li{
   background:#fff;border:1px solid rgba(20,30,60,.10);border-radius:9px;
-  padding:4px 34px 4px 9px;font-size:13px;line-height:1.48}
+  padding:4px 34px 4px 9px;font-size:13.5px;line-height:1.48}
 .section.sec-solutions .d-bullets li::before,.section.sec-multigrade .d-bullets li::before{
   inset-inline-start:9px;top:50%;transform:translateY(-50%);width:18px;height:18px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
@@ -250,10 +250,12 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-stage-taqwim::before{height:72px;width:62px;bottom:2px;padding-bottom:8px;
   background:var(--navy) url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'><path d='M21 11.2c0 3.9-3.8 7-8.5 7-1 0-2-.13-2.9-.38L5.2 19.5l1.2-3C4.9 15.2 4 13.3 4 11.2c0-3.9 3.8-7 8.5-7s8.5 3.1 8.5 7z' stroke='%23fff' stroke-width='1.8' stroke-linejoin='round'/><path d='M8.8 10h6.9M8.8 12.8h4.4' stroke='%23fff' stroke-width='1.6' stroke-linecap='round'/></svg>") no-repeat center 11px/26px 26px}
 /* 3) footer: pilot structure — text at the start, page number at the far end */
-.lp-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:start}
-.lp-footer::after{content:"الصفحة ٢ من ٢";font-weight:700;color:var(--navy);font-size:10.5px;white-space:nowrap}
+/* left end of the band is reserved for the composer page number (pilot: the page
+   number lives inside the footer band) */
+.lp-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:start;padding-left:130px}
+/* page numbers are composer chrome now (PAGE_NUMBER_STYLE ar-bottom) — no footer ::after */
 /* 5) slightly darker overall (weights unchanged) */
-:root{--muted:#4a5568;--ink:#0a1220}
+:root{--muted:#43506b;--ink:#060d1a}
 /* 7) figures wider in their cards */
 .panel.has-inline-img{grid-template-columns:minmax(0,.95fr) minmax(0,55%) minmax(0,.6fr)}
 
@@ -269,10 +271,10 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-homework .panel.has-inline-img{display:flex;gap:10px;align-items:center}
 .section.sec-homework .panel.has-inline-img .ii-body{display:block;flex:1;min-width:0}
 .section.sec-homework .panel.has-inline-img .d-inline-img{flex:0 0 27%;max-width:200px;position:static;align-self:auto}
-.section.sec-homework .panel.has-inline-img .d-inline-img img{max-height:110px;position:static;height:auto}
+.section.sec-homework .panel.has-inline-img .d-inline-img img{max-height:92px;position:static;height:auto}
 .section.sec-homework .panel.has-inline-img::before{display:none}
 .section.sec-homework .panel.has-inline-img{padding-left:14px}
 
 `;
 
-module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen' };
+module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom' };

@@ -23,7 +23,7 @@ function chromePath() {
   return undefined;
 }
 
-async function htmlToPixelPdf(html) {
+async function htmlToPixelPdf(html, opts = {}) {
   if (!fs.existsSync(COMPOSER)) throw new Error('compose_pdf.py not found');
   const browser = await chromium.launch({ executablePath: chromePath(), args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--font-render-hinting=none'] });
   let shot; let geom;
@@ -71,14 +71,14 @@ async function htmlToPixelPdf(html) {
     // same slices with Chromium instead. Additive fallback: machines with the Python
     // libs keep the exact path above; only its failure reaches here.
     fs.rmSync(dir, { recursive: true, force: true });
-    return composeWithChromium(shot, geom);
+    return composeWithChromium(shot, geom, opts);
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 }
 
 // Node/Chromium composer: same contract as compose_pdf.py — slice the 2× screenshot
 // into A4 pages cutting only at the supplied boundaries, page number on every page,
 // top margin band, pages filled (a long section continues overleaf), no blank tail.
-async function composeWithChromium(shotBuf, geom) {
+async function composeWithChromium(shotBuf, geom, opts = {}) {
   const PAGE_H = 1123; const TOP = 28; const BOT = 12;
   const usable = PAGE_H - TOP - BOT;
   const height = Math.ceil(geom.height);
@@ -95,8 +95,14 @@ async function composeWithChromium(shotBuf, geom) {
     start = end;
   }
   const b64 = shotBuf.toString('base64');
+  // Page-number chrome is pack-driven: 'ar-bottom' prints the pilot-style
+  // «الصفحة ن من م» at the bottom start edge; default keeps the classic top num.
+  const arDigits = (v) => String(v).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]);
+  const numFor = (i, n) => opts.pageStyle === 'ar-bottom'
+    ? `<div class="num ar" dir="rtl">الصفحة ${arDigits(i + 1)} من ${arDigits(n)}</div>`
+    : `<div class="num">${i + 1} / ${n}</div>`;
   const divs = pages.map(([s, e], i) =>
-    `<div class="pg"><div class="num">${i + 1} / ${pages.length}</div>`
+    `<div class="pg">${numFor(i, pages.length)}`
     + `<div class="clip" style="height:${e - s}px"><img src="data:image/png;base64,${b64}" style="top:${-s}px"></div></div>`).join('');
   const html = `<!doctype html><html><head><style>
   @page{size:794px 1123px;margin:0}
@@ -104,6 +110,7 @@ async function composeWithChromium(shotBuf, geom) {
   .pg{width:794px;height:${PAGE_H - 2}px;box-sizing:border-box;position:relative;overflow:hidden;page-break-after:always;background:${geom.bg || '#fff'}}
   .pg:last-child{page-break-after:auto}
   .num{position:absolute;top:9px;inset-inline-end:16px;font:700 11px system-ui,sans-serif;color:#8a8f98;z-index:2}
+  .num.ar{top:auto;bottom:7px;inset-inline-end:auto;left:20px;font:700 10.5px system-ui,sans-serif;color:#182448}
   .clip{position:relative;overflow:hidden;margin-top:${TOP}px;width:794px}
   .clip img{position:absolute;left:0;width:794px}
   </style></head><body>${divs}</body></html>`;

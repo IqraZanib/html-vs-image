@@ -128,6 +128,7 @@ async function renderLessonImage(content, opts = {}) {
   // No pack → the locked default (R26) as-is. Regions are fully independent: adding
   // or changing one pack cannot affect another region's output.
   let regionCss = '';
+  let regionPageStyle = '';
   const themeRegion = String(meta.region || '').toLowerCase();
   if (themeRegion) {
     // Cache-busted so a long-running server (LP Studio) always serves the pack's
@@ -135,7 +136,9 @@ async function renderLessonImage(content, opts = {}) {
     try {
       const themePath = require.resolve(`./decorative/regions/${themeRegion}/theme`);
       delete require.cache[themePath];
-      regionCss = require(themePath).THEME_OVERRIDE_CSS || '';
+      const pack = require(themePath);
+      regionCss = pack.THEME_OVERRIDE_CSS || '';
+      regionPageStyle = pack.PAGE_NUMBER_STYLE || '';
       log(`  ⛨ region design pack "${themeRegion}" applied`);
     } catch (_) { /* no design pack for this region — default look */ }
   }
@@ -150,7 +153,7 @@ async function renderLessonImage(content, opts = {}) {
     // preview, no section leaking, real margins. Falls back to the Chromium vector PDF if
     // python3 + pillow + img2pdf are not available.
     try {
-      pdf = await htmlToPixelPdf(html);
+      pdf = await htmlToPixelPdf(html, regionPageStyle ? { pageStyle: regionPageStyle } : {});
     } catch (e) {
       log(`  (pixel-perfect PDF unavailable — ${e.message}; using vector fallback)`);
       pdf = await htmlToPdf(html, { pageMode: 'paged', pdfOptions: { printBackground: true } });
