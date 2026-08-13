@@ -32,7 +32,7 @@ const THEME_OVERRIDE_CSS = FONT_FACES + `
 }
 /* measured: WHITE page ground; IBM Plex everywhere */
 body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','Noto Sans',sans-serif}
-.sheet{background:#fcfcfc}
+.sheet{background:#fcfcfc;padding-bottom:4px}
 .s-title,.lp-header h1,.lp-header .sub,.d-step .st-label,.d-q,.d-note,.d-text,.d-bullets li,
 .d-field,.d-chip,.st-body,.d-a,.d-img .cap,.d-inline-img .cap,.lp-footer,.s-time{
   font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','Noto Sans',sans-serif}
@@ -61,7 +61,7 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .s-ic{display:none}
 .s-time{position:static;margin-inline-start:auto;background:#fff;border:1px solid var(--line);
   color:var(--navy);font-weight:700;font-size:11px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
-.panel{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:33px 15px 5px;box-shadow:none}
+.panel{background:#fff;border:2px solid #ccd2dc;border-radius:14px;padding:33px 15px 5px;box-shadow:none;border-color:#ccd2dc !important}
 
 /* in-card figures — the pilot's card anatomy: TEXT | IMAGE | TEXT. Teacher
    actions at the inline start, the hero illustration centred and large, and the
@@ -109,14 +109,14 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-lesson-line .panel{background:transparent;border:0;box-shadow:none;padding:2px 4px 0}
 .section.sec-lesson-line .d-text{font-size:13.5px;font-weight:700;color:var(--navy)}
 .section.sec-goal .s-head{display:none}
-.section.sec-goal .panel{border:2px solid var(--c-teal);background:#fff;padding:10px 15px;position:relative;padding-left:66px}
+.section.sec-goal .panel{border:2px solid var(--c-teal);border-color:var(--c-teal) !important;background:#fff;padding:10px 68px 10px 15px;position:relative}
 /* pilot: dartboard-with-arrow icon at the goal card's left end */
-.section.sec-goal .panel::before{content:"";position:absolute;left:12px;top:50%;transform:translateY(-50%);width:44px;height:44px;background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='28' cy='36' r='25' fill='%23e0705a'/><circle cx='28' cy='36' r='18.5' fill='%23fff'/><circle cx='28' cy='36' r='12' fill='%23e0705a'/><circle cx='28' cy='36' r='5.5' fill='%23fff'/><path d='M28 36 L50 14' stroke='%23182448' stroke-width='4.5' stroke-linecap='round'/><path d='M50 14 l-1.5 9 M50 14 l-9 1.5' stroke='%23e3a23c' stroke-width='4' stroke-linecap='round'/></svg>") no-repeat center/contain}
+.section.sec-goal .panel::before{content:"";position:absolute;right:-10px;top:50%;transform:translateY(-50%);width:58px;height:58px;background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='28' cy='36' r='25' fill='%23e0705a'/><circle cx='28' cy='36' r='18.5' fill='%23fff'/><circle cx='28' cy='36' r='12' fill='%23e0705a'/><circle cx='28' cy='36' r='5.5' fill='%23fff'/><path d='M28 36 L50 14' stroke='%23182448' stroke-width='4.5' stroke-linecap='round'/><path d='M50 14 l-1.5 9 M50 14 l-9 1.5' stroke='%23e3a23c' stroke-width='4' stroke-linecap='round'/></svg>") no-repeat center/contain}
 .section.sec-goal .d-note{background:none !important;border:0 !important;color:var(--ink);padding:0;font-size:14px}
 .section.sec-goal .d-note .nt{display:none}
 .section.sec-goal .d-note b{color:var(--c-teal-ink)}
 .section.sec-errors .s-title{color:#c0392b}
-.section.sec-errors .panel{border:2px solid var(--c-red);background:#fff}
+.section.sec-errors .panel{border:2px solid var(--c-red);border-color:var(--c-red) !important;background:#fff}
 .section.sec-errors .d-qc{border-width:1.5px;border-radius:10px}
 /* Illustrated errors strip (pilot): the خطأ/صواب twin-board figure spans the card
    width BELOW the twins instead of squeezing them into a side column. */
@@ -129,36 +129,38 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-errors-caption .panel{background:transparent;border:0;box-shadow:none;padding:0 6px}
 .section.sec-errors-caption .d-text{font-size:12px;color:var(--muted);text-align:center;font-weight:600}
 .section.sec-stage-tamhid .s-title{color:#b23a48}
-.section.sec-stage-tamhid .panel{background:#fcd8d8;border-color:#f2c0c0}
+.section.sec-stage-tamhid .panel{background:#fcd8d8;border-color:#e79a9a !important}
 .section.sec-stage-arad .s-title{color:var(--c-blue-ink)}
-.section.sec-stage-arad .panel{background:#e7eef8;border-color:#c9d9ee}
+.section.sec-stage-arad .panel{background:#e7eef8;border-color:#9dbbde !important}
 .section.sec-stage-tatbiq .s-title{color:var(--c-green-ink)}
 /* practice/assessment figures a notch smaller than the intro heroes: keeps the
    guide to its 2-page promise while every card stays figure-led */
 .section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:180px}
-.section.sec-stage-tatbiq .panel{background:#e9f2e5;border-color:#cde3c5}
+.section.sec-stage-tatbiq .panel{background:#e9f2e5;border-color:#a3cc93 !important}
 .section.sec-stage-taqwim .s-title{color:#8a6d1d}
-.section.sec-stage-taqwim .panel{background:var(--cream);border-color:var(--cream-line)}
+.section.sec-stage-taqwim .panel{background:var(--cream);border-color:#dbb95e !important}
 .section.sec-stage-taqwim .d-step:last-child{background:#fff;border-color:var(--cream-line)}
 /* pilot chrome: teacher-notes strip after التقويم — dotted ruled lines and the
    dark ملاحظات tab; pure theme chrome, identical for every lesson */
 .section.sec-stage-taqwim{position:relative}
-.section.sec-stage-taqwim::after{content:"ملاحظات المعلّم بعد الدرس";display:block;margin-top:6px;
+.section.sec-stage-taqwim::after{content:"ملاحظات المعلّم بعد الدرس";display:block;margin-top:6px;height:38px;
   background-color:#fff;
   background-image:repeating-linear-gradient(to right,#b9c2d0 0 5px,transparent 5px 11px),repeating-linear-gradient(to right,#b9c2d0 0 5px,transparent 5px 11px);
-  background-size:calc(100% - 120px) 1.5px,calc(100% - 120px) 1.5px;background-repeat:no-repeat,no-repeat;background-position:16px 31px,16px 47px;
-  border:1.5px solid var(--navy);border-radius:12px;padding:6px 14px 27px;min-height:22px;
+  background-size:calc(100% - 130px) 1.5px,calc(100% - 130px) 1.5px;background-repeat:no-repeat,no-repeat;background-position:16px 32px,16px 48px;
+  border:2px solid var(--navy);border-radius:12px;padding:6px 100px 16px 14px;
   font-weight:700;font-size:13px;color:var(--navy);text-align:start}
-.section.sec-stage-taqwim::before{content:"ملاحظات";position:absolute;bottom:10px;inset-inline-start:10px;
-  background:var(--navy);color:#fff;font-weight:700;font-size:11.5px;padding:5px 12px;border-radius:8px;z-index:1}
+.section.sec-stage-taqwim::before{content:"💬 ملاحظات";position:absolute;bottom:2px;right:2px;width:86px;height:56px;
+  display:flex;align-items:center;justify-content:center;box-sizing:border-box;
+  background:var(--navy);color:#fff;font-weight:700;font-size:12px;
+  border-radius:0 10px 10px 0;z-index:1}
 .section.sec-solutions .s-title{color:var(--c-teal-ink)}
-.section.sec-solutions .panel{border-color:var(--c-teal)}
+.section.sec-solutions .panel{border-color:var(--c-teal) !important}
 .section.sec-glossary .s-title{color:var(--navy)}
-.section.sec-glossary .panel{border-color:var(--navy)}
+.section.sec-glossary .panel{border-color:var(--navy) !important}
 .section.sec-multigrade .s-title{color:#a94f86}
-.section.sec-multigrade .panel{border-color:#e0a3c6}
+.section.sec-multigrade .panel{border-color:#d68fb8 !important}
 .section.sec-homework .s-title{color:var(--c-amber-ink)}
-.section.sec-homework .panel{background:var(--cream);border-color:var(--cream-line)}
+.section.sec-homework .panel{background:var(--cream);border-color:#dbb95e !important}
 .section.sec-homework .d-note{background:none !important;border:0 !important}
 
 /* misc */
