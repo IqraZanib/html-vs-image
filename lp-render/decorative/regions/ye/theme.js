@@ -153,9 +153,10 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
   background-size:calc(100% - 92px) 1.5px,calc(100% - 92px) 1.5px;background-repeat:no-repeat,no-repeat;background-position:16px 32px,16px 48px;
   border:2px solid var(--navy);border-radius:12px;padding:6px 64px 16px 14px;
   font-weight:700;font-size:13px;color:var(--navy);text-align:start}
-.section.sec-stage-taqwim::before{content:"💬";position:absolute;bottom:2px;right:2px;width:50px;height:56px;
-  display:flex;align-items:center;justify-content:center;box-sizing:border-box;
-  background:var(--navy);color:#fff;font-size:17px;
+.section.sec-stage-taqwim::before{content:"ملاحظات";position:absolute;bottom:2px;right:2px;width:58px;height:56px;
+  display:flex;align-items:flex-end;justify-content:center;box-sizing:border-box;padding-bottom:7px;
+  background:var(--navy) url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M4 3.5h16a2.2 2.2 0 012.2 2.2v8.6a2.2 2.2 0 01-2.2 2.2H9.6L4.4 20.6v-4.1H4a2.2 2.2 0 01-2.2-2.2V5.7A2.2 2.2 0 014 3.5z' fill='%23fff'/><circle cx='8' cy='10' r='1.25' fill='%23182448'/><circle cx='12' cy='10' r='1.25' fill='%23182448'/><circle cx='16' cy='10' r='1.25' fill='%23182448'/></svg>") no-repeat center 8px/22px 22px;
+  color:#fff;font-size:10.5px;font-weight:700;
   border-radius:0 10px 10px 0;z-index:1}
 .section.sec-solutions .s-title{color:var(--c-teal-ink)}
 .section.sec-solutions .panel{border-color:var(--c-teal) !important}
@@ -188,6 +189,43 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .lp-footer{margin:6px 22px 0;padding:5px 4px 0;background:none;border-top:1.5px solid var(--navy);
   color:var(--navy);font-size:10.5px;text-align:center;font-weight:700}
 .lp-footer b{color:var(--navy)}
+
+/* ── ROUND 11 visual polish (reviewer): pastel fills, stronger text, compact
+      visual language in the lower sections, figures fill their columns. ── */
+/* 1) subtle tinted fills per role (twins/inner cards stay white and pop) */
+.section.sec-goal .panel{background:#f4fbfb}
+.section.sec-errors .panel{background:#fdf3f1}
+.section.sec-solutions .panel{background:#f1fafa}
+.section.sec-glossary .panel{background:#f5f7fc}
+.section.sec-multigrade .panel{background:#fdf4f9}
+/* 2) text: a step larger, darker, roomier */
+:root{--ink:#0c1526}
+.d-step .st-body{font-size:14.5px;line-height:1.56}
+.d-qc .d-a{font-size:14.5px;line-height:1.6}
+.d-bullets li{font-size:14.5px;line-height:1.48}
+.d-note{font-size:15px}
+.section.sec-glossary .d-field{font-size:13px}
+.section.sec-multigrade .d-bullets li{font-size:13px;line-height:1.55}
+/* 3) lower sections: labels as chips, icons on titles — visual, not text-heavy */
+.section.sec-solutions .d-bullets li b,.section.sec-multigrade .d-bullets li b{
+  background:#fff;border:1.5px solid var(--c-teal);color:var(--c-teal-ink);
+  padding:1px 9px;border-radius:9px;font-size:12px;margin-inline-end:4px;display:inline-block}
+.section.sec-multigrade .d-bullets li b{border-color:#d68fb8;color:#a94f86}
+.section.sec-solutions .s-title::before,.section.sec-glossary .s-title::before,.section.sec-multigrade .s-title::before{
+  content:"";display:inline-block;width:15px;height:15px;vertical-align:-2px;margin-inline-end:6px;
+  background:no-repeat center/contain}
+.section.sec-solutions .s-title::before{background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='2.5' y='2.5' width='19' height='19' rx='5' fill='%230e7a7a'/><path d='M7 12.5l3.2 3.2L17 8.9' stroke='%23fff' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>")}
+.section.sec-glossary .s-title::before{background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M4 4.5A2.5 2.5 0 016.5 2H20v17.5H6.75A2.75 2.75 0 004 22z' fill='%23182448'/><path d='M6.5 2H20v15H6.75c-1 0-1.95.3-2.75.85V4.5A2.5 2.5 0 016.5 2z' fill='%23fff' stroke='%23182448' stroke-width='1.6'/><path d='M9 7.5h7M9 11h7' stroke='%23182448' stroke-width='1.7' stroke-linecap='round'/></svg>")}
+.section.sec-multigrade .s-title::before{background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='8.5' cy='8' r='3.4' fill='%23a94f86'/><circle cx='16.5' cy='9.5' r='2.7' fill='%23d68fb8'/><path d='M2.5 19.5c0-3.2 2.7-5.4 6-5.4s6 2.2 6 5.4z' fill='%23a94f86'/><path d='M14.7 19.5c.4-2.6 2-4.2 4.3-4.2 2 0 3.7 1.5 4 4.2z' fill='%23d68fb8'/></svg>")}
+/* 5) no dead space around images: on the text-driven cards (تمهيد/عرض) the figure
+      absolutely FILLS its stretched column so it can never grow the row; the
+      figure-driven cards (تطبيق/تقويم) keep flow layout. */
+.section.sec-stage-tamhid .d-inline-img,.section.sec-stage-arad .d-inline-img{position:relative;align-self:stretch;min-height:252px}
+.section.sec-stage-tamhid .d-inline-img img,.section.sec-stage-arad .d-inline-img img{position:absolute;left:0;top:0;width:100%;height:calc(100% - 24px);object-fit:contain;max-height:none}
+.section.sec-stage-tamhid .d-inline-img .cap,.section.sec-stage-arad .d-inline-img .cap{position:absolute;bottom:0;left:0;right:0}
+.section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:185px}
+/* 7) footer: stronger, pilot-proportioned band */
+.lp-footer{border-top:2px solid var(--navy);font-size:11.5px;padding:6px 4px 0;margin:8px 22px 0}
 `;
 
 module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen' };
