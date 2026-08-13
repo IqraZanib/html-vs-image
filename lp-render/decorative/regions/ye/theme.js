@@ -200,8 +200,8 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-multigrade .panel{background:#fdf4f9}
 /* 2) text: a step larger, darker, roomier */
 :root{--ink:#0c1526}
-.d-step .st-body{font-size:15px;line-height:1.56;font-weight:700}
-.d-qc .d-a{font-size:15px;line-height:1.6;font-weight:700}
+.d-step .st-body{font-size:15.5px;line-height:1.56;font-weight:700}
+.d-qc .d-a{font-size:15.5px;line-height:1.6;font-weight:700}
 .d-bullets li{font-size:14.5px;line-height:1.48;font-weight:700}
 .d-note{font-size:15px;font-weight:700}
 .d-text,.d-field{font-weight:700}
@@ -225,7 +225,7 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-stage-tamhid .d-inline-img,.section.sec-stage-arad .d-inline-img{position:relative;align-self:stretch;min-height:230px}
 .section.sec-stage-tamhid .d-inline-img img,.section.sec-stage-arad .d-inline-img img{position:absolute;left:0;top:0;width:100%;height:calc(100% - 24px);object-fit:contain;max-height:none}
 .section.sec-stage-tamhid .d-inline-img .cap,.section.sec-stage-arad .d-inline-img .cap{position:absolute;bottom:0;left:0;right:0}
-.section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:172px}
+.section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:166px}
 /* 7) footer: stronger, pilot-proportioned band */
 .lp-footer{border-top:2px solid var(--navy);font-size:11.5px;padding:6px 4px 0;margin:8px 22px 0}
 
@@ -234,14 +234,14 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-solutions .d-bullets,.section.sec-multigrade .d-bullets{gap:5px}
 .section.sec-solutions .d-bullets li,.section.sec-multigrade .d-bullets li{
   background:#fff;border:1px solid rgba(20,30,60,.10);border-radius:9px;
-  padding:4px 34px 4px 9px;font-size:13.5px;line-height:1.48}
+  padding:3px 34px 3px 9px;font-size:14px;line-height:1.46}
 .section.sec-solutions .d-bullets li::before,.section.sec-multigrade .d-bullets li::before{
   inset-inline-start:9px;top:50%;transform:translateY(-50%);width:18px;height:18px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   background:var(--c-teal-soft);color:var(--c-teal-ink);font-size:11px;line-height:1}
 .section.sec-multigrade .d-bullets li::before{background:#f7e3ee;color:#a94f86}
 /* 6) terms rows and homework note get soft inner cards */
-.section.sec-glossary .d-field{background:#fff;border:1px solid rgba(20,30,60,.08);border-radius:8px;padding:3px 9px;margin-bottom:3px}
+.section.sec-glossary .d-field{background:#fff;border:1px solid rgba(20,30,60,.08);border-radius:8px;padding:2px 9px;margin-bottom:2px}
 .section.sec-glossary .d-field:last-child{margin-bottom:0}
 .section.sec-homework .d-note{background:#fff !important;border:1.5px solid #ecd9a0 !important;border-radius:10px;padding:6px 11px;font-size:13.5px}
 /* 2) notes box: taller with top breathing room; tab = outlined message icon + label */
@@ -250,12 +250,11 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-stage-taqwim::before{height:72px;width:62px;bottom:2px;padding-bottom:8px;
   background:var(--navy) url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'><path d='M21 11.2c0 3.9-3.8 7-8.5 7-1 0-2-.13-2.9-.38L5.2 19.5l1.2-3C4.9 15.2 4 13.3 4 11.2c0-3.9 3.8-7 8.5-7s8.5 3.1 8.5 7z' stroke='%23fff' stroke-width='1.8' stroke-linejoin='round'/><path d='M8.8 10h6.9M8.8 12.8h4.4' stroke='%23fff' stroke-width='1.6' stroke-linecap='round'/></svg>") no-repeat center 11px/26px 26px}
 /* 3) footer: pilot structure — text at the start, page number at the far end */
-/* left end of the band is reserved for the composer page number (pilot: the page
-   number lives inside the footer band) */
-.lp-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:start;padding-left:130px}
+/* left end reserved for the composer page number; single centered line like the pilot */
+.lp-footer{display:block;text-align:center;padding-left:130px}
 /* page numbers are composer chrome now (PAGE_NUMBER_STYLE ar-bottom) — no footer ::after */
 /* 5) slightly darker overall (weights unchanged) */
-:root{--muted:#43506b;--ink:#060d1a}
+:root{--muted:#3a4660;--ink:#03080f}
 /* 7) figures wider in their cards */
 .panel.has-inline-img{grid-template-columns:minmax(0,.95fr) minmax(0,55%) minmax(0,.6fr)}
 
@@ -270,8 +269,8 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
    yields its place to the figure */
 .section.sec-homework .panel.has-inline-img{display:flex;gap:10px;align-items:center}
 .section.sec-homework .panel.has-inline-img .ii-body{display:block;flex:1;min-width:0}
-.section.sec-homework .panel.has-inline-img .d-inline-img{flex:0 0 27%;max-width:200px;position:static;align-self:auto}
-.section.sec-homework .panel.has-inline-img .d-inline-img img{max-height:92px;position:static;height:auto}
+.section.sec-homework .panel.has-inline-img .d-inline-img{flex:0 0 31%;max-width:230px;position:static;align-self:auto}
+.section.sec-homework .panel.has-inline-img .d-inline-img img{max-height:124px;position:static;height:auto}
 .section.sec-homework .panel.has-inline-img::before{display:none}
 .section.sec-homework .panel.has-inline-img{padding-left:14px}
 

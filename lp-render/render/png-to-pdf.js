@@ -110,7 +110,7 @@ async function composeWithChromium(shotBuf, geom, opts = {}) {
   .pg{width:794px;height:${PAGE_H - 2}px;box-sizing:border-box;position:relative;overflow:hidden;page-break-after:always;background:${geom.bg || '#fff'}}
   .pg:last-child{page-break-after:auto}
   .num{position:absolute;top:9px;inset-inline-end:16px;font:700 11px system-ui,sans-serif;color:#8a8f98;z-index:2}
-  .num.ar{top:auto;bottom:7px;inset-inline-end:auto;left:20px;font:700 10.5px system-ui,sans-serif;color:#182448}
+  .num.ar{top:auto;bottom:11px;inset-inline-end:auto;left:22px;font:700 11.5px 'Noto Naskh Arabic',system-ui,sans-serif;color:#182448}
   .clip{position:relative;overflow:hidden;margin-top:${TOP}px;width:794px}
   .clip img{position:absolute;left:0;width:794px}
   </style></head><body>${divs}</body></html>`;
