@@ -63,13 +63,20 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
   color:var(--navy);font-weight:700;font-size:11px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .panel{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:33px 15px 7px;box-shadow:none}
 
-/* in-card figures: HERO-sized like the pilot — the illustration IS the card's
-   main content and the text is the sidebar, not the other way round. Labels
-   inside the image must stay readable at print size. */
-.panel.has-inline-img{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-.panel.has-inline-img .ii-body{flex:1 1 40%;min-width:0}
-.d-inline-img{flex:0 0 54%;max-width:424px;border:1.5px solid #fff;border-radius:10px;background:#fff;box-shadow:0 2px 8px rgba(20,30,60,.10)}
-.d-inline-img img{background:#fff;max-height:215px}
+/* in-card figures — the pilot's card anatomy: TEXT | IMAGE | TEXT. Teacher
+   actions at the inline start, the hero illustration centred and large, and the
+   تحقق checkpoint as the far amber sidebar. Stage steps are body + تحقق by the
+   content contract, so the two steps become the two text columns around the
+   figure (display:contents lifts them into the card grid). */
+.panel.has-inline-img{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,50%) minmax(0,.68fr);gap:10px;align-items:center}
+.panel.has-inline-img .ii-body{display:contents}
+.panel.has-inline-img .ii-body > .d-steps{display:contents}
+.panel.has-inline-img .d-steps > .d-step:first-child{grid-column:1;grid-row:1;align-self:center}
+.panel.has-inline-img .d-steps > .d-step:last-child{grid-column:3;grid-row:1;align-self:stretch;display:flex;flex-direction:column;justify-content:center}
+.panel.has-inline-img .d-steps > .d-step:only-child{grid-column:1}
+.panel.has-inline-img .d-inline-img{grid-column:2;grid-row:1;justify-self:center;width:100%}
+.d-inline-img{border:1.5px solid #fff;border-radius:10px;background:#fff;box-shadow:0 2px 8px rgba(20,30,60,.10)}
+.d-inline-img img{background:#fff;max-height:238px;width:100%;object-fit:contain}
 .d-inline-img .cap{background:#fff;color:var(--muted);border-top:1px solid var(--line);font-size:10.5px;padding:3px 8px}
 
 /* stage steps: no numbered circles; the LAST item is the amber checkpoint strip */
@@ -111,8 +118,8 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 .section.sec-errors .d-qc{border-width:1.5px;border-radius:10px}
 /* Illustrated errors strip (pilot): the خطأ/صواب twin-board figure spans the card
    width BELOW the twins instead of squeezing them into a side column. */
-.section.sec-errors .panel.has-inline-img{flex-direction:column}
-.section.sec-errors .panel.has-inline-img .ii-body{flex:none;width:100%}
+.section.sec-errors .panel.has-inline-img{display:flex;flex-direction:column}
+.section.sec-errors .panel.has-inline-img .ii-body{display:block;flex:none;width:100%}
 .section.sec-errors .d-inline-img{flex:none;width:100%;max-width:100%;display:flex;flex-direction:column;align-items:center;box-shadow:none;border:0;background:transparent}
 .section.sec-errors .d-inline-img img{max-height:126px;width:auto;max-width:96%;border:1px solid var(--line);border-radius:10px}
 .section.sec-errors .d-inline-img .cap{border-top:0;background:transparent}
@@ -121,13 +128,12 @@ body{background:#fcfcfc;font-family:'IBM Plex Sans Arabic','Noto Naskh Arabic','
 .section.sec-errors-caption .d-text{font-size:12px;color:var(--muted);text-align:center;font-weight:600}
 .section.sec-stage-tamhid .s-title{color:#b23a48}
 .section.sec-stage-tamhid .panel{background:#fcd8d8;border-color:#f2c0c0}
-.section.sec-stage-tamhid .panel.has-inline-img{flex-direction:row-reverse}
 .section.sec-stage-arad .s-title{color:var(--c-blue-ink)}
 .section.sec-stage-arad .panel{background:#e7eef8;border-color:#c9d9ee}
 .section.sec-stage-tatbiq .s-title{color:var(--c-green-ink)}
 /* practice/assessment figures a notch smaller than the intro heroes: keeps the
    guide to its 2-page promise while every card stays figure-led */
-.section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:190px}
+.section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:210px}
 .section.sec-stage-tatbiq .panel{background:#e9f2e5;border-color:#cde3c5}
 .section.sec-stage-taqwim .s-title{color:#8a6d1d}
 .section.sec-stage-taqwim .panel{background:var(--cream);border-color:var(--cream-line)}
