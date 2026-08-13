@@ -298,6 +298,44 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-stage-taqwim::after{margin-top:6px}
 .section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:158px}
 
+
+/* ── ROUND 18 (teammate feedback): bigger type, blacker headings, stage icons ── */
+/* headings: darker role inks (the light title colours read as not-bold) + larger */
+.s-title{font-size:17px}
+.section.sec-stage-tamhid .s-title{color:#8f2230}
+.section.sec-stage-arad .s-title{color:#1e4266}
+.section.sec-stage-tatbiq .s-title{color:#25511d}
+.section.sec-stage-taqwim .s-title{color:#6e5410}
+.section.sec-errors .s-title{color:#a82d20}
+.section.sec-solutions .s-title{color:#0a5c5c}
+.section.sec-glossary .s-title{color:#101a30}
+.section.sec-multigrade .s-title{color:#8f3b6f}
+.section.sec-homework .s-title{color:#6e5410}
+.section.sec-goal .d-note b{color:#0a5c5c}
+/* body: one more notch, tighter leading pays part of it */
+.d-step .st-body{font-size:17px;line-height:1.5}
+.d-qc .d-a{font-size:17px;line-height:1.52}
+.d-note{font-size:16px}
+.section.sec-homework .d-note{font-size:14.5px}
+.section.sec-solutions .d-bullets li,.section.sec-multigrade .d-bullets li{font-size:15px;line-height:1.42}
+.section.sec-glossary .d-field{font-size:14.5px}
+.section.sec-lesson-line .d-text{font-size:14.5px}
+.d-step .st-label{font-size:15px}
+.d-qc .d-q{font-size:15px}
+/* stage-title icons like the reference (leaf/book/pencil/board/warning) */
+.section.sec-stage-tamhid .s-title::before,.section.sec-stage-arad .s-title::before,
+.section.sec-stage-tatbiq .s-title::before,.section.sec-stage-taqwim .s-title::before,
+.section.sec-errors .s-title::before{
+  content:"";display:inline-block;width:17px;height:17px;vertical-align:-3px;margin-inline-end:6px;background:no-repeat center/contain}
+.section.sec-stage-tamhid .s-title::before{background-image:url("data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 viewBox%3D%220 0 24 24%22%3E%3Cpath d%3D%22M20 4C10 4 5 9 5 15c0 2.5 1.5 4.5 4 4.5 6 0 11-5 11-15.5zM5 20c3-6 7-9 11-11%22 fill%3D%22none%22 stroke%3D%22%23b23a48%22 stroke-width%3D%222%22 stroke-linecap%3D%22round%22 stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E")}
+.section.sec-stage-arad .s-title::before{background-image:url("data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 viewBox%3D%220 0 24 24%22%3E%3Cpath d%3D%22M12 6c-2-1.5-5-2-8-2v14c3 0 6 .5 8 2 2-1.5 5-2 8-2V4c-3 0-6 .5-8 2zm0 0v14%22 fill%3D%22none%22 stroke%3D%22%232f5a88%22 stroke-width%3D%222%22 stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E")}
+.section.sec-stage-tatbiq .s-title::before{background-image:url("data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 viewBox%3D%220 0 24 24%22%3E%3Cpath d%3D%22M4 20l1-4L16 5l3 3L8 19l-4 1zm11-14l3 3%22 fill%3D%22none%22 stroke%3D%22%2338682e%22 stroke-width%3D%222%22 stroke-linecap%3D%22round%22 stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E")}
+.section.sec-stage-taqwim .s-title::before{background-image:url("data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 viewBox%3D%220 0 24 24%22%3E%3Crect x%3D%224%22 y%3D%225%22 width%3D%2216%22 height%3D%2212%22 rx%3D%221.5%22 fill%3D%22none%22 stroke%3D%22%238a6d1d%22 stroke-width%3D%222%22%2F%3E%3Cpath d%3D%22M8 21l4-4 4 4M9 9h6M9 12h4%22 fill%3D%22none%22 stroke%3D%22%238a6d1d%22 stroke-width%3D%222%22 stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E")}
+.section.sec-errors .s-title::before{background-image:url("data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 viewBox%3D%220 0 24 24%22%3E%3Cpath d%3D%22M12 4L2.5 20h19L12 4z%22 fill%3D%22none%22 stroke%3D%22%23a82d20%22 stroke-width%3D%222%22 stroke-linejoin%3D%22round%22%2F%3E%3Cpath d%3D%22M12 10v4.5%22 stroke%3D%22%23a82d20%22 stroke-width%3D%222.2%22 stroke-linecap%3D%22round%22%2F%3E%3Ccircle cx%3D%2212%22 cy%3D%2217.4%22 r%3D%221.2%22 fill%3D%22%23a82d20%22%2F%3E%3C%2Fsvg%3E")}
+/* funding trims */
+.section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:150px}
+.section.sec-stage-taqwim::after{height:40px;background-position:16px 38px,16px 54px}
+
 `;
 
 module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom' };
