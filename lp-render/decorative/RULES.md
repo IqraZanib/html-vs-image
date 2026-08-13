@@ -254,6 +254,10 @@ they all go through `renderLessonImage`.
   diagram, every label must be spelled correctly and point to the right part; reject
   any diagram with a wrong, missing, or misplaced label (for example a wrongly drawn
   or wrongly placed diaphragm on a breathing-system chart).
+- When the request states a quantity, count or fraction (two shaded parts of four,
+  «٢/٤», five steps, three groups), COUNT the depicted elements: reject the image if
+  the number of parts drawn, shaded or listed does not match the stated number — a
+  fraction diagram with the wrong shading count teaches the wrong mathematics.
 - Reject anything against human values: violence, blood, weapons, nudity or sexual
   content, hate or discriminatory symbols, harmful stereotypes, frightening imagery,
   substance use, or culturally/religiously offensive content.
