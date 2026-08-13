@@ -200,10 +200,12 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-multigrade .panel{background:#fdf4f9}
 /* 2) text: a step larger, darker, roomier */
 :root{--ink:#0c1526}
-.d-step .st-body{font-size:14.5px;line-height:1.56}
-.d-qc .d-a{font-size:14.5px;line-height:1.6}
-.d-bullets li{font-size:14.5px;line-height:1.48}
-.d-note{font-size:15px}
+.d-step .st-body{font-size:14.5px;line-height:1.56;font-weight:700}
+.d-qc .d-a{font-size:14.5px;line-height:1.6;font-weight:700}
+.d-bullets li{font-size:14.5px;line-height:1.48;font-weight:700}
+.d-note{font-size:15px;font-weight:700}
+.d-text,.d-field{font-weight:700}
+.d-step:last-child .st-body{font-weight:700}
 .section.sec-glossary .d-field{font-size:13px}
 .section.sec-multigrade .d-bullets li{font-size:13px;line-height:1.55}
 /* 3) lower sections: labels as chips, icons on titles — visual, not text-heavy */

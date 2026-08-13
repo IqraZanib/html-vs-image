@@ -74,7 +74,17 @@ const IMAGES_REUSE = `IMAGES — critical:
 - Choose up to 4 images FROM THE SOURCE's "images" array. COPY each chosen entry EXACTLY — id, concept, label and PROMPT BYTE-FOR-BYTE VERBATIM (any change breaks the image cache). Never write new prompts unless the source has NO images at all (then use an empty array).
 - Selection taste: التمهيد may take a "scene"; العرض and التطبيق prefer labelled "diagram" concepts (they teach); التقويم takes whatever depicts the exit task. Attach via "image": "<id>" on the stage sections (one per stage, best content fit). Do NOT emit any "images"-type section. Labels stay the source's own.`;
 
-const buildSystem = (richFigures) => SYSTEM.replace('__IMAGES_BLOCK__', richFigures ? IMAGES_RICH : IMAGES_REUSE);
+// Figure-rich design sets EXPLAIN THROUGH THE PICTURES — the text is a terse
+// sidebar. Their word budgets override the template's (appended after the
+// images block so the shared template stays byte-identical for other regions).
+const RICH_BUDGETS = `
+
+FIGURE-RICH TEXT BUDGETS (this design set explains through IMAGES; text is a terse sidebar — these budgets OVERRIDE the ones above):
+- goal body ≤ 20 words. errors ✗/✓ sides ≤ 16 words each. errors-caption ≤ 12 words.
+- STAGE BODIES ≤ 24 words: short imperative sentences — the hook BY NAME, the essential move, ONE short quote if the source has one. NO narration; the figure carries the explanation.
+- تحقق lines ≤ 10 words. solutions items ≤ 18 words each. glossary values ≤ 7 words. multigrade lines ≤ 12 words. homework ≤ 40 words.`;
+
+const buildSystem = (richFigures) => SYSTEM.replace('__IMAGES_BLOCK__', richFigures ? IMAGES_RICH + RICH_BUDGETS : IMAGES_REUSE);
 
 async function callOnce(content, { apiKey, fetchImpl, extra, system }) {
   const body = JSON.stringify({
