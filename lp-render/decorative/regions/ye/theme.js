@@ -51,7 +51,11 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .hbwrap,.deco{display:none}
 
 /* rhythm */
-.body{padding:6px 22px 2px}
+.body{padding:6px 22px 2px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-flow:row dense;column-gap:8px}
+.body > .section{grid-column:1/-1;min-width:0}
+.section.sec-glossary{grid-column:6/13}
+.section.sec-multigrade{grid-column:1/6}
+.section.sec-glossary .panel,.section.sec-multigrade .panel{height:calc(100% - 2px);box-sizing:border-box}
 .section{margin:0 0 4px}
 
 /* section anatomy: the title sits ON the card; white pill carries time + GRR marker */
@@ -146,21 +150,28 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-stage-taqwim::after{content:"ملاحظات المعلّم بعد الدرس";display:block;margin-top:6px;height:38px;
   background-color:#fff;
   background-image:repeating-linear-gradient(to right,#b9c2d0 0 5px,transparent 5px 11px),repeating-linear-gradient(to right,#b9c2d0 0 5px,transparent 5px 11px);
-  background-size:calc(100% - 130px) 1.5px,calc(100% - 130px) 1.5px;background-repeat:no-repeat,no-repeat;background-position:16px 32px,16px 48px;
-  border:2px solid var(--navy);border-radius:12px;padding:6px 100px 16px 14px;
+  background-size:calc(100% - 92px) 1.5px,calc(100% - 92px) 1.5px;background-repeat:no-repeat,no-repeat;background-position:16px 32px,16px 48px;
+  border:2px solid var(--navy);border-radius:12px;padding:6px 64px 16px 14px;
   font-weight:700;font-size:13px;color:var(--navy);text-align:start}
-.section.sec-stage-taqwim::before{content:"💬 ملاحظات";position:absolute;bottom:2px;right:2px;width:86px;height:56px;
+.section.sec-stage-taqwim::before{content:"💬";position:absolute;bottom:2px;right:2px;width:50px;height:56px;
   display:flex;align-items:center;justify-content:center;box-sizing:border-box;
-  background:var(--navy);color:#fff;font-weight:700;font-size:12px;
+  background:var(--navy);color:#fff;font-size:17px;
   border-radius:0 10px 10px 0;z-index:1}
 .section.sec-solutions .s-title{color:var(--c-teal-ink)}
 .section.sec-solutions .panel{border-color:var(--c-teal) !important}
 .section.sec-glossary .s-title{color:var(--navy)}
+.section.sec-glossary .d-fields{display:block}
+.section.sec-glossary .d-field{display:block;padding:5px 2px;border-bottom:1px dashed #c9cfda;font-size:12.5px;font-weight:600;line-height:1.5}
+.section.sec-glossary .d-field:last-child{border-bottom:0}
+.section.sec-glossary .d-field b{display:inline;margin-inline-end:6px;font-size:11px}
+.section.sec-multigrade .d-bullets li{font-size:12.5px;line-height:1.5}
 .section.sec-glossary .panel{border-color:var(--navy) !important}
 .section.sec-multigrade .s-title{color:#a94f86}
 .section.sec-multigrade .panel{border-color:#d68fb8 !important}
 .section.sec-homework .s-title{color:var(--c-amber-ink)}
-.section.sec-homework .panel{background:var(--cream);border-color:#dbb95e !important}
+.section.sec-homework .panel{background:var(--cream);border-color:#dbb95e !important;position:relative;padding-left:66px}
+.section.sec-homework .panel::before{content:"";position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  width:40px;height:40px;background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><circle cx='24' cy='24' r='22' fill='%2340c351'/><path d='M24 12c-6.6 0-12 5.1-12 11.4 0 2.3.75 4.5 2.05 6.3L12.6 35l5.5-1.4c1.75 1 3.8 1.6 5.9 1.6 6.6 0 12-5.1 12-11.4S30.6 12 24 12z' fill='%23fff'/><path d='M20.3 18.9c-.3-.65-.6-.66-.87-.67h-.74c-.26 0-.68.1-1.03.47s-1.36 1.32-1.36 3.22 1.39 3.73 1.58 3.99c.2.26 2.7 4.3 6.65 5.86 3.28 1.29 3.95 1.03 4.66.97.71-.07 2.3-.94 2.62-1.84.32-.9.32-1.68.23-1.84-.1-.16-.36-.26-.74-.45s-2.3-1.13-2.65-1.26c-.36-.13-.61-.2-.87.2-.26.39-1 1.25-1.23 1.51-.23.26-.45.29-.84.1-.39-.2-1.64-.6-3.12-1.92-1.15-1.02-1.93-2.28-2.16-2.67-.23-.39-.02-.6.17-.79.18-.17.39-.45.58-.68.2-.23.26-.39.39-.65.13-.26.06-.49-.03-.68-.1-.2-.85-2.12-1.19-2.87z' fill='%2340c351'/></svg>") no-repeat center/contain}
 .section.sec-homework .d-note{background:none !important;border:0 !important}
 
 /* misc */
