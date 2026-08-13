@@ -228,6 +228,35 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:185px}
 /* 7) footer: stronger, pilot-proportioned band */
 .lp-footer{border-top:2px solid var(--navy);font-size:11.5px;padding:6px 4px 0;margin:8px 22px 0}
+
+/* ── ROUND 13: page-2 polish (numbered cards, notes box, footer, fills, wider figures) ── */
+/* 1+4+6) numbered lines become airy white row-cards with circled numbers */
+.section.sec-solutions .d-bullets,.section.sec-multigrade .d-bullets{gap:5px}
+.section.sec-solutions .d-bullets li,.section.sec-multigrade .d-bullets li{
+  background:#fff;border:1px solid rgba(20,30,60,.10);border-radius:9px;
+  padding:4px 34px 4px 9px;font-size:13px;line-height:1.48}
+.section.sec-solutions .d-bullets li::before,.section.sec-multigrade .d-bullets li::before{
+  inset-inline-start:9px;top:50%;transform:translateY(-50%);width:18px;height:18px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--c-teal-soft);color:var(--c-teal-ink);font-size:11px;line-height:1}
+.section.sec-multigrade .d-bullets li::before{background:#f7e3ee;color:#a94f86}
+/* 6) terms rows and homework note get soft inner cards */
+.section.sec-glossary .d-field{background:#fff;border:1px solid rgba(20,30,60,.08);border-radius:8px;padding:3px 9px;margin-bottom:3px}
+.section.sec-glossary .d-field:last-child{margin-bottom:0}
+.section.sec-homework .d-note{background:#fff !important;border:1.5px solid #ecd9a0 !important;border-radius:10px;padding:6px 11px;font-size:13.5px}
+/* 2) notes box: taller with top breathing room; tab = outlined message icon + label */
+.section.sec-stage-taqwim::after{margin-top:8px;height:42px;padding:10px 70px 16px 14px;
+  background-position:16px 40px,16px 56px;background-size:calc(100% - 100px) 1.5px,calc(100% - 100px) 1.5px}
+.section.sec-stage-taqwim::before{height:72px;width:62px;bottom:2px;padding-bottom:8px;
+  background:var(--navy) url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'><path d='M21 11.2c0 3.9-3.8 7-8.5 7-1 0-2-.13-2.9-.38L5.2 19.5l1.2-3C4.9 15.2 4 13.3 4 11.2c0-3.9 3.8-7 8.5-7s8.5 3.1 8.5 7z' stroke='%23fff' stroke-width='1.8' stroke-linejoin='round'/><path d='M8.8 10h6.9M8.8 12.8h4.4' stroke='%23fff' stroke-width='1.6' stroke-linecap='round'/></svg>") no-repeat center 11px/26px 26px}
+/* 3) footer: pilot structure — text at the start, page number at the far end */
+.lp-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:start}
+.lp-footer::after{content:"الصفحة ٢ من ٢";font-weight:700;color:var(--navy);font-size:10.5px;white-space:nowrap}
+/* 5) slightly darker overall (weights unchanged) */
+:root{--muted:#4a5568;--ink:#0a1220}
+/* 7) figures wider in their cards */
+.panel.has-inline-img{grid-template-columns:minmax(0,.95fr) minmax(0,55%) minmax(0,.6fr)}
+
 `;
 
 module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen' };
