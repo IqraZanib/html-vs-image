@@ -28,7 +28,7 @@ const THEME_OVERRIDE_CSS = FONT_FACES + `
   --c-blue:#4479ad;  --c-blue-ink:#2f5a88;  --c-blue-soft:#dfe9f5;
   --navy:#182448;
   --cream:#fcf0d8; --cream-line:#ecd9a0;
-  --ink:#1f2a44; --muted:#6b7280; --line:#e5e7eb;
+  --ink:#172138; --muted:#6b7280; --line:#e5e7eb;
 }
 /* measured: WHITE page ground; IBM Plex everywhere */
 body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','Noto Sans',sans-serif}
@@ -84,7 +84,7 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .d-step{background:transparent;border:0;padding:2px 0}
 .d-step .n{display:none}
 .d-step .st-label{color:var(--navy);font-size:13.5px}
-.d-step .st-body{font-size:13.5px;line-height:1.55}
+.d-step .st-body{font-size:13.5px;line-height:1.55;font-weight:500}
 .d-step:last-child{background:var(--cream);border:1px solid var(--cream-line);border-radius:9px;padding:5px 10px;flex-basis:100%}
 .d-step:last-child .st-label{color:#8a6d1d}
 .d-step:last-child .st-label::before{content:"✔ "}
@@ -98,10 +98,10 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .d-qc:first-child .d-q{color:var(--c-red-ink) !important}
 .d-qc:last-child .d-q{color:#2c7d52 !important}
 .d-qc .d-q::before{content:""}
-.d-qc .d-a{color:var(--ink);font-size:13.5px;line-height:1.55}
+.d-qc .d-a{color:var(--ink);font-size:13.5px;line-height:1.55;font-weight:500}
 .d-qc .d-a::before{content:""}
-.d-note{border-radius:10px;padding:9px 13px;font-size:14px}
-.d-bullets li{font-size:13.5px;line-height:1.44}
+.d-note{border-radius:10px;padding:9px 13px;font-size:14px;font-weight:500}
+.d-bullets li{font-size:13.5px;line-height:1.44;font-weight:500}
 
 /* ── template ROLE map — order-independent via sec-<id> classes (see DESIGN.md).
       Sections without contract ids get only the base skin above. ── */
@@ -111,7 +111,7 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-goal .s-head{display:none}
 .section.sec-goal .panel{border:2px solid var(--c-teal);border-color:var(--c-teal) !important;background:#fff;padding:10px 68px 10px 15px;position:relative}
 /* pilot: dartboard-with-arrow icon at the goal card's left end */
-.section.sec-goal .panel::before{content:"";position:absolute;right:-10px;top:50%;transform:translateY(-50%);width:58px;height:58px;background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='28' cy='36' r='25' fill='%23e0705a'/><circle cx='28' cy='36' r='18.5' fill='%23fff'/><circle cx='28' cy='36' r='12' fill='%23e0705a'/><circle cx='28' cy='36' r='5.5' fill='%23fff'/><path d='M28 36 L50 14' stroke='%23182448' stroke-width='4.5' stroke-linecap='round'/><path d='M50 14 l-1.5 9 M50 14 l-9 1.5' stroke='%23e3a23c' stroke-width='4' stroke-linecap='round'/></svg>") no-repeat center/contain}
+.section.sec-goal .panel::before{content:"";position:absolute;right:-20px;top:50%;transform:translateY(-50%);width:58px;height:58px;background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='28' cy='36' r='25' fill='%23e0705a'/><circle cx='28' cy='36' r='18.5' fill='%23fff'/><circle cx='28' cy='36' r='12' fill='%23e0705a'/><circle cx='28' cy='36' r='5.5' fill='%23fff'/><path d='M28 36 L50 14' stroke='%23182448' stroke-width='4.5' stroke-linecap='round'/><path d='M50 14 l-1.5 9 M50 14 l-9 1.5' stroke='%23e3a23c' stroke-width='4' stroke-linecap='round'/></svg>") no-repeat center/contain}
 .section.sec-goal .d-note{background:none !important;border:0 !important;color:var(--ink);padding:0;font-size:14px}
 .section.sec-goal .d-note .nt{display:none}
 .section.sec-goal .d-note b{color:var(--c-teal-ink)}
