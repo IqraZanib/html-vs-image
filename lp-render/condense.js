@@ -59,7 +59,7 @@ HARD RULES:
 const RICH_FIGURE_REGIONS = new Set(['ye']);
 
 const IMAGES_RICH = `IMAGES — the guide is FIGURE-RICH like the approved pilot. A picture must TEACH, never decorate: the explanation happens INSIDE the image, on a teaching surface (chalkboard, notebook page, flashcards, wall chart) that carries THIS lesson's exact words/letters/numbers/answers.
-- EVERY stage section (stage-tamhid, stage-arad, stage-tatbiq, stage-taqwim) carries one figure via "image": "<id>". The "errors" section ALSO carries one: a split twin-board image visualizing the misconception.
+- EVERY stage section (stage-tamhid, stage-arad, stage-tatbiq, stage-taqwim) carries one figure via "image": "<id>". The "errors" section ALSO carries one: a split twin-board image visualizing the misconception. The "homework" section takes a SMALL figure when its task is physical (cutting, folding, counting objects): a simple labelled diagram of that one task.
 - REUSE FIRST: if a SOURCE image already IS a labelled teaching diagram that fits a stage, reference its id and COPY its entry into "images" EXACTLY — id, concept, label, prompt BYTE-FOR-BYTE (any change breaks the image cache).
 - Otherwise AUTHOR a new entry (fresh id, kebab-case, never colliding with a source id) in the pilot's grammar:
   * Prompt in English instruction + the lesson's exact Arabic strings quoted. Template: "Flat vector educational illustration, clean textbook style. <the teaching surface and who works at it>. <the lesson's OWN content worked out on that surface — the actual example, decomposition, matching, ordering or answer>. Labelled in Arabic exactly as follows: «…», «…», «…». No other text, no decoration."
@@ -82,7 +82,7 @@ const RICH_BUDGETS = `
 FIGURE-RICH TEXT BUDGETS (this design set explains through IMAGES; text is a terse sidebar — these budgets OVERRIDE the ones above):
 - goal body ≤ 20 words. errors ✗/✓ sides ≤ 16 words each. errors-caption ≤ 12 words.
 - STAGE BODIES ≤ 24 words: short imperative sentences — the hook BY NAME, the essential move, ONE short quote if the source has one. NO narration; the figure carries the explanation.
-- تحقق lines ≤ 10 words. solutions items ≤ 18 words each. glossary values ≤ 7 words. multigrade lines ≤ 12 words. homework ≤ 40 words.`;
+- تحقق lines ≤ 10 words. solutions items ≤ 18 words each. glossary values ≤ 7 words. multigrade lines ≤ 12 words. homework ≤ 30 words — numbered tasks only, no explanations (the figure shows the task).`;
 
 const buildSystem = (richFigures) => SYSTEM.replace('__IMAGES_BLOCK__', richFigures ? IMAGES_RICH + RICH_BUDGETS : IMAGES_REUSE);
 

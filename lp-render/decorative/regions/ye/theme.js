@@ -257,6 +257,22 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 /* 7) figures wider in their cards */
 .panel.has-inline-img{grid-template-columns:minmax(0,.95fr) minmax(0,55%) minmax(0,.6fr)}
 
+
+/* ── ROUND 14: Arabic-Indic badges + visual homework ── */
+.section.sec-solutions .d-bullets li:nth-child(1)::before,.section.sec-multigrade .d-bullets li:nth-child(1)::before{content:"١"}
+.section.sec-solutions .d-bullets li:nth-child(2)::before,.section.sec-multigrade .d-bullets li:nth-child(2)::before{content:"٢"}
+.section.sec-solutions .d-bullets li:nth-child(3)::before,.section.sec-multigrade .d-bullets li:nth-child(3)::before{content:"٣"}
+.section.sec-solutions .d-bullets li:nth-child(4)::before,.section.sec-multigrade .d-bullets li:nth-child(4)::before{content:"٤"}
+.section.sec-solutions .d-bullets li:nth-child(5)::before,.section.sec-multigrade .d-bullets li:nth-child(5)::before{content:"٥"}
+/* homework with a figure: small task diagram beside the note; the messenger icon
+   yields its place to the figure */
+.section.sec-homework .panel.has-inline-img{display:flex;gap:10px;align-items:center}
+.section.sec-homework .panel.has-inline-img .ii-body{display:block;flex:1;min-width:0}
+.section.sec-homework .panel.has-inline-img .d-inline-img{flex:0 0 27%;max-width:200px;position:static;align-self:auto}
+.section.sec-homework .panel.has-inline-img .d-inline-img img{max-height:110px;position:static;height:auto}
+.section.sec-homework .panel.has-inline-img::before{display:none}
+.section.sec-homework .panel.has-inline-img{padding-left:14px}
+
 `;
 
 module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen' };
