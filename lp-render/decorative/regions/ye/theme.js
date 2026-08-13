@@ -274,6 +274,30 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-homework .panel.has-inline-img::before{display:none}
 .section.sec-homework .panel.has-inline-img{padding-left:14px}
 
+
+/* ── ROUND 17: typography — labels and body one notch up; funded by rhythm trims ── */
+.s-title{font-size:16px}
+.s-time{font-size:11.5px}
+.d-step .st-label{font-size:14px}
+.d-qc .d-q{font-size:14px}
+.d-step .st-body{font-size:16px}
+.d-qc .d-a{font-size:16px}
+.d-note{font-size:15.5px}
+.section.sec-homework .d-note{font-size:14px}
+.section.sec-solutions .d-bullets li,.section.sec-multigrade .d-bullets li{font-size:14.5px}
+.section.sec-solutions .d-bullets li b,.section.sec-multigrade .d-bullets li b{font-size:12.5px;padding:1px 10px}
+.section.sec-solutions .d-bullets li::before,.section.sec-multigrade .d-bullets li::before{width:19px;height:19px;font-size:11.5px}
+.section.sec-glossary .d-field{font-size:14px}
+.section.sec-glossary .d-field b{font-size:12px}
+.d-inline-img .cap{font-size:11px}
+.section.sec-errors-caption .d-text{font-size:12.5px}
+.section.sec-lesson-line .d-text{font-size:14px}
+/* funding trims — invisible rhythm, not content */
+.section{margin:0 0 3px}
+.panel{padding-bottom:4px}
+.section.sec-stage-taqwim::after{margin-top:6px}
+.section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:158px}
+
 `;
 
 module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom' };
