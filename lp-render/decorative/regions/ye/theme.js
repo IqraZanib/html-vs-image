@@ -351,6 +351,17 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:144px}
 .section.sec-stage-taqwim::after{height:38px;background-position:16px 36px,16px 52px;padding-bottom:14px}
 
+
+/* ── ROUND 20: heading hierarchy — larger, more prominent like the reference ── */
+.s-title{font-size:19px;letter-spacing:.1px}
+.s-head{height:34px;margin:0 0 -34px}
+.d-step .st-label{font-size:16px}
+.d-qc .d-q{font-size:16px}
+.section.sec-goal .d-note b{font-size:17px}
+.section.sec-stage-tamhid .s-title::before,.section.sec-stage-arad .s-title::before,
+.section.sec-stage-tatbiq .s-title::before,.section.sec-stage-taqwim .s-title::before,
+.section.sec-errors .s-title::before{width:19px;height:19px;vertical-align:-3.5px}
+
 `;
 
 module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom' };
