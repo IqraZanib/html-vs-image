@@ -17,6 +17,7 @@ main{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:0}
 .phead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line)}
 .phead h2{margin:0;font-size:13px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .tools{display:flex;gap:8px}
+select{font-family:var(--sans);font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:9px;padding:7px 10px;cursor:pointer}
 button{font-family:var(--sans);font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--card);color:var(--ink);
   border-radius:9px;padding:8px 14px;cursor:pointer}
 button:hover{border-color:var(--muted)}
@@ -45,7 +46,7 @@ a.dl{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--signal)}
 <main>
   <section class="panel left">
     <div class="phead"><h2>Content (JSON)</h2>
-      <div class="tools"><button id="sample">Load sample</button><button id="run" class="primary">Render →</button></div></div>
+      <div class="tools"><label style="display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;cursor:pointer"><input type="checkbox" id="guide2p" checked> 2-page</label><select id="region" title="Render with this region's approved design pack"></select><button id="sample">Load sample</button><button id="run" class="primary">Render →</button></div></div>
     <textarea id="content" spellcheck="false" placeholder="Paste a lesson content JSON — or just raw lesson text — then press Render…"></textarea>
     <div class="hint">Paste a content JSON, or raw lesson text (it is auto-structured, keeping its own words, before rendering). Images already in the store are restored free; new ones are generated via kie.ai and saved.</div>
   </section>
@@ -63,6 +64,9 @@ a.dl{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--signal)}
 <script>
 const $=id=>document.getElementById(id);
 $('sample').onclick=async()=>{ const r=await fetch('/sample'); $('content').value=await r.text(); };
+// populate the region picker from the design packs on disk — named regions only
+(async()=>{ try{ const r=await fetch('/regions'); const j=await r.json();
+  for(const {code,name} of (j.regions||[])){ const o=document.createElement('option'); o.value=code; o.textContent='Region: '+(name||code.toUpperCase()); $('region').appendChild(o); } }catch(_){} })();
 $('run').onclick=async()=>{
   const btn=$('run'); const raw=$('content').value.trim();
   if(!raw){ $('content').focus(); return; }
@@ -71,7 +75,7 @@ $('run').onclick=async()=>{
   $('out').querySelectorAll('img').forEach(n=>n.remove());
   ['c-ok','c-gen','c-drop'].forEach(id=>$(id).style.display='none'); $('log').style.display='none'; $('dl').style.display='none';
   try{
-    const res=await fetch('/render',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:raw})});
+    const res=await fetch('/render',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:raw,region:$('region').value,guide2p:$('guide2p').checked})});
     const j=await res.json();
     if(j.logs&&j.logs.length){ $('log').textContent=j.logs.join('\n'); $('log').style.display=''; }
     if(!j.ok){ $('ph').innerHTML='<span style="color:var(--signal)">Error:</span> '+(j.error||'render failed'); return; }

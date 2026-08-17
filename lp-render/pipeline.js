@@ -81,13 +81,27 @@ async function renderLessonImage(content, opts = {}) {
   if (toGen.length) {
     if (!apiKey) throw new Error(`Need KIE_API_KEY to generate ${toGen.length} new image(s) (or seed the asset store first).`);
     // Ground generated images in the lesson's region (people/setting): sw→Kenya, ar→Yemen.
-    const imgRegion = ({ sw: 'ke', ar: 'ye' })[locale] || meta.region || 'pk';
+    // Region comes FIRST from the content's own meta.region; the language mapping is
+    // only a fallback when no region is declared. (Kiswahili is spoken in Tanzania AND
+    // Kenya — a language never implies a country. RULES R22.)
+    const imgRegion = meta.region || ({ sw: 'ke', ar: 'ye' })[locale] || 'pk';
     const segment = {
       subject: meta.subject || (meta.chips || []).map((c) => c.value).join(' '),
       grade: meta.grade || '', region: imgRegion, locale,
       blocks: toGen.map(({ im }) => ({ type: CONCEPT_TO_BLOCK[im.concept] || 'HOOK_STORY', text: im.prompt, characters: im.characters, model: im.model })),
     };
     const { images } = await resolveSegmentImages(segment, { apiKey, region: segment.region, gatePolicy });
+    // One retry pass for gate-dropped figures only: every generation is a fresh
+    // sample, so a second roll rescues most first-pass drops (batch runs showed
+    // ~50% first-pass drop rates). Additive and region-neutral: nothing changes
+    // when the first pass passed everything.
+    const failedIdx = toGen.map((_, i) => i).filter((i) => !(images[i] && images[i].asset && images[i].asset.url));
+    if (failedIdx.length) {
+      log(`  ↻ retrying ${failedIdx.length} gate-dropped image(s) once…`);
+      const retrySeg = { ...segment, blocks: failedIdx.map((i) => segment.blocks[i]) };
+      const { images: retryImages } = await resolveSegmentImages(retrySeg, { apiKey, region: segment.region, gatePolicy });
+      failedIdx.forEach((origI, k) => { if (retryImages[k] && retryImages[k].asset && retryImages[k].asset.url) images[origI] = retryImages[k]; });
+    }
     for (let i = 0; i < toGen.length; i++) {
       const { im, key } = toGen[i]; const got = images[i];
       if (got && got.asset && got.asset.url) {
@@ -107,7 +121,28 @@ async function renderLessonImage(content, opts = {}) {
   const cast = anyImage ? {} : await ensureCast({ apiKey, gatePolicy, locale });
   const { headerHtml, bodyHtml, headCss } = renderDecorativeLesson(content, imagesMap, cast);
   let html = buildShell({ headerHtml, bodyHtml, locale, title: meta.title || contentId });
-  html = html.replace('</head>', `<style>${THEME_CSS}</style>${headCss ? `<style>${headCss}</style>` : ''}</head>`);
+  // Region DESIGN PACK: each region with an approved design set owns a folder
+  // (decorative/regions/<region>/) holding its theme.js (CSS overrides, loaded AFTER
+  // the default theme so plain cascade re-skins the page), its DESIGN.md (the design
+  // set: reference artifacts, anatomy, template rules) and, when needed, goldens.
+  // No pack → the locked default (R26) as-is. Regions are fully independent: adding
+  // or changing one pack cannot affect another region's output.
+  let regionCss = '';
+  let regionPageStyle = '';
+  const themeRegion = String(meta.region || '').toLowerCase();
+  if (themeRegion) {
+    // Cache-busted so a long-running server (LP Studio) always serves the pack's
+    // CURRENT code — theme edits apply on the next render, no restart needed.
+    try {
+      const themePath = require.resolve(`./decorative/regions/${themeRegion}/theme`);
+      delete require.cache[themePath];
+      const pack = require(themePath);
+      regionCss = pack.THEME_OVERRIDE_CSS || '';
+      regionPageStyle = pack.PAGE_NUMBER_STYLE || '';
+      log(`  ⛨ region design pack "${themeRegion}" applied`);
+    } catch (_) { /* no design pack for this region — default look */ }
+  }
+  html = html.replace('</head>', `<style>${THEME_CSS}</style>${regionCss ? `<style>${regionCss}</style>` : ''}${headCss ? `<style>${headCss}</style>` : ''}</head>`);
 
   // The PDF is a second full render; skip it when only the PNG is needed (e.g. the web
   // interface) to roughly halve the render step.
@@ -118,7 +153,7 @@ async function renderLessonImage(content, opts = {}) {
     // preview, no section leaking, real margins. Falls back to the Chromium vector PDF if
     // python3 + pillow + img2pdf are not available.
     try {
-      pdf = await htmlToPixelPdf(html);
+      pdf = await htmlToPixelPdf(html, regionPageStyle ? { pageStyle: regionPageStyle, footerText: (content.meta && content.meta.footer) || '' } : {});
     } catch (e) {
       log(`  (pixel-perfect PDF unavailable — ${e.message}; using vector fallback)`);
       pdf = await htmlToPdf(html, { pageMode: 'paged', pdfOptions: { printBackground: true } });

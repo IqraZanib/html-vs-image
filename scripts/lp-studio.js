@@ -10,6 +10,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { renderLessonImage } = require('../lp-render/pipeline');
 const { structureLesson } = require('../lp-render/structure');
+const { condenseToGuide } = require('../lp-render/condense');
 
 const ROOT = path.resolve(__dirname, '..');
 // Load the kie.ai key from the git-ignored .env-api if it isn't already in the env.
@@ -33,13 +34,42 @@ function handler(req, res) {
     try { return send(res, 200, 'application/json', fs.readFileSync(SAMPLE_FILE, 'utf8')); }
     catch (_) { return send(res, 404, 'application/json', '{}'); }
   }
+  if (req.method === 'GET' && req.url === '/regions') {
+    // Region design packs on disk (decorative/regions/<code>/theme.js) — the picker
+    // lists them automatically, so a new pack shows up with no Studio change.
+    const dir = path.join(ROOT, 'lp-render/decorative/regions');
+    let regions = [];
+    try {
+      regions = fs.readdirSync(dir).filter((r) => fs.existsSync(path.join(dir, r, 'theme.js'))).sort()
+        .map((code) => {
+          let name = code.toUpperCase();
+          try {
+            const themePath = require.resolve(path.join(dir, code, 'theme.js'));
+            delete require.cache[themePath];
+            name = require(themePath).REGION_NAME || name;
+          } catch (_) { /* stub without name — code is fine */ }
+          return { code, name };
+        });
+    } catch (_) { /* no regions dir — empty list */ }
+    return send(res, 200, 'application/json', JSON.stringify({ regions }));
+  }
   if (req.method === 'POST' && req.url === '/render') {
     let body = '';
     req.on('data', (d) => { body += d; if (body.length > 5e6) req.destroy(); });
     req.on('end', async () => {
       const logs = []; const log = (m) => logs.push(m);
+      // Proxies and tunnels (Cloudflare et al) kill a response that stays silent for
+      // ~100s, while structure+render+imagegen can take minutes. Send the headers now
+      // and a whitespace heartbeat until the JSON is ready — leading whitespace is
+      // valid JSON, so the client's res.json() parses exactly as before.
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      const heartbeat = setInterval(() => { try { res.write(' '); } catch (_) { /* client gone */ } }, 15000);
+      const finish = (obj) => { clearInterval(heartbeat); res.end(JSON.stringify(obj)); };
       try {
-        const { content } = JSON.parse(body);
+        const parsedBody = JSON.parse(body);
+        const { content, region } = parsedBody;
+        // Default ON — clients that predate the checkbox get the 2-page guide too.
+        const guide2p = parsedBody.guide2p !== false;
         let parsed = null; let structured = null;
         // First, try to read the paste as a ready content JSON.
         if (typeof content !== 'string') parsed = content;
@@ -55,7 +85,39 @@ function handler(req, res) {
           structured = JSON.stringify(parsed, null, 2);
           log('Structured the input into a content JSON (kept its own words).');
         }
-        const { png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)
+        // Region override from the Studio picker: '' = auto (whatever the content
+        // declares), 'default' = force the default theme, '<code>' = that design pack.
+        if (region === 'default') { parsed.meta = { ...(parsed.meta || {}) }; delete parsed.meta.region; log('Region: forced default theme (picker).'); }
+        else if (region) { parsed.meta = { ...(parsed.meta || {}), region }; log(`Region: "${region}" design pack (picker).`); }
+        // 2-page guide (default ON): condense the full lesson into the design sets'
+        // teacher-facing 12-role template before rendering. Content already in the
+        // guide shape passes through untouched.
+        const looksLikeGuide = Array.isArray(parsed.sections) && parsed.sections.some((x) => x && x.id === 'stage-tamhid');
+        if (guide2p && !looksLikeGuide) {
+          if (!process.env.KIE_API_KEY) throw new Error('The 2-page guide needs a kie.ai key for the condense step.');
+          log('Condensing the full lesson into the 2-page guide template…');
+          const keepRegion = parsed.meta && parsed.meta.region;
+          parsed = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log });
+          if (keepRegion) parsed.meta = { ...(parsed.meta || {}), region: keepRegion };
+          structured = JSON.stringify(parsed, null, 2);
+        }
+        let { png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)
+        // Fit loop: the guide promises 2 pages — if the condensed lesson still paginates
+        // longer, re-condense with escalating tightness (up to two retries: dense
+        // lessons at large type sizes routinely survive a single pass).
+        const pageCount = (buf) => ((buf || '').toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
+        const TIGHTEN = [
+          'The previous attempt was TOO LONG. Cut every word budget by a third; keep only the most essential sentence in each stage body.',
+          'STILL TOO LONG. Halve every word budget: stage bodies ≤ 14 words (one imperative sentence), goal ≤ 14, errors sides ≤ 12, solutions items ≤ 12, homework ≤ 20, glossary values ≤ 5, multigrade lines ≤ 8. The figures carry the lesson.',
+        ];
+        for (let pass = 0; guide2p && pdf && pageCount(pdf) > 2 && !looksLikeGuide && pass < TIGHTEN.length; pass++) {
+          log(`Guide came out ${pageCount(pdf)} pages — re-condensing tighter (pass ${pass + 1})…`);
+          const keepRegion2 = parsed.meta && parsed.meta.region;
+          parsed = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log, extra: TIGHTEN[pass] });
+          if (keepRegion2) parsed.meta = { ...(parsed.meta || {}), region: keepRegion2 };
+          structured = JSON.stringify(parsed, null, 2);
+          ({ png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }));
+        }
         // Keep every rendered lesson in the repo (pdf + png + the content JSON used).
         try {
           const dir = path.join(ROOT, 'assets/generated/lessons');
@@ -66,14 +128,14 @@ function handler(req, res) {
           fs.writeFileSync(`${base}.json`, JSON.stringify(parsed, null, 2));
           log(`Saved to assets/generated/lessons/${contentId}.${locale || 'en'}.{pdf,png,json}`);
         } catch (e) { log(`(could not save to repo: ${e.message})`); }
-        send(res, 200, 'application/json', JSON.stringify({
+        finish({
           ok: true,
           png: 'data:image/png;base64,' + png.toString('base64'),
           pdf: pdf ? 'data:application/pdf;base64,' + pdf.toString('base64') : null,
           logs, stats, structured,
-        }));
+        });
       } catch (e) {
-        send(res, 200, 'application/json', JSON.stringify({ ok: false, error: e.message, logs }));
+        finish({ ok: false, error: e.message, logs });
       }
     });
     return;
