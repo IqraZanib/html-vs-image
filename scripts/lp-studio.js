@@ -103,13 +103,17 @@ function handler(req, res) {
         }
         let { png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)
         // Fit loop: the guide promises 2 pages — if the condensed lesson still paginates
-        // longer, re-condense once with tighter budgets and render again.
+        // longer, re-condense with escalating tightness (up to two retries: dense
+        // lessons at large type sizes routinely survive a single pass).
         const pageCount = (buf) => ((buf || '').toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
-        if (guide2p && pdf && pageCount(pdf) > 2 && !looksLikeGuide) {
-          log(`Guide came out ${pageCount(pdf)} pages — re-condensing tighter…`);
+        const TIGHTEN = [
+          'The previous attempt was TOO LONG. Cut every word budget by a third; keep only the most essential sentence in each stage body.',
+          'STILL TOO LONG. Halve every word budget: stage bodies ≤ 14 words (one imperative sentence), goal ≤ 14, errors sides ≤ 12, solutions items ≤ 12, homework ≤ 20, glossary values ≤ 5, multigrade lines ≤ 8. The figures carry the lesson.',
+        ];
+        for (let pass = 0; guide2p && pdf && pageCount(pdf) > 2 && !looksLikeGuide && pass < TIGHTEN.length; pass++) {
+          log(`Guide came out ${pageCount(pdf)} pages — re-condensing tighter (pass ${pass + 1})…`);
           const keepRegion2 = parsed.meta && parsed.meta.region;
-          parsed = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log,
-            extra: 'The previous attempt was TOO LONG. Cut every word budget by a third; keep only the most essential sentence in each stage body.' });
+          parsed = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log, extra: TIGHTEN[pass] });
           if (keepRegion2) parsed.meta = { ...(parsed.meta || {}), region: keepRegion2 };
           structured = JSON.stringify(parsed, null, 2);
           ({ png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }));
