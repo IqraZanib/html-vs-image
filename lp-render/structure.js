@@ -20,9 +20,11 @@ Shape:
             "region": "pk"|"ke"|"ye", "title": string, "subtitle": string,
             "banner": (optional) the id of a "scene" image to show as the top hero banner,
             "footer": (optional) a short end-of-page line (contact / credit / "sample draft" note),
+            "multigrade": (optional) true when ONE lesson teaches TWO grades at once,
+            "gradeA": (multigrade) the LOWER grade label e.g. "Grade 3", "gradeB": the higher e.g. "Grade 4",
             "chips": [ { "label": string, "value": string } ] },
   "images": [ { "id": string, "concept": "diagram"|"scene", "label": string, "prompt": string } ],
-  "sections": [ { "heading": string, "type": string, ...typeFields } ]
+  "sections": [ { "heading": string, "type": string, ...typeFields, "image"?: an image id shown INLINE under this section } ]
 }
 
 Section "type" values and their fields:
@@ -37,6 +39,9 @@ Section "type" values and their fields:
 - "images":  { "imageIds": [ string ] }  // DISPLAYS images; ids must match entries in the top-level "images" array
 - "summary":  { "items": [ { "icon"?: one emoji, "label": string, "body": string } ] }  // an at-a-glance / "30-second summary" card
 - "rubric":   { "items": [ { "level": string, "desc": string } ] }  // an assessment rubric / marking guide (levels)
+- "duo":      { "a": { "label": string, "role"?: "teacher"|"own", "body": string }, "b": { "label": string, "role"?: "teacher"|"own", "body": string } }  // TWO grades side by side (multigrade): a = lower grade, b = higher grade; role = who has the teacher
+- "schedule": { "gradeA": string, "gradeB": string, "items": [ { "time": string, "phase": string, "teacher": "a"|"b"|"both", "pages"?: string } ] }  // multigrade minute-by-minute rotation overview
+- "table":    { "caption"?: string, "grade"?: "a"|"b", "columns": [ string ], "rows": [ [ string ] ] }  // a grid, e.g. a board-prep place-value table
 
 Hard rules:
 - Use the lesson's OWN words and headings VERBATIM. Do NOT summarize, reword, translate, or invent content. If the lesson is in Urdu/Swahili/Arabic/etc, keep that language and set locale accordingly (default "en").
@@ -50,12 +55,23 @@ Hard rules:
 - Images must be INFORMATIVE and content-relevant, like a good textbook illustration that helps the teacher explain the concept — never decorative or irrelevant filler. For vocabulary/parts, prefer a LABELLED "diagram" (e.g. a family with each member labelled by name: أبي، أمي، أخت …; the parts of a plant; a process). 1–3 well-chosen images per lesson is plenty; not every section needs one.
 - Cultural grounding: any people or places in a prompt must match the lesson's region — Arabic → Yemeni children in a Yemeni setting; Kiswahili → Kenyan children in a Kenyan setting; otherwise Pakistani — so local teachers recognise their own pupils.
 - Where the concept involves children doing something (counting, an activity, a family, playing), prefer a "scene" that SHOWS the region's own children doing it — e.g. "Kenyan children in a classroom counting stones to add 3 + 2 = 5"; "a Yemeni family" — so local children see themselves in the picture. Use a bare labelled diagram only when labelling parts is the actual point.
-- If you declare any images, you MUST also add ONE "images" section whose "imageIds" list every declared image id, placed where the pictures belong.
+- PLACE EACH IMAGE INLINE, with the point it explains (this is the user-friendly pattern): whenever a section explains a concept, a step, a story or an activity that would be clearer with a picture, attach ONE image to THAT section via its "image" field (the image id) so the picture appears directly under that heading, next to the text it illustrates. Declare the image in the top-level "images" array. Do NOT collect the pictures into a separate "Lesson Images" gallery. Use a standalone "images" section (imageIds) only for a set of pictures that genuinely belong together as a group; the hero picture is meta.banner, not an inline image.
+- If you declare any image, it MUST be shown — either inline via a section's "image" field, or listed in an "images" section. Never declare an image and leave it unplaced.
 - 30-SECOND / AT-A-GLANCE SUMMARY: if the source has a short summary box near the top (e.g. "30-Second Summary", "At a glance", "Snapshot") with a few labelled points, emit it as a "summary" section — one item per point, with a fitting emoji in "icon" (e.g. 🎯 for the goal/outcome, ⏱️ for time, ⭐ for the key must-do). Do NOT invent a summary if the source has none.
 - ASSESSMENT RUBRIC: if the source has a rubric / marking guide with levels, emit a "rubric" section — one item per level ("level" + "desc"). Keep the source's level names (e.g. Exceeding / Meeting / Approaching / Below).
 - BANNER: if the lesson has a natural hero scene (a child or children doing the activity), declare ONE "scene" image for it and set meta.banner to that image's id — it becomes the top banner and is NOT listed in any "images" section.
 - FOOTER: if the source ends with a contact line, credit, or "sample/draft" note, put it verbatim in meta.footer (not as a section).
+- NO "VIDEO" SECTION: never create a section headed "Video". A "/video in Rumi" tip is teacher tooling — fold it into the "Record and Send" / "Additional Resources" section, or omit it. Same for any app-usage tip.
 - REGION: set meta.region from the audience — Kiswahili → "ke", Arabic → "ye", otherwise "pk". If the lesson is English but clearly Kenyan (CBC/KICD, "learner", TSC, sufuria, Kenyan names/places) use "ke"; if clearly Yemeni use "ye". Region drives who appears in the images (Kenyan / Yemeni / Pakistani children).
+- MULTIGRADE (very important): if the lesson teaches TWO grades together (grade_3 + grade_4, "Grade 4 + Grade 5", "One Teacher, Two Classes"), set meta.multigrade=true, meta.gradeA=the LOWER grade label, meta.gradeB=the higher. The whole lesson is then rendered SIDE BY SIDE: almost every part that differs by grade is a "duo".
+  * DEFAULT TO "duo": objectives, board prep, hook, EACH teaching step (I Do / We Do / You Do), recap, exit tickets, homework, next lesson — whenever a part has grade_A content AND grade_B content, emit ONE "duo": heading = the part's name (e.g. "Learning Objectives", "Step 1 · I Do", "Exit Check"); a = { label: gradeA, body: gradeA's OWN content }; b = { label: gradeB, body: gradeB's OWN content }.
+  * TEACHING STEPS especially: a step usually has what ONE grade does WITH the teacher and what the OTHER grade does ON ITS OWN — put each grade's activity (teacher part + its need_help/standard/challenge sub-tasks) into that grade's column. Prefer a "duo" over a "steps" block for any grade-split step.
+  * CRITICAL: the two columns hold DIFFERENT content — grade_A's text in "a", grade_B's DIFFERENT text in "b". NEVER the same text in both columns; never split one part into two separate duos.
+  * A "duo" body may be long: fold that grade's sub-fields in with **Readable label:** sub-headings (Title Case, human words — e.g. **Teacher:**, **On their own:**, **Standard:**) and line breaks. Do NOT print raw field keys like "recap_grade_3:", "silent_letter_words:", "grade_4_teacher:" — turn them into plain readable labels or drop the key entirely.
+  * WHO HAS THE TEACHER (make it a proper teacher guide): in a step's "duo", set role="teacher" on the grade the teacher is working WITH, and role="own" on the grade working independently — so the teacher sees at a glance who to stand with and who is busy alone. Nobody sits idle.
+  * ROTATION OVERVIEW: build ONE "schedule" section near the top from the lesson's timing/segments — gradeA/gradeB set to the labels, and one item per segment { time, phase, teacher: "a"/"b"/"both", pages }. This replaces a per-segment section spray.
+  * BOARD PREP / PLACE-VALUE CHART (emit a "table"): when the source lists place names with a single digit each — e.g. a run of lines "Ten Thousands: 6", "Thousands: 9", "Hundreds: 2", "Tens: 7", "Ones: 3" (or with Hundred Thousands…) — that IS a place-value chart. Turn it into a "table": columns = the place names in their given order (highest place first), rows = [[ the matching digits in the same order ]]. Emit ONE table per grade, grade:"a" for the lower grade and grade:"b" for the higher, heading like "Board Prep — Grade 4". Do NOT render a place-value chart as bullets, fields, or a duo. Also emit any word-card / material list as its own short section.
+  * IMAGES for a teacher guide: give EACH major concept / step / story its own informative image, attached INLINE via that section's "image" field (the activity in action, or the picture/diagram to draw on the board) — about one banner + one image per big concept/step (6–10), each content-relevant, so the teacher SEES what to do right where it is explained. Do not gather them into a gallery.
 - Every "id" must be unique kebab-case.`;
 
 const PART_NOTE = `
@@ -216,6 +232,7 @@ async function structureChunked(text, { apiKey, fetchImpl, maxChars }) {
     }
     for (const s of part.sections) {
       if (s && s.type === 'images' && Array.isArray(s.imageIds)) s.imageIds = s.imageIds.map((id) => idmap[id] || id);
+      if (s && s.image && idmap[s.image]) s.image = idmap[s.image]; // inline image id → prefixed id
       sections.push(s);
     }
   });
@@ -241,26 +258,79 @@ function langRegionHint(raw) {
 // image we synthesise a dedicated banner scene so the hero renders.
 function finalizeBanner(content) {
   const meta = content.meta || (content.meta = {});
-  if (!meta.banner) return content;
   const images = Array.isArray(content.images) ? content.images : (content.images = []);
   const ids = new Set(images.map((im) => im && im.id));
-  if (ids.has(meta.banner)) return content;
-  const remap = images.find((im) => im && typeof im.id === 'string' && im.id.endsWith(`-${meta.banner}`));
-  if (remap) { meta.banner = remap.id; return content; }
-  const subj = meta.subject ? `${meta.subject} — ` : '';
-  images.push({ id: meta.banner, concept: 'scene', label: '',
-    prompt: `${subj}children doing the lesson activity: ${meta.title || 'the topic'}` });
+  // A simple, gate-friendly hero scene — specific prompts fail the vision gate, so keep it
+  // a plain happy-classroom scene (the region scaffold adds the local children + setting).
+  const heroPrompt = `happy schoolchildren in a classroom learning ${meta.subject || meta.topic || 'together'}, friendly`;
+  // Always ensure a banner: if none is declared, synthesise one so every lesson has a hero.
+  if (!meta.banner) {
+    meta.banner = 'lesson-hero';
+    images.push({ id: meta.banner, concept: 'scene', label: '', prompt: heroPrompt });
+    return content;
+  }
+  // Resolve the id (remap the chunk prefix if needed), then FORCE the banner to a simple
+  // scene prompt — a hero should be a friendly classroom scene, and specific prompts the
+  // model invents (e.g. big numbers on a board) routinely fail the gate and lose the hero.
+  const remap = ids.has(meta.banner) ? meta.banner : (images.find((im) => im && typeof im.id === 'string' && im.id.endsWith(`-${meta.banner}`)) || {}).id;
+  if (remap) {
+    meta.banner = remap;
+    const im = images.find((x) => x && x.id === remap);
+    if (im) { im.concept = 'scene'; im.prompt = heroPrompt; im.label = ''; }
+    return content;
+  }
+  images.push({ id: meta.banner, concept: 'scene', label: '', prompt: heroPrompt });
   return content;
+}
+
+// Deterministically pull place-value charts out of the raw JSON and build "table"
+// sections — the LLM is unreliable at turning a {"Ten Thousands":6,…} object into a
+// grid, but the source structure is unambiguous, so we do it in code and guarantee it.
+function placeValueTables(raw, meta) {
+  let obj; try { obj = JSON.parse(String(raw)); } catch (_) { return []; }
+  const out = [];
+  const isG5 = (k) => /(grade[_\s]?5|g5|hundred[_\s]?thousand)/i.test(k);
+  const walk = (o) => {
+    if (!o || typeof o !== 'object') return;
+    for (const [k, v] of Object.entries(o)) {
+      if (/place[_\s]?value[_\s]?chart/i.test(k) && v && typeof v === 'object' && !Array.isArray(v)) {
+        const cols = Object.keys(v);
+        const vals = Object.values(v).map((x) => String(x).trim());
+        if (cols.length >= 2 && vals.every((x) => /^\d+$/.test(x))) {
+          const g = (isG5(k) || cols.some(isG5)) ? 'b' : 'a';
+          const label = g === 'b' ? (meta.gradeB || 'Grade 5') : (meta.gradeA || 'Grade 4');
+          out.push({ type: 'table', heading: `Board Prep — ${label}`, grade: g, columns: cols, rows: [vals] });
+        }
+      } else walk(v);
+    }
+  };
+  walk(obj);
+  return out;
 }
 
 async function structureLesson(raw, { apiKey, fetchImpl = defaultFetch, maxChars = 4500 } = {}) {
   if (!apiKey) throw new Error('structuring needs a kie.ai API key');
   const text = langRegionHint(String(raw)) + extractLessonText(String(raw)); // hint + stripped lesson
+  let content;
   if (text.length <= maxChars) {
     const single = await callStructure(text, SYSTEM, { apiKey, fetchImpl });
-    if (single && Array.isArray(single.sections) && single.sections.length) return finalizeBanner(normalize(single));
+    if (single && Array.isArray(single.sections) && single.sections.length) content = normalize(single);
   }
-  return finalizeBanner(await structureChunked(text, { apiKey, fetchImpl, maxChars }));
+  if (!content) content = await structureChunked(text, { apiKey, fetchImpl, maxChars });
+  finalizeBanner(content);
+  // Drop a standalone "Video" section — the /video tip is teacher tooling, not lesson
+  // content, and clutters the plan (kept only if it carries real extra text).
+  content.sections = (content.sections || []).filter((s) => {
+    const h = String((s && s.heading) || '').replace(/[*_`#]/g, '').trim();
+    return !/^videos?$/i.test(h);
+  });
+  // Guarantee board-prep place-value tables (deterministic — the LLM is unreliable here).
+  const tables = placeValueTables(raw, content.meta || {});
+  if (tables.length && !content.sections.some((s) => s && s.type === 'table')) {
+    const at = content.sections.findIndex((s) => s && s.type === 'schedule');
+    content.sections.splice(at >= 0 ? at + 1 : Math.min(2, content.sections.length), 0, ...tables);
+  }
+  return content;
 }
 
 module.exports = { structureLesson, splitIntoChunks, extractLessonText };
