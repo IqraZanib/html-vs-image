@@ -460,5 +460,75 @@
     "model": "gpt-image-2-text-to-image",
     "concept": "diagram",
     "prompt": "Labelled diagram showing Roman numerals I to X matched with numbers 1 to 10."
+  },
+  "1b5e90b7d585d593": {
+    "file": "1b5e90b7d585d593.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Pakistani children reciting the poem 'Golden Sun' aloud with actions while learning about the gifts of the sun."
+  },
+  "1b5051c41722b008": {
+    "file": "1b5051c41722b008.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "diagram",
+    "prompt": "A caterpillar with the words lamb, climb, and thumb shown to illustrate the silent letter b."
+  },
+  "1fb7e48f3d2d5222": {
+    "file": "1fb7e48f3d2d5222.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Pakistani Grade 3 pupils in a classroom looking at a sunrise picture and learning about the gifts of the sun: light, life and warmth."
+  },
+  "cc28d33b81a9a894": {
+    "file": "cc28d33b81a9a894.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "A labelled diagram showing a caterpillar on a leaf and a butterfly near flowers, with the life-cycle picture labels written in English."
+  },
+  "6125951c5f6952bc": {
+    "file": "6125951c5f6952bc.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "A caterpillar on a plant, showing its brown and furry appearance."
+  },
+  "7ee7188be58ed04b": {
+    "file": "7ee7188be58ed04b.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "A Pakistani classroom scene with pupils looking at a sunrise picture and discussing what changes around them when the sun comes out in the morning."
+  },
+  "307885acbb06ff30": {
+    "file": "307885acbb06ff30.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "diagram",
+    "prompt": "A life-cycle diagram of a caterpillar becoming a butterfly, with each stage labelled in English."
+  },
+  "cf8058b20575312d": {
+    "file": "cf8058b20575312d.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Pakistani children observing and talking about the golden sun, showing light, life, and warmth."
+  },
+  "e733293d24eedd29": {
+    "file": "e733293d24eedd29.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "diagram",
+    "prompt": "A labelled English diagram showing a lamb, a person climbing, and a thumb, with the silent letter b identified in the words lamb, climb, thumb."
+  },
+  "99f280a745f35742": {
+    "file": "99f280a745f35742.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "A diagram showing the words lamb, climb, thumb with the silent b highlighted, with labels in English."
   }
 }

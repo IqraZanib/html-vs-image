@@ -16,6 +16,11 @@ const THEME_CSS = `
   --cream:#fdf6e6; --cream-line:#efd9a4;
   /* neutral "slate" pseudo-accent for admin blocks (e.g. Lesson Details) */
   --c-slate:#8590a4; --c-slate-ink:#5a6478; --c-slate-soft:#eef0f4;
+  /* MULTIGRADE scheme (reference-matched, used only when meta.multigrade):
+     lower grade = teal, higher grade = gold, section headers = dark navy. */
+  --g-a:#1a8778; --g-a-soft:#e2f1ee;
+  --g-b:#e0a020; --g-b-soft:#fbf0d4;
+  --navy:#1b2b4d;
   --ink:#23314e; --muted:#6b7688; --line:#e9edf3;
   --grey-mark:#aab2bf;
 }
@@ -71,6 +76,25 @@ body{background:#eef1f7;color:var(--ink);font-family:var(--font),'Baloo 2','Popp
 .s-time{margin-inline-start:auto;background:#fff;border:1px solid var(--line);color:var(--muted);font-size:12px;
   font-weight:700;padding:4px 12px;border-radius:999px;white-space:nowrap}
 .panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:0 6px 18px rgba(40,60,120,.06)}
+
+/* MULTIGRADE — dark navy full-width section header bar (reference-matched) */
+.s-head.mg{display:block;margin:0 0 11px}
+.s-bar{display:flex;align-items:center;gap:10px;background:var(--navy);color:#fff;border-radius:10px;padding:11px 16px;box-shadow:0 4px 11px rgba(27,43,77,.2)}
+.s-bar .s-ic svg{fill:#fff}
+.s-bar .s-ic svg [fill]:not([fill="none"]){fill:#fff}
+.s-bar .s-ic svg [stroke]:not([stroke="none"]){stroke:#fff}
+.s-bar .s-title{color:#fff;font-size:16px}
+.s-bar .s-time{margin-inline-start:auto}
+
+/* MULTIGRADE — two grades side by side (lower = teal, higher = gold) */
+.d-duo{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.d-col{border:1.5px solid var(--cc-soft);border-radius:13px;overflow:hidden;background:#fff}
+.d-col .cc-h{background:var(--cc);color:#fff;font-weight:800;font-size:13.5px;padding:8px 14px;text-align:center;letter-spacing:.2px}
+.d-col .cc-b{padding:12px 15px;font-size:13.5px;line-height:1.55;color:var(--ink)}
+.d-col .cc-b b{color:var(--ink)}
+/* grade-band divider ("Grade 4 — Five Digits") for a banded image gallery */
+.d-band{display:flex;align-items:center;gap:12px;margin:2px 0 11px;color:var(--cc);font-weight:800;font-size:14px;white-space:nowrap}
+.d-band::before,.d-band::after{content:"";flex:1;height:2px;background:var(--cc-soft)}
 
 /* 30-second summary — cream card */
 .d-summary{background:var(--cream);border:1.5px solid var(--cream-line);border-radius:16px;padding:16px 20px}

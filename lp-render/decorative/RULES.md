@@ -243,6 +243,24 @@ and falls back to the Chromium vector PDF (`html-to-pdf.js`, `pageMode:'paged'`)
 is always produced. This applies to ALL entry points (CLI, LP Studio, the rumi adapter) —
 they all go through `renderLessonImage`.
 
+## R31 — Multigrade lessons: two grades, side by side
+When ONE lesson teaches TWO grades at once ("Grade 4 + Grade 5", "One Teacher, Two
+Classes", a source with grade_A / grade_B pairs), render it in MULTIGRADE mode
+(`meta.multigrade` + `meta.gradeA`/`gradeB`, set by the structurer):
+- **Section headers become dark navy full-width bars** (not the warm coloured pills).
+- **Grade-band colours:** the LOWER grade is teal (`--g-a`), the higher grade is gold
+  (`--g-b`), used consistently everywhere the two grades appear.
+- **Wherever the two grades differ** (objectives, board prep, hook, step tasks, recap,
+  exit tickets, homework, next lesson) → ONE `duo` section, two columns side by side:
+  `a` = lower grade (teal header), `b` = higher grade (gold header). The columns hold
+  DIFFERENT content — never the same text in both. Do NOT stack the two grades as
+  separate sections, and fold a timing/schedule table into ONE compact section.
+- Shared content (a concept both grades learn, a whole-class game) stays a normal
+  single section. Everything else (banner, summary, images, pixel-perfect paginated PDF,
+  region-appropriate children) works exactly as for a single-grade lesson.
+(See `decorative/theme.js` grade tokens + `.d-duo`, `decorative/render.js` `duo` +
+`sectionHead` mg branch, `structure.js` multigrade rule.)
+
 ## GATE_POLICY
 - The image must be correct for the exact concept named in the content. For a labeled
   diagram, every label must be spelled correctly and point to the right part; reject

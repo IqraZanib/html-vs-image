@@ -16,13 +16,17 @@ const mark = (kind, i) => (kind === 'alpha' ? ALPHA[i] + ')' : kind === 'num' ? 
 function seedOf(str) { let h = 0; for (const c of String(str)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; }
 function rotate(arr, k) { const n = arr.length; if (!n) return arr.slice(); const s = ((k % n) + n) % n; return arr.slice(s).concat(arr.slice(0, s)); }
 
-// A section header — a solid coloured tab (accent box) with a WHITE icon + WHITE title.
-// Returns '' for an empty heading so no blank header space is reserved.
-function sectionHead(accent, section, i) {
+// A section header. Single-grade: a solid coloured tab (accent box, white icon+title).
+// Multigrade (mg): a dark navy full-width bar (reference-matched). '' for empty heading.
+function sectionHead(accent, section, i, mg) {
   const title = cleanHeading(section.heading);
   if (!title) return '';
   const time = section.time ? `<div class="s-time">${esc(cleanHeading(section.time))}</div>` : '';
   const ic = section.icon && hasIcon(section.icon) ? icon(section.icon, 22) : sparkle('#fff');
+  if (mg) {
+    return `<div class="s-head mg"><div class="s-bar"><span class="s-ic">${ic}</span>`
+      + `<span class="s-title">${esc(title)}</span>${time}</div></div>`;
+  }
   return `<div class="s-head"><div class="s-tab" style="background:var(${accent})">`
     + `<span class="s-ic">${ic}</span><span class="s-title">${esc(title)}</span></div>${time}</div>`;
 }
@@ -43,6 +47,16 @@ function renderBody(section, accent, images) {
         + `<div class="stext">${it.label ? `<b>${esc(cleanHeading(it.label))}:</b> ` : ''}${richText(it.body || '', { engine: section.engine })}</div></div>`
       ).join('');
       return `<div class="d-summary">${rows}</div>`;
+    }
+    case 'duo': {
+      // Two grades side by side — lower grade (a) teal, higher grade (b) gold.
+      const col = (g, tok) => (g && (g.label || g.body))
+        ? `<div class="d-col" style="--cc:var(${tok});--cc-soft:var(${tok}-soft)">`
+          + `<div class="cc-h">${esc(cleanHeading(g.label || ''))}</div>`
+          + `<div class="cc-b">${richText(g.body || '', { engine: section.engine })}</div></div>`
+        : '';
+      const cols = col(section.a, '--g-a') + col(section.b, '--g-b');
+      return cols ? `<div class="d-duo">${cols}</div>` : '';
     }
     case 'rubric': {
       const COL = { exceeding: '--c-teal', meeting: '--c-green', approaching: '--c-amber', below: '--c-red' };
@@ -181,6 +195,7 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
   // images, we add no characters at all — the informative images carry it.
   const hasContentImages = Object.values(images).some((im) => im && im.dataUri);
 
+  const mg = !!meta.multigrade; // multigrade → navy headers + teal/gold grade columns
   let placed = 0;
   let prevHeading = '';
   const rot = { n: 0, t: 0, seed: seedOf(`${meta.id || ''}|${meta.subject || ''}|${meta.title || ''}`) };
@@ -193,7 +208,7 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     // A heading that repeats the previous one (e.g. a phase split across structuring
     // chunks) is shown once — the rest render as a continuation, no repeated header.
     const title = cleanHeading(section.heading);
-    const head = (title && title !== prevHeading) ? sectionHead(accent, section, i) : '';
+    const head = (title && title !== prevHeading) ? sectionHead(accent, section, i, mg) : '';
     if (title) prevHeading = title;
     const charId = hasContentImages ? null : pickCharacter(section, cast, rot, used);
     if (charId) {

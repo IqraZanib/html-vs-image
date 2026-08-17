@@ -20,6 +20,8 @@ Shape:
             "region": "pk"|"ke"|"ye", "title": string, "subtitle": string,
             "banner": (optional) the id of a "scene" image to show as the top hero banner,
             "footer": (optional) a short end-of-page line (contact / credit / "sample draft" note),
+            "multigrade": (optional) true when ONE lesson teaches TWO grades at once,
+            "gradeA": (multigrade) the LOWER grade label e.g. "Grade 3", "gradeB": the higher e.g. "Grade 4",
             "chips": [ { "label": string, "value": string } ] },
   "images": [ { "id": string, "concept": "diagram"|"scene", "label": string, "prompt": string } ],
   "sections": [ { "heading": string, "type": string, ...typeFields } ]
@@ -37,6 +39,7 @@ Section "type" values and their fields:
 - "images":  { "imageIds": [ string ] }  // DISPLAYS images; ids must match entries in the top-level "images" array
 - "summary":  { "items": [ { "icon"?: one emoji, "label": string, "body": string } ] }  // an at-a-glance / "30-second summary" card
 - "rubric":   { "items": [ { "level": string, "desc": string } ] }  // an assessment rubric / marking guide (levels)
+- "duo":      { "a": { "label": string, "body": string }, "b": { "label": string, "body": string } }  // TWO grades side by side (multigrade): a = lower grade, b = higher grade
 
 Hard rules:
 - Use the lesson's OWN words and headings VERBATIM. Do NOT summarize, reword, translate, or invent content. If the lesson is in Urdu/Swahili/Arabic/etc, keep that language and set locale accordingly (default "en").
@@ -56,6 +59,11 @@ Hard rules:
 - BANNER: if the lesson has a natural hero scene (a child or children doing the activity), declare ONE "scene" image for it and set meta.banner to that image's id — it becomes the top banner and is NOT listed in any "images" section.
 - FOOTER: if the source ends with a contact line, credit, or "sample/draft" note, put it verbatim in meta.footer (not as a section).
 - REGION: set meta.region from the audience — Kiswahili → "ke", Arabic → "ye", otherwise "pk". If the lesson is English but clearly Kenyan (CBC/KICD, "learner", TSC, sufuria, Kenyan names/places) use "ke"; if clearly Yemeni use "ye". Region drives who appears in the images (Kenyan / Yemeni / Pakistani children).
+- MULTIGRADE (very important): if the lesson teaches TWO grades together (e.g. grade_3 + grade_4, "Grade 4 + Grade 5", "One Teacher, Two Classes"), set meta.multigrade=true, meta.gradeA=the LOWER grade label, meta.gradeB=the higher.
+  * When a part of the source has a grade_A sub-object AND a grade_B sub-object (objectives, board prep, hook, step tasks, recap, exit tickets, homework, next lesson), emit exactly ONE "duo" section: heading = the part's name (e.g. "Learning Objectives", "Homework", "Exit Check"); a = { label: gradeA, body: gradeA's OWN content }; b = { label: gradeB, body: gradeB's OWN content }.
+  * CRITICAL: the two columns hold DIFFERENT content — copy grade_A's text into "a" and grade_B's DIFFERENT text into "b". NEVER put the same text in both columns, and never merge the two objectives into two separate duos.
+  * A single "duo" can carry many lines: fold that grade's sub-fields into its "body" using **bold:** sub-labels and line breaks.
+  * TIMING / SCHEDULE: fold a whole timing table / segment list ("0-5 min Start·Hook", "5-15 min Step 1"…) into ONE compact section (a single "bullets" list, one bullet per segment) — do NOT make a separate section per time segment.
 - Every "id" must be unique kebab-case.`;
 
 const PART_NOTE = `
