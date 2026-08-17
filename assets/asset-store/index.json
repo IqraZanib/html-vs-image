@@ -530,5 +530,26 @@
     "model": "nano-banana-2",
     "concept": "diagram",
     "prompt": "A diagram showing the words lamb, climb, thumb with the silent b highlighted, with labels in English."
+  },
+  "83fb9fa4b1d46607": {
+    "file": "83fb9fa4b1d46607.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Pakistani children reciting the poem 'Golden Sun' aloud with actions while learning about light, life, and warmth from the sun."
+  },
+  "dcb7005a7066ae94": {
+    "file": "dcb7005a7066ae94.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "A textbook illustration of the sun showing its gifts of light, life, and warmth, with the words light, life, warmth labelled in English and Urdu."
+  },
+  "fd85578d1bfc122c": {
+    "file": "fd85578d1bfc122c.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "A textbook illustration of a caterpillar on a leaf with the stages of its life cycle, showing the caterpillar's brown colour and the words caterpillar and butterfly labelled in English."
   }
 }
