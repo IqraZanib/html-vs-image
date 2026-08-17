@@ -270,6 +270,17 @@ Classes", a source with grade_A / grade_B pairs), render it in MULTIGRADE mode
 (See `decorative/theme.js` grade tokens + `.d-duo`, `decorative/render.js` `duo` +
 `sectionHead` mg branch, `structure.js` multigrade rule.)
 
+## R32 — Put each explanatory image INLINE, with the point it explains
+Images must sit next to the thing they teach, not in a separate gallery. Whenever a
+section explains a concept, a step, a story or an activity that a picture would make
+clearer, attach ONE image to THAT section via its `image` field (an image id) so the
+picture renders directly UNDER that heading, beside the text it illustrates. This is the
+user-friendly pattern — the teacher reads the point and sees the picture for it in the
+same place. Do NOT collect pictures into a separate "Lesson Images" gallery. A standalone
+`images` section is only for a set that genuinely belongs together; the hero is
+`meta.banner`. (Renderer: any section may carry `image`; `structure.js` attaches it and
+rewrites the id across chunk merges; `render.js` `inlineImage`.)
+
 ## GATE_POLICY
 - The image must be correct for the exact concept named in the content. For a labeled
   diagram, every label must be spelled correctly and point to the right part; reject

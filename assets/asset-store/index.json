@@ -621,5 +621,19 @@
     "model": "bytedance/seedream-v4-text-to-image",
     "concept": "diagram",
     "prompt": "A classroom mathematics board showing examples of numbers written in words and in expanded form."
+  },
+  "bf5392f901012e1b": {
+    "file": "bf5392f901012e1b.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Amina sees a price board in the bazaar and reads 78 500 digit by digit; her father puts each digit in its own place."
+  },
+  "35fa1ca566799ffe": {
+    "file": "35fa1ca566799ffe.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "diagram",
+    "prompt": "A place-value reading diagram comparing 363104 with 363 104 and showing how the space makes the number easier to read, with the number written clearly in English."
   }
 }

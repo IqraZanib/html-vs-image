@@ -24,7 +24,7 @@ Shape:
             "gradeA": (multigrade) the LOWER grade label e.g. "Grade 3", "gradeB": the higher e.g. "Grade 4",
             "chips": [ { "label": string, "value": string } ] },
   "images": [ { "id": string, "concept": "diagram"|"scene", "label": string, "prompt": string } ],
-  "sections": [ { "heading": string, "type": string, ...typeFields } ]
+  "sections": [ { "heading": string, "type": string, ...typeFields, "image"?: an image id shown INLINE under this section } ]
 }
 
 Section "type" values and their fields:
@@ -55,7 +55,8 @@ Hard rules:
 - Images must be INFORMATIVE and content-relevant, like a good textbook illustration that helps the teacher explain the concept — never decorative or irrelevant filler. For vocabulary/parts, prefer a LABELLED "diagram" (e.g. a family with each member labelled by name: أبي، أمي، أخت …; the parts of a plant; a process). 1–3 well-chosen images per lesson is plenty; not every section needs one.
 - Cultural grounding: any people or places in a prompt must match the lesson's region — Arabic → Yemeni children in a Yemeni setting; Kiswahili → Kenyan children in a Kenyan setting; otherwise Pakistani — so local teachers recognise their own pupils.
 - Where the concept involves children doing something (counting, an activity, a family, playing), prefer a "scene" that SHOWS the region's own children doing it — e.g. "Kenyan children in a classroom counting stones to add 3 + 2 = 5"; "a Yemeni family" — so local children see themselves in the picture. Use a bare labelled diagram only when labelling parts is the actual point.
-- If you declare any images, you MUST also add ONE "images" section whose "imageIds" list every declared image id, placed where the pictures belong.
+- PLACE EACH IMAGE INLINE, with the point it explains (this is the user-friendly pattern): whenever a section explains a concept, a step, a story or an activity that would be clearer with a picture, attach ONE image to THAT section via its "image" field (the image id) so the picture appears directly under that heading, next to the text it illustrates. Declare the image in the top-level "images" array. Do NOT collect the pictures into a separate "Lesson Images" gallery. Use a standalone "images" section (imageIds) only for a set of pictures that genuinely belong together as a group; the hero picture is meta.banner, not an inline image.
+- If you declare any image, it MUST be shown — either inline via a section's "image" field, or listed in an "images" section. Never declare an image and leave it unplaced.
 - 30-SECOND / AT-A-GLANCE SUMMARY: if the source has a short summary box near the top (e.g. "30-Second Summary", "At a glance", "Snapshot") with a few labelled points, emit it as a "summary" section — one item per point, with a fitting emoji in "icon" (e.g. 🎯 for the goal/outcome, ⏱️ for time, ⭐ for the key must-do). Do NOT invent a summary if the source has none.
 - ASSESSMENT RUBRIC: if the source has a rubric / marking guide with levels, emit a "rubric" section — one item per level ("level" + "desc"). Keep the source's level names (e.g. Exceeding / Meeting / Approaching / Below).
 - BANNER: if the lesson has a natural hero scene (a child or children doing the activity), declare ONE "scene" image for it and set meta.banner to that image's id — it becomes the top banner and is NOT listed in any "images" section.
@@ -69,7 +70,7 @@ Hard rules:
   * WHO HAS THE TEACHER (make it a proper teacher guide): in a step's "duo", set role="teacher" on the grade the teacher is working WITH, and role="own" on the grade working independently — so the teacher sees at a glance who to stand with and who is busy alone. Nobody sits idle.
   * ROTATION OVERVIEW: build ONE "schedule" section near the top from the lesson's timing/segments — gradeA/gradeB set to the labels, and one item per segment { time, phase, teacher: "a"/"b"/"both", pages }. This replaces a per-segment section spray.
   * BOARD PREP / PLACE-VALUE CHART (emit a "table"): when the source lists place names with a single digit each — e.g. a run of lines "Ten Thousands: 6", "Thousands: 9", "Hundreds: 2", "Tens: 7", "Ones: 3" (or with Hundred Thousands…) — that IS a place-value chart. Turn it into a "table": columns = the place names in their given order (highest place first), rows = [[ the matching digits in the same order ]]. Emit ONE table per grade, grade:"a" for the lower grade and grade:"b" for the higher, heading like "Board Prep — Grade 4". Do NOT render a place-value chart as bullets, fields, or a duo. Also emit any word-card / material list as its own short section.
-  * IMAGES for a teacher guide: declare an informative image for EACH major teaching step or key concept the lesson describes (the activity in action, or the picture/diagram to draw on the board) — aim for one banner + one image per big step/concept (about 6–10), each content-relevant, so the teacher can SEE what to do. Every declared image id must appear in an "images" section placed with that step.
+  * IMAGES for a teacher guide: give EACH major concept / step / story its own informative image, attached INLINE via that section's "image" field (the activity in action, or the picture/diagram to draw on the board) — about one banner + one image per big concept/step (6–10), each content-relevant, so the teacher SEES what to do right where it is explained. Do not gather them into a gallery.
 - Every "id" must be unique kebab-case.`;
 
 const PART_NOTE = `
@@ -230,6 +231,7 @@ async function structureChunked(text, { apiKey, fetchImpl, maxChars }) {
     }
     for (const s of part.sections) {
       if (s && s.type === 'images' && Array.isArray(s.imageIds)) s.imageIds = s.imageIds.map((id) => idmap[id] || id);
+      if (s && s.image && idmap[s.image]) s.image = idmap[s.image]; // inline image id → prefixed id
       sections.push(s);
     }
   });

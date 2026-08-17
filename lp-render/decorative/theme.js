@@ -201,6 +201,9 @@ body{background:#eef1f7;color:var(--ink);font-family:var(--font),'Baloo 2','Popp
 .d-img img{display:block;width:100%;height:225px;object-fit:contain;background:#fff}
 .d-img.cover img{object-fit:cover}
 .d-img .cap{padding:9px 13px;font-size:13px;font-weight:700;color:var(--ink);text-align:center}
+/* an image shown inline under the point it explains (R32) */
+.d-inline-img{margin-top:12px}
+.d-inline-img .d-img img{height:200px}
 
 /* footer */
 .lp-footer{margin:18px 30px 0;padding-top:11px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);line-height:1.7;text-align:right}

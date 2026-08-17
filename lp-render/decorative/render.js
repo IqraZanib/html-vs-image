@@ -37,6 +37,15 @@ function headerBg() {
   return `<div class="hbwrap">${ic('blackboard', 'b1')}${ic('books', 'b2')}${ic('target', 'b3')}${ic('pencil', 'b4')}</div>`;
 }
 
+// An image shown INLINE inside a section, right under the point it explains.
+function inlineImage(id, images) {
+  const im = images[id];
+  if (!im || !im.dataUri) return '';
+  const cap = im.label ? `<div class="cap">${esc(cleanHeading(im.label))}</div>` : '';
+  return `<div class="d-imgrow n1 d-inline-img"><div class="d-img${im.cover ? ' cover' : ''}">`
+    + `<img src="${im.dataUri}" alt="${esc(cleanHeading(im.label || ''))}">${cap}</div></div>`;
+}
+
 function renderBody(section, accent, images) {
   const soft = `var(${accent}-soft)`;
   const ink = `var(${accent}-ink)`;
@@ -230,7 +239,13 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
   const sections = (content.sections || []).map((section, i) => {
     // Admin blocks (Lesson Details) use a neutral slate tab, not a warm accent.
     const accent = section.type === 'fields' ? '--c-slate' : accentFor(i);
-    const body = renderBody(section, accent, images);
+    let body = renderBody(section, accent, images);
+    // Inline image: a picture that explains THIS section sits under its heading (R32),
+    // right with the point it illustrates — not collected into a separate gallery.
+    if (section.image && images[section.image] && images[section.image].dataUri) {
+      referenced.add(section.image);
+      body += inlineImage(section.image, images);
+    }
     if (body === '') return '';
     // A heading that repeats the previous one (e.g. a phase split across structuring
     // chunks) is shown once — the rest render as a continuation, no repeated header.

@@ -7,7 +7,10 @@
   "region": "pk",
   "title": "Whole Numbers — Big Numbers Are All Around Us",
   "subtitle": "Whole Numbers",
-  "banner": "c0-amina-price-board",
+  "banner": "c0-whole-numbers-hook",
+  "multigrade": true,
+  "gradeA": "Grade 4",
+  "gradeB": "Grade 5",
   "chips": [
    {
     "label": "Duration",
@@ -16,63 +19,218 @@
    {
     "label": "Curriculum",
     "value": "Punjab Textbook"
-   },
-   {
-    "label": "Materials",
-    "value": "chalk, paper digit cards 0 to 9, pebbles or sticks"
    }
-  ],
-  "multigrade": true,
-  "gradeA": "Grade 4",
-  "gradeB": "Grade 5"
+  ]
  },
  "images": [
   {
-   "id": "c0-amina-price-board",
+   "id": "c0-whole-numbers-hook",
    "concept": "scene",
-   "label": "Amina Reads The Price Board",
-   "prompt": "Pakistani child Amina reading a price board in a bazaar showing 78 500 rupees."
+   "label": "Whole Numbers — Big Numbers Are All Around Us",
+   "prompt": "Pakistani children in a classroom exploring large whole numbers from everyday contexts such as a bazaar price board, a newspaper, kilometres, and rupees."
   },
   {
    "id": "c0-place-value-bundles",
    "concept": "diagram",
    "label": "One Bundle For Every Place",
-   "prompt": "A place-value representation using sticks, paper squares, and pebbles to represent 1, 10, 100, 1 000, 10 000, 100 000, with each place labelled in English."
+   "prompt": "A place-value teaching diagram showing sticks, paper squares, and pebbles representing 1, 10, 100, 1 000, 10 000, and 100 000, with each place labelled in English."
   },
   {
    "id": "c0-space-every-three-digits",
    "concept": "diagram",
    "label": "Leave A Space Every Three Digits",
-   "prompt": "A place-value number diagram comparing 363104 with 363 104 and showing how the space makes the number easier to read, with the number labels in English."
-  },
-  {
-   "id": "c1-place-value-chart-69-273",
-   "concept": "diagram",
-   "label": "69 273 place-value chart",
-   "prompt": "A place-value chart showing 69 273 with the digits positioned in their place values and the expanded form 60 000 + 9 000 + 200 + 70 + 3."
-  },
-  {
-   "id": "c1-place-value-chart-456-907",
-   "concept": "diagram",
-   "label": "456 907 place-value chart",
-   "prompt": "A place-value chart showing 456 907 with the digits positioned in their place values and the expanded form 400 000 + 50 000 + 6 000 + 900 + 7."
-  },
-  {
-   "id": "c1-greatest-number-cards",
-   "concept": "scene",
-   "label": "Greatest number with cards",
-   "prompt": "Pakistani children using digit cards to make the greatest 5-digit number and adding one more card to make a 6-digit number."
-  },
-  {
-   "id": "c1-number-writing-expanded-form",
-   "concept": "diagram",
-   "label": "Number writing and expanded form",
-   "prompt": "A classroom mathematics board showing examples of numbers written in words and in expanded form."
+   "prompt": "A place-value reading diagram comparing 363104 with 363 104 and showing how the space makes the number easier to read, with the number written clearly in English."
   }
  ],
  "sections": [
   {
-   "heading": "Lesson Flow",
+   "heading": "Start · Hook — Whole Class",
+   "type": "note",
+   "label": "Time: 0-5 min",
+   "body": "pages: 1-3\nGrade 4: Bazaar mein sab se bari qeemat kya dekhi hai?\nGrade 5: Chaand kitna door hai — 363 104 ko kaise parhenge?",
+   "image": "c0-whole-numbers-hook"
+  },
+  {
+   "heading": "Step 1 · I Do — Teacher Teaches Grade 4",
+   "type": "duo",
+   "a": {
+    "label": "Grade 4",
+    "role": "teacher",
+    "body": "Read and write 5-digit whole numbers (up to 100 000) in a place-value chart, expanded form, and words."
+   },
+   "b": {
+    "label": "Grade 5",
+    "role": "own",
+    "body": "Read and write 6-digit whole numbers (up to 1 000 000) in a place-value chart, expanded form, and words."
+   }
+  },
+  {
+   "heading": "Step 1 · I Do — Teacher Teaches Grade 5",
+   "type": "duo",
+   "a": {
+    "label": "Grade 4",
+    "role": "own",
+    "body": "Read and write 5-digit whole numbers (up to 100 000) in a place-value chart, expanded form, and words."
+   },
+   "b": {
+    "label": "Grade 5",
+    "role": "teacher",
+    "body": "Read and write 6-digit whole numbers (up to 1 000 000) in a place-value chart, expanded form, and words."
+   }
+  },
+  {
+   "heading": "Step 2 · We Do — Number Game",
+   "type": "note",
+   "body": "Time: 27-35 min\npage: 5\nmaterials: chalk, paper digit cards 0 to 9, pebbles or sticks"
+  },
+  {
+   "heading": "Step 3 · You Do, Then Close",
+   "type": "note",
+   "body": "Time: 35-45 min\npages: 5-6"
+  },
+  {
+   "heading": "Amina Reads The Price Board",
+   "type": "steps",
+   "items": [
+    {
+     "label": "Step 1",
+     "body": "Amina sees a price board in the bazaar."
+    },
+    {
+     "label": "Step 2",
+     "body": "She reads it digit by digit: seven, eight, five, zero, zero."
+    },
+    {
+     "label": "Step 3",
+     "body": "Her father puts each digit in its own place."
+    },
+    {
+     "label": "Step 4",
+     "body": "Now she reads it: seventy-eight thousand and five hundred rupees."
+    }
+   ],
+   "image": "c0-place-value-bundles"
+  },
+  {
+   "heading": "Bilal Reads The Newspaper",
+   "type": "steps",
+   "items": [
+    {
+     "label": "Step 1",
+     "body": "Bilal finds a number in the newspaper."
+    },
+    {
+     "label": "Step 2",
+     "body": "391 000 kinds of plants grow in the world."
+    },
+    {
+     "label": "Step 3",
+     "body": "He counts three digits from the right and leaves a space."
+    },
+    {
+     "label": "Step 4",
+     "body": "Three hundred and ninety-one thousand."
+    }
+   ],
+   "image": "c0-space-every-three-digits"
+  },
+  {
+   "heading": "Amina ne pehle galat kyun parha?",
+   "type": "qa",
+   "marker": "alpha",
+   "items": [
+    {
+     "q": "Amina ne pehle galat kyun parha?"
+    }
+   ]
+  },
+  {
+   "heading": "Teen digit ke baad space kyun chhodte hain?",
+   "type": "qa",
+   "marker": "alpha",
+   "items": [
+    {
+     "q": "Teen digit ke baad space kyun chhodte hain?"
+    }
+   ]
+  },
+  {
+   "heading": "Each Step Is Ten Times Bigger",
+   "type": "math",
+   "engine": "katex",
+   "items": [
+    {
+     "tex": "1 \\to 10 \\to 100 \\to 1{,}000 \\to 10{,}000 \\to 100{,}000"
+    }
+   ]
+  },
+  {
+   "heading": "One Bundle For Every Place",
+   "type": "note",
+   "body": "Zero-cost materials: sticks, paper squares, pebbles represent 1, 10, 100, 1 000, 10 000, 100 000."
+  },
+  {
+   "heading": "Leave A Space Every Three Digits",
+   "type": "note",
+   "body": "363104 is hard to read; 363 104 is easy to read = three hundred and sixty-three thousand, one hundred and four.",
+   "image": "c0-space-every-three-digits"
+  },
+  {
+   "heading": "Number Examples",
+   "type": "fields",
+   "items": [
+    {
+     "label": "number",
+     "value": "21 196"
+    },
+    {
+     "label": "context",
+     "value": "kilometres of the Great Wall"
+    },
+    {
+     "label": "number",
+     "value": "78 500"
+    },
+    {
+     "label": "context",
+     "value": "rupees for a laptop"
+    },
+    {
+     "label": "number",
+     "value": "62 870"
+    },
+    {
+     "label": "context",
+     "value": "rupees for a mobile phone"
+    },
+    {
+     "label": "number",
+     "value": "363 104"
+    },
+    {
+     "label": "context",
+     "value": "kilometres to the moon"
+    },
+    {
+     "label": "number",
+     "value": "861 100"
+    },
+    {
+     "label": "context",
+     "value": "centimetres high is K-2"
+    },
+    {
+     "label": "number",
+     "value": "391 000"
+    },
+    {
+     "label": "context",
+     "value": "kinds of plants in the world"
+    }
+   ]
+  },
+  {
+   "heading": "Rotation Overview",
    "type": "schedule",
    "gradeA": "Grade 4",
    "gradeB": "Grade 5",
@@ -154,158 +312,6 @@
    ]
   },
   {
-   "heading": "Start · Hook — Whole Class",
-   "type": "duo",
-   "a": {
-    "label": "Grade 4",
-    "role": "teacher",
-    "body": "Bazaar mein sab se bari qeemat kya dekhi hai?"
-   },
-   "b": {
-    "label": "Grade 5",
-    "role": "own",
-    "body": "Chaand kitna door hai — 363 104 ko kaise parhenge?"
-   }
-  },
-  {
-   "heading": "Amina Reads The Price Board",
-   "type": "steps",
-   "items": [
-    {
-     "label": "Step 1",
-     "body": "Amina sees a price board in the bazaar."
-    },
-    {
-     "label": "Step 2",
-     "body": "She reads it digit by digit: seven, eight, five, zero, zero."
-    },
-    {
-     "label": "Step 3",
-     "body": "Her father puts each digit in its own place."
-    },
-    {
-     "label": "Step 4",
-     "body": "Now she reads it: seventy-eight thousand and five hundred rupees."
-    }
-   ]
-  },
-  {
-   "heading": "Bilal Reads The Newspaper",
-   "type": "steps",
-   "items": [
-    {
-     "label": "Step 1",
-     "body": "Bilal finds a number in the newspaper."
-    },
-    {
-     "label": "Step 2",
-     "body": "391 000 kinds of plants grow in the world."
-    },
-    {
-     "label": "Step 3",
-     "body": "He counts three digits from the right and leaves a space."
-    },
-    {
-     "label": "Step 4",
-     "body": "Three hundred and ninety-one thousand."
-    }
-   ]
-  },
-  {
-   "heading": "Step 1 · I Do — Teacher Teaches Grade 4",
-   "type": "duo",
-   "a": {
-    "label": "Grade 4",
-    "role": "teacher",
-    "body": "Read and write 5-digit whole numbers (up to 100 000) in a place-value chart, expanded form, and words."
-   },
-   "b": {
-    "label": "Grade 5",
-    "role": "own",
-    "body": "Read and write 6-digit whole numbers (up to 1 000 000) in a place-value chart, expanded form, and words."
-   }
-  },
-  {
-   "heading": "Step 1 · I Do — Teacher Teaches Grade 5",
-   "type": "duo",
-   "a": {
-    "label": "Grade 4",
-    "role": "own",
-    "body": "Read and write 5-digit whole numbers (up to 100 000) in a place-value chart, expanded form, and words."
-   },
-   "b": {
-    "label": "Grade 5",
-    "role": "teacher",
-    "body": "Read and write 6-digit whole numbers (up to 1 000 000) in a place-value chart, expanded form, and words."
-   }
-  },
-  {
-   "heading": "Step 2 · We Do — Number Game",
-   "type": "text",
-   "body": "materials: chalk, paper digit cards 0 to 9, pebbles or sticks"
-  },
-  {
-   "heading": "Step 3 · You Do, Then Close",
-   "type": "duo",
-   "a": {
-    "label": "Grade 4",
-    "body": "Amina ne pehle galat kyun parha?"
-   },
-   "b": {
-    "label": "Grade 5",
-    "body": "Teen digit ke baad space kyun chhodte hain?"
-   }
-  },
-  {
-   "heading": "Each Step Is Ten Times Bigger",
-   "type": "text",
-   "body": "Move one place to the left and the value grows ten times: 1 -> 10 -> 100 -> 1,000 -> 10,000 -> 100,000."
-  },
-  {
-   "heading": "One Bundle For Every Place",
-   "type": "text",
-   "body": "Zero-cost materials: sticks, paper squares, pebbles represent 1, 10, 100, 1 000, 10 000, 100 000."
-  },
-  {
-   "heading": "Leave A Space Every Three Digits",
-   "type": "text",
-   "body": "363104 is hard to read; 363 104 is easy to read = three hundred and sixty-three thousand, one hundred and four."
-  },
-  {
-   "heading": "Number Contexts",
-   "type": "bullets",
-   "marker": "dot",
-   "items": [
-    {
-     "text": "21 196 — kilometres of the Great Wall"
-    },
-    {
-     "text": "78 500 — rupees for a laptop"
-    },
-    {
-     "text": "62 870 — rupees for a mobile phone"
-    },
-    {
-     "text": "363 104 — kilometres to the moon"
-    },
-    {
-     "text": "861 100 — centimetres high is K-2"
-    },
-    {
-     "text": "391 000 — kinds of plants in the world"
-    }
-   ]
-  },
-  {
-   "heading": "Lesson Images",
-   "type": "images",
-   "imageIds": [
-    "c0-amina-price-board",
-    "c0-place-value-bundles",
-    "c0-space-every-three-digits"
-   ]
-  },
-  {
    "heading": "One Chart Teaches Both Classes",
    "type": "duo",
    "a": {
@@ -318,14 +324,6 @@
     "role": "own",
     "body": "Write in words: 290 014 · 433 453 · 910 009 · 871 653 (Mathematics 5, Exercise 1, page 5)"
    }
-  },
-  {
-   "heading": "One Chart Teaches Both Classes",
-   "type": "images",
-   "imageIds": [
-    "c1-place-value-chart-69-273",
-    "c1-place-value-chart-456-907"
-   ]
   },
   {
    "heading": "One Chart Teaches Both Classes",
@@ -346,24 +344,15 @@
    "type": "duo",
    "a": {
     "label": "Grade 4",
-    "role": "teacher",
     "body": "Make the greatest 5-digit number. Answer: 76 532"
    },
    "b": {
     "label": "Grade 5",
-    "role": "own",
     "body": "Add one more card and make a 6-digit number."
    }
   },
   {
-   "heading": "Sab Se Bara Number",
-   "type": "images",
-   "imageIds": [
-    "c1-greatest-number-cards"
-   ]
-  },
-  {
-   "heading": "Sab Se Bara Number",
+   "heading": "35-42 min",
    "type": "duo",
    "a": {
     "label": "Grade 4",
@@ -377,19 +366,12 @@
    }
   },
   {
-   "heading": "Sab Se Bara Number",
-   "type": "note",
+   "heading": "teacher_rotation",
+   "type": "text",
    "body": "2 min with Grade 4 <-> 2 min with Grade 5. Never more than 3 minutes with one class."
   },
   {
-   "heading": "Sab Se Bara Number",
-   "type": "images",
-   "imageIds": [
-    "c1-number-writing-expanded-form"
-   ]
-  },
-  {
-   "heading": "Recap",
+   "heading": "42-45 min",
    "type": "duo",
    "a": {
     "label": "Grade 4",
@@ -401,59 +383,55 @@
    }
   },
   {
-   "heading": "Reasoning",
+   "heading": "task",
    "type": "qa",
    "marker": "alpha",
    "items": [
     {
-     "q": "Write 62 897 in words."
-    },
-    {
-     "q": "Is the 6 worth 6 or 60 000? How do you know?",
+     "q": "Write 62 897 in words.",
      "a": "60 000, because it sits in the Ten Thousands place."
     },
     {
-     "q": "Write 242 140 in words."
+     "q": "Is the 6 worth 6 or 60 000? How do you know?"
     },
     {
-     "q": "The digit 2 appears twice. Is it worth the same both times? Why?",
+     "q": "Write 242 140 in words.",
      "a": "No — one is worth 200 000 and the other 2 000."
+    },
+    {
+     "q": "The digit 2 appears twice. Is it worth the same both times? Why?"
     }
    ]
   },
   {
-   "heading": "Next Lesson",
-   "type": "duo",
-   "a": {
-    "label": "Grade 4",
-    "body": "Mathematics 4, Exercise 1, page 5, Q4 (e) to (h): write 67 459, 25 302, 36 721 and 78 065 in words."
-   },
-   "b": {
-    "label": "Grade 5",
-    "body": "Mathematics 5, Exercise 1, page 5, Q2 (c) to (f): write 949 181, 466 456, 286 019 and 479 321 in expanded form."
-   }
+   "heading": "grade_4",
+   "type": "text",
+   "body": "Mathematics 4, Exercise 1, page 5, Q4 (e) to (h): write 67 459, 25 302, 36 721 and 78 065 in words."
   },
   {
-   "heading": "Video",
+   "heading": "grade_5",
+   "type": "text",
+   "body": "Mathematics 5, Exercise 1, page 5, Q2 (c) to (f): write 949 181, 466 456, 286 019 and 479 321 in expanded form."
+  },
+  {
+   "heading": "video",
    "type": "note",
    "body": "Type /video in Rumi, choose class, subject and topic."
   },
   {
-   "heading": "Record and Send",
+   "heading": "record_and_send",
    "type": "note",
    "body": "Record 5-10 minutes of this lesson. WhatsApp to +92 329 5012345. Coaching notes back within 24 hours — free."
   },
   {
-   "heading": "Next Lesson",
-   "type": "duo",
-   "a": {
-    "label": "Grade 4",
-    "body": "Comparing And Ordering Numbers, page 6."
-   },
-   "b": {
-    "label": "Grade 5",
-    "body": "Addition And Subtraction, page 7."
-   }
+   "heading": "grade_4",
+   "type": "text",
+   "body": "Comparing And Ordering Numbers, page 6."
+  },
+  {
+   "heading": "grade_5",
+   "type": "text",
+   "body": "Addition And Subtraction, page 7."
   }
  ]
 }
