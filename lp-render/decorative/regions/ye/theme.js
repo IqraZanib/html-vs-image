@@ -362,6 +362,15 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-stage-tatbiq .s-title::before,.section.sec-stage-taqwim .s-title::before,
 .section.sec-errors .s-title::before{width:19px;height:19px;vertical-align:-3.5px}
 
+
+/* ── ROUND 21: beyond weight-700 — stroke the glyphs (Chromium render) ── */
+:root{--ink:#000}
+.s-title{font-size:21px;-webkit-text-stroke:.45px currentColor}
+.s-head{height:36px;margin:0 0 -36px}
+.d-step .st-label,.d-qc .d-q{-webkit-text-stroke:.3px currentColor}
+.d-step .st-body,.d-qc .d-a,.d-bullets li,.d-note,.d-field,.d-text{-webkit-text-stroke:.22px currentColor}
+.section.sec-goal .d-note b{-webkit-text-stroke:.35px currentColor}
+
 `;
 
 module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom' };
