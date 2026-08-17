@@ -376,6 +376,16 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-errors .d-inline-img img{max-height:232px}
 .section.sec-stage-tamhid .d-inline-img,.section.sec-stage-arad .d-inline-img{min-height:188px}
 
+
+/* ── ROUND 23: errors figure — zoom the BOARD, not the card. Fixed frame crops the
+      bitmap's beige margins (uniform scale, centred, no distortion); card border
+      slightly darker/more defined. ── */
+.section.sec-errors .panel{border-color:#c85340 !important}
+.section.sec-errors .d-inline-img{height:252px;width:440px;max-width:96%;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;border:1.5px solid #c3cad6;border-radius:12px;background:#f6efe3}
+.section.sec-errors .d-inline-img img{height:330px;max-height:none;width:auto;max-width:none;border:0;border-radius:0;flex:none}
+.section.sec-errors .d-inline-img .cap{display:none}
+
 `;
 
 module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom' };
