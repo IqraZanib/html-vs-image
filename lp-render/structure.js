@@ -68,7 +68,7 @@ Hard rules:
   * A "duo" body may be long: fold that grade's sub-fields in with **Readable label:** sub-headings (Title Case, human words — e.g. **Teacher:**, **On their own:**, **Standard:**) and line breaks. Do NOT print raw field keys like "recap_grade_3:", "silent_letter_words:", "grade_4_teacher:" — turn them into plain readable labels or drop the key entirely.
   * WHO HAS THE TEACHER (make it a proper teacher guide): in a step's "duo", set role="teacher" on the grade the teacher is working WITH, and role="own" on the grade working independently — so the teacher sees at a glance who to stand with and who is busy alone. Nobody sits idle.
   * ROTATION OVERVIEW: build ONE "schedule" section near the top from the lesson's timing/segments — gradeA/gradeB set to the labels, and one item per segment { time, phase, teacher: "a"/"b"/"both", pages }. This replaces a per-segment section spray.
-  * BOARD PREP: if the source gives a place-value / digit table (Hundred-Thousands…Ones with digits) or word cards to write on the board, emit a "table" section (columns + rows), one per grade with grade:"a"/"b". This is what the teacher draws before the bell.
+  * BOARD PREP / PLACE-VALUE CHART (emit a "table"): when the source lists place names with a single digit each — e.g. a run of lines "Ten Thousands: 6", "Thousands: 9", "Hundreds: 2", "Tens: 7", "Ones: 3" (or with Hundred Thousands…) — that IS a place-value chart. Turn it into a "table": columns = the place names in their given order (highest place first), rows = [[ the matching digits in the same order ]]. Emit ONE table per grade, grade:"a" for the lower grade and grade:"b" for the higher, heading like "Board Prep — Grade 4". Do NOT render a place-value chart as bullets, fields, or a duo. Also emit any word-card / material list as its own short section.
   * IMAGES for a teacher guide: declare an informative image for EACH major teaching step or key concept the lesson describes (the activity in action, or the picture/diagram to draw on the board) — aim for one banner + one image per big step/concept (about 6–10), each content-relevant, so the teacher can SEE what to do. Every declared image id must appear in an "images" section placed with that step.
 - Every "id" must be unique kebab-case.`;
 
@@ -267,14 +267,48 @@ function finalizeBanner(content) {
   return content;
 }
 
+// Deterministically pull place-value charts out of the raw JSON and build "table"
+// sections — the LLM is unreliable at turning a {"Ten Thousands":6,…} object into a
+// grid, but the source structure is unambiguous, so we do it in code and guarantee it.
+function placeValueTables(raw, meta) {
+  let obj; try { obj = JSON.parse(String(raw)); } catch (_) { return []; }
+  const out = [];
+  const isG5 = (k) => /(grade[_\s]?5|g5|hundred[_\s]?thousand)/i.test(k);
+  const walk = (o) => {
+    if (!o || typeof o !== 'object') return;
+    for (const [k, v] of Object.entries(o)) {
+      if (/place[_\s]?value[_\s]?chart/i.test(k) && v && typeof v === 'object' && !Array.isArray(v)) {
+        const cols = Object.keys(v);
+        const vals = Object.values(v).map((x) => String(x).trim());
+        if (cols.length >= 2 && vals.every((x) => /^\d+$/.test(x))) {
+          const g = (isG5(k) || cols.some(isG5)) ? 'b' : 'a';
+          const label = g === 'b' ? (meta.gradeB || 'Grade 5') : (meta.gradeA || 'Grade 4');
+          out.push({ type: 'table', heading: `Board Prep — ${label}`, grade: g, columns: cols, rows: [vals] });
+        }
+      } else walk(v);
+    }
+  };
+  walk(obj);
+  return out;
+}
+
 async function structureLesson(raw, { apiKey, fetchImpl = defaultFetch, maxChars = 4500 } = {}) {
   if (!apiKey) throw new Error('structuring needs a kie.ai API key');
   const text = langRegionHint(String(raw)) + extractLessonText(String(raw)); // hint + stripped lesson
+  let content;
   if (text.length <= maxChars) {
     const single = await callStructure(text, SYSTEM, { apiKey, fetchImpl });
-    if (single && Array.isArray(single.sections) && single.sections.length) return finalizeBanner(normalize(single));
+    if (single && Array.isArray(single.sections) && single.sections.length) content = normalize(single);
   }
-  return finalizeBanner(await structureChunked(text, { apiKey, fetchImpl, maxChars }));
+  if (!content) content = await structureChunked(text, { apiKey, fetchImpl, maxChars });
+  finalizeBanner(content);
+  // Guarantee board-prep place-value tables (deterministic — the LLM is unreliable here).
+  const tables = placeValueTables(raw, content.meta || {});
+  if (tables.length && !content.sections.some((s) => s && s.type === 'table')) {
+    const at = content.sections.findIndex((s) => s && s.type === 'schedule');
+    content.sections.splice(at >= 0 ? at + 1 : Math.min(2, content.sections.length), 0, ...tables);
+  }
+  return content;
 }
 
 module.exports = { structureLesson, splitIntoChunks, extractLessonText };

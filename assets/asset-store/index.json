@@ -593,5 +593,33 @@
     "model": "nano-banana-2",
     "concept": "diagram",
     "prompt": "An educational diagram showing the sun with light, life, and warmth, alongside the words lamb, climb, thumb with the silent b identified."
+  },
+  "2dda6bcbad8441a1": {
+    "file": "2dda6bcbad8441a1.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "diagram",
+    "prompt": "A place-value representation using sticks, paper squares, and pebbles to represent 1, 10, 100, 1 000, 10 000, 100 000, with each place labelled in English."
+  },
+  "784cf70aacb4e6f6": {
+    "file": "784cf70aacb4e6f6.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "A place-value chart showing 69 273 with the digits positioned in their place values and the expanded form 60 000 + 9 000 + 200 + 70 + 3."
+  },
+  "316c1dbfe299e857": {
+    "file": "316c1dbfe299e857.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "A place-value chart showing 456 907 with the digits positioned in their place values and the expanded form 400 000 + 50 000 + 6 000 + 900 + 7."
+  },
+  "2dde7016a8981bb6": {
+    "file": "2dde7016a8981bb6.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "diagram",
+    "prompt": "A classroom mathematics board showing examples of numbers written in words and in expanded form."
   }
 }
