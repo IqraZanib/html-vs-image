@@ -635,5 +635,68 @@
     "model": "bytedance/seedream-v4-text-to-image",
     "concept": "diagram",
     "prompt": "A place-value reading diagram comparing 363104 with 363 104 and showing how the space makes the number easier to read, with the number written clearly in English."
+  },
+  "56cc2c175b1d364f": {
+    "file": "56cc2c175b1d364f.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "diagram",
+    "prompt": "A number-reading diagram comparing 363104 with 363 104 and showing the space after every three digits, with the example three hundred and sixty-three thousand, one hundred and four."
+  },
+  "a1d98eec48e72fe1": {
+    "file": "a1d98eec48e72fe1.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "A place-value chart showing 69 273 and 456 907 being read by Grade 4 and Grade 5 students, with place values and numbers clearly visible."
+  },
+  "e6561134e9286602": {
+    "file": "e6561134e9286602.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "A place-value reading diagram comparing 363104 with 363 104 and showing how the space makes the number easier to read as three hundred and sixty-three thousand, one hundred and four, with labels in English."
+  },
+  "78def2cbafb62bf7": {
+    "file": "78def2cbafb62bf7.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Pakistani schoolchildren using number cards to make the greatest 5-digit number and then adding one more card to make a 6-digit number."
+  },
+  "2678804cc872df74": {
+    "file": "2678804cc872df74.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Place-value diagram showing 1 → 10 → 100 → 1,000 → 10,000 → 100,000, with each step to the left growing ten times bigger."
+  },
+  "e872c8c7a3c77223": {
+    "file": "e872c8c7a3c77223.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "A place-value chart showing 69 273 and 456 907, with digits positioned in their place-value columns and expanded forms beneath the numbers."
+  },
+  "237eafdcecfe7674": {
+    "file": "237eafdcecfe7674.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "A six-digit place-value chart demonstrating 456 907 = 400 000 + 50 000 + 6 000 + 900 + 7, with the digits aligned by place value."
+  },
+  "445dc2cac115e5b1": {
+    "file": "445dc2cac115e5b1.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "A place-value diagram showing 62 897 with the digit 6 highlighted in the Ten Thousands place, and 242 140 with the two digits 2 highlighted at different place values."
+  },
+  "ed038fcb0e36a876": {
+    "file": "ed038fcb0e36a876.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "happy schoolchildren in a classroom learning Mathematics, friendly"
   }
 }

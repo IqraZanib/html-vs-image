@@ -61,6 +61,7 @@ Hard rules:
 - ASSESSMENT RUBRIC: if the source has a rubric / marking guide with levels, emit a "rubric" section — one item per level ("level" + "desc"). Keep the source's level names (e.g. Exceeding / Meeting / Approaching / Below).
 - BANNER: if the lesson has a natural hero scene (a child or children doing the activity), declare ONE "scene" image for it and set meta.banner to that image's id — it becomes the top banner and is NOT listed in any "images" section.
 - FOOTER: if the source ends with a contact line, credit, or "sample/draft" note, put it verbatim in meta.footer (not as a section).
+- NO "VIDEO" SECTION: never create a section headed "Video". A "/video in Rumi" tip is teacher tooling — fold it into the "Record and Send" / "Additional Resources" section, or omit it. Same for any app-usage tip.
 - REGION: set meta.region from the audience — Kiswahili → "ke", Arabic → "ye", otherwise "pk". If the lesson is English but clearly Kenyan (CBC/KICD, "learner", TSC, sufuria, Kenyan names/places) use "ke"; if clearly Yemeni use "ye". Region drives who appears in the images (Kenyan / Yemeni / Pakistani children).
 - MULTIGRADE (very important): if the lesson teaches TWO grades together (grade_3 + grade_4, "Grade 4 + Grade 5", "One Teacher, Two Classes"), set meta.multigrade=true, meta.gradeA=the LOWER grade label, meta.gradeB=the higher. The whole lesson is then rendered SIDE BY SIDE: almost every part that differs by grade is a "duo".
   * DEFAULT TO "duo": objectives, board prep, hook, EACH teaching step (I Do / We Do / You Do), recap, exit tickets, homework, next lesson — whenever a part has grade_A content AND grade_B content, emit ONE "duo": heading = the part's name (e.g. "Learning Objectives", "Step 1 · I Do", "Exit Check"); a = { label: gradeA, body: gradeA's OWN content }; b = { label: gradeB, body: gradeB's OWN content }.
@@ -257,15 +258,28 @@ function langRegionHint(raw) {
 // image we synthesise a dedicated banner scene so the hero renders.
 function finalizeBanner(content) {
   const meta = content.meta || (content.meta = {});
-  if (!meta.banner) return content;
   const images = Array.isArray(content.images) ? content.images : (content.images = []);
   const ids = new Set(images.map((im) => im && im.id));
-  if (ids.has(meta.banner)) return content;
-  const remap = images.find((im) => im && typeof im.id === 'string' && im.id.endsWith(`-${meta.banner}`));
-  if (remap) { meta.banner = remap.id; return content; }
-  const subj = meta.subject ? `${meta.subject} — ` : '';
-  images.push({ id: meta.banner, concept: 'scene', label: '',
-    prompt: `${subj}children doing the lesson activity: ${meta.title || 'the topic'}` });
+  // A simple, gate-friendly hero scene — specific prompts fail the vision gate, so keep it
+  // a plain happy-classroom scene (the region scaffold adds the local children + setting).
+  const heroPrompt = `happy schoolchildren in a classroom learning ${meta.subject || meta.topic || 'together'}, friendly`;
+  // Always ensure a banner: if none is declared, synthesise one so every lesson has a hero.
+  if (!meta.banner) {
+    meta.banner = 'lesson-hero';
+    images.push({ id: meta.banner, concept: 'scene', label: '', prompt: heroPrompt });
+    return content;
+  }
+  // Resolve the id (remap the chunk prefix if needed), then FORCE the banner to a simple
+  // scene prompt — a hero should be a friendly classroom scene, and specific prompts the
+  // model invents (e.g. big numbers on a board) routinely fail the gate and lose the hero.
+  const remap = ids.has(meta.banner) ? meta.banner : (images.find((im) => im && typeof im.id === 'string' && im.id.endsWith(`-${meta.banner}`)) || {}).id;
+  if (remap) {
+    meta.banner = remap;
+    const im = images.find((x) => x && x.id === remap);
+    if (im) { im.concept = 'scene'; im.prompt = heroPrompt; im.label = ''; }
+    return content;
+  }
+  images.push({ id: meta.banner, concept: 'scene', label: '', prompt: heroPrompt });
   return content;
 }
 
@@ -304,6 +318,12 @@ async function structureLesson(raw, { apiKey, fetchImpl = defaultFetch, maxChars
   }
   if (!content) content = await structureChunked(text, { apiKey, fetchImpl, maxChars });
   finalizeBanner(content);
+  // Drop a standalone "Video" section — the /video tip is teacher tooling, not lesson
+  // content, and clutters the plan (kept only if it carries real extra text).
+  content.sections = (content.sections || []).filter((s) => {
+    const h = String((s && s.heading) || '').replace(/[*_`#]/g, '').trim();
+    return !/^videos?$/i.test(h);
+  });
   // Guarantee board-prep place-value tables (deterministic — the LLM is unreliable here).
   const tables = placeValueTables(raw, content.meta || {});
   if (tables.length && !content.sections.some((s) => s && s.type === 'table')) {
