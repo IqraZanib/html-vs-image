@@ -551,5 +551,47 @@
     "model": "nano-banana-2",
     "concept": "diagram",
     "prompt": "A textbook illustration of a caterpillar on a leaf with the stages of its life cycle, showing the caterpillar's brown colour and the words caterpillar and butterfly labelled in English."
+  },
+  "7165be6f9ca6cee1": {
+    "file": "7165be6f9ca6cee1.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Pakistani Grade 3 and Grade 4 children learning English poems about nature, reciting poems with actions and reading together in a classroom, with the golden sun and a caterpillar represented as the lesson subjects."
+  },
+  "9c80ee3673477d24": {
+    "file": "9c80ee3673477d24.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Pakistani schoolchildren reciting the poem 'Golden Sun' aloud with actions, with the golden sun representing light, life, and warmth."
+  },
+  "9486715e2e2c722d": {
+    "file": "9486715e2e2c722d.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "A clear English phonics diagram showing the silent letter 'b' in the words lamb, climb, and thumb, with each word labelled in English."
+  },
+  "f32059c285bd9fd4": {
+    "file": "f32059c285bd9fd4.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Pakistani Grade 3 pupils reciting 'Golden Sun' with actions while looking at a sunrise picture and pointing to the sun."
+  },
+  "e480444feeed91a2": {
+    "file": "e480444feeed91a2.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "A labelled caterpillar life-cycle picture with the labels written in English: caterpillar, butterfly, leaf, flowers."
+  },
+  "4aa85c3ae61164b0": {
+    "file": "4aa85c3ae61164b0.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "An educational diagram showing the sun with light, life, and warmth, alongside the words lamb, climb, thumb with the silent b identified."
   }
 }

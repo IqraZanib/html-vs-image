@@ -49,14 +49,41 @@ function renderBody(section, accent, images) {
       return `<div class="d-summary">${rows}</div>`;
     }
     case 'duo': {
-      // Two grades side by side — lower grade (a) teal, higher grade (b) gold.
-      const col = (g, tok) => (g && (g.label || g.body))
-        ? `<div class="d-col" style="--cc:var(${tok});--cc-soft:var(${tok}-soft)">`
-          + `<div class="cc-h">${esc(cleanHeading(g.label || ''))}</div>`
-          + `<div class="cc-b">${richText(g.body || '', { engine: section.engine })}</div></div>`
-        : '';
+      // Two grades side by side — lower grade (a) teal, higher grade (b) gold. Each
+      // column can show WHO HAS THE TEACHER: role "teacher" (filled dot) / "own" (ring).
+      const col = (g, tok) => {
+        if (!g || !(g.label || g.body)) return '';
+        const role = g.role === 'teacher'
+          ? '<span class="mk teacher"></span><span class="role">Teacher here</span>'
+          : g.role === 'own'
+            ? '<span class="mk own"></span><span class="role">On its own</span>' : '';
+        return `<div class="d-col" style="--cc:var(${tok});--cc-soft:var(${tok}-soft)">`
+          + `<div class="cc-h">${role}${esc(cleanHeading(g.label || ''))}</div>`
+          + `<div class="cc-b">${richText(g.body || '', { engine: section.engine })}</div></div>`;
+      };
       const cols = col(section.a, '--g-a') + col(section.b, '--g-b');
       return cols ? `<div class="d-duo">${cols}</div>` : '';
+    }
+    case 'schedule': {
+      // Minute-by-minute rotation overview: time · phase · who has the teacher · pages.
+      const dot = (who) => {
+        if (who === 'a') return '<span class="who"><span class="dot" style="background:var(--g-a)"></span>Teacher with ' + esc(section.gradeA || 'Grade A') + '</span>';
+        if (who === 'b') return '<span class="who"><span class="dot" style="background:var(--g-b)"></span>Teacher with ' + esc(section.gradeB || 'Grade B') + '</span>';
+        return '<span class="who">Whole class</span>';
+      };
+      const rows = (section.items || []).map((it) =>
+        `<tr><td class="t">${esc(cleanHeading(it.time || ''))}</td><td>${richText(it.phase || '', { engine: section.engine })}</td>`
+        + `<td>${dot(it.teacher)}</td><td>${esc(cleanHeading(it.pages || ''))}</td></tr>`).join('');
+      return `<table class="d-sched"><thead><tr><th>Time</th><th>What happens</th><th>Who has the teacher</th><th>Pages</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }
+    case 'table': {
+      // A simple grid (e.g. a board-prep place-value table). Optional grade colour.
+      const tok = section.grade === 'b' ? '--g-b' : section.grade === 'a' ? '--g-a' : null;
+      const style = tok ? ` style="--cc:var(${tok});--cc-soft:var(${tok}-soft);--cc-ink:var(${tok}-ink)"` : '';
+      const cap = section.caption ? `<caption>${esc(cleanHeading(section.caption))}</caption>` : '';
+      const head = (section.columns || []).length ? `<thead><tr>${section.columns.map((c) => `<th>${esc(cleanHeading(c))}</th>`).join('')}</tr></thead>` : '';
+      const body = (section.rows || []).map((r) => `<tr>${(r || []).map((c) => `<td>${esc(String(c))}</td>`).join('')}</tr>`).join('');
+      return `<table class="d-gtable"${style}>${cap}${head}<tbody>${body}</tbody></table>`;
     }
     case 'rubric': {
       const COL = { exceeding: '--c-teal', meeting: '--c-green', approaching: '--c-amber', below: '--c-red' };
@@ -232,8 +259,17 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     if (body2) extra = `<section class="section"><div class="panel">${body2}</div></section>`;
   }
 
+  // Multigrade legend — "what the symbols mean" (only when there is duo content to explain).
+  const legend = (mg && /class="d-duo"/.test(sections))
+    ? `<div class="mg-legend">`
+      + `<span class="li"><span class="dot fill"></span>Teacher is here</span>`
+      + `<span class="li"><span class="dot"></span>This class works on its own</span>`
+      + `<span class="li"><span class="sw" style="background:var(--g-a)"></span>${esc(cleanHeading(meta.gradeA || 'Grade A'))}</span>`
+      + `<span class="li"><span class="sw" style="background:var(--g-b)"></span>${esc(cleanHeading(meta.gradeB || 'Grade B'))}</span>`
+      + `</div>`
+    : '';
   const footer = meta.footer ? `<div class="lp-footer">${richText(String(meta.footer), {})}</div>` : '';
-  const body = `<div class="body">${sections}${extra}</div>${footer}`;
+  const body = `<div class="body">${legend}${sections}${extra}</div>${footer}`;
   // KaTeX-rendered math needs its stylesheet; MathJax output is self-contained SVG.
   const headCss = /class="katex"/.test(body) ? katexCss() : '';
   return { headerHtml, bodyHtml: body, headCss };

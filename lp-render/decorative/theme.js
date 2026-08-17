@@ -89,9 +89,38 @@ body{background:#eef1f7;color:var(--ink);font-family:var(--font),'Baloo 2','Popp
 /* MULTIGRADE — two grades side by side (lower = teal, higher = gold) */
 .d-duo{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 .d-col{border:1.5px solid var(--cc-soft);border-radius:13px;overflow:hidden;background:#fff}
-.d-col .cc-h{background:var(--cc);color:#fff;font-weight:800;font-size:13.5px;padding:8px 14px;text-align:center;letter-spacing:.2px}
+.d-col .cc-h{background:var(--cc);color:#fff;font-weight:800;font-size:13.5px;padding:8px 14px;text-align:center;letter-spacing:.2px;display:flex;align-items:center;justify-content:center;gap:8px}
 .d-col .cc-b{padding:12px 15px;font-size:13.5px;line-height:1.55;color:var(--ink)}
 .d-col .cc-b b{color:var(--ink)}
+/* who has the teacher: filled dot = teacher here, open ring = works on its own */
+.cc-h .mk{flex:0 0 auto;width:13px;height:13px;border-radius:50%;border:2px solid #fff}
+.cc-h .mk.teacher{background:#fff}
+.cc-h .mk.own{background:transparent}
+.cc-h .role{font-weight:800;font-size:11px;text-transform:uppercase;letter-spacing:.4px;opacity:.95}
+
+/* MULTIGRADE — "what the symbols mean" legend under the banner */
+.mg-legend{display:flex;flex-wrap:wrap;gap:16px;align-items:center;background:#fff;border:1px solid var(--line);
+  border-radius:12px;padding:10px 16px;margin:0 0 14px;font-size:12.5px;font-weight:700;color:var(--ink)}
+.mg-legend .li{display:flex;align-items:center;gap:7px}
+.mg-legend .dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--navy)}
+.mg-legend .dot.fill{background:var(--navy)}
+.mg-legend .sw{width:14px;height:14px;border-radius:4px}
+
+/* MULTIGRADE — minute-by-minute rotation overview */
+.d-sched{width:100%;border-collapse:collapse;font-size:12.5px;overflow:hidden;border-radius:10px}
+.d-sched th{background:var(--navy);color:#fff;font-weight:800;padding:8px 11px;text-align:start;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px}
+.d-sched td{padding:8px 11px;border-bottom:1px solid var(--line);color:var(--ink);font-weight:600;vertical-align:top}
+.d-sched tr:last-child td{border-bottom:0}
+.d-sched .t{font-weight:800;white-space:nowrap;color:var(--navy)}
+.d-sched .who{display:inline-flex;align-items:center;gap:6px;font-weight:700}
+.d-sched .who .dot{width:11px;height:11px;border-radius:50%}
+
+/* MULTIGRADE — board-prep / place-value table */
+.d-gtable{width:100%;border-collapse:collapse;font-size:13px;margin-top:2px}
+.d-gtable caption{caption-side:top;text-align:start;font-weight:800;font-size:12.5px;color:var(--cc,var(--navy));margin-bottom:5px}
+.d-gtable th{background:var(--cc-soft,var(--c-slate-soft));color:var(--cc-ink,var(--ink));font-weight:800;font-size:11px;
+  padding:7px 8px;border:1px solid var(--line);text-align:center;line-height:1.2}
+.d-gtable td{border:1px solid var(--line);padding:9px 8px;text-align:center;font-weight:800;font-size:16px;color:var(--ink)}
 /* grade-band divider ("Grade 4 — Five Digits") for a banded image gallery */
 .d-band{display:flex;align-items:center;gap:12px;margin:2px 0 11px;color:var(--cc);font-weight:800;font-size:14px;white-space:nowrap}
 .d-band::before,.d-band::after{content:"";flex:1;height:2px;background:var(--cc-soft)}

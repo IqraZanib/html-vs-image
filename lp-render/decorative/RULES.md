@@ -258,6 +258,15 @@ Classes", a source with grade_A / grade_B pairs), render it in MULTIGRADE mode
 - Shared content (a concept both grades learn, a whole-class game) stays a normal
   single section. Everything else (banner, summary, images, pixel-perfect paginated PDF,
   region-appropriate children) works exactly as for a single-grade lesson.
+- **Make it a complete teacher guide** ("one teacher, two classes — nobody sits idle"):
+  * each step's duo marks WHO HAS THE TEACHER — `role:"teacher"` (filled dot) on the grade
+    the teacher is with, `role:"own"` (ring) on the grade working independently; a legend
+    under the banner explains the symbols;
+  * a `schedule` section near the top gives the minute-by-minute rotation (time · what
+    happens · who has the teacher · pages) so the whole flow is visible at a glance;
+  * a `table` section renders board-prep grids (e.g. a place-value table to draw);
+  * declare an informative image per major step/concept (~6–10) so the teacher can SEE
+    the activity or what to draw on the board.
 (See `decorative/theme.js` grade tokens + `.d-duo`, `decorative/render.js` `duo` +
 `sectionHead` mg branch, `structure.js` multigrade rule.)
 

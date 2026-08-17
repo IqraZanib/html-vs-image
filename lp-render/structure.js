@@ -39,7 +39,9 @@ Section "type" values and their fields:
 - "images":  { "imageIds": [ string ] }  // DISPLAYS images; ids must match entries in the top-level "images" array
 - "summary":  { "items": [ { "icon"?: one emoji, "label": string, "body": string } ] }  // an at-a-glance / "30-second summary" card
 - "rubric":   { "items": [ { "level": string, "desc": string } ] }  // an assessment rubric / marking guide (levels)
-- "duo":      { "a": { "label": string, "body": string }, "b": { "label": string, "body": string } }  // TWO grades side by side (multigrade): a = lower grade, b = higher grade
+- "duo":      { "a": { "label": string, "role"?: "teacher"|"own", "body": string }, "b": { "label": string, "role"?: "teacher"|"own", "body": string } }  // TWO grades side by side (multigrade): a = lower grade, b = higher grade; role = who has the teacher
+- "schedule": { "gradeA": string, "gradeB": string, "items": [ { "time": string, "phase": string, "teacher": "a"|"b"|"both", "pages"?: string } ] }  // multigrade minute-by-minute rotation overview
+- "table":    { "caption"?: string, "grade"?: "a"|"b", "columns": [ string ], "rows": [ [ string ] ] }  // a grid, e.g. a board-prep place-value table
 
 Hard rules:
 - Use the lesson's OWN words and headings VERBATIM. Do NOT summarize, reword, translate, or invent content. If the lesson is in Urdu/Swahili/Arabic/etc, keep that language and set locale accordingly (default "en").
@@ -64,7 +66,10 @@ Hard rules:
   * TEACHING STEPS especially: a step usually has what ONE grade does WITH the teacher and what the OTHER grade does ON ITS OWN — put each grade's activity (teacher part + its need_help/standard/challenge sub-tasks) into that grade's column. Prefer a "duo" over a "steps" block for any grade-split step.
   * CRITICAL: the two columns hold DIFFERENT content — grade_A's text in "a", grade_B's DIFFERENT text in "b". NEVER the same text in both columns; never split one part into two separate duos.
   * A "duo" body may be long: fold that grade's sub-fields in with **Readable label:** sub-headings (Title Case, human words — e.g. **Teacher:**, **On their own:**, **Standard:**) and line breaks. Do NOT print raw field keys like "recap_grade_3:", "silent_letter_words:", "grade_4_teacher:" — turn them into plain readable labels or drop the key entirely.
-  * TIMING / SCHEDULE: fold a whole timing table / segment list into ONE compact "bullets" section (one bullet per segment) — never a separate section per time segment. Only whole-class shared content (a concept both grades learn, a whole-class game) stays a normal single section.
+  * WHO HAS THE TEACHER (make it a proper teacher guide): in a step's "duo", set role="teacher" on the grade the teacher is working WITH, and role="own" on the grade working independently — so the teacher sees at a glance who to stand with and who is busy alone. Nobody sits idle.
+  * ROTATION OVERVIEW: build ONE "schedule" section near the top from the lesson's timing/segments — gradeA/gradeB set to the labels, and one item per segment { time, phase, teacher: "a"/"b"/"both", pages }. This replaces a per-segment section spray.
+  * BOARD PREP: if the source gives a place-value / digit table (Hundred-Thousands…Ones with digits) or word cards to write on the board, emit a "table" section (columns + rows), one per grade with grade:"a"/"b". This is what the teacher draws before the bell.
+  * IMAGES for a teacher guide: declare an informative image for EACH major teaching step or key concept the lesson describes (the activity in action, or the picture/diagram to draw on the board) — aim for one banner + one image per big step/concept (about 6–10), each content-relevant, so the teacher can SEE what to do. Every declared image id must appear in an "images" section placed with that step.
 - Every "id" must be unique kebab-case.`;
 
 const PART_NOTE = `
