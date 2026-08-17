@@ -1,0 +1,361 @@
+{
+ "meta": {
+  "id": "gifts-beauty-of-nature-day1",
+  "locale": "en",
+  "subject": "English",
+  "grade": "Grade 3 + Grade 4",
+  "region": "pk",
+  "title": "Gifts & Beauty Of Nature",
+  "subtitle": "Nature · 40 Minutes · Punjab SNC",
+  "banner": "c0-nature-poems-children",
+  "multigrade": true,
+  "gradeA": "Grade 3",
+  "gradeB": "Grade 4",
+  "chips": [
+   {
+    "label": "Duration",
+    "value": "40 Minutes"
+   },
+   {
+    "label": "Curriculum",
+    "value": "Punjab SNC"
+   },
+   {
+    "label": "Subject",
+    "value": "English"
+   },
+   {
+    "label": "Topic",
+    "value": "Nature"
+   }
+  ]
+ },
+ "images": [
+  {
+   "id": "c0-nature-poems-children",
+   "concept": "scene",
+   "label": "Gifts & Beauty Of Nature",
+   "prompt": "Pakistani Grade 3 and Grade 4 children learning English poems about nature, reciting poems with actions and reading together in a classroom, with the golden sun and a caterpillar represented as the lesson subjects."
+  },
+  {
+   "id": "c0-golden-sun-poem",
+   "concept": "scene",
+   "label": "Golden Sun",
+   "prompt": "Pakistani schoolchildren reciting the poem 'Golden Sun' aloud with actions, with the golden sun representing light, life, and warmth."
+  },
+  {
+   "id": "c0-long-short-vowels",
+   "concept": "diagram",
+   "label": "Long and short vowels",
+   "prompt": "A clear English phonics diagram showing long and short vowel examples from the lesson, with the words and labels written in English."
+  },
+  {
+   "id": "c0-caterpillar-poem",
+   "concept": "scene",
+   "label": "Brown And Furry (Caterpillar)",
+   "prompt": "Pakistani schoolchildren reading and reciting the poem 'Brown and Furry, Caterpillar in a hurry', with a caterpillar as the central subject."
+  },
+  {
+   "id": "c0-silent-b-words",
+   "concept": "diagram",
+   "label": "silent letter b",
+   "prompt": "A clear English phonics diagram showing the silent letter 'b' in the words lamb, climb, and thumb, with each word labelled in English."
+  },
+  {
+   "id": "c1-golden-sun-activity",
+   "concept": "scene",
+   "label": "Golden Sun",
+   "prompt": "Pakistani Grade 3 pupils reciting 'Golden Sun' with actions while looking at a sunrise picture and pointing to the sun."
+  },
+  {
+   "id": "c1-caterpillar-life-cycle",
+   "concept": "diagram",
+   "label": "Caterpillar life-cycle",
+   "prompt": "A labelled caterpillar life-cycle picture with the labels written in English: caterpillar, butterfly, leaf, flowers."
+  },
+  {
+   "id": "c1-sun-gifts-and-silent-letters",
+   "concept": "diagram",
+   "label": "Gifts of the sun and silent letters",
+   "prompt": "An educational diagram showing the sun with light, life, and warmth, alongside the words lamb, climb, thumb with the silent b identified."
+  }
+ ],
+ "sections": [
+  {
+   "heading": "Gifts of Nature (p.12)",
+   "type": "duo",
+   "a": {
+    "label": "Grade 3",
+    "role": "teacher",
+    "body": "By the end, students will: recite the poem 'Golden Sun' aloud with actions, and name the gifts we get from the sun, reading words with correct long and short vowels."
+   },
+   "b": {
+    "label": "Grade 4",
+    "role": "own",
+    "body": "textbook_ref: Golden Sun · p.13-14"
+   }
+  },
+  {
+   "heading": "Beauty of Nature (p.13)",
+   "type": "duo",
+   "a": {
+    "label": "Grade 3",
+    "role": "own",
+    "body": "textbook_ref: Caterpillar · p.14-16"
+   },
+   "b": {
+    "label": "Grade 4",
+    "role": "teacher",
+    "body": "By the end, students will: read and recite the poem 'Caterpillar' for meaning, and read words with silent letters — the silent 'b' in lamb, climb, thumb."
+   }
+  },
+  {
+   "heading": "Golden Sun",
+   "type": "text",
+   "body": "themes: light\n\nthemes: life\n\nthemes: warmth\n\nopening_line: Great, glorious, golden sun, Shine down on me today!"
+  },
+  {
+   "heading": "Brown And Furry (Caterpillar)",
+   "type": "text",
+   "body": "themes: silent letter b\n\nthemes: lamb\n\nthemes: climb\n\nthemes: thumb\n\nopening_line: Brown and furry, Caterpillar in a hurry"
+  },
+  {
+   "heading": "Start · Hook",
+   "type": "duo",
+   "a": {
+    "label": "Grade 3",
+    "role": "teacher",
+    "body": "Time: 0-4 min\npages: 1-2"
+   },
+   "b": {
+    "label": "Grade 4",
+    "role": "own",
+    "body": "Time: 0-4 min\npages: 1-2"
+   }
+  },
+  {
+   "heading": "Step 1 · I Do — G3 then G4",
+   "type": "duo",
+   "a": {
+    "label": "Grade 3",
+    "role": "teacher",
+    "body": "Time: 4-11 min\npage: 3"
+   },
+   "b": {
+    "label": "Grade 4",
+    "role": "own",
+    "body": "Time: 4-11 min\npage: 3"
+   }
+  },
+  {
+   "heading": "Step 1 · I Do — G4 then G3 (Swap)",
+   "type": "duo",
+   "a": {
+    "label": "Grade 3",
+    "role": "own",
+    "body": "Time: 4-11 min\npage: 3"
+   },
+   "b": {
+    "label": "Grade 4",
+    "role": "teacher",
+    "body": "Time: 4-11 min\npage: 3"
+   }
+  },
+  {
+   "heading": "Step 2 · We Do — Rotation",
+   "type": "duo",
+   "a": {
+    "label": "Grade 3",
+    "role": "teacher",
+    "body": "Time: 11-23 min\npage: 4"
+   },
+   "b": {
+    "label": "Grade 4",
+    "role": "own",
+    "body": "Time: 11-23 min\npage: 4"
+   }
+  },
+  {
+   "heading": "Images",
+   "type": "images",
+   "imageIds": [
+    "c0-golden-sun-poem",
+    "c0-long-short-vowels",
+    "c0-caterpillar-poem",
+    "c0-silent-b-words"
+   ]
+  },
+  {
+   "heading": "Rotation Overview",
+   "type": "schedule",
+   "gradeA": "Grade 3",
+   "gradeB": "Grade 4",
+   "items": [
+    {
+     "time": "0-4 min",
+     "phase": "Start · Hook",
+     "teacher": "both",
+     "pages": "1-2"
+    },
+    {
+     "time": "4-11 min",
+     "phase": "Step 1 · I Do — G3 then G4",
+     "teacher": "a",
+     "pages": "3"
+    },
+    {
+     "time": "4-11 min",
+     "phase": "Step 1 · I Do — G4 then G3 (Swap)",
+     "teacher": "b",
+     "pages": "3"
+    },
+    {
+     "time": "11-23 min",
+     "phase": "Step 2 · We Do — Rotation",
+     "teacher": "a",
+     "pages": "4"
+    }
+   ]
+  },
+  {
+   "heading": "Step 3 · You Do → Close",
+   "type": "schedule",
+   "gradeA": "Grade 3",
+   "gradeB": "Grade 4",
+   "items": [
+    {
+     "time": "23-40 min",
+     "phase": "You Do → Close",
+     "teacher": "both",
+     "pages": "5-6"
+    },
+    {
+     "time": "0-4 min",
+     "phase": "Opening",
+     "teacher": "both",
+     "pages": "5-6"
+    },
+    {
+     "time": "4-11 min",
+     "phase": "Teaching and independent work",
+     "teacher": "both",
+     "pages": "5-6"
+    },
+    {
+     "time": "11-16 min",
+     "phase": "Rotation A",
+     "teacher": "a",
+     "pages": "5-6"
+    },
+    {
+     "time": "16-18 min",
+     "phase": "Buddy activity",
+     "teacher": "both",
+     "pages": "5-6"
+    },
+    {
+     "time": "18-23 min",
+     "phase": "Rotation B",
+     "teacher": "b",
+     "pages": "5-6"
+    },
+    {
+     "time": "23-36 min",
+     "phase": "You Do",
+     "teacher": "both",
+     "pages": "5-6"
+    },
+    {
+     "time": "36-40 min",
+     "phase": "Close",
+     "teacher": "both",
+     "pages": "5-6"
+    }
+   ]
+  },
+  {
+   "heading": "0-4 min",
+   "type": "duo",
+   "a": {
+    "label": "Grade 3",
+    "role": "teacher",
+    "body": "Ask: 'When the sun comes out in the morning, what changes around us?' Let 3-4 pupils share. Write one word from each answer on the board. Open page 13, point to sunrise picture."
+   },
+   "b": {
+    "label": "Grade 4",
+    "role": "own",
+    "body": "Ask: 'Have you ever seen a caterpillar on a leaf, or a butterfly near flowers? What did you notice?' Let 3-4 pupils share. Open page 14, point to life-cycle picture."
+   }
+  },
+  {
+   "heading": "4-11 min",
+   "type": "duo",
+   "a": {
+    "label": "Grade 3",
+    "role": "teacher",
+    "body": "Teacher: Recite 'Golden Sun' one line at a time with actions. Say 'sun' (short u) and 'shine' (long i). Class claps vowels. Ask: 'Suraj hamein kaun se tohfe deta hai?' Expected: light, life, warmth.\nOn their own: Read the 5 board-prep words aloud in a whisper. Say 'sun' and 'shine' with partner. Whisper your favourite gift of the sun.\nStruggler: Teacher recites one line, student repeats just the last word with the action."
+   },
+   "b": {
+    "label": "Grade 4",
+    "role": "own",
+    "body": "On their own: Look at page 15. Read 'Caterpillar' quietly. Copy words lamb, climb, thumb. Think about caterpillar's colour.\nTeacher: Read 'Caterpillar' aloud. Write lamb, climb, thumb — explain silent b. Ask: 'What is the colour of a caterpillar?' Expected: Brown.\nStruggler: Teacher points to lamb and says it; student repeats aloud — no writing needed."
+   }
+  },
+  {
+   "heading": "11-23 min",
+   "type": "duo",
+   "a": {
+    "label": "Grade 3",
+    "role": "teacher",
+    "body": "Time: min 11-16\nTeacher with: Grade 3 — recite 'Golden Sun' with actions, then post-read Q\nGrade 3 independent: Copy silent-letter words lamb, climb, thumb from Board Prep\nTime: min 16-18\nActivity: A Grade 4 buddy reads one line of 'Caterpillar' to a Grade 3 buddy, who claps the rhythm. Swap after 1 min.\nTransition cue: Clap twice, say 'G3, apni jagah pakadiye. G4, apni jagah tasveer dekhein.'\nTime: min 18-23\nGrade 3 independent: Describe the sunset picture in one sentence\nMonitor role: Pick one Grade 3 student as Monitor (rotates weekly). During Rotation B: keep Grade 3 on task, point to picture if a child forgets, quietly say 'shabash' when they finish."
+   },
+   "b": {
+    "label": "Grade 4",
+    "role": "own",
+    "body": "Time: min 11-16\nGrade 4 independent: Copy silent-letter words lamb, climb, thumb from Board Prep\nTime: min 16-18\nActivity: A Grade 4 buddy reads one line of 'Caterpillar' to a Grade 3 buddy, who claps the rhythm. Swap after 1 min.\nTransition cue: Clap twice, say 'G3, apni jagah pakadiye. G4, apni jagah tasveer dekhein.'\nTime: min 18-23\nTeacher with: Grade 4 — silent-letter words + echo the 'Caterpillar' poem\nCorrection tip: If a pair says the b in lamb, gently correct: 'b khamosh hai — laam.'"
+   }
+  },
+  {
+   "heading": "23-36 min",
+   "type": "duo",
+   "a": {
+    "label": "Grade 3",
+    "role": "teacher",
+    "body": "Timing: Min 23-25: assign tasks · Min 25-27: G3 first · Min 27-30: G4 · Min 30-36: rotate every 90 sec\nNeed help: Copy 3 words from the board: light, life, warmth.\nStandard: 1. Write 3 gifts from the sun. 2. Copy line from 'Golden Sun' and underline the long-vowel word: 'Shine down on me today!'\nChallenge: Write one sentence about the sun using the word 'because'.\nExtra support: Point to the sun on the board as you name each gift in Urdu · draw the sun and 3 things · circle the correct gift."
+   },
+   "b": {
+    "label": "Grade 4",
+    "role": "own",
+    "body": "Timing: Min 23-25: assign tasks · Min 25-27: G3 first · Min 27-30: G4 · Min 30-36: rotate every 90 sec\nNeed help: Copy 3 words and circle the silent letter: lamb, climb, thumb.\nStandard: 1. Write 4 words with silent letter and circle it. 2. Copy one line from 'Caterpillar' and read aloud to partner.\nChallenge: Find and write 2 more words with a silent letter from your own reading.\nExtra support: Circle the silent letter in 3 words teacher writes · trace lamb, climb, thumb from dotted template.\nFinished early: Did you like the poem? Why? Write one sentence."
+   }
+  },
+  {
+   "heading": "36-40 min",
+   "type": "duo",
+   "a": {
+    "label": "Grade 3",
+    "role": "teacher",
+    "body": "Recap: We recited 'Golden Sun'. The sun gives us light, life and warmth. We noticed the long-vowel word 'shine'.\nExit ticket: (a) 'Suraj hamein do tohfe kaun se deta hai?' — Expected: any two of light, life, warmth.\n(b) Underline the long-vowel word in: 'Shine down on me today' — Expected: shine.\nHomework: Draw the sun and 2 gifts it gives us. Label each in English AND Urdu."
+   },
+   "b": {
+    "label": "Grade 4",
+    "role": "own",
+    "body": "Recap: We read the poem 'Caterpillar' and learned silent letters: the b in lamb, climb and thumb is silent.\nExit ticket: (a) 'Caterpillar nazm ki aik line sunayen — caterpillar kaisa hai?' — Expected: Brown.\n(b) Read aloud: lamb, climb, thumb. Kaun sa letter khamosh hai? — Expected: The letter b.\nExtra support: Circle the correct answer on the board · point to matching picture · trace on dotted line · draw the answer.\nHomework: Find and write 2 more words that have a silent letter."
+   }
+  },
+  {
+   "heading": "Images",
+   "type": "images",
+   "imageIds": [
+    "c1-golden-sun-activity",
+    "c1-caterpillar-life-cycle",
+    "c1-sun-gifts-and-silent-letters"
+   ]
+  },
+  {
+   "heading": "Coaching notes back within 24 hours — free.",
+   "type": "note",
+   "body": "grade_3: Golden Sun — long/short vowels, page 15\ngrade_4: Caterpillar poem — introduce salt dialogue, page 16"
+  }
+ ]
+}

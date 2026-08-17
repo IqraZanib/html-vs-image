@@ -249,6 +249,44 @@ and falls back to the Chromium vector PDF (`html-to-pdf.js`, `pageMode:'paged'`)
 is always produced. This applies to ALL entry points (CLI, LP Studio, the rumi adapter) —
 they all go through `renderLessonImage`.
 
+## R31 — Multigrade lessons: two grades, side by side
+When ONE lesson teaches TWO grades at once ("Grade 4 + Grade 5", "One Teacher, Two
+Classes", a source with grade_A / grade_B pairs), render it in MULTIGRADE mode
+(`meta.multigrade` + `meta.gradeA`/`gradeB`, set by the structurer):
+- **Section headers become dark navy full-width bars** (not the warm coloured pills).
+- **Grade-band colours:** the LOWER grade is teal (`--g-a`), the higher grade is gold
+  (`--g-b`), used consistently everywhere the two grades appear.
+- **Wherever the two grades differ** (objectives, board prep, hook, step tasks, recap,
+  exit tickets, homework, next lesson) → ONE `duo` section, two columns side by side:
+  `a` = lower grade (teal header), `b` = higher grade (gold header). The columns hold
+  DIFFERENT content — never the same text in both. Do NOT stack the two grades as
+  separate sections, and fold a timing/schedule table into ONE compact section.
+- Shared content (a concept both grades learn, a whole-class game) stays a normal
+  single section. Everything else (banner, summary, images, pixel-perfect paginated PDF,
+  region-appropriate children) works exactly as for a single-grade lesson.
+- **Make it a complete teacher guide** ("one teacher, two classes — nobody sits idle"):
+  * each step's duo marks WHO HAS THE TEACHER — `role:"teacher"` (filled dot) on the grade
+    the teacher is with, `role:"own"` (ring) on the grade working independently; a legend
+    under the banner explains the symbols;
+  * a `schedule` section near the top gives the minute-by-minute rotation (time · what
+    happens · who has the teacher · pages) so the whole flow is visible at a glance;
+  * a `table` section renders board-prep grids (e.g. a place-value table to draw);
+  * declare an informative image per major step/concept (~6–10) so the teacher can SEE
+    the activity or what to draw on the board.
+(See `decorative/theme.js` grade tokens + `.d-duo`, `decorative/render.js` `duo` +
+`sectionHead` mg branch, `structure.js` multigrade rule.)
+
+## R32 — Put each explanatory image INLINE, with the point it explains
+Images must sit next to the thing they teach, not in a separate gallery. Whenever a
+section explains a concept, a step, a story or an activity that a picture would make
+clearer, attach ONE image to THAT section via its `image` field (an image id) so the
+picture renders directly UNDER that heading, beside the text it illustrates. This is the
+user-friendly pattern — the teacher reads the point and sees the picture for it in the
+same place. Do NOT collect pictures into a separate "Lesson Images" gallery. A standalone
+`images` section is only for a set that genuinely belongs together; the hero is
+`meta.banner`. (Renderer: any section may carry `image`; `structure.js` attaches it and
+rewrites the id across chunk merges; `render.js` `inlineImage`.)
+
 ## GATE_POLICY
 - The image must be correct for the exact concept named in the content. For a labeled
   diagram, every label must be spelled correctly and point to the right part; reject

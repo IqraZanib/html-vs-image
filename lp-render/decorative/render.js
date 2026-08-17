@@ -16,13 +16,17 @@ const mark = (kind, i) => (kind === 'alpha' ? ALPHA[i] + ')' : kind === 'num' ? 
 function seedOf(str) { let h = 0; for (const c of String(str)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; }
 function rotate(arr, k) { const n = arr.length; if (!n) return arr.slice(); const s = ((k % n) + n) % n; return arr.slice(s).concat(arr.slice(0, s)); }
 
-// A section header — a solid coloured tab (accent box) with a WHITE icon + WHITE title.
-// Returns '' for an empty heading so no blank header space is reserved.
-function sectionHead(accent, section, i) {
+// A section header. Single-grade: a solid coloured tab (accent box, white icon+title).
+// Multigrade (mg): a dark navy full-width bar (reference-matched). '' for empty heading.
+function sectionHead(accent, section, i, mg) {
   const title = cleanHeading(section.heading);
   if (!title) return '';
   const time = section.time ? `<div class="s-time">${esc(cleanHeading(section.time))}</div>` : '';
   const ic = section.icon && hasIcon(section.icon) ? icon(section.icon, 22) : sparkle('#fff');
+  if (mg) {
+    return `<div class="s-head mg"><div class="s-bar"><span class="s-ic">${ic}</span>`
+      + `<span class="s-title">${esc(title)}</span>${time}</div></div>`;
+  }
   return `<div class="s-head"><div class="s-tab" style="background:var(${accent})">`
     + `<span class="s-ic">${ic}</span><span class="s-title">${esc(title)}</span></div>${time}</div>`;
 }
@@ -31,6 +35,15 @@ function sectionHead(accent, section, i) {
 function headerBg() {
   const ic = (n, cls) => (hasIcon(n) ? `<div class="hb ${cls}">${icon(n, 60)}</div>` : '');
   return `<div class="hbwrap">${ic('blackboard', 'b1')}${ic('books', 'b2')}${ic('target', 'b3')}${ic('pencil', 'b4')}</div>`;
+}
+
+// An image shown INLINE inside a section, right under the point it explains.
+function inlineImage(id, images) {
+  const im = images[id];
+  if (!im || !im.dataUri) return '';
+  const cap = im.label ? `<div class="cap">${esc(cleanHeading(im.label))}</div>` : '';
+  return `<div class="d-imgrow n1 d-inline-img"><div class="d-img${im.cover ? ' cover' : ''}">`
+    + `<img src="${im.dataUri}" alt="${esc(cleanHeading(im.label || ''))}">${cap}</div></div>`;
 }
 
 function renderBody(section, accent, images) {
@@ -43,6 +56,43 @@ function renderBody(section, accent, images) {
         + `<div class="stext">${it.label ? `<b>${esc(cleanHeading(it.label))}:</b> ` : ''}${richText(it.body || '', { engine: section.engine })}</div></div>`
       ).join('');
       return `<div class="d-summary">${rows}</div>`;
+    }
+    case 'duo': {
+      // Two grades side by side — lower grade (a) teal, higher grade (b) gold. Each
+      // column can show WHO HAS THE TEACHER: role "teacher" (filled dot) / "own" (ring).
+      const col = (g, tok) => {
+        if (!g || !(g.label || g.body)) return '';
+        const role = g.role === 'teacher'
+          ? '<span class="mk teacher"></span><span class="role">Teacher here</span>'
+          : g.role === 'own'
+            ? '<span class="mk own"></span><span class="role">On its own</span>' : '';
+        return `<div class="d-col" style="--cc:var(${tok});--cc-soft:var(${tok}-soft)">`
+          + `<div class="cc-h">${role}${esc(cleanHeading(g.label || ''))}</div>`
+          + `<div class="cc-b">${richText(g.body || '', { engine: section.engine })}</div></div>`;
+      };
+      const cols = col(section.a, '--g-a') + col(section.b, '--g-b');
+      return cols ? `<div class="d-duo">${cols}</div>` : '';
+    }
+    case 'schedule': {
+      // Minute-by-minute rotation overview: time · phase · who has the teacher · pages.
+      const dot = (who) => {
+        if (who === 'a') return '<span class="who"><span class="dot" style="background:var(--g-a)"></span>Teacher with ' + esc(section.gradeA || 'Grade A') + '</span>';
+        if (who === 'b') return '<span class="who"><span class="dot" style="background:var(--g-b)"></span>Teacher with ' + esc(section.gradeB || 'Grade B') + '</span>';
+        return '<span class="who">Whole class</span>';
+      };
+      const rows = (section.items || []).map((it) =>
+        `<tr><td class="t">${esc(cleanHeading(it.time || ''))}</td><td>${richText(it.phase || '', { engine: section.engine })}</td>`
+        + `<td>${dot(it.teacher)}</td><td>${esc(cleanHeading(it.pages || ''))}</td></tr>`).join('');
+      return `<table class="d-sched"><thead><tr><th>Time</th><th>What happens</th><th>Who has the teacher</th><th>Pages</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }
+    case 'table': {
+      // A simple grid (e.g. a board-prep place-value table). Optional grade colour.
+      const tok = section.grade === 'b' ? '--g-b' : section.grade === 'a' ? '--g-a' : null;
+      const style = tok ? ` style="--cc:var(${tok});--cc-soft:var(${tok}-soft);--cc-ink:var(${tok}-ink)"` : '';
+      const cap = section.caption ? `<caption>${esc(cleanHeading(section.caption))}</caption>` : '';
+      const head = (section.columns || []).length ? `<thead><tr>${section.columns.map((c) => `<th>${esc(cleanHeading(c))}</th>`).join('')}</tr></thead>` : '';
+      const body = (section.rows || []).map((r) => `<tr>${(r || []).map((c) => `<td>${esc(String(c))}</td>`).join('')}</tr>`).join('');
+      return `<table class="d-gtable"${style}>${cap}${head}<tbody>${body}</tbody></table>`;
     }
     case 'rubric': {
       const COL = { exceeding: '--c-teal', meeting: '--c-green', approaching: '--c-amber', below: '--c-red' };
@@ -182,6 +232,7 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
   // images, we add no characters at all — the informative images carry it.
   const hasContentImages = Object.values(images).some((im) => im && im.dataUri);
 
+  const mg = !!meta.multigrade; // multigrade → navy headers + teal/gold grade columns
   let placed = 0;
   let prevHeading = '';
   const rot = { n: 0, t: 0, seed: seedOf(`${meta.id || ''}|${meta.subject || ''}|${meta.title || ''}`) };
@@ -192,18 +243,26 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     // A section's id becomes a class (sec-<id>) so region packs can style specific
     // template roles order-independently. Additive: nothing targets these by default.
     const idCls = section.id ? ` sec-${String(section.id).toLowerCase().replace(/[^a-z0-9_-]/g, '')}` : '';
-    const body = renderBody(section, accent, images);
+    let body = renderBody(section, accent, images);
+    // Inline image (R32, upstream): in MULTIGRADE guides an explanatory picture sits
+    // under the point it explains. In all other lessons section.image renders as the
+    // in-panel side figure (design packs like Yemen's — see below); the mg gate keeps
+    // both features exactly as their authors shipped them.
+    if (mg && section.image && images[section.image] && images[section.image].dataUri) {
+      referenced.add(section.image);
+      body += inlineImage(section.image, images);
+    }
     if (body === '') return '';
     // A heading that repeats the previous one (e.g. a phase split across structuring
     // chunks) is shown once — the rest render as a continuation, no repeated header.
     const title = cleanHeading(section.heading);
-    const head = (title && title !== prevHeading) ? sectionHead(accent, section, i) : '';
+    const head = (title && title !== prevHeading) ? sectionHead(accent, section, i, mg) : '';
     if (title) prevHeading = title;
     // Optional in-panel illustration: `section.image` names a declared image id and the
     // figure renders INSIDE the section's panel beside the body (design sets like
     // Yemen's put an illustration in every stage card). Additive — no existing content
     // sets it, and sections without it render exactly as before.
-    const inlineIm = section.image && images[section.image] && images[section.image].dataUri ? images[section.image] : null;
+    const inlineIm = !mg && section.image && images[section.image] && images[section.image].dataUri ? images[section.image] : null;
     if (inlineIm) {
       const fig = `<div class="d-inline-img"><img src="${inlineIm.dataUri}" alt="${esc(cleanHeading(inlineIm.label || ''))}">${inlineIm.label ? `<div class="cap">${esc(cleanHeading(inlineIm.label))}</div>` : ''}</div>`;
       return `<section class="section${idCls}">${head}<div class="panel has-inline-img" style="border-color:var(${accent}-soft)"><div class="ii-body">${body}</div>${fig}</div></section>`;
@@ -230,8 +289,17 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     if (body2) extra = `<section class="section"><div class="panel">${body2}</div></section>`;
   }
 
+  // Multigrade legend — "what the symbols mean" (only when there is duo content to explain).
+  const legend = (mg && /class="d-duo"/.test(sections))
+    ? `<div class="mg-legend">`
+      + `<span class="li"><span class="dot fill"></span>Teacher is here</span>`
+      + `<span class="li"><span class="dot"></span>This class works on its own</span>`
+      + `<span class="li"><span class="sw" style="background:var(--g-a)"></span>${esc(cleanHeading(meta.gradeA || 'Grade A'))}</span>`
+      + `<span class="li"><span class="sw" style="background:var(--g-b)"></span>${esc(cleanHeading(meta.gradeB || 'Grade B'))}</span>`
+      + `</div>`
+    : '';
   const footer = meta.footer ? `<div class="lp-footer">${richText(String(meta.footer), {})}</div>` : '';
-  const body = `<div class="body">${sections}${extra}</div>${footer}`;
+  const body = `<div class="body">${legend}${sections}${extra}</div>${footer}`;
   // KaTeX-rendered math needs its stylesheet; MathJax output is self-contained SVG.
   const headCss = /class="katex"/.test(body) ? katexCss() : '';
   return { headerHtml, bodyHtml: body, headCss };
