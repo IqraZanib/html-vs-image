@@ -391,9 +391,9 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
       zoomed board (object-fit cover crops the bitmap's beige margins), tighter
       lower spacing so the block stays compact ── */
 .section.sec-errors .panel{border-color:var(--c-red) !important;padding-bottom:2px}
-.section.sec-errors .panel.has-inline-img{gap:8px}
+.section.sec-errors .panel.has-inline-img{gap:6px}
 .section.sec-errors .d-inline-img{height:auto;width:470px;max-width:96%;overflow:hidden;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;border:1.5px solid #c3cad6;border-radius:12px;background:#fff}
-.section.sec-errors .d-inline-img img{height:258px;width:100%;object-fit:cover;max-height:none;border:0;border-radius:0}
+.section.sec-errors .d-inline-img img{height:236px;width:100%;object-fit:cover;max-height:none;border:0;border-radius:0}
 .section.sec-errors .d-inline-img .cap{display:block;background:#fff;border-top:1px solid var(--line);font-size:11.5px;padding:3px 8px;text-align:center}
 .section.sec-stage-tamhid .d-inline-img,.section.sec-stage-arad .d-inline-img{min-height:180px}
 
