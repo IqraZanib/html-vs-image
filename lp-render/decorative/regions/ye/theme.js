@@ -371,6 +371,11 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .d-step .st-body,.d-qc .d-a,.d-bullets li,.d-note,.d-field,.d-text{-webkit-text-stroke:.22px currentColor}
 .section.sec-goal .d-note b{-webkit-text-stroke:.35px currentColor}
 
+
+/* ── ROUND 22: the errors board fills its strip (reviewer) — heroes pay ── */
+.section.sec-errors .d-inline-img img{max-height:232px}
+.section.sec-stage-tamhid .d-inline-img,.section.sec-stage-arad .d-inline-img{min-height:188px}
+
 `;
 
 module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom' };
