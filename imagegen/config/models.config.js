@@ -20,6 +20,10 @@ const MODELS = {
   'z-image': { input: { aspect_ratio: '4:3' } },
   'seedream/5-lite-text-to-image': { input: { image_size: 'landscape_4_3', image_resolution: '1K' } },
 };
+// SINGLE-MODEL POLICY (company decision 2026-08-18): every image type uses
+// nano-banana-2-lite — one model for all generation, all regions. The pipeline's
+// retry pass provides a second Lite attempt when the gate rejects. Previous
+// per-type ladders are in git history if the policy changes.
 // Direct type → model assignment (NOT a cost-ascending climb). Each image type goes
 // straight to the model that empirically makes it best on the FIRST attempt, so we do
 // not burn credits generating-then-rejecting cheap models. The second entry is a single
@@ -28,17 +32,17 @@ const MODELS = {
 const LADDERS = {
   // Scenes (children/activity/family, no in-image text): cheap, fast, warm art with
   // expressive faces → nano-banana-2-lite. Fallback: qwen2 (open-weight, ~10s, good art).
-  decorative_scene: ['nano-banana-2-lite', 'qwen2/text-to-image'],
+  decorative_scene: ['nano-banana-2-lite'],
   // Latin-script labelled diagrams (en, sw, fr…): Seedream v4 = best value + accurate
   // labels on the first try. Fallback: nano-banana-2 (top label fidelity).
-  labeled_diagram: ['bytedance/seedream-v4-text-to-image', 'nano-banana-2'],
+  labeled_diagram: ['nano-banana-2-lite'],
   // Complex / right-to-left scripts (Arabic, Urdu…). The Arabic bake-off
   // (2026-08-18, four corpus prompts × 6 models) showed nano-banana-2-lite renders
   // our few-label Arabic boards correctly at 4cr/~10s — half of nano-banana-2 —
   // while Seedream/FLUX/Qwen garble Arabic outright. Lite goes FIRST; the gate
   // escalates to nano-banana-2 then gpt-image-2 for the many-label/complex cases
   // Lite is known to mis-map.
-  labeled_diagram_complex: ['nano-banana-2-lite', 'nano-banana-2-lite'], // Lite ONLY (owner decision 2026-08-18): retry Lite once via the ladder slot, never escalate to costlier models — the gate re-rolls or drops, cost stays 4cr/attempt
+  labeled_diagram_complex: ['nano-banana-2-lite'],
 };
 
 // Scripts whose in-image labels only the strongest model renders reliably.
