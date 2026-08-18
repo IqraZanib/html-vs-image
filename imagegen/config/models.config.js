@@ -17,6 +17,7 @@ const MODELS = {
   'google/nano-banana': { input: { aspect_ratio: '4:3' } },
   'ideogram/v3-text-to-image': { input: { aspect_ratio: '4:3' } },
   'google/imagen4-fast': { input: { aspect_ratio: '4:3' } },
+  'z-image': { input: { aspect_ratio: '4:3' } },
   'seedream/5-lite-text-to-image': { input: { image_size: 'landscape_4_3', image_resolution: '1K' } },
 };
 // Direct type → model assignment (NOT a cost-ascending climb). Each image type goes

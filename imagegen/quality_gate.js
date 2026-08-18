@@ -7,6 +7,9 @@ const VLM_URL = 'https://api.kie.ai/gpt-5-2/v1/chat/completions';
 // safe against human values. Returns { pass, reason }; fails closed on any
 // error. `policy` is extra reviewer guidance (read from RULES.md by the caller).
 async function checkImage({ apiKey, imageUrl, expectation, policy = '', fetchImpl = defaultFetch } = {}) {
+  // Research/debug knob: KIE_GATE_OFF=1 approves everything so a run shows each
+  // model's RAW output (used for model bake-offs). Never set in production.
+  if (process.env.KIE_GATE_OFF === '1') return { pass: true, reason: 'gate off (KIE_GATE_OFF=1)' };
   const ask = `You are a strict reviewer of teaching images for a school classroom.
 The image is intended to show: ${expectation}
 Approve (pass:true) ONLY if EVERY check passes:
