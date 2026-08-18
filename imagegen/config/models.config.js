@@ -38,7 +38,7 @@ const LADDERS = {
   // while Seedream/FLUX/Qwen garble Arabic outright. Lite goes FIRST; the gate
   // escalates to nano-banana-2 then gpt-image-2 for the many-label/complex cases
   // Lite is known to mis-map.
-  labeled_diagram_complex: ['nano-banana-2-lite', 'nano-banana-2', 'gpt-image-2-text-to-image'],
+  labeled_diagram_complex: ['nano-banana-2-lite', 'nano-banana-2-lite'], // Lite ONLY (owner decision 2026-08-18): retry Lite once via the ladder slot, never escalate to costlier models — the gate re-rolls or drops, cost stays 4cr/attempt
 };
 
 // Scripts whose in-image labels only the strongest model renders reliably.
