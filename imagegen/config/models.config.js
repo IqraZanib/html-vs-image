@@ -24,10 +24,13 @@ const LADDERS = {
   // Latin-script labelled diagrams (en, sw, fr…): Seedream v4 = best value + accurate
   // labels on the first try. Fallback: nano-banana-2 (top label fidelity).
   labeled_diagram: ['bytedance/seedream-v4-text-to-image', 'nano-banana-2'],
-  // Complex / right-to-left scripts (Arabic, Urdu…): only the strongest model renders
-  // the script reliably, so give it the top model FIRST (cheaper in expectation than
-  // letting Seedream fail the gate and climb anyway). Fallback: gpt-image-2.
-  labeled_diagram_complex: ['nano-banana-2', 'gpt-image-2-text-to-image'],
+  // Complex / right-to-left scripts (Arabic, Urdu…). The Arabic bake-off
+  // (2026-08-18, four corpus prompts × 6 models) showed nano-banana-2-lite renders
+  // our few-label Arabic boards correctly at 4cr/~10s — half of nano-banana-2 —
+  // while Seedream/FLUX/Qwen garble Arabic outright. Lite goes FIRST; the gate
+  // escalates to nano-banana-2 then gpt-image-2 for the many-label/complex cases
+  // Lite is known to mis-map.
+  labeled_diagram_complex: ['nano-banana-2-lite', 'nano-banana-2', 'gpt-image-2-text-to-image'],
 };
 
 // Scripts whose in-image labels only the strongest model renders reliably.
