@@ -11,6 +11,13 @@ const MODELS = {
   //  qwen2      : fastest (~10s), 5.6cr, but returns a tinted (non-white) bg. image_size uses ratio strings ('1:1'), NOT 'portrait_4_3'.
   'flux-2/pro-text-to-image': { input: { aspect_ratio: '2:3', resolution: '1K' } },
   'qwen2/text-to-image': { input: { image_size: '1:1' } },
+  // registered for the Arabic low-cost research (2026-08-18) — cheapest tier:
+  'gpt-image/1.5-text-to-image': { input: {} },
+  'grok-imagine/text-to-image': { input: { aspect_ratio: '1:1' } },
+  'google/nano-banana': { input: { aspect_ratio: '4:3' } },
+  'ideogram/v3-text-to-image': { input: { aspect_ratio: '4:3' } },
+  'google/imagen4-fast': { input: { aspect_ratio: '4:3' } },
+  'seedream/5-lite-text-to-image': { input: { image_size: 'landscape_4_3', image_resolution: '1K' } },
 };
 // Direct type → model assignment (NOT a cost-ascending climb). Each image type goes
 // straight to the model that empirically makes it best on the FIRST attempt, so we do
