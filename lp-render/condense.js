@@ -59,10 +59,12 @@ HARD RULES:
 const RICH_FIGURE_REGIONS = new Set(['ye']);
 
 const IMAGES_RICH = `IMAGES — the guide is FIGURE-RICH like the approved pilot. A picture must TEACH, never decorate: the explanation happens INSIDE the image, on a teaching surface (chalkboard, notebook page, flashcards, wall chart) that carries THIS lesson's exact words/letters/numbers/answers.
-- EVERY stage section (stage-tamhid, stage-arad, stage-tatbiq, stage-taqwim) carries one figure via "image": "<id>". The "errors" section ALSO carries one: a split twin-board image visualizing the misconception. The "homework" section takes a SMALL figure when its task is physical (cutting, folding, counting objects): a simple labelled diagram of that one task.
+- EVERY stage section (stage-tamhid, stage-arad, stage-tatbiq, stage-taqwim) carries one figure via "image": "<id>". The "homework" section takes a SMALL figure when its task is physical (cutting, folding, counting objects): a simple labelled diagram of that one task.
+- THE ERRORS FIGURE IS TWO SEPARATE IMAGES (the renderer composes the ✗/✓ board itself — never draw marks, never draw a split board): attach "imageWrong": "<id>" (a board showing ONLY the mistaken version) and "imageCorrect": "<id>" (a board showing ONLY the correct version) on the errors section. Each is a SINGLE-CONCEPT brief: one board, one item, its labels. Do NOT mention the other version, do NOT use words like wrong/correct/mistake inside the prompt's visual description.
 - REUSE FIRST: if a SOURCE image already IS a labelled teaching diagram that fits a stage, reference its id and COPY its entry into "images" EXACTLY — id, concept, label, prompt BYTE-FOR-BYTE (any change breaks the image cache).
 - Otherwise AUTHOR a new entry (fresh id, kebab-case, never colliding with a source id) in the pilot's grammar:
-  * Prompt in English instruction + the lesson's exact Arabic strings quoted. Template: "Flat vector educational illustration, clean textbook style. <the teaching surface and who works at it>. <the lesson's OWN content worked out on that surface — the actual example, decomposition, matching, ordering or answer>. Labelled in Arabic exactly as follows: «…», «…», «…». No other text, no decoration."
+  * Prompt in English instruction + the lesson's exact Arabic strings quoted, using this EXACT slot template (the fixed wording is what keeps figures consistent across lessons): "Flat vector educational illustration, clean children's textbook style, soft colours. A dark-green classroom chalkboard with a light wooden frame. <ONE concept from the lesson worked out on the board — state every count in words AND digits, e.g. 'one square divided into exactly four equal parts, exactly two parts filled solid yellow'>. The ONLY text anywhere in the image is: «…», «…». No other text, no other numbers, no decorations." For notebook/exit-card/home roles swap the surface wording ('an open pupil notebook page' / 'a small exit card' / 'a simple home-objects diagram') but keep everything else identical.
+  * NEVER put a contrast inside one image: no negations, no 'instead of', no wrong-vs-right — describe only what must appear.
   * LABEL RULES (image models garble long/vocalized Arabic, and garbled labels FAIL the quality gate — these rules are what make the figure generatable): 2–4 labels total; each label ONE or TWO words; STRIP ALL DIACRITICS/tashkeel from labels (write «أبي», never «أَبِي») even when the lesson text carries them; never a sentence, chant line or instruction as a label; never the same word twice; besides the labels, at most ONE short line of text on the teaching surface.
   * Per stage: stage-tamhid = the named hook object/scene WITH the day's key words written plainly on a board inside it (a chant belongs in the stage BODY, never inside the image); stage-arad = the concept worked on the board with the lesson's real example, kept to ONE worked example; stage-tatbiq = the actual exercise being solved in a pupil's notebook, the real answer visible; stage-taqwim = the exit task being performed.
   * "errors" figure: "One wide chalkboard split in two halves by a vertical line: one half shows <the lesson's real example done WRONG> under a large red ✗; the other half shows <the CORRECT version> under a large green ✓." Keep each half to ONE word/expression — the two things the lesson distinguishes. Same label rules.
@@ -143,8 +145,22 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
   const outById = new Map((out.images || []).filter((im) => im && im.id).map((im) => [im.id, im]));
   const seenIm = new Set();
   const rebuilt = [];
+  const keepRef = (s, field) => {
+    const id = s[field];
+    if (!id || seenIm.has(id)) { delete s[field]; return; }
+    const src = srcById.get(id);
+    const authored = outById.get(id);
+    const entry = src || ((richFigures || !srcById.size) && authored && typeof authored.prompt === 'string' && authored.prompt.trim().length >= 40 && authored.label
+      ? { id: String(authored.id), concept: authored.concept === 'scene' ? 'scene' : 'diagram', label: String(authored.label), prompt: authored.prompt } : null);
+    if (!entry) { delete s[field]; return; }
+    seenIm.add(id);
+    rebuilt.push(src ? { id: src.id, concept: src.concept, label: src.label, prompt: src.prompt } : entry);
+  };
   for (const s of out.sections) {
-    if (!s || !s.image) continue;
+    if (!s) continue;
+    if (s.imageWrong) keepRef(s, 'imageWrong');
+    if (s.imageCorrect) keepRef(s, 'imageCorrect');
+    if (!s.image) continue;
     if (seenIm.has(s.image)) { delete s.image; continue; }
     const src = srcById.get(s.image);
     if (src) {

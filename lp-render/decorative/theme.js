@@ -211,6 +211,15 @@ body{background:#eef1f7;color:var(--ink);font-family:var(--font),'Baloo 2','Popp
 .d-inline-img{flex:0 0 32%;max-width:240px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
 .d-inline-img img{display:block;width:100%;height:auto;max-height:190px;object-fit:contain;background:#fff}
 .d-inline-img .cap{padding:6px 10px;font-size:11.5px;font-weight:700;color:var(--muted);text-align:center}
+/* code-composed misconception twin-board (marks + divider are code, not model) */
+.d-twin-board{display:flex;align-items:stretch;gap:0;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;margin-top:8px}
+.d-twin-board .tb-half{flex:1;position:relative;min-width:0}
+.d-twin-board .tb-half img{display:block;width:100%;height:150px;object-fit:cover}
+.d-twin-board .tb-divider{width:2px;background:var(--line)}
+.d-twin-board .tb-mark{position:absolute;top:6px;inset-inline-start:8px;z-index:1;font-size:22px;font-weight:800;line-height:1;
+  background:#fff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.d-twin-board .tb-wrong .tb-mark{color:#c0392b}
+.d-twin-board .tb-correct .tb-mark{color:#1e8e4d}
 
 /* footer */
 .lp-footer{margin:18px 30px 0;padding-top:11px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);line-height:1.7;text-align:right}

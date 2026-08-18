@@ -227,6 +227,7 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
   if (meta.banner) referenced.add(meta.banner); // shown in the hero, not as a card
   for (const s of (content.sections || [])) if (s && s.type === 'images' && Array.isArray(s.imageIds)) s.imageIds.forEach((id) => referenced.add(id));
   for (const s of (content.sections || [])) if (s && s.image) referenced.add(s.image); // in-panel figures (see below)
+  for (const s of (content.sections || [])) { if (s && s.imageWrong) referenced.add(s.imageWrong); if (s && s.imageCorrect) referenced.add(s.imageCorrect); } // code-composed twin boards
 
   // Characters are a FALLBACK only (R23): if this lesson already shows real content
   // images, we add no characters at all — the informative images carry it.
@@ -262,6 +263,17 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     // figure renders INSIDE the section's panel beside the body (design sets like
     // Yemen's put an illustration in every stage card). Additive — no existing content
     // sets it, and sections without it render exactly as before.
+    // Code-composed misconception board: the model draws two SINGLE-CONCEPT halves
+    // (imageWrong / imageCorrect); the ✗/✓ marks, divider and side assignment are
+    // rendered by CODE so the mapping can never invert (weak models scramble
+    // relational binding when one image must contain the contrast).
+    const twinW = !mg && section.imageWrong && images[section.imageWrong] && images[section.imageWrong].dataUri ? images[section.imageWrong] : null;
+    const twinC = !mg && section.imageCorrect && images[section.imageCorrect] && images[section.imageCorrect].dataUri ? images[section.imageCorrect] : null;
+    if (twinW && twinC) {
+      const half = (im, mark, cls) => `<div class="tb-half ${cls}"><div class="tb-mark">${mark}</div><img src="${im.dataUri}" alt="${esc(cleanHeading(im.label || ''))}"></div>`;
+      const fig = `<div class="d-twin-board">${half(twinW, '✗', 'tb-wrong')}<div class="tb-divider"></div>${half(twinC, '✓', 'tb-correct')}</div>`;
+      return `<section class="section${idCls}">${head}<div class="panel has-twin-board" style="border-color:var(${accent}-soft)"><div class="ii-body">${body}</div>${fig}</div></section>`;
+    }
     const inlineIm = !mg && section.image && images[section.image] && images[section.image].dataUri ? images[section.image] : null;
     if (inlineIm) {
       const fig = `<div class="d-inline-img"><img src="${inlineIm.dataUri}" alt="${esc(cleanHeading(inlineIm.label || ''))}">${inlineIm.label ? `<div class="cap">${esc(cleanHeading(inlineIm.label))}</div>` : ''}</div>`;
