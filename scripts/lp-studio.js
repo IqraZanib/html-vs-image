@@ -11,6 +11,7 @@ const path = require('node:path');
 const { renderLessonImage } = require('../lp-render/pipeline');
 const { structureLesson } = require('../lp-render/structure');
 const { condenseToGuide } = require('../lp-render/condense');
+const { validateFigures } = require('../lp-render/figures/validate');
 
 const ROOT = path.resolve(__dirname, '..');
 // Load the kie.ai key from the git-ignored .env-api if it isn't already in the env.
@@ -92,6 +93,8 @@ function handler(req, res) {
         // 2-page guide (default ON): condense the full lesson into the design sets'
         // teacher-facing 12-role template before rendering. Content already in the
         // guide shape passes through untouched.
+        const srcForValidation = parsed; // the structured lesson, before condensing
+        let figureReport = null;
         const looksLikeGuide = Array.isArray(parsed.sections) && parsed.sections.some((x) => x && x.id === 'stage-tamhid');
         if (guide2p && !looksLikeGuide) {
           if (!process.env.KIE_API_KEY) throw new Error('The 2-page guide needs a kie.ai key for the condense step.');
@@ -102,17 +105,22 @@ function handler(req, res) {
           // Coverage retry: the design set promises a figure on every stage card, but
           // condense rolls vary. Count the stages that actually got one and re-condense
           // (text only — no image credits spent yet) when the guide comes back bare.
+          // Coverage: no fixed figure count — a lesson may be as visual as it needs.
+          // Only a guide that comes back with essentially NO figures is re-condensed.
           const STAGES = ['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim'];
           const covered = (g) => STAGES.filter((id) => {
             const s = (g.sections || []).find((x) => x && x.id === id);
             return s && (s.image || s.codeFigure);
           }).length;
-          for (let pass = 0; covered(parsed) < 4 && pass < 2; pass++) {
-            log(`Only ${covered(parsed)}/4 stages have a figure — re-condensing for full coverage…`);
+          for (let pass = 0; covered(parsed) < 2 && pass < 2; pass++) {
+            log(`Only ${covered(parsed)}/4 stages carry a figure — re-condensing for a visual-first guide…`);
             parsed = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log,
-              extra: 'COVERAGE: every one of stage-tamhid, stage-arad, stage-tatbiq and stage-taqwim MUST carry a figure — either "image" (a textless illustration you author) or a "codeFigure". Do not leave any stage without one.' });
+              extra: 'VISUAL-FIRST: this guide came back nearly text-only. Give the stages that genuinely benefit a figure — a textless illustration ("image") or a "codeFigure" — and keep their prose to one or two short lines.' });
             if (keepRegion) parsed.meta = { ...(parsed.meta || {}), region: keepRegion };
           }
+          // Accuracy net (§6/§7): validate the figure SPECS against the source lesson
+          // before any image is generated, so wrong values surface as findings.
+          figureReport = validateFigures(parsed, { source: srcForValidation, log });
           structured = JSON.stringify(parsed, null, 2);
         }
         let { png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)
@@ -142,8 +150,32 @@ function handler(req, res) {
           fs.writeFileSync(`${base}.json`, JSON.stringify(parsed, null, 2));
           log(`Saved to assets/generated/lessons/${contentId}.${locale || 'en'}.{pdf,png,json}`);
         } catch (e) { log(`(could not save to repo: ${e.message})`); }
+        // Second pass with the generated artwork's real dimensions (resolution check).
+        if (figureReport) {
+          try {
+            const dims = {};
+            for (const im of parsed.images || []) {
+              const hit = require('../lp-render/store/assets').get(require('../lp-render/store/assets').keyFor(im.prompt));
+              if (!hit) continue;
+              const buf = Buffer.from(hit.dataUri.split(',')[1], 'base64');
+              if (buf[0] === 0x89) dims[im.id] = { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
+              else { // JPEG: walk the segments for SOFn
+                for (let i = 2; i < buf.length - 9;) {
+                  if (buf[i] !== 0xFF) { i++; continue; }
+                  const m = buf[i + 1];
+                  if (m >= 0xC0 && m <= 0xCF && m !== 0xC4 && m !== 0xC8 && m !== 0xCC) {
+                    dims[im.id] = { width: buf.readUInt16BE(i + 7), height: buf.readUInt16BE(i + 5) }; break;
+                  }
+                  i += 2 + buf.readUInt16BE(i + 2);
+                }
+              }
+            }
+            figureReport = validateFigures(parsed, { source: srcForValidation, imageDims: dims, log });
+          } catch (e) { log(`  (resolution check skipped: ${e.message})`); }
+        }
         finish({
           ok: true,
+          figureReport,
           png: 'data:image/png;base64,' + png.toString('base64'),
           pdf: pdf ? 'data:application/pdf;base64,' + pdf.toString('base64') : null,
           logs, stats, structured,

@@ -62,7 +62,7 @@ const IMAGES_RICH = `IMAGES — HYBRID FIGURES: the image model draws TEXTLESS i
 
 WHAT EACH SECTION CARRIES:
 - stage-tamhid, stage-arad, stage-tatbiq, stage-taqwim: each carries EITHER an authored textless image ("image": "<id>") OR a CODE-DRAWN figure ("codeFigure"). *** PREFER codeFigure whenever the teaching point is a direction, a comparison, a count, a part-of-a-whole, a fraction, or a key expression — the renderer draws those exactly and legibly. Use a generated image only for real-world scenes, people and objects (supporting artwork). ***
-  BALANCE (important — the page must still feel illustrated): AT MOST TWO stage sections may use a codeFigure, and never the same kind twice. Every other stage carries a textless image (supporting artwork). The errors board does not count towards the two.
+  BALANCE (the page must feel illustrated, not diagrammatic): use a codeFigure wherever exactness matters, up to THREE stage sections, and never the same kind twice; the other stages carry textless illustrations as supporting artwork. There is no fixed figure count — give a stage a figure when it earns one, and leave prose alone when a figure would only decorate. The errors board does not count towards the three.
   codeFigure kinds — pick the one that fits, all take optional "label" (big caption under the drawing, Eastern numerals) and "caption" (short Arabic line):
   · { "kind":"fraction-grid", "shape":"square"|"circle", "parts":N, "shaded":K } — one whole split into N equal parts with K shaded.
   · { "kind":"count-set", "shape":"circle"|"square"|"triangle", "total":N, "shaded":K } — N separate objects, K highlighted (counting, grouping, "K of N").
@@ -285,7 +285,7 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
     for (const s of out.sections) {
       if (!s || !s.codeFigure || s.codeFigure.kind === 'error-board') continue;
       const k = sig(s.codeFigure);
-      if (seen.has(k) || stageCount >= 2) { delete s.codeFigure; continue; }
+      if (seen.has(k) || stageCount >= 3) { delete s.codeFigure; continue; }
       seen.add(k); stageCount++;
     }
   }
