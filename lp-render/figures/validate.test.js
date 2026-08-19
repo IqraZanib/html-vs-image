@@ -60,7 +60,7 @@ test('in LABELED mode, a label-asking brief is expected (no textless findings)',
 test('in LABELED mode, a wordless brief is flagged (the figure would carry no labels)', () => {
   const guide = { images: [{ id: 'a3', label: 'x', prompt: 'Flat vector illustration. ABSOLUTELY NO text of any kind.' }], sections: [] };
   const r = validateFigures(guide, { mode: 'labeled' });
-  assert.ok(r.findings.some((f) => f.code === 'art_no_label_ask'));
+  assert.ok(r.findings.some((f) => f.code === 'art_forbids_text_in_labeled_mode'));
 });
 
 test('small artwork is flagged as possibly soft at print size', () => {

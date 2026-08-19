@@ -76,9 +76,9 @@ function validateFigures(guide, { source = null, imageDims = {}, log = null, mod
       if (/labeled infographic|label every part|labels must be spelled/i.test(p)) {
         add('fail', 'art_asks_labels', `image "${im.id}": brief asks for labels while claiming to be textless (contradictory contract)`, null);
       }
-    } else if (!/label|labelled|labeled/i.test(p)) {
+    } else if (/no text|no letters|wordless/i.test(p)) {
       // Labeled mode: the figure is supposed to carry its own Arabic labels.
-      add('warn', 'art_no_label_ask', `image "${im.id}": brief does not ask for in-image labels, so the figure may come out wordless`, null);
+      add('warn', 'art_forbids_text_in_labeled_mode', `image "${im.id}": brief forbids text while the design set expects in-image Arabic labels`, null);
     }
     const dim = imageDims[im.id];
     if (dim && dim.width && dim.width < MIN_ART_WIDTH) {
