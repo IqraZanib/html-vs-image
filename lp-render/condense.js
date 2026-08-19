@@ -70,7 +70,8 @@ AUTHORED IMAGE ENTRIES (in "images"): { "id": kebab-case fresh id, "concept": "s
 - PROMPT TEMPLATE — English only, EXACTLY this shape: "Flat vector educational illustration, clean children's textbook style, soft colours. <the scene or object composition — concrete pictures only, real objects, people, places>. The image contains ABSOLUTELY NO text, no letters, no numbers, no symbols, no writing of any kind; boards, pages and cards appear clean and blank."
 - OVERLAYS carry the figure's labels: up to 3 of { "text": "<exact Arabic ≤ 4 words, undiacritized, OR a fraction like ٢/٤>", "pos": "top-right"|"top-left"|"bottom-right"|"bottom-left"|"top"|"bottom", "kind": "chip"|"fraction" }. Code renders them on the image in that corner/strip; compose the picture so those areas stay uncluttered. Use kind "fraction" for fractions, "chip" for words.
 - NEVER put a contrast inside one image; describe only what must appear.
-- One figure per section, no repeats. Do NOT emit any "images"-type section. If a SOURCE image is reused verbatim it keeps its own prompt (copy BYTE-FOR-BYTE).`;
+- One figure per section, no repeats. Do NOT emit any "images"-type section.
+- NEVER reference or reuse an image id from the source content: source prompts predate this contract and request in-image text. ALWAYS author fresh textless entries with the template above.`;
 
 const IMAGES_REUSE = `IMAGES — critical:
 - Choose up to 4 images FROM THE SOURCE's "images" array. COPY each chosen entry EXACTLY — id, concept, label and PROMPT BYTE-FOR-BYTE VERBATIM (any change breaks the image cache). Never write new prompts unless the source has NO images at all (then use an empty array).
@@ -141,7 +142,9 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
   // prompt + label). One figure per section, no repeats; stages left bare are
   // auto-assigned from remaining source images (scenes suit التمهيد, labelled
   // diagrams suit the teaching stages).
-  const srcById = new Map((content.images || []).map((im) => [im.id, im]));
+  // Hybrid regions never reuse source prompts (they request in-image text, which the
+  // textless contract forbids) — the model authors every figure fresh.
+  const srcById = richFigures ? new Map() : new Map((content.images || []).map((im) => [im.id, im]));
   const outById = new Map((out.images || []).filter((im) => im && im.id).map((im) => [im.id, im]));
   const POS = new Set(['top-right', 'top-left', 'bottom-right', 'bottom-left', 'top', 'bottom']);
   const cleanOverlays = (o) => Array.isArray(o) ? o.slice(0, 3)
@@ -199,7 +202,7 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
     }
     delete s.image;
   }
-  const remaining = (content.images || []).filter((im) => !seenIm.has(im.id));
+  const remaining = richFigures ? [] : (content.images || []).filter((im) => !seenIm.has(im.id));
   const pick = (pred) => { const i = remaining.findIndex(pred); return i < 0 ? null : remaining.splice(i, 1)[0]; };
   for (const id of ['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim']) {
     const sec = out.sections.find((x) => x && x.id === id);
