@@ -317,6 +317,23 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
       seen.add(k); stageCount++;
     }
   }
+  // LANGUAGE SAFETY: the guide must never disagree with its own text about language.
+  // A wrong locale (seen: "en" on an Arabic lesson) flips the whole page to LTR and
+  // makes the figure prompts ask for ENGLISH labels — so derive it from the script.
+  {
+    out.meta = out.meta || {};
+    const AR_LOCALES = ['ar', 'ur', 'sd', 'fa', 'ps'];
+    const guideText = JSON.stringify(out.sections || []);
+    const isArabicScript = /[\u0621-\u064A]/.test(guideText);
+    const declared = String((content.meta && content.meta.locale) || out.meta.locale || '').toLowerCase();
+    if (isArabicScript && !AR_LOCALES.includes(declared)) {
+      if (out.meta.locale !== 'ar') log(`  (locale corrected to "ar": the guide text is Arabic but locale said "${out.meta.locale || declared || 'none'}")`);
+      out.meta.locale = 'ar';
+    } else if (declared) out.meta.locale = declared;
+    for (const k of ['subject', 'grade', 'region']) {
+      if (!out.meta[k] && content.meta && content.meta[k]) out.meta[k] = content.meta[k];
+    }
+  }
   if (out.meta) delete out.meta.banner;
   log(`Condensed to the 2-page guide: ${out.sections.length} sections, ${out.images.length} reused image(s).`);
   return out;

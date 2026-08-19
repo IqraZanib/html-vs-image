@@ -50,6 +50,15 @@ function validateFigures(guide, { source = null, imageDims = {}, log = null, mod
   const srcFractions = fractionsIn(src);
   const srcNumbers = new Set(numbersIn(src));
 
+  // Language sanity: Arabic text with a non-Arabic locale renders the page LTR and
+  // asks the image model for English labels — a whole-page failure, so it fails hard.
+  {
+    const AR = ['ar', 'ur', 'sd', 'fa', 'ps'];
+    const loc = String((guide && guide.meta && guide.meta.locale) || '').toLowerCase();
+    if (/[\u0621-\u064A]/.test(JSON.stringify((guide && guide.sections) || [])) && !AR.includes(loc)) {
+      add('fail', 'locale_mismatch', `guide text is Arabic but meta.locale is "${loc || 'missing'}" — the page would render left-to-right with English figure labels`, null);
+    }
+  }
   const sections = Array.isArray(guide && guide.sections) ? guide.sections : [];
   const images = Array.isArray(guide && guide.images) ? guide.images : [];
   const imById = new Map(images.map((im) => [im.id, im]));
