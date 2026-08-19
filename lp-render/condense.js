@@ -58,21 +58,19 @@ HARD RULES:
 // region is never restyled by another region's design decisions.
 const RICH_FIGURE_REGIONS = new Set(['ye']);
 
-const IMAGES_RICH = `IMAGES — the guide is FIGURE-RICH like the approved pilot, built HYBRID: the image model draws a TEXTLESS illustration and ALL text/numbers/marks are added by code afterwards. A generated image must NEVER contain any text, letters, numbers, fractions, or symbols — describe pictures only, and where a label will be added leave that area visually clean.
-- EVERY stage section (stage-tamhid, stage-arad, stage-tatbiq, stage-taqwim) carries one figure via "image": "<id>". The "homework" section takes a SMALL figure when its task is physical (cutting, folding, counting objects): a simple labelled diagram of that one task.
-- THE ERRORS FIGURE IS TWO SEPARATE TEXTLESS IMAGES (the renderer composes the ✗/✓ board, marks and labels itself): attach "imageWrong" and "imageCorrect" ids on the errors section, plus "labelWrong" and "labelCorrect" — short Arabic captions (≤ 4 words) the code prints under each half. Each image brief is a SINGLE-CONCEPT textless picture. Do NOT mention the other version or wrong/correct words in the visual description.
-- EXACT-MATH DIAGRAMS ARE CODE, NOT IMAGES: when a stage figure must show exact counting, shading, grouping or a fraction (a square/circle divided into N parts with K shaded), do NOT author an image. Instead set on that section "codeFigure": { "kind": "fraction-grid", "shape": "square"|"circle", "parts": N, "shaded": K, "label": "<the fraction, Eastern numerals, e.g. ٢/٤>", "caption": "<short Arabic caption>" }. The renderer draws it pixel-exact in the design set's palette.
-- OVERLAYS carry the labels: each authored image entry may include "overlays": up to 3 of { "text": "<exact Arabic, ≤ 4 words, or a fraction like ٢/٤>", "pos": "top-right"|"top-left"|"bottom-right"|"bottom-left"|"top"|"bottom", "kind": "chip"|"fraction" }. Code renders them ON the image in that corner/strip — so the picture should keep those areas uncluttered.
-- REUSE FIRST: if a SOURCE image already IS a labelled teaching diagram that fits a stage, reference its id and COPY its entry into "images" EXACTLY — id, concept, label, prompt BYTE-FOR-BYTE (any change breaks the image cache).
-- Otherwise AUTHOR a new entry (fresh id, kebab-case, never colliding with a source id) in the pilot's grammar:
-  * Prompt in English instruction ONLY (no Arabic needed — images are textless), using this EXACT slot template: "Flat vector educational illustration, clean children's textbook style, soft colours. <the scene or object composition — pictures only>. The image contains ABSOLUTELY NO text, no letters, no numbers, no symbols, no writing of any kind; surfaces like boards and pages appear clean/blank."
-  * NEVER put a contrast inside one image: no negations, no 'instead of', no wrong-vs-right — describe only what must appear.
-  * LABEL RULES (image models garble long/vocalized Arabic, and garbled labels FAIL the quality gate — these rules are what make the figure generatable): 2–4 labels total; each label ONE or TWO words; STRIP ALL DIACRITICS/tashkeel from labels (write «أبي», never «أَبِي») even when the lesson text carries them; never a sentence, chant line or instruction as a label; never the same word twice; besides the labels, at most ONE short line of text on the teaching surface.
-  * Per stage: stage-tamhid = the named hook object/scene WITH the day's key words written plainly on a board inside it (a chant belongs in the stage BODY, never inside the image); stage-arad = the concept worked on the board with the lesson's real example, kept to ONE worked example; stage-tatbiq = the actual exercise being solved in a pupil's notebook, the real answer visible; stage-taqwim = the exit task being performed.
-  * "errors" figure: "One wide chalkboard split in two halves by a vertical line: one half shows <the lesson's real example done WRONG> under a large red ✗; the other half shows <the CORRECT version> under a large green ✓." Keep each half to ONE word/expression — the two things the lesson distinguishes. Same label rules.
-  * concept: "diagram" for worked/labelled boards (most figures); "scene" only for a stage-tamhid real-world hook — and even then the key fact appears written inside.
-  * label: a short Arabic caption in the lesson's language.
-- One figure per section, no repeats. Do NOT emit any "images"-type section.`;
+const IMAGES_RICH = `IMAGES — HYBRID FIGURES: the image model draws TEXTLESS illustrations; ALL text, numbers, fractions and marks are rendered by code afterwards. A generated image must NEVER contain any text, letters, numbers, fractions or symbols of any kind.
+
+WHAT EACH SECTION CARRIES:
+- stage-tamhid, stage-arad, stage-tatbiq, stage-taqwim: each carries EITHER an authored image ("image": "<id>") OR, when the figure must show exact counting/shading/grouping/a fraction, a code-drawn figure instead:
+  "codeFigure": { "kind": "fraction-grid", "shape": "square"|"circle", "parts": N, "shaded": K, "label": "<Eastern-numeral fraction, e.g. ٢/٤>", "caption": "<short Arabic caption>" } — the renderer draws it pixel-exact. PREFER codeFigure for any fraction/counting diagram; use a generated image only for real-world scenes and objects.
+- errors: TWO textless images composed by the renderer into the ✗/✓ board — set "imageWrong" and "imageCorrect" ids PLUS "labelWrong"/"labelCorrect" (short Arabic captions ≤ 4 words that code prints under each half). Each brief describes ONE picture; never mention the other version or wrong/correct words in the visual description. When the misconception is about a fraction/count, make each half's brief a simple object composition (e.g. 'four paper squares on a desk, two of them coloured') — never digits.
+- homework: a SMALL textless image of the physical task when there is one.
+
+AUTHORED IMAGE ENTRIES (in "images"): { "id": kebab-case fresh id, "concept": "scene"|"diagram", "label": "<short Arabic caption for under the figure>", "prompt": <see template>, "overlays": [...] }.
+- PROMPT TEMPLATE — English only, EXACTLY this shape: "Flat vector educational illustration, clean children's textbook style, soft colours. <the scene or object composition — concrete pictures only, real objects, people, places>. The image contains ABSOLUTELY NO text, no letters, no numbers, no symbols, no writing of any kind; boards, pages and cards appear clean and blank."
+- OVERLAYS carry the figure's labels: up to 3 of { "text": "<exact Arabic ≤ 4 words, undiacritized, OR a fraction like ٢/٤>", "pos": "top-right"|"top-left"|"bottom-right"|"bottom-left"|"top"|"bottom", "kind": "chip"|"fraction" }. Code renders them on the image in that corner/strip; compose the picture so those areas stay uncluttered. Use kind "fraction" for fractions, "chip" for words.
+- NEVER put a contrast inside one image; describe only what must appear.
+- One figure per section, no repeats. Do NOT emit any "images"-type section. If a SOURCE image is reused verbatim it keeps its own prompt (copy BYTE-FOR-BYTE).`;
 
 const IMAGES_REUSE = `IMAGES — critical:
 - Choose up to 4 images FROM THE SOURCE's "images" array. COPY each chosen entry EXACTLY — id, concept, label and PROMPT BYTE-FOR-BYTE VERBATIM (any change breaks the image cache). Never write new prompts unless the source has NO images at all (then use an empty array).
@@ -156,8 +154,8 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
       const ok = cf && cf.kind === 'fraction-grid' && ['square', 'circle'].includes(cf.shape)
         && Number.isInteger(cf.parts) && cf.parts >= 2 && cf.parts <= 12
         && Number.isInteger(cf.shaded) && cf.shaded >= 0 && cf.shaded <= cf.parts;
-      if (ok) s.codeFigure = { kind: 'fraction-grid', shape: cf.shape, parts: cf.parts, shaded: cf.shaded,
-        label: String(cf.label || ''), caption: String(cf.caption || '') };
+      if (ok) { s.codeFigure = { kind: 'fraction-grid', shape: cf.shape, parts: cf.parts, shaded: cf.shaded,
+        label: String(cf.label || ''), caption: String(cf.caption || '') }; delete s.image; }
       else delete s.codeFigure;
     }
     if (s.labelWrong) s.labelWrong = String(s.labelWrong).slice(0, 60);

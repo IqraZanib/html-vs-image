@@ -275,7 +275,7 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-homework .panel.has-inline-img{display:flex;gap:10px;align-items:center}
 .section.sec-homework .panel.has-inline-img .ii-body{display:block;flex:1;min-width:0}
 .section.sec-homework .panel.has-inline-img .d-inline-img{flex:0 0 31%;max-width:230px;position:static;align-self:auto}
-.section.sec-homework .panel.has-inline-img .d-inline-img img{max-height:124px;position:static;height:auto}
+.section.sec-homework .panel.has-inline-img .d-inline-img img{max-height:96px;position:static;height:auto}
 .section.sec-homework .panel.has-inline-img::before{display:none}
 .section.sec-homework .panel.has-inline-img{padding-left:14px}
 
@@ -420,6 +420,22 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .tb-label{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--line);
   border-radius:8px;padding:1px 10px;font-weight:700;font-size:12.5px;color:var(--navy);white-space:nowrap}
 .d-twin-board .tb-half{padding-bottom:26px;background:#fff}
+
+
+/* hybrid fixes: ov-wrap fills the absolute-fill hero slots; compact code figures */
+.section.sec-stage-tamhid .d-inline-img .ov-wrap,.section.sec-stage-arad .d-inline-img .ov-wrap{position:absolute;left:0;right:0;top:0;bottom:24px}
+.section.sec-stage-tamhid .d-inline-img .ov-wrap img,.section.sec-stage-arad .d-inline-img .ov-wrap img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;max-height:none}
+.d-code-fig .cf-svg{max-height:132px}
+.d-code-fig .cf-label{font-size:20px}
+
+
+/* code figures are flow-laid-out even inside the hero slots (the absolute-fill
+   rules are for bitmaps only) — otherwise the SVG + fraction label get clipped */
+.section.sec-stage-tamhid .d-code-fig,.section.sec-stage-arad .d-code-fig{position:static;min-height:0;height:auto;align-self:center;padding:6px 6px 4px}
+.section.sec-stage-tamhid .d-code-fig .cf-svg,.section.sec-stage-arad .d-code-fig .cf-svg{position:static;width:78%;height:auto;max-height:126px}
+.d-code-fig .cf-label{margin-top:1px;line-height:1.1}
+/* on-image chips sit clear of the caption strip */
+.d-inline-img.has-ov .ov-bottom-right{bottom:8px;right:8px}
 
 `;
 

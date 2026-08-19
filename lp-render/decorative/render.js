@@ -308,13 +308,19 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     }
     const inlineIm = !mg && section.image && images[section.image] && images[section.image].dataUri ? images[section.image] : null;
     if (inlineIm) {
-      const ovs = (section.overlays || (inlineIm.overlays)) || [];
+      // Labels are ALWAYS code-rendered on the image: use the model's overlay spec
+      // when it gave one, otherwise derive a chip from the figure's own label so the
+      // guarantee never depends on the model emitting the optional field.
+      const lbl = cleanHeading(inlineIm.label || '');
+      const ovs = (section.overlays || inlineIm.overlays
+        || (lbl ? [{ text: lbl, pos: 'bottom-right', kind: /[٠-٩0-9]\s*\/\s*[٠-٩0-9]/.test(lbl) ? 'fraction' : 'chip' }] : []));
+      const capBelow = !(ovs.length && ovs.some((o) => o.text === lbl));
       const ovHtml = ovs.map((o) => {
         const frac = o.kind === 'fraction' && /\//.test(o.text);
         const inner = frac ? `<span class="fr-n">${esc(o.text.split('/')[0])}</span><span class="fr-b"></span><span class="fr-d">${esc(o.text.split('/')[1])}</span>` : esc(o.text);
         return `<div class="ov ov-${o.pos} ov-${o.kind === 'fraction' ? 'fraction' : 'chip'}">${inner}</div>`;
       }).join('');
-      const fig = `<div class="d-inline-img${ovHtml ? ' has-ov' : ''}"><div class="ov-wrap"><img src="${inlineIm.dataUri}" alt="${esc(cleanHeading(inlineIm.label || ''))}">${ovHtml}</div>${inlineIm.label ? `<div class="cap">${esc(cleanHeading(inlineIm.label))}</div>` : ''}</div>`;
+      const fig = `<div class="d-inline-img${ovHtml ? ' has-ov' : ''}"><div class="ov-wrap"><img src="${inlineIm.dataUri}" alt="${esc(lbl)}">${ovHtml}</div>${lbl && capBelow ? `<div class="cap">${esc(lbl)}</div>` : ''}</div>`;
       return `<section class="section${idCls}">${head}<div class="panel has-inline-img" style="border-color:var(${accent}-soft)"><div class="ii-body">${body}</div>${fig}</div></section>`;
     }
     const charId = hasContentImages ? null : pickCharacter(section, cast, rot, used);
