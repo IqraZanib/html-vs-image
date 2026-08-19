@@ -208,7 +208,115 @@ function charSize(section, charId) {
   return { h, w };
 }
 
-// SVG fraction figure: square grids or circle pies, K of N shaded — exact by code.
+
+// ── Code-rendered teaching visuals ────────────────────────────────────────────
+// The image model draws wordless art; everything a pupil must READ or COUNT is
+// drawn here, so it is exact by construction. Palette follows the design set.
+const CF = { fill: '#f5c33b', empty: '#ffffff', stroke: '#2f3e63', ink: '#0a1220',
+  good: '#1e8e4d', bad: '#c0392b', accent: '#4479ad' };
+
+function cfSvg(inner, w = 240, h = 200, cls = 'cf-svg') {
+  return '<svg class="' + cls + '" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">' + inner + '</svg>';
+}
+function cfText(x, y, s, size = 13, weight = 700, fill = CF.ink, anchor = 'middle') {
+  return '<text x="' + x + '" y="' + y + '" text-anchor="' + anchor + '" font-size="' + size
+    + '" font-weight="' + weight + '" fill="' + fill + '" direction="rtl">' + esc(String(s || '')) + '</text>';
+}
+
+// N parts of one shape, K shaded (square grid or circle pie) — exact fractions.
+function cfFractionGrid({ shape, parts, shaded }) {
+  const W = 240, H = 190;
+  if (shape === 'circle') {
+    const cx = W / 2, cy = H / 2, r = 78; let out = '';
+    for (let i = 0; i < parts; i++) {
+      const a0 = -Math.PI / 2 + (2 * Math.PI * i) / parts, a1 = -Math.PI / 2 + (2 * Math.PI * (i + 1)) / parts;
+      const large = (a1 - a0) > Math.PI ? 1 : 0;
+      out += '<path d="M ' + cx + ' ' + cy + ' L ' + (cx + r * Math.cos(a0)) + ' ' + (cy + r * Math.sin(a0))
+        + ' A ' + r + ' ' + r + ' 0 ' + large + ' 1 ' + (cx + r * Math.cos(a1)) + ' ' + (cy + r * Math.sin(a1))
+        + ' Z" fill="' + (i < shaded ? CF.fill : CF.empty) + '" stroke="' + CF.stroke + '" stroke-width="3"/>';
+    }
+    return cfSvg(out, W, H);
+  }
+  const cols = parts <= 2 ? 2 : parts === 3 ? 3 : parts <= 4 ? 2 : parts <= 6 ? 3 : 4;
+  const rows = Math.ceil(parts / cols), cw = 170 / cols, ch = 140 / rows;
+  const x0 = (W - 170) / 2, y0 = (H - 140) / 2; let out = '';
+  for (let i = 0; i < parts; i++) {
+    const c = i % cols, r = Math.floor(i / cols);
+    out += '<rect x="' + (x0 + c * cw) + '" y="' + (y0 + r * ch) + '" width="' + cw + '" height="' + ch
+      + '" fill="' + (i < shaded ? CF.fill : CF.empty) + '" stroke="' + CF.stroke + '" stroke-width="3"/>';
+  }
+  return cfSvg(out, W, H);
+}
+
+// A row of separate objects, K of them highlighted — counting and grouping.
+function cfCountSet({ shape = 'circle', total = 4, shaded = 0 }) {
+  const W = 240, H = 150, n = Math.max(1, Math.min(8, total));
+  const gap = W / (n + 1), r = Math.min(26, gap / 2.4), cy = H / 2; let out = '';
+  for (let i = 0; i < n; i++) {
+    const cx = gap * (i + 1), f = i < shaded ? CF.fill : CF.empty;
+    if (shape === 'square') out += '<rect x="' + (cx - r) + '" y="' + (cy - r) + '" width="' + (2 * r) + '" height="' + (2 * r) + '" rx="3" fill="' + f + '" stroke="' + CF.stroke + '" stroke-width="3"/>';
+    else if (shape === 'triangle') out += '<path d="M ' + cx + ' ' + (cy - r) + ' L ' + (cx + r) + ' ' + (cy + r) + ' L ' + (cx - r) + ' ' + (cy + r) + ' Z" fill="' + f + '" stroke="' + CF.stroke + '" stroke-width="3"/>';
+    else out += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + f + '" stroke="' + CF.stroke + '" stroke-width="3"/>';
+  }
+  return cfSvg(out, W, H);
+}
+
+// Four labelled direction arrows (Arabic labels supplied by the guide).
+function cfCompass({ north, east, south, west, center }) {
+  const W = 240, H = 200, cx = W / 2, cy = H / 2 + 4, L = 58;
+  const arrow = (dx, dy) => '<path d="M ' + cx + ' ' + cy + ' L ' + (cx + dx * L) + ' ' + (cy + dy * L)
+    + '" stroke="' + CF.accent + '" stroke-width="5" stroke-linecap="round" marker-end="url(#cfArrow)"/>';
+  const defs = '<defs><marker id="cfArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">'
+    + '<path d="M 0 0 L 10 5 L 0 10 z" fill="' + CF.accent + '"/></marker></defs>';
+  let out = defs + arrow(0, -1) + arrow(1, 0) + arrow(0, 1) + arrow(-1, 0)
+    + '<circle cx="' + cx + '" cy="' + cy + '" r="7" fill="' + CF.fill + '" stroke="' + CF.stroke + '" stroke-width="2.5"/>';
+  if (north) out += cfText(cx, cy - L - 12, north, 14);
+  if (south) out += cfText(cx, cy + L + 24, south, 14);
+  if (east) out += cfText(cx + L + 22, cy + 5, east, 14);
+  if (west) out += cfText(cx - L - 22, cy + 5, west, 14);
+  if (center) out += cfText(cx, cy + 34, center, 11, 700, CF.stroke);
+  return cfSvg(out, W, H);
+}
+
+// Two labelled bars for length / size / quantity comparisons.
+function cfCompare({ items = [] }) {
+  const W = 240, H = 170; let out = '';
+  items.slice(0, 3).forEach((it, i) => {
+    const y = 44 + i * 56, len = Math.max(0.15, Math.min(1, Number(it.len) || 0.6)) * 170;
+    out += '<rect x="' + ((W - 170) / 2) + '" y="' + y + '" width="' + len + '" height="16" rx="8" fill="'
+      + (it.mark === 'good' ? CF.good : it.mark === 'bad' ? CF.bad : CF.accent) + '"/>';
+    if (it.label) out += cfText(W / 2, y + 38, it.label, 12.5);
+  });
+  return cfSvg(out, W, H);
+}
+
+// A large expression/word (e.g. ٢/٤ or a key term) drawn as text, not generated.
+function cfExpression({ text }) {
+  return '<div class="cf-expr">' + esc(String(text || '')) + '</div>';
+}
+
+const CF_KINDS = new Set(['fraction-grid', 'count-set', 'compass', 'compare', 'expression', 'error-board']);
+function cfMini(spec) {
+  if (!spec) return '';
+  switch (spec.kind) {
+    case 'fraction-grid': return cfFractionGrid(spec);
+    case 'count-set': return cfCountSet(spec);
+    case 'compass': return cfCompass(spec);
+    case 'compare': return cfCompare(spec);
+    case 'expression': return cfExpression(spec);
+    default: return '';
+  }
+}
+// Fully code-drawn misconception board: ✗ half and ✓ half, each a code visual.
+function cfErrorBoard(cf) {
+  const half = (spec, mark, cls, label) => '<div class="cb-half ' + cls + '"><div class="cb-mark">' + mark + '</div>'
+    + '<div class="cb-vis">' + cfMini(spec) + '</div>'
+    + (label ? '<div class="cb-label">' + esc(cleanHeading(label)) + '</div>' : '') + '</div>';
+  return '<div class="d-code-board">' + half(cf.wrong, '✗', 'cb-wrong', cf.labelWrong)
+    + '<div class="cb-divider"></div>' + half(cf.correct, '✓', 'cb-correct', cf.labelCorrect) + '</div>';
+}
+
+// (legacy name kept for the existing call path)
 function fractionGridSvg({ shape, parts, shaded }) {
   const W = 240, H = 200, FILL = '#f5c33b', EMPTY = '#ffffff', STROKE = '#2f3e63';
   if (shape === 'circle') {
@@ -301,9 +409,13 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     }
     // Code-drawn exact-math figure (fraction grids): parts/shading/label are
     // parameters, so the mathematics is pixel-exact by construction.
-    if (!mg && section.codeFigure && section.codeFigure.kind === 'fraction-grid') {
+    if (!mg && section.codeFigure && CF_KINDS.has(section.codeFigure.kind)) {
       const cf = section.codeFigure;
-      const fig = `<div class="d-inline-img d-code-fig">${fractionGridSvg(cf)}${cf.label ? `<div class="cf-label">${esc(cf.label)}</div>` : ''}${cf.caption ? `<div class="cap">${esc(cleanHeading(cf.caption))}</div>` : ''}</div>`;
+      // A code-drawn misconception board spans the card under the body.
+      if (cf.kind === 'error-board') {
+        return `<section class="section${idCls}">${head}<div class="panel has-twin-board" style="border-color:var(${accent}-soft)"><div class="ii-body">${body}</div>${cfErrorBoard(cf)}</div></section>`;
+      }
+      const fig = `<div class="d-inline-img d-code-fig">${cfMini(cf)}${cf.label ? `<div class="cf-label">${esc(cf.label)}</div>` : ''}${cf.caption ? `<div class="cap">${esc(cleanHeading(cf.caption))}</div>` : ''}</div>`;
       return `<section class="section${idCls}">${head}<div class="panel has-inline-img" style="border-color:var(${accent}-soft)"><div class="ii-body">${body}</div>${fig}</div></section>`;
     }
     const inlineIm = !mg && section.image && images[section.image] && images[section.image].dataUri ? images[section.image] : null;

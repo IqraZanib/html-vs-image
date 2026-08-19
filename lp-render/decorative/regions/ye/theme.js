@@ -437,6 +437,27 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 /* on-image chips sit clear of the caption strip */
 .d-inline-img.has-ov .ov-bottom-right{bottom:8px;right:8px}
 
+
+/* ── code-rendered teaching visuals: expressions, and the code-drawn ✗/✓ board ── */
+.cf-expr{font:800 40px 'Noto Naskh Arabic','IBM Plex Sans Arabic',sans-serif;color:var(--navy);
+  padding:14px 6px 8px;text-align:center;line-height:1.1}
+.d-code-board{display:flex;flex-direction:row-reverse;align-items:stretch;gap:0;background:#fff;
+  border:1.5px solid var(--line);border-radius:12px;overflow:hidden;max-width:470px;margin:4px auto 2px}
+.d-code-board .cb-half{flex:1;position:relative;padding:6px 6px 4px;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-start;min-width:0}
+.d-code-board .cb-divider{width:2px;background:var(--line)}
+.d-code-board .cb-mark{position:absolute;top:4px;inset-inline-start:6px;font-size:19px;font-weight:800;line-height:1;
+  width:26px;height:26px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 1px 3px rgba(0,0,0,.22);z-index:1}
+.d-code-board .cb-wrong .cb-mark{color:#c0392b}
+.d-code-board .cb-correct .cb-mark{color:#1e8e4d}
+.d-code-board .cb-vis{width:100%;display:flex;justify-content:center}
+.d-code-board .cb-vis .cf-svg{max-height:104px;width:88%}
+.d-code-board .cb-vis .cf-expr{font-size:30px;padding:8px 4px 2px}
+.d-code-board .cb-label{margin-top:2px;background:#fff;border:1px solid var(--line);border-radius:8px;
+  padding:1px 10px;font-weight:700;font-size:12.5px;color:var(--navy);white-space:nowrap}
+.section.sec-errors .panel.has-twin-board .d-code-board{margin-top:6px}
+
 `;
 
 module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom' };

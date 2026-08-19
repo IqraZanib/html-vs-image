@@ -99,6 +99,20 @@ function handler(req, res) {
           const keepRegion = parsed.meta && parsed.meta.region;
           parsed = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log });
           if (keepRegion) parsed.meta = { ...(parsed.meta || {}), region: keepRegion };
+          // Coverage retry: the design set promises a figure on every stage card, but
+          // condense rolls vary. Count the stages that actually got one and re-condense
+          // (text only — no image credits spent yet) when the guide comes back bare.
+          const STAGES = ['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim'];
+          const covered = (g) => STAGES.filter((id) => {
+            const s = (g.sections || []).find((x) => x && x.id === id);
+            return s && (s.image || s.codeFigure);
+          }).length;
+          for (let pass = 0; covered(parsed) < 4 && pass < 2; pass++) {
+            log(`Only ${covered(parsed)}/4 stages have a figure — re-condensing for full coverage…`);
+            parsed = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log,
+              extra: 'COVERAGE: every one of stage-tamhid, stage-arad, stage-tatbiq and stage-taqwim MUST carry a figure — either "image" (a textless illustration you author) or a "codeFigure". Do not leave any stage without one.' });
+            if (keepRegion) parsed.meta = { ...(parsed.meta || {}), region: keepRegion };
+          }
           structured = JSON.stringify(parsed, null, 2);
         }
         let { png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)

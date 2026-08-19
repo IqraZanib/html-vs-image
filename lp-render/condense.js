@@ -61,9 +61,15 @@ const RICH_FIGURE_REGIONS = new Set(['ye']);
 const IMAGES_RICH = `IMAGES — HYBRID FIGURES: the image model draws TEXTLESS illustrations; ALL text, numbers, fractions and marks are rendered by code afterwards. A generated image must NEVER contain any text, letters, numbers, fractions or symbols of any kind.
 
 WHAT EACH SECTION CARRIES:
-- stage-tamhid, stage-arad, stage-tatbiq, stage-taqwim: each carries EITHER an authored image ("image": "<id>") OR, when the figure must show exact counting/shading/grouping/a fraction, a code-drawn figure instead:
-  "codeFigure": { "kind": "fraction-grid", "shape": "square"|"circle", "parts": N, "shaded": K, "label": "<Eastern-numeral fraction, e.g. ٢/٤>", "caption": "<short Arabic caption>" } — the renderer draws it pixel-exact. PREFER codeFigure for any fraction/counting diagram; use a generated image only for real-world scenes and objects.
-- errors: TWO textless images composed by the renderer into the ✗/✓ board — set "imageWrong" and "imageCorrect" ids PLUS "labelWrong"/"labelCorrect" (short Arabic captions ≤ 4 words that code prints under each half). Each brief describes ONE picture; never mention the other version or wrong/correct words in the visual description. When the misconception is about a fraction/count, make each half's brief a simple object composition (e.g. 'four paper squares on a desk, two of them coloured') — never digits.
+- stage-tamhid, stage-arad, stage-tatbiq, stage-taqwim: each carries EITHER an authored textless image ("image": "<id>") OR a CODE-DRAWN figure ("codeFigure"). *** PREFER codeFigure whenever the teaching point is a direction, a comparison, a count, a part-of-a-whole, a fraction, or a key expression — the renderer draws those exactly and legibly. Use a generated image only for real-world scenes, people and objects (supporting artwork). ***
+  BALANCE (important — the page must still feel illustrated): AT MOST TWO stage sections may use a codeFigure, and never the same kind twice. Every other stage carries a textless image (supporting artwork). The errors board does not count towards the two.
+  codeFigure kinds — pick the one that fits, all take optional "label" (big caption under the drawing, Eastern numerals) and "caption" (short Arabic line):
+  · { "kind":"fraction-grid", "shape":"square"|"circle", "parts":N, "shaded":K } — one whole split into N equal parts with K shaded.
+  · { "kind":"count-set", "shape":"circle"|"square"|"triangle", "total":N, "shaded":K } — N separate objects, K highlighted (counting, grouping, "K of N").
+  · { "kind":"compass", "north":"شمال", "east":"شرق", "south":"جنوب", "west":"غرب", "center":"<optional short word>" } — four labelled direction arrows.
+  · { "kind":"compare", "items":[ { "label":"<short Arabic>", "len":0.0-1.0, "mark":"good"|"bad"|null }, … ] } — two or three labelled bars for length/size/quantity comparisons.
+  · { "kind":"expression", "text":"<a short expression or key term, e.g. ٢/٤>" } — drawn as large text, never generated.
+- errors: *** STRONGLY PREFER a fully code-drawn board *** — set "codeFigure": { "kind":"error-board", "wrong": <any codeFigure kind above, minus label/caption>, "correct": <same>, "labelWrong":"<short Arabic ≤ 4 words>", "labelCorrect":"<short Arabic ≤ 4 words>" }. The renderer draws the split board, the ✗ and ✓ marks, both mini-visuals and both captions — so the mistake is shown exactly (e.g. wrong = expression "٤/٢", correct = expression "٢/٤"; or wrong = count-set with the wrong number shaded, correct = the right one; or wrong/correct = compare bars). ONLY when the misconception cannot be drawn this way (it is about behaviour, a physical action or a place) fall back to two textless images: "imageWrong"/"imageCorrect" ids plus "labelWrong"/"labelCorrect".
 - homework: a SMALL textless image of the physical task when there is one.
 
 AUTHORED IMAGE ENTRIES (in "images"): { "id": kebab-case fresh id, "concept": "scene"|"diagram", "label": "<short Arabic caption for under the figure>", "prompt": <see template>, "overlays": [...] }.
@@ -82,9 +88,11 @@ const IMAGES_REUSE = `IMAGES — critical:
 // images block so the shared template stays byte-identical for other regions).
 const RICH_BUDGETS = `
 
+VISUAL-FIRST RULE (applies to every section): if a point is carried by the section's figure — a direction, a count, a fraction, a comparison, a marked mistake — do NOT restate it in the prose. Write the teacher's ACTION only, and let the visual carry the concept. Never describe in words what the code-drawn visual already shows. Aim for a light page with generous whitespace; a section whose figure explains the idea needs only ONE short line of text.
+
 FIGURE-RICH TEXT BUDGETS (this design set explains through IMAGES; text is a terse sidebar — these budgets OVERRIDE the ones above):
 - goal body ≤ 20 words. errors ✗/✓ sides ≤ 16 words each. errors-caption ≤ 12 words.
-- STAGE BODIES ≤ 24 words: short imperative sentences — the hook BY NAME, the essential move, ONE short quote if the source has one. NO narration; the figure carries the explanation.
+- STAGE BODIES ≤ 18 words when the section has a figure (≤ 24 only if it has none): short imperative sentences — the hook BY NAME and the essential move. NO narration, no restating the visual.
 - تحقق lines ≤ 10 words. solutions items ≤ 18 words each. glossary values ≤ 7 words. multigrade lines ≤ 12 words. homework ≤ 30 words — numbered tasks only, no explanations (the figure shows the task).`;
 
 const buildSystem = (richFigures) => SYSTEM.replace('__IMAGES_BLOCK__', richFigures ? IMAGES_RICH + RICH_BUDGETS : IMAGES_REUSE);
@@ -103,6 +111,51 @@ async function callOnce(content, { apiKey, fetchImpl, extra, system }) {
   const m = String(text || '').match(/\{[\s\S]*\}/);
   if (!m) throw new Error('condense: model returned no JSON');
   return JSON.parse(m[0]);
+}
+
+// Validate a code-figure spec: unknown kinds and out-of-range numbers are dropped
+// rather than trusted, so a bad model emission can never reach the renderer.
+function sanitizeCodeFigure(cf, depth = 0) {
+  if (!cf || typeof cf !== 'object') return null;
+  const s = (v, n = 40) => String(v == null ? '' : v).slice(0, n);
+  const int = (v, lo, hi) => (Number.isInteger(v) && v >= lo && v <= hi ? v : null);
+  const label = s(cf.label), caption = s(cf.caption, 60);
+  switch (cf.kind) {
+    case 'fraction-grid': {
+      const parts = int(cf.parts, 2, 12); if (parts == null) return null;
+      const shaded = int(cf.shaded, 0, parts); if (shaded == null) return null;
+      return { kind: 'fraction-grid', shape: cf.shape === 'circle' ? 'circle' : 'square', parts, shaded, label, caption };
+    }
+    case 'count-set': {
+      const total = int(cf.total, 1, 8); if (total == null) return null;
+      const shaded = int(cf.shaded, 0, total); if (shaded == null) return null;
+      const shape = ['circle', 'square', 'triangle'].includes(cf.shape) ? cf.shape : 'circle';
+      return { kind: 'count-set', shape, total, shaded, label, caption };
+    }
+    case 'compass':
+      return { kind: 'compass', north: s(cf.north, 16), east: s(cf.east, 16), south: s(cf.south, 16),
+        west: s(cf.west, 16), center: s(cf.center, 20), label, caption };
+    case 'compare': {
+      const items = (Array.isArray(cf.items) ? cf.items : []).slice(0, 3)
+        .map((it) => ({ label: s(it && it.label, 24), len: Math.max(0.15, Math.min(1, Number(it && it.len) || 0.6)),
+          mark: ['good', 'bad'].includes(it && it.mark) ? it.mark : null }))
+        .filter((it) => it.label);
+      return items.length >= 2 ? { kind: 'compare', items, label, caption } : null;
+    }
+    case 'expression': {
+      const text = s(cf.text, 24); return text ? { kind: 'expression', text, label, caption } : null;
+    }
+    case 'error-board': {
+      if (depth) return null; // no nesting of boards
+      const wrong = sanitizeCodeFigure(cf.wrong, 1), correct = sanitizeCodeFigure(cf.correct, 1);
+      if (!wrong || !correct) return null;
+      // Both halves identical means the board shows no contrast at all — it would
+      // read as a rendering fault. Reject so the section falls back to images/text.
+      if (JSON.stringify(wrong) === JSON.stringify(correct)) return null;
+      return { kind: 'error-board', wrong, correct, labelWrong: s(cf.labelWrong, 40), labelCorrect: s(cf.labelCorrect, 40) };
+    }
+    default: return null;
+  }
 }
 
 async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log = () => {}, extra = '' } = {}) {
@@ -153,12 +206,8 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
   for (const s of out.sections) {
     if (!s) continue;
     if (s.codeFigure) {
-      const cf = s.codeFigure;
-      const ok = cf && cf.kind === 'fraction-grid' && ['square', 'circle'].includes(cf.shape)
-        && Number.isInteger(cf.parts) && cf.parts >= 2 && cf.parts <= 12
-        && Number.isInteger(cf.shaded) && cf.shaded >= 0 && cf.shaded <= cf.parts;
-      if (ok) { s.codeFigure = { kind: 'fraction-grid', shape: cf.shape, parts: cf.parts, shaded: cf.shaded,
-        label: String(cf.label || ''), caption: String(cf.caption || '') }; delete s.image; }
+      const clean = sanitizeCodeFigure(s.codeFigure);
+      if (clean) { s.codeFigure = clean; if (clean.kind !== 'error-board') delete s.image; }
       else delete s.codeFigure;
     }
     if (s.labelWrong) s.labelWrong = String(s.labelWrong).slice(0, 60);
@@ -225,6 +274,19 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
       if (!im || !im.label) continue;
       const cleaned = String(im.label).replace(/\s*\([^)]*[A-Za-z][^)]*\)/g, ' ').replace(/\s{2,}/g, ' ').trim();
       if (cleaned) im.label = cleaned;
+    }
+  }
+  // BALANCE ENFORCEMENT (deterministic): identical code visuals are duplicates —
+  // keep the first; and no more than two stage sections may be code-drawn, so the
+  // page keeps its supporting illustrations instead of turning into a diagram sheet.
+  {
+    const sig = (cf) => JSON.stringify([cf.kind, cf.shape, cf.parts, cf.shaded, cf.total, cf.north, cf.east, cf.text, (cf.items || []).map((i) => i.label)]);
+    const seen = new Set(); let stageCount = 0;
+    for (const s of out.sections) {
+      if (!s || !s.codeFigure || s.codeFigure.kind === 'error-board') continue;
+      const k = sig(s.codeFigure);
+      if (seen.has(k) || stageCount >= 2) { delete s.codeFigure; continue; }
+      seen.add(k); stageCount++;
     }
   }
   if (out.meta) delete out.meta.banner;
