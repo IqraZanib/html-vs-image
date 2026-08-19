@@ -44,11 +44,23 @@ test('identical board halves fail', () => {
   assert.ok(validateFigures(guide, {}).findings.some((f) => f.code === 'board_identical'));
 });
 
-test('artwork that asks for labels fails the textless contract', () => {
+test('in HYBRID mode, artwork that asks for labels fails the textless contract', () => {
   const guide = { images: [{ id: 'a2', label: 'x', prompt: 'a clean, labeled educational infographic diagram; label every part in Arabic' }], sections: [] };
-  const r = validateFigures(guide, {});
+  const r = validateFigures(guide, { mode: 'hybrid' });
   assert.ok(r.findings.some((f) => f.code === 'art_asks_labels'));
   assert.ok(r.findings.some((f) => f.code === 'art_not_textless'));
+});
+
+test('in LABELED mode, a label-asking brief is expected (no textless findings)', () => {
+  const guide = { images: [{ id: 'a2', label: 'خط مستقيم', prompt: 'a clean, labeled educational diagram; label every part in Arabic' }], sections: [] };
+  const r = validateFigures(guide, { mode: 'labeled' });
+  assert.strictEqual(r.findings.some((f) => f.code === 'art_asks_labels' || f.code === 'art_not_textless'), false);
+});
+
+test('in LABELED mode, a wordless brief is flagged (the figure would carry no labels)', () => {
+  const guide = { images: [{ id: 'a3', label: 'x', prompt: 'Flat vector illustration. ABSOLUTELY NO text of any kind.' }], sections: [] };
+  const r = validateFigures(guide, { mode: 'labeled' });
+  assert.ok(r.findings.some((f) => f.code === 'art_no_label_ask'));
 });
 
 test('small artwork is flagged as possibly soft at print size', () => {

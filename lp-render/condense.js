@@ -58,7 +58,32 @@ HARD RULES:
 // region is never restyled by another region's design decisions.
 const RICH_FIGURE_REGIONS = new Set(['ye']);
 
-const IMAGES_RICH = `IMAGES — HYBRID FIGURES: the image model draws TEXTLESS illustrations; ALL text, numbers, fractions and marks are rendered by code afterwards. A generated image must NEVER contain any text, letters, numbers, fractions or symbols of any kind.
+// FIGURE MODE (owner decision 2026-08-19 — reverted to 'labeled'):
+//   'labeled' — the image model writes the figure's Arabic labels itself, as the
+//               design set was originally built. Richer-looking figures; the model
+//               can misspell a label or miscount a diagram, so answer-bearing
+//               figures need a human eye.
+//   'hybrid'  — the model draws wordless artwork and the renderer draws every label,
+//               mark and exact diagram (accurate by construction).
+// Switch with FIGURE_MODE below, or per run with LP_FIGURE_MODE=hybrid|labeled.
+const FIGURE_MODE = process.env.LP_FIGURE_MODE || 'labeled';
+
+const IMAGES_RICH_LABELED = `IMAGES — the guide is FIGURE-RICH like the approved pilot. A picture must TEACH, never decorate: the explanation happens INSIDE the image, on a teaching surface (chalkboard, notebook page, flashcards, wall chart) that carries THIS lesson's exact words/letters/numbers/answers.
+- EVERY stage section (stage-tamhid, stage-arad, stage-tatbiq, stage-taqwim) carries one figure via "image": "<id>". The "homework" section takes a SMALL figure when its task is physical (cutting, folding, counting objects): a simple labelled diagram of that one task.
+- THE ERRORS FIGURE IS TWO SEPARATE IMAGES (the renderer composes the ✗/✓ board itself — never draw marks, never draw a split board): attach "imageWrong": "<id>" (a board showing ONLY the mistaken version) and "imageCorrect": "<id>" (a board showing ONLY the correct version) on the errors section. Each is a SINGLE-CONCEPT brief: one board, one item, its labels. Do NOT mention the other version, do NOT use words like wrong/correct/mistake inside the prompt's visual description.
+- REUSE FIRST: if a SOURCE image already IS a labelled teaching diagram that fits a stage, reference its id and COPY its entry into "images" EXACTLY — id, concept, label, prompt BYTE-FOR-BYTE (any change breaks the image cache).
+- Otherwise AUTHOR a new entry (fresh id, kebab-case, never colliding with a source id) in the pilot's grammar:
+  * Prompt in English instruction + the lesson's exact Arabic strings quoted, using this EXACT slot template (the fixed wording is what keeps figures consistent across lessons): "Flat vector educational illustration, clean children's textbook style, soft colours. A dark-green classroom chalkboard with a light wooden frame. <ONE concept from the lesson worked out on the board — state every count in words AND digits, e.g. 'one square divided into exactly four equal parts, exactly two parts filled solid yellow'>. The ONLY text anywhere in the image is: «…», «…». No other text, no other numbers, no decorations." For notebook/exit-card/home roles swap the surface wording ('an open pupil notebook page' / 'a small exit card' / 'a simple home-objects diagram') but keep everything else identical.
+  * NEVER put a contrast inside one image: no negations, no 'instead of', no wrong-vs-right — describe only what must appear.
+  * LABEL RULES (image models garble long/vocalized Arabic, and garbled labels FAIL the quality gate — these rules are what make the figure generatable): 2–4 labels total; each label ONE or TWO words; STRIP ALL DIACRITICS/tashkeel from labels (write «أبي», never «أَبِي») even when the lesson text carries them; never a sentence, chant line or instruction as a label; never the same word twice; besides the labels, at most ONE short line of text on the teaching surface.
+  * Per stage: stage-tamhid = the named hook object/scene WITH the day's key words written plainly on a board inside it (a chant belongs in the stage BODY, never inside the image); stage-arad = the concept worked on the board with the lesson's real example, kept to ONE worked example; stage-tatbiq = the actual exercise being solved in a pupil's notebook, the real answer visible; stage-taqwim = the exit task being performed.
+  * "errors" figure: "One wide chalkboard split in two halves by a vertical line: one half shows <the lesson's real example done WRONG> under a large red ✗; the other half shows <the CORRECT version> under a large green ✓." Keep each half to ONE word/expression — the two things the lesson distinguishes. Same label rules.
+  * concept: "diagram" for worked/labelled boards (most figures); "scene" only for a stage-tamhid real-world hook — and even then the key fact appears written inside.
+  * label: a short Arabic caption in the lesson's language.
+- One figure per section, no repeats. Do NOT emit any "images"-type section.`;
+
+
+const IMAGES_RICH_HYBRID = `IMAGES — HYBRID FIGURES: the image model draws TEXTLESS illustrations; ALL text, numbers, fractions and marks are rendered by code afterwards. A generated image must NEVER contain any text, letters, numbers, fractions or symbols of any kind.
 
 WHAT EACH SECTION CARRIES:
 - stage-tamhid, stage-arad, stage-tatbiq, stage-taqwim: each carries EITHER an authored textless image ("image": "<id>") OR a CODE-DRAWN figure ("codeFigure"). *** PREFER codeFigure whenever the teaching point is a direction, a comparison, a count, a part-of-a-whole, a fraction, or a key expression — the renderer draws those exactly and legibly. Use a generated image only for real-world scenes, people and objects (supporting artwork). ***
@@ -95,7 +120,8 @@ FIGURE-RICH TEXT BUDGETS (this design set explains through IMAGES; text is a ter
 - STAGE BODIES ≤ 18 words when the section has a figure (≤ 24 only if it has none): short imperative sentences — the hook BY NAME and the essential move. NO narration, no restating the visual.
 - تحقق lines ≤ 10 words. solutions items ≤ 18 words each. glossary values ≤ 7 words. multigrade lines ≤ 12 words. homework ≤ 30 words — numbered tasks only, no explanations (the figure shows the task).`;
 
-const buildSystem = (richFigures) => SYSTEM.replace('__IMAGES_BLOCK__', richFigures ? IMAGES_RICH + RICH_BUDGETS : IMAGES_REUSE);
+const buildSystem = (richFigures) => SYSTEM.replace('__IMAGES_BLOCK__',
+  richFigures ? (FIGURE_MODE === 'hybrid' ? IMAGES_RICH_HYBRID : IMAGES_RICH_LABELED) + RICH_BUDGETS : IMAGES_REUSE);
 
 async function callOnce(content, { apiKey, fetchImpl, extra, system }) {
   const body = JSON.stringify({
@@ -197,7 +223,9 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
   // diagrams suit the teaching stages).
   // Hybrid regions never reuse source prompts (they request in-image text, which the
   // textless contract forbids) — the model authors every figure fresh.
-  const srcById = richFigures ? new Map() : new Map((content.images || []).map((im) => [im.id, im]));
+  // Labeled mode reuses the source's own (already labelled) prompts — free cache
+  // hits; hybrid mode must author fresh wordless briefs instead.
+  const srcById = (richFigures && FIGURE_MODE === 'hybrid') ? new Map() : new Map((content.images || []).map((im) => [im.id, im]));
   const outById = new Map((out.images || []).filter((im) => im && im.id).map((im) => [im.id, im]));
   const POS = new Set(['top-right', 'top-left', 'bottom-right', 'bottom-left', 'top', 'bottom']);
   const cleanOverlays = (o) => Array.isArray(o) ? o.slice(0, 3)
@@ -251,7 +279,7 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
     }
     delete s.image;
   }
-  const remaining = richFigures ? [] : (content.images || []).filter((im) => !seenIm.has(im.id));
+  const remaining = (richFigures && FIGURE_MODE === 'hybrid') ? [] : (content.images || []).filter((im) => !seenIm.has(im.id));
   const pick = (pred) => { const i = remaining.findIndex(pred); return i < 0 ? null : remaining.splice(i, 1)[0]; };
   for (const id of ['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim']) {
     const sec = out.sections.find((x) => x && x.id === id);

@@ -42,7 +42,8 @@ function sourceText(source) {
 
 const MIN_ART_WIDTH = 700; // px: below this, artwork visibly softens at LP print size
 
-function validateFigures(guide, { source = null, imageDims = {}, log = null } = {}) {
+function validateFigures(guide, { source = null, imageDims = {}, log = null, mode = process.env.LP_FIGURE_MODE || 'labeled' } = {}) {
+  const hybrid = mode === 'hybrid'; // textless-artwork checks apply to hybrid only
   const findings = [];
   const add = (level, code, message, section) => findings.push({ level, code, message, section: section || null });
   const src = sourceText(source);
@@ -56,14 +57,19 @@ function validateFigures(guide, { source = null, imageDims = {}, log = null } = 
   // ── AI artwork: briefs must be artwork-only, and the art must be big enough ──
   for (const im of images) {
     const p = String(im.prompt || '');
-    if (!/no text|no letters|wordless/i.test(p)) {
-      add('fail', 'art_not_textless', `image "${im.id}": brief does not forbid text — artwork must be wordless`, null);
-    }
-    if (hasArabicLetters(p)) {
-      add('warn', 'art_brief_has_arabic', `image "${im.id}": brief contains Arabic — a wordless brief should be English-only so no script is copied into the art`, null);
-    }
-    if (/labeled infographic|label every part|labels must be spelled/i.test(p)) {
-      add('fail', 'art_asks_labels', `image "${im.id}": brief still asks for labels while claiming to be textless (contradictory contract)`, null);
+    if (hybrid) {
+      if (!/no text|no letters|wordless/i.test(p)) {
+        add('fail', 'art_not_textless', `image "${im.id}": brief does not forbid text — artwork must be wordless in hybrid mode`, null);
+      }
+      if (hasArabicLetters(p)) {
+        add('warn', 'art_brief_has_arabic', `image "${im.id}": brief contains Arabic — a wordless brief should be English-only`, null);
+      }
+      if (/labeled infographic|label every part|labels must be spelled/i.test(p)) {
+        add('fail', 'art_asks_labels', `image "${im.id}": brief asks for labels while claiming to be textless (contradictory contract)`, null);
+      }
+    } else if (!/label|labelled|labeled/i.test(p)) {
+      // Labeled mode: the figure is supposed to carry its own Arabic labels.
+      add('warn', 'art_no_label_ask', `image "${im.id}": brief does not ask for in-image labels, so the figure may come out wordless`, null);
     }
     const dim = imageDims[im.id];
     if (dim && dim.width && dim.width < MIN_ART_WIDTH) {
