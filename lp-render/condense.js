@@ -58,12 +58,14 @@ HARD RULES:
 // region is never restyled by another region's design decisions.
 const RICH_FIGURE_REGIONS = new Set(['ye']);
 
-const IMAGES_RICH = `IMAGES — the guide is FIGURE-RICH like the approved pilot. A picture must TEACH, never decorate: the explanation happens INSIDE the image, on a teaching surface (chalkboard, notebook page, flashcards, wall chart) that carries THIS lesson's exact words/letters/numbers/answers.
+const IMAGES_RICH = `IMAGES — the guide is FIGURE-RICH like the approved pilot, built HYBRID: the image model draws a TEXTLESS illustration and ALL text/numbers/marks are added by code afterwards. A generated image must NEVER contain any text, letters, numbers, fractions, or symbols — describe pictures only, and where a label will be added leave that area visually clean.
 - EVERY stage section (stage-tamhid, stage-arad, stage-tatbiq, stage-taqwim) carries one figure via "image": "<id>". The "homework" section takes a SMALL figure when its task is physical (cutting, folding, counting objects): a simple labelled diagram of that one task.
-- THE ERRORS FIGURE IS TWO SEPARATE IMAGES (the renderer composes the ✗/✓ board itself — never draw marks, never draw a split board): attach "imageWrong": "<id>" (a board showing ONLY the mistaken version) and "imageCorrect": "<id>" (a board showing ONLY the correct version) on the errors section. Each is a SINGLE-CONCEPT brief: one board, one item, its labels. Do NOT mention the other version, do NOT use words like wrong/correct/mistake inside the prompt's visual description.
+- THE ERRORS FIGURE IS TWO SEPARATE TEXTLESS IMAGES (the renderer composes the ✗/✓ board, marks and labels itself): attach "imageWrong" and "imageCorrect" ids on the errors section, plus "labelWrong" and "labelCorrect" — short Arabic captions (≤ 4 words) the code prints under each half. Each image brief is a SINGLE-CONCEPT textless picture. Do NOT mention the other version or wrong/correct words in the visual description.
+- EXACT-MATH DIAGRAMS ARE CODE, NOT IMAGES: when a stage figure must show exact counting, shading, grouping or a fraction (a square/circle divided into N parts with K shaded), do NOT author an image. Instead set on that section "codeFigure": { "kind": "fraction-grid", "shape": "square"|"circle", "parts": N, "shaded": K, "label": "<the fraction, Eastern numerals, e.g. ٢/٤>", "caption": "<short Arabic caption>" }. The renderer draws it pixel-exact in the design set's palette.
+- OVERLAYS carry the labels: each authored image entry may include "overlays": up to 3 of { "text": "<exact Arabic, ≤ 4 words, or a fraction like ٢/٤>", "pos": "top-right"|"top-left"|"bottom-right"|"bottom-left"|"top"|"bottom", "kind": "chip"|"fraction" }. Code renders them ON the image in that corner/strip — so the picture should keep those areas uncluttered.
 - REUSE FIRST: if a SOURCE image already IS a labelled teaching diagram that fits a stage, reference its id and COPY its entry into "images" EXACTLY — id, concept, label, prompt BYTE-FOR-BYTE (any change breaks the image cache).
 - Otherwise AUTHOR a new entry (fresh id, kebab-case, never colliding with a source id) in the pilot's grammar:
-  * Prompt in English instruction + the lesson's exact Arabic strings quoted, using this EXACT slot template (the fixed wording is what keeps figures consistent across lessons): "Flat vector educational illustration, clean children's textbook style, soft colours. A dark-green classroom chalkboard with a light wooden frame. <ONE concept from the lesson worked out on the board — state every count in words AND digits, e.g. 'one square divided into exactly four equal parts, exactly two parts filled solid yellow'>. The ONLY text anywhere in the image is: «…», «…». No other text, no other numbers, no decorations." For notebook/exit-card/home roles swap the surface wording ('an open pupil notebook page' / 'a small exit card' / 'a simple home-objects diagram') but keep everything else identical.
+  * Prompt in English instruction ONLY (no Arabic needed — images are textless), using this EXACT slot template: "Flat vector educational illustration, clean children's textbook style, soft colours. <the scene or object composition — pictures only>. The image contains ABSOLUTELY NO text, no letters, no numbers, no symbols, no writing of any kind; surfaces like boards and pages appear clean/blank."
   * NEVER put a contrast inside one image: no negations, no 'instead of', no wrong-vs-right — describe only what must appear.
   * LABEL RULES (image models garble long/vocalized Arabic, and garbled labels FAIL the quality gate — these rules are what make the figure generatable): 2–4 labels total; each label ONE or TWO words; STRIP ALL DIACRITICS/tashkeel from labels (write «أبي», never «أَبِي») even when the lesson text carries them; never a sentence, chant line or instruction as a label; never the same word twice; besides the labels, at most ONE short line of text on the teaching surface.
   * Per stage: stage-tamhid = the named hook object/scene WITH the day's key words written plainly on a board inside it (a chant belongs in the stage BODY, never inside the image); stage-arad = the concept worked on the board with the lesson's real example, kept to ONE worked example; stage-tatbiq = the actual exercise being solved in a pupil's notebook, the real answer visible; stage-taqwim = the exit task being performed.
@@ -143,6 +145,24 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
   // diagrams suit the teaching stages).
   const srcById = new Map((content.images || []).map((im) => [im.id, im]));
   const outById = new Map((out.images || []).filter((im) => im && im.id).map((im) => [im.id, im]));
+  const POS = new Set(['top-right', 'top-left', 'bottom-right', 'bottom-left', 'top', 'bottom']);
+  const cleanOverlays = (o) => Array.isArray(o) ? o.slice(0, 3)
+    .filter((v) => v && typeof v.text === 'string' && v.text.length <= 40 && POS.has(v.pos))
+    .map((v) => ({ text: v.text, pos: v.pos, kind: v.kind === 'fraction' ? 'fraction' : 'chip' })) : undefined;
+  for (const s of out.sections) {
+    if (!s) continue;
+    if (s.codeFigure) {
+      const cf = s.codeFigure;
+      const ok = cf && cf.kind === 'fraction-grid' && ['square', 'circle'].includes(cf.shape)
+        && Number.isInteger(cf.parts) && cf.parts >= 2 && cf.parts <= 12
+        && Number.isInteger(cf.shaded) && cf.shaded >= 0 && cf.shaded <= cf.parts;
+      if (ok) s.codeFigure = { kind: 'fraction-grid', shape: cf.shape, parts: cf.parts, shaded: cf.shaded,
+        label: String(cf.label || ''), caption: String(cf.caption || '') };
+      else delete s.codeFigure;
+    }
+    if (s.labelWrong) s.labelWrong = String(s.labelWrong).slice(0, 60);
+    if (s.labelCorrect) s.labelCorrect = String(s.labelCorrect).slice(0, 60);
+  }
   const seenIm = new Set();
   const rebuilt = [];
   const keepRef = (s, field) => {
@@ -151,7 +171,8 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
     const src = srcById.get(id);
     const authored = outById.get(id);
     const entry = src || ((richFigures || !srcById.size) && authored && typeof authored.prompt === 'string' && authored.prompt.trim().length >= 40 && authored.label
-      ? { id: String(authored.id), concept: authored.concept === 'scene' ? 'scene' : 'diagram', label: String(authored.label), prompt: authored.prompt } : null);
+      ? { id: String(authored.id), concept: authored.concept === 'scene' ? 'scene' : 'diagram', label: String(authored.label), prompt: authored.prompt,
+          overlays: cleanOverlays(authored.overlays) } : null);
     if (!entry) { delete s[field]; return; }
     seenIm.add(id);
     rebuilt.push(src ? { id: src.id, concept: src.concept, label: src.label, prompt: src.prompt } : entry);

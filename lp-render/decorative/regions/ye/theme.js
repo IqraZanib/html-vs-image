@@ -402,6 +402,25 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-errors .d-inline-img .cap{display:block;background:#fff;border-top:1px solid var(--line);font-size:11.5px;padding:3px 8px;text-align:center}
 .section.sec-stage-tamhid .d-inline-img,.section.sec-stage-arad .d-inline-img{min-height:180px}
 
+
+/* ── ROUND: hybrid figures — code overlays on textless art + SVG math figures ── */
+.ov-wrap{position:relative;display:block}
+.ov{position:absolute;z-index:2;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic',sans-serif}
+.ov-chip{background:#fff;border:1.5px solid var(--navy);color:var(--navy);font-weight:700;font-size:13px;
+  padding:2px 10px;border-radius:9px;box-shadow:0 1px 4px rgba(20,30,60,.18);white-space:nowrap}
+.ov-fraction{background:#fff;border:2px solid var(--navy);border-radius:10px;padding:3px 10px;
+  display:flex;flex-direction:column;align-items:center;line-height:1.05;font-weight:800;color:var(--navy);font-size:15px}
+.ov-fraction .fr-b{display:block;width:16px;border-top:2.5px solid var(--navy);margin:2px 0}
+.ov-top-right{top:6px;right:6px}.ov-top-left{top:6px;left:6px}
+.ov-bottom-right{bottom:6px;right:6px}.ov-bottom-left{bottom:6px;left:6px}
+.ov-top{top:6px;left:50%;transform:translateX(-50%)}.ov-bottom{bottom:6px;left:50%;transform:translateX(-50%)}
+.d-code-fig{background:#fff;display:flex;flex-direction:column;align-items:center;padding:8px 6px 0}
+.d-code-fig .cf-svg{width:82%;max-height:170px}
+.d-code-fig .cf-label{font-weight:800;font-size:22px;color:var(--navy);margin:2px 0 0}
+.tb-label{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--line);
+  border-radius:8px;padding:1px 10px;font-weight:700;font-size:12.5px;color:var(--navy);white-space:nowrap}
+.d-twin-board .tb-half{padding-bottom:26px;background:#fff}
+
 `;
 
 module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom' };

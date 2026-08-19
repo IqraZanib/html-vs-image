@@ -208,6 +208,31 @@ function charSize(section, charId) {
   return { h, w };
 }
 
+// SVG fraction figure: square grids or circle pies, K of N shaded — exact by code.
+function fractionGridSvg({ shape, parts, shaded }) {
+  const W = 240, H = 200, FILL = '#f5c33b', EMPTY = '#ffffff', STROKE = '#2f3e63';
+  if (shape === 'circle') {
+    const cx = W / 2, cy = H / 2, r = 82;
+    let paths = '';
+    for (let i = 0; i < parts; i++) {
+      const a0 = -Math.PI / 2 + (2 * Math.PI * i) / parts;
+      const a1 = -Math.PI / 2 + (2 * Math.PI * (i + 1)) / parts;
+      const large = (a1 - a0) > Math.PI ? 1 : 0;
+      paths += `<path d="M ${cx} ${cy} L ${cx + r * Math.cos(a0)} ${cy + r * Math.sin(a0)} A ${r} ${r} 0 ${large} 1 ${cx + r * Math.cos(a1)} ${cy + r * Math.sin(a1)} Z" fill="${i < shaded ? FILL : EMPTY}" stroke="${STROKE}" stroke-width="3"/>`;
+    }
+    return `<svg class="cf-svg" viewBox="0 0 ${W} ${H}">${paths}</svg>`;
+  }
+  const cols = parts === 2 ? 2 : parts === 3 ? 3 : parts <= 4 ? 2 : parts <= 6 ? 3 : 4;
+  const rows = Math.ceil(parts / cols);
+  const cw = 180 / cols, ch = 150 / rows, x0 = (W - 180) / 2, y0 = (H - 150) / 2;
+  let rects = '';
+  for (let i = 0; i < parts; i++) {
+    const c = i % cols, rr = Math.floor(i / cols);
+    rects += `<rect x="${x0 + c * cw}" y="${y0 + rr * ch}" width="${cw}" height="${ch}" fill="${i < shaded ? FILL : EMPTY}" stroke="${STROKE}" stroke-width="3"/>`;
+  }
+  return `<svg class="cf-svg" viewBox="0 0 ${W} ${H}">${rects}</svg>`;
+}
+
 function renderDecorativeLesson(content, images = {}, cast = {}) {
   const meta = content.meta || {};
   const chips = (meta.chips || []).map((c) => `<span><b>${esc(cleanHeading(c.label))}</b>${esc(cleanHeading(c.value))}</span>`).join('');
@@ -270,13 +295,26 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     const twinW = !mg && section.imageWrong && images[section.imageWrong] && images[section.imageWrong].dataUri ? images[section.imageWrong] : null;
     const twinC = !mg && section.imageCorrect && images[section.imageCorrect] && images[section.imageCorrect].dataUri ? images[section.imageCorrect] : null;
     if (twinW && twinC) {
-      const half = (im, mark, cls) => `<div class="tb-half ${cls}"><div class="tb-mark">${mark}</div><img src="${im.dataUri}" alt="${esc(cleanHeading(im.label || ''))}"></div>`;
-      const fig = `<div class="d-twin-board">${half(twinW, '✗', 'tb-wrong')}<div class="tb-divider"></div>${half(twinC, '✓', 'tb-correct')}</div>`;
+      const half = (im, mark, cls, lbl) => `<div class="tb-half ${cls}"><div class="tb-mark">${mark}</div><img src="${im.dataUri}" alt="${esc(cleanHeading(im.label || ''))}">${lbl ? `<div class="tb-label">${esc(cleanHeading(lbl))}</div>` : ''}</div>`;
+      const fig = `<div class="d-twin-board">${half(twinW, '✗', 'tb-wrong', section.labelWrong)}<div class="tb-divider"></div>${half(twinC, '✓', 'tb-correct', section.labelCorrect)}</div>`;
       return `<section class="section${idCls}">${head}<div class="panel has-twin-board" style="border-color:var(${accent}-soft)"><div class="ii-body">${body}</div>${fig}</div></section>`;
+    }
+    // Code-drawn exact-math figure (fraction grids): parts/shading/label are
+    // parameters, so the mathematics is pixel-exact by construction.
+    if (!mg && section.codeFigure && section.codeFigure.kind === 'fraction-grid') {
+      const cf = section.codeFigure;
+      const fig = `<div class="d-inline-img d-code-fig">${fractionGridSvg(cf)}${cf.label ? `<div class="cf-label">${esc(cf.label)}</div>` : ''}${cf.caption ? `<div class="cap">${esc(cleanHeading(cf.caption))}</div>` : ''}</div>`;
+      return `<section class="section${idCls}">${head}<div class="panel has-inline-img" style="border-color:var(${accent}-soft)"><div class="ii-body">${body}</div>${fig}</div></section>`;
     }
     const inlineIm = !mg && section.image && images[section.image] && images[section.image].dataUri ? images[section.image] : null;
     if (inlineIm) {
-      const fig = `<div class="d-inline-img"><img src="${inlineIm.dataUri}" alt="${esc(cleanHeading(inlineIm.label || ''))}">${inlineIm.label ? `<div class="cap">${esc(cleanHeading(inlineIm.label))}</div>` : ''}</div>`;
+      const ovs = (section.overlays || (inlineIm.overlays)) || [];
+      const ovHtml = ovs.map((o) => {
+        const frac = o.kind === 'fraction' && /\//.test(o.text);
+        const inner = frac ? `<span class="fr-n">${esc(o.text.split('/')[0])}</span><span class="fr-b"></span><span class="fr-d">${esc(o.text.split('/')[1])}</span>` : esc(o.text);
+        return `<div class="ov ov-${o.pos} ov-${o.kind === 'fraction' ? 'fraction' : 'chip'}">${inner}</div>`;
+      }).join('');
+      const fig = `<div class="d-inline-img${ovHtml ? ' has-ov' : ''}"><div class="ov-wrap"><img src="${inlineIm.dataUri}" alt="${esc(cleanHeading(inlineIm.label || ''))}">${ovHtml}</div>${inlineIm.label ? `<div class="cap">${esc(cleanHeading(inlineIm.label))}</div>` : ''}</div>`;
       return `<section class="section${idCls}">${head}<div class="panel has-inline-img" style="border-color:var(${accent}-soft)"><div class="ii-body">${body}</div>${fig}</div></section>`;
     }
     const charId = hasContentImages ? null : pickCharacter(section, cast, rot, used);
