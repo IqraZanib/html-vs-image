@@ -178,7 +178,9 @@ function sanitizeCodeFigure(cf, depth = 0) {
       return items.length >= 2 ? { kind: 'compare', items, label, caption } : null;
     }
     case 'expression': {
-      const text = s(cf.text, 24); return text ? { kind: 'expression', text, label, caption } : null;
+      // 48 chars: enough for a short sequence like «تبخر ← تكاثف ← هطول المطر»
+      // (24 was cutting Arabic words in half).
+      const text = s(cf.text, 48); return text ? { kind: 'expression', text, label, caption } : null;
     }
     case 'error-board': {
       if (depth) return null; // no nesting of boards

@@ -11,6 +11,9 @@
 const AR_DIGITS = '٠١٢٣٤٥٦٧٨٩';
 const toLatinDigits = (s) => String(s == null ? '' : s).replace(/[٠-٩]/g, (d) => String(AR_DIGITS.indexOf(d)));
 const hasArabicLetters = (s) => /[ء-غف-ي]/.test(String(s || ''));
+// A label may legitimately be a number («٦», «٢/٤») — Eastern numerals count as
+// Arabic script for label checks, so a numeric label is not flagged as non-Arabic.
+const isArabicLabel = (s) => /[ء-غف-ي٠-٩]/.test(String(s || ''));
 
 // Every "a/b" pair in a string, as numbers (Eastern or Latin digits).
 function fractionsIn(text) {
@@ -127,7 +130,7 @@ function validateFigures(guide, { source = null, imageDims = {}, log = null, mod
         if (new Set(labels.filter(Boolean)).size !== labels.filter(Boolean).length) {
           add('fail', 'compass_duplicate_label', `${at}: two directions carry the same label`, sectionId);
         }
-        for (const s of labels) if (s && !hasArabicLetters(s)) add('warn', 'compass_label_not_arabic', `${at}: direction label "${s}" is not Arabic`, sectionId);
+        for (const s of labels) if (s && !isArabicLabel(s)) add('warn', 'compass_label_not_arabic', `${at}: direction label "${s}" is not Arabic`, sectionId);
         break;
       }
       case 'compare': {
@@ -136,7 +139,7 @@ function validateFigures(guide, { source = null, imageDims = {}, log = null, mod
         if (items.length >= 2 && items.every((it) => Math.abs(it.len - items[0].len) < 0.02)) {
           add('fail', 'compare_no_contrast', `${at}: all bars are the same length — nothing is being compared`, sectionId);
         }
-        for (const it of items) if (!hasArabicLetters(it.label)) add('warn', 'compare_label_not_arabic', `${at}: bar label "${it.label}" is not Arabic`, sectionId);
+        for (const it of items) if (!isArabicLabel(it.label)) add('warn', 'compare_label_not_arabic', `${at}: bar label "${it.label}" is not Arabic`, sectionId);
         break;
       }
       case 'expression': {
