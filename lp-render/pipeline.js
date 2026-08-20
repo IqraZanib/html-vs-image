@@ -118,7 +118,8 @@ async function renderLessonImage(content, opts = {}) {
   // Characters are a fallback: only build the (region-appropriate) cast when the
   // lesson has no content images. Region follows the language (ar→Yemen, sw→Kenya).
   const anyImage = Object.values(imagesMap).some((im) => im && im.dataUri);
-  const cast = anyImage ? {} : await ensureCast({ apiKey, gatePolicy, locale });
+  // Code-only mode spends nothing: the character cast is a generator too, so skip it.
+  const cast = (anyImage || process.env.LP_NO_IMAGES === '1') ? {} : await ensureCast({ apiKey, gatePolicy, locale });
   const { headerHtml, bodyHtml, headCss } = renderDecorativeLesson(content, imagesMap, cast);
   let html = buildShell({ headerHtml, bodyHtml, locale, title: meta.title || contentId });
   // Region DESIGN PACK: each region with an approved design set owns a folder

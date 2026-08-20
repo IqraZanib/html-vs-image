@@ -120,8 +120,15 @@ FIGURE-RICH TEXT BUDGETS (this design set explains through IMAGES; text is a ter
 - STAGE BODIES ≤ 18 words when the section has a figure (≤ 24 only if it has none): short imperative sentences — the hook BY NAME and the essential move. NO narration, no restating the visual.
 - تحقق lines ≤ 10 words. solutions items ≤ 18 words each. glossary values ≤ 7 words. multigrade lines ≤ 12 words. homework ≤ 30 words — numbered tasks only, no explanations (the figure shows the task).`;
 
+// ZERO-COST MODE (LP_NO_IMAGES=1): no image is generated at all — every figure
+// must be a code-drawn visual, so an LP costs nothing but the text condensation.
+const NO_IMAGES = process.env.LP_NO_IMAGES === '1';
+const CODE_ONLY_RULE = `
+
+CODE-ONLY MODE — ABSOLUTE: do NOT author any entry in "images" and do NOT set "image", "imageWrong" or "imageCorrect" on any section. "images" MUST be an empty array. EVERY figure is a "codeFigure" chosen from the kinds above, and the errors section uses { "kind":"error-board", ... }. Give a codeFigure to each stage that genuinely teaches something drawable (a count, a part of a whole, a comparison, a direction, an expression); a stage with nothing drawable simply has no figure and keeps its short text.`;
+
 const buildSystem = (richFigures) => SYSTEM.replace('__IMAGES_BLOCK__',
-  richFigures ? (FIGURE_MODE === 'hybrid' ? IMAGES_RICH_HYBRID : IMAGES_RICH_LABELED) + RICH_BUDGETS : IMAGES_REUSE);
+  richFigures ? (FIGURE_MODE === 'hybrid' ? IMAGES_RICH_HYBRID : IMAGES_RICH_LABELED) + RICH_BUDGETS + (NO_IMAGES ? CODE_ONLY_RULE : '') : IMAGES_REUSE);
 
 async function callOnce(content, { apiKey, fetchImpl, extra, system }) {
   const body = JSON.stringify({
@@ -333,6 +340,13 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
     for (const k of ['subject', 'grade', 'region']) {
       if (!out.meta[k] && content.meta && content.meta[k]) out.meta[k] = content.meta[k];
     }
+  }
+  if (NO_IMAGES) {
+    // Enforce it in code, not just in the prompt: drop every image reference so
+    // nothing can reach the generator.
+    for (const s of out.sections || []) { delete s.image; delete s.imageWrong; delete s.imageCorrect; }
+    if ((out.images || []).length) log(`  (code-only mode: discarded ${out.images.length} image brief(s) — no generation)`);
+    out.images = [];
   }
   if (out.meta) delete out.meta.banner;
   log(`Condensed to the 2-page guide: ${out.sections.length} sections, ${out.images.length} reused image(s).`);
