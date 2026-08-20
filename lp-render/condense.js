@@ -183,6 +183,10 @@ function sanitizeCodeFigure(cf, depth = 0) {
         .map((it) => ({ label: s(it && it.label, 24), len: Math.max(0.15, Math.min(1, Number(it && it.len) || 0.6)),
           mark: ['good', 'bad'].includes(it && it.mark) ? it.mark : null }))
         .filter((it) => it.label);
+      // A comparison whose bars are all the same length compares nothing — it reads
+      // as a rendering fault, so reject the spec rather than draw it (this recurred
+      // across rolls, so it is enforced here instead of asked for in the prompt).
+      if (items.length >= 2 && items.every((it) => Math.abs(it.len - items[0].len) < 0.02)) return null;
       return items.length >= 2 ? { kind: 'compare', items, label, caption } : null;
     }
     case 'expression': {
