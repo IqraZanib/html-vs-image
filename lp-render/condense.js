@@ -96,6 +96,7 @@ WHAT EACH SECTION CARRIES:
   · { "kind":"compass", "north":"شمال", "east":"شرق", "south":"جنوب", "west":"غرب", "center":"<optional short word>" } — four labelled direction arrows.
   · { "kind":"compare", "items":[ { "label":"<short Arabic>", "len":0.0-1.0, "mark":"good"|"bad"|null }, … ] } — two or three labelled bars for length/size/quantity comparisons.
   · { "kind":"expression", "text":"<a short expression or key term, e.g. ٢/٤>" } — drawn as large text, never generated.
+  · { "kind":"process", "layout":"cycle"|"linear", "stages":[ { "label":"<short Arabic stage name>", "caption":"<optional 2–4 word note>" }, … 3 to 6 of them ] } — labelled stages with code-drawn arrows between them. *** USE THIS whenever the lesson teaches a SEQUENCE or a CYCLE: one thing leading to the next (water cycle, plant growth, wudu steps, life cycles, any ordered procedure). "cycle" closes the loop; "linear" is a right-to-left sequence with a start and an end. Take the stage names VERBATIM from the lesson source, in the source's order — never invent or reorder them, and never use a comparison or a compass for a process. ***
 - errors: *** STRONGLY PREFER a fully code-drawn board *** — set "codeFigure": { "kind":"error-board", "wrong": <any codeFigure kind above, minus label/caption>, "correct": <same>, "labelWrong":"<short Arabic ≤ 4 words>", "labelCorrect":"<short Arabic ≤ 4 words>" }. The renderer draws the split board, the ✗ and ✓ marks, both mini-visuals and both captions — so the mistake is shown exactly (e.g. wrong = expression "٤/٢", correct = expression "٢/٤"; or wrong = count-set with the wrong number shaded, correct = the right one; or wrong/correct = compare bars). ONLY when the misconception cannot be drawn this way (it is about behaviour, a physical action or a place) fall back to two textless images: "imageWrong"/"imageCorrect" ids plus "labelWrong"/"labelCorrect".
 - homework: a SMALL textless image of the physical task when there is one.
 
@@ -188,6 +189,15 @@ function sanitizeCodeFigure(cf, depth = 0) {
       // 48 chars: enough for a short sequence like «تبخر ← تكاثف ← هطول المطر»
       // (24 was cutting Arabic words in half).
       const text = s(cf.text, 48); return text ? { kind: 'expression', text, label, caption } : null;
+    }
+    case 'process': {
+      const stages = (Array.isArray(cf.stages) ? cf.stages : []).slice(0, 6)
+        .map((st) => ({ label: s(st && st.label, 28), caption: s(st && st.caption, 28) }))
+        .filter((st) => st.label);
+      if (stages.length < 3) return null; // fewer than three stages is not a process
+      const seen = new Set();
+      for (const st of stages) { if (seen.has(st.label)) return null; seen.add(st.label); } // no duplicate stage
+      return { kind: 'process', layout: cf.layout === 'linear' ? 'linear' : 'cycle', stages, label, caption };
     }
     case 'error-board': {
       if (depth) return null; // no nesting of boards

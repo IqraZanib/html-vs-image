@@ -458,6 +458,12 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
   padding:1px 10px;font-weight:700;font-size:12.5px;color:var(--navy);white-space:nowrap}
 .section.sec-errors .panel.has-twin-board .d-code-board{margin-top:6px}
 
+
+/* process / cycle figures: wider than tall, so let them use the full card width */
+.d-code-fig .cf-svg{max-height:150px}
+.section.sec-stage-tamhid .d-code-fig .cf-svg,.section.sec-stage-arad .d-code-fig .cf-svg{max-height:150px}
+.d-code-fig.cf-wide,.d-inline-img.cf-wide{width:100% !important;max-width:100% !important;flex:0 0 100% !important}
+
 `;
 
 module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom' };

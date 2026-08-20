@@ -295,7 +295,67 @@ function cfExpression({ text }) {
   return '<div class="cf-expr">' + esc(String(text || '')) + '</div>';
 }
 
-const CF_KINDS = new Set(['fraction-grid', 'count-set', 'compass', 'compare', 'expression', 'error-board']);
+
+// PROCESS / CYCLE: stages in order with arrows between them. layout 'cycle' closes
+// the loop (water cycle, life cycles); layout 'linear' reads RIGHT-TO-LEFT like the
+// Arabic text (wudu steps, procedures). Tints cycle through the design-set palette.
+function cfProcess({ layout = 'cycle', stages = [] }) {
+  const S = stages.slice(0, 6).filter((s) => s && String(s.label || '').trim());
+  if (S.length < 2) return '';
+  const TINT = ['#fcd8d8', '#e7eef8', '#e9f2e5', '#fcf0d8', '#f1e7f5', '#dcf2f2'];
+  const defs = '<defs><marker id="cfPA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
+    + '<path d="M 0 0 L 10 5 L 0 10 z" fill="' + CF.stroke + '"/></marker></defs>';
+  const box = (cx, cy, w, h, i, s) => {
+    const label = cfText(cx, cy + (s.caption ? -1 : 4), s.label, S.length > 4 ? 11.5 : 13, 700);
+    const cap = s.caption ? cfText(cx, cy + 13, s.caption, 9.5, 600, CF.stroke) : '';
+    return '<rect x="' + (cx - w / 2) + '" y="' + (cy - h / 2) + '" width="' + w + '" height="' + h
+      + '" rx="9" fill="' + TINT[i % TINT.length] + '" stroke="' + CF.stroke + '" stroke-width="2"/>' + label + cap;
+  };
+  // arrow from box i to box j, trimmed to the boxes' edges
+  const arrow = (x1, y1, x2, y2, w, h) => {
+    const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len, uy = dy / len;
+    const t = (bw, bh) => Math.min(Math.abs(ux) > 1e-6 ? (bw / 2 + 6) / Math.abs(ux) : 1e9,
+      Math.abs(uy) > 1e-6 ? (bh / 2 + 6) / Math.abs(uy) : 1e9);
+    const a = t(w, h), b = t(w, h);
+    return '<line x1="' + (x1 + ux * a) + '" y1="' + (y1 + uy * a) + '" x2="' + (x2 - ux * b) + '" y2="' + (y2 - uy * b)
+      + '" stroke="' + CF.stroke + '" stroke-width="2.4" marker-end="url(#cfPA)"/>';
+  };
+
+  if (layout === 'linear') {
+    const W = 480, BH = 46, BW = Math.min(120, (W - 40 - (S.length - 1) * 26) / S.length);
+    const gap = (W - 30 - S.length * BW) / Math.max(1, S.length - 1);
+    const cy = 40 + (S.some((s) => s.caption) ? 6 : 0);
+    let out = defs, xs = [];
+    // RTL: the first stage sits on the RIGHT and the sequence runs leftwards.
+    for (let i = 0; i < S.length; i++) {
+      const cx = W - 15 - BW / 2 - i * (BW + gap);
+      xs.push(cx);
+      out += box(cx, cy, BW, BH, i, S[i]);
+    }
+    for (let i = 0; i < S.length - 1; i++) out += arrow(xs[i], cy, xs[i + 1], cy, BW, BH);
+    return cfSvg(out, W, cy + BH / 2 + 14);
+  }
+
+  // cycle: stages on an ellipse, running counter-clockwise so the order reads
+  // right-to-left like the Arabic around it; the last arrow closes the loop.
+  const W = 480, H = 290, cx0 = W / 2, cy0 = H / 2, rx = 170, ry = 96;
+  const BW = S.length > 4 ? 104 : 118, BH = 44;
+  let out = defs, pts = [];
+  for (let i = 0; i < S.length; i++) {
+    const th = -Math.PI / 2 - (2 * Math.PI * i) / S.length;
+    const cx = cx0 + rx * Math.cos(th), cy = cy0 + ry * Math.sin(th);
+    pts.push([cx, cy]);
+  }
+  for (let i = 0; i < S.length; i++) {
+    const [x1, y1] = pts[i], [x2, y2] = pts[(i + 1) % S.length];
+    out += arrow(x1, y1, x2, y2, BW, BH);
+  }
+  for (let i = 0; i < S.length; i++) out += box(pts[i][0], pts[i][1], BW, BH, i, S[i]);
+  return cfSvg(out, W, H);
+}
+
+const CF_KINDS = new Set(['fraction-grid', 'count-set', 'compass', 'compare', 'expression', 'process', 'error-board']);
 function cfMini(spec) {
   if (!spec) return '';
   switch (spec.kind) {
@@ -303,6 +363,7 @@ function cfMini(spec) {
     case 'count-set': return cfCountSet(spec);
     case 'compass': return cfCompass(spec);
     case 'compare': return cfCompare(spec);
+    case 'process': return cfProcess(spec);
     case 'expression': return cfExpression(spec);
     default: return '';
   }

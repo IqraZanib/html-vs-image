@@ -145,6 +145,23 @@ function validateFigures(guide, { source = null, imageDims = {}, log = null, mod
         for (const it of items) if (!isArabicLabel(it.label)) add('warn', 'compare_label_not_arabic', `${at}: bar label "${it.label}" is not Arabic`, sectionId);
         break;
       }
+      case 'process': {
+        const st = Array.isArray(cf.stages) ? cf.stages : [];
+        if (st.length < 3 || st.length > 6) add('fail', 'process_stage_count', `${at}: a process needs 3–6 stages, got ${st.length}`, sectionId);
+        const labels = st.map((x) => String((x && x.label) || '').trim());
+        if (labels.some((l) => !l)) add('fail', 'process_stage_unlabelled', `${at}: every stage needs a label`, sectionId);
+        if (new Set(labels).size !== labels.length) add('fail', 'process_stage_duplicate', `${at}: a stage label is repeated — the sequence would loop on itself`, sectionId);
+        for (const l of labels) if (l && !isArabicLabel(l)) add('warn', 'process_label_not_arabic', `${at}: stage label "${l}" is not Arabic`, sectionId);
+        // Stage names must come from the lesson, and in the lesson's own order.
+        if (src) {
+          const missing = labels.filter((l) => l && !src.includes(l));
+          if (missing.length) add('warn', 'process_stage_not_in_source', `${at}: stage(s) ${missing.map((m) => '«' + m + '»').join(', ')} do not appear in the lesson source — verify against the textbook`, sectionId);
+          const pos = labels.map((l) => src.indexOf(l)).filter((i) => i >= 0);
+          const ordered = pos.every((p, i) => i === 0 || p >= pos[i - 1]);
+          if (pos.length >= 3 && !ordered) add('warn', 'process_order_differs', `${at}: the stage order differs from the order they appear in the source — check the sequence`, sectionId);
+        }
+        break;
+      }
       case 'expression': {
         if (!String(cf.text || '').trim()) add('fail', 'expression_empty', `${at}: expression has no text`, sectionId);
         const fr = fractionsIn(cf.text);

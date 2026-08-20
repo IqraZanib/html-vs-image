@@ -90,3 +90,32 @@ test('a matching count-set label passes', () => {
   const guide = { images: [artBrief], sections: [{ id: 'stage-tatbiq', codeFigure: { kind: 'count-set', shape: 'triangle', total: 4, shaded: 2, label: '٢/٤' } }] };
   assert.strictEqual(validateFigures(guide, { source: SOURCE }).ok, true);
 });
+
+test('a process with a duplicated stage fails', () => {
+  const guide = { images: [artBrief], sections: [{ id: 'stage-arad', codeFigure: { kind: 'process', layout: 'cycle',
+    stages: [{ label: 'تبخر' }, { label: 'تكاثف' }, { label: 'تبخر' }] } }] };
+  const r = validateFigures(guide, {});
+  assert.ok(r.findings.some((f) => f.code === 'process_stage_duplicate'));
+});
+
+test('a process with too few stages fails', () => {
+  const guide = { images: [artBrief], sections: [{ id: 'stage-arad', codeFigure: { kind: 'process',
+    stages: [{ label: 'تبخر' }, { label: 'هطول' }] } }] };
+  assert.ok(validateFigures(guide, {}).findings.some((f) => f.code === 'process_stage_count'));
+});
+
+test('a valid process against a matching source passes clean', () => {
+  const source = { sections: [{ body: 'دورة الماء: تبخر ثم تكاثف ثم هطول ثم تجمع' }] };
+  const guide = { images: [artBrief], sections: [{ id: 'stage-arad', codeFigure: { kind: 'process', layout: 'cycle',
+    stages: [{ label: 'تبخر' }, { label: 'تكاثف' }, { label: 'هطول' }, { label: 'تجمع' }] } }] };
+  const r = validateFigures(guide, { source });
+  assert.strictEqual(r.fails, 0);
+  assert.ok(!r.findings.some((f) => f.code === 'process_stage_not_in_source'));
+});
+
+test('a process whose stages are not in the source is flagged', () => {
+  const source = { sections: [{ body: 'دورة الماء: تبخر ثم تكاثف' }] };
+  const guide = { images: [artBrief], sections: [{ id: 'stage-arad', codeFigure: { kind: 'process',
+    stages: [{ label: 'تبخر' }, { label: 'تكاثف' }, { label: 'انفجار' }] } }] };
+  assert.ok(validateFigures(guide, { source }).findings.some((f) => f.code === 'process_stage_not_in_source'));
+});
