@@ -494,6 +494,37 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-stage-taqwim .d-code-fig.cf-k-steps:not(.cf-wide) .cf-svg{max-height:126px}
 .section.sec-stage-taqwim .d-code-fig.cf-wide .cf-svg{max-height:100px}
 
+
+/* ───────────────────────────────────────────────────────────────────────────
+   RULE: a status icon never overlaps instructional text. It gets its own slot
+   in the layout, so the text cannot be covered at any size and nothing depends
+   on the icon happening to be small.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* code-drawn ✗/✓ board: each half becomes a two-column grid — a fixed icon column
+   at the RTL start (the right), then the content. The icon spans both content rows,
+   so it stays beside the drawing AND its caption instead of floating over either. */
+.d-code-board .cb-half{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;
+  column-gap:8px;align-items:start;justify-items:center;padding:7px 8px 6px}
+.d-code-board .cb-mark{position:static;grid-column:1;grid-row:1 / span 2;align-self:start;
+  width:23px;height:23px;min-width:23px;font-size:15.5px;box-shadow:none;
+  border:1.6px solid currentColor;background:#fff}
+.d-code-board .cb-vis{grid-column:2;grid-row:1}
+/* the caption may now wrap inside its column rather than run under the icon */
+.d-code-board .cb-label{grid-column:2;grid-row:2;white-space:normal;text-align:center;max-width:100%}
+
+/* twin IMAGE board: the badge moves off the picture into its own row above it, so it
+   can never cover the image's code-rendered label chip. */
+/* with no mini-visuals the board used to collapse to its content, leaving each
+   caption barely 85px and wrapping short labels; hold the full width so a 2-3 word
+   caption stays on one line (and the board stays the height it was) */
+.d-code-board{width:100%}
+
+.d-twin-board .tb-half{display:flex;flex-direction:column;align-items:stretch}
+.d-twin-board .tb-mark{position:static;align-self:flex-start;margin:4px 7px 3px;box-shadow:none;
+  border:1.6px solid currentColor;background:#fff;width:23px;height:23px;font-size:15.5px;
+  display:flex;align-items:center;justify-content:center;border-radius:50%;line-height:1}
+
 `;
 
 module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom' };

@@ -136,7 +136,7 @@ body{background:#eef1f7;color:var(--ink);font-family:var(--font),'Baloo 2','Popp
 /* bullets — plain, black text, small neutral markers */
 .d-lead{font-size:14px;font-weight:700;color:var(--muted);margin-bottom:8px}
 .d-bullets{margin:0;padding:0;list-style:none;display:grid;gap:6px}
-.d-bullets li{position:relative;padding:2px 2px 2px 24px;font-size:14.5px;font-weight:600;line-height:1.55;color:var(--ink)}
+.d-bullets li{position:relative;padding:2px;padding-inline-start:24px;font-size:14.5px;font-weight:600;line-height:1.55;color:var(--ink)}
 /* plain marker in the gutter — never a filled disc over the text */
 .d-bullets li::before{content:attr(data-mark);position:absolute;inset-inline-start:2px;top:2px;
   font-size:13px;font-weight:800;color:var(--muted);line-height:1.55}
