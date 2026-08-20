@@ -241,7 +241,14 @@ function sanitizeCodeFigure(cf, depth = 0) {
       const lw = s(cf.labelWrong, 40), lc = s(cf.labelCorrect, 40);
       // A board with no drawable halves is still a teaching visual: two colour-coded
       // halves, the ✗/✓ marks and the two labels are drawn by code either way.
-      if (!wrong || !correct) return lw && lc && lw !== lc ? { kind: 'error-board', labelWrong: lw, labelCorrect: lc } : null;
+      // A label-only board must actually SAY something. «خطأ»/«صواب» simply repeat the
+      // headings of the card it sits in, so it is noise, not a visual.
+      const GENERIC = /^(خطأ|خطا|صواب|صحيح|غير صحيح|صح)$/;
+      if (!wrong || !correct) {
+        if (!lw || !lc || lw === lc) return null;
+        if (GENERIC.test(lw.trim()) || GENERIC.test(lc.trim())) return null;
+        return { kind: 'error-board', labelWrong: lw, labelCorrect: lc };
+      }
       // Both halves identical means the board shows no contrast at all — it would
       // read as a rendering fault. Reject so the section falls back to images/text.
       if (JSON.stringify(wrong) === JSON.stringify(correct)) return null;
@@ -277,7 +284,15 @@ Return ONLY this JSON, nothing else:
 const AR_STOP = new Set(['في', 'من', 'على', 'إلى', 'عن', 'مع', 'ثم', 'أن', 'إن', 'لا', 'ما', 'هو', 'هي',
   'هذا', 'هذه', 'ذلك', 'التي', 'الذي', 'كل', 'بعد', 'قبل', 'عند', 'حتى', 'أو', 'و', 'ال']);
 function labelGrounded(label, haystack) {
-  const words = String(label || '').split(/[\s،.:؛!؟"«»()]+/).filter(Boolean);
+  const text = String(label || '');
+  // A label can be arithmetic rather than words («٩ + ٤» in an addition lesson). Ground
+  // it on its digits: without this the rule would throw away legitimate maths cards.
+  const digits = text.replace(/[^٠-٩0-9+\-×÷=\/]/g, '');
+  if (digits.length >= 2 && !/[ء-ي]/.test(text)) {
+    const bare = (v) => v.replace(/\s+/g, '');
+    return bare(haystack).includes(bare(digits)) || haystack.includes(text.trim());
+  }
+  const words = text.split(/[\s،.:؛!؟"«»()]+/).filter(Boolean);
   const content = words.filter((w) => w.length >= 3 && !AR_STOP.has(w));
   if (!content.length) return false;
   // Strip a leading conjunction/article so «والجذور» matches «الجذور», and a trailing
@@ -364,8 +379,10 @@ function applyFigureBalance(out) {
   const STAGES = new Set(['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim']);
   // A figure that must span the card costs real page height, and two pages will
   // not hold more than one of them.
-  const spansCard = (cf) => cf.kind === 'process' || cf.kind === 'labeled-parts'
-    || (cf.kind === 'steps' && (cf.items || []).length >= 3);
+  // Only these always need the card's width. Whether a STEP SET spans is a layout
+  // call the renderer makes — it can see how many are on the page — and the condenser
+  // must never delete a teaching step to influence layout.
+  const spansCard = (cf) => cf.kind === 'process' || cf.kind === 'labeled-parts';
   for (const s of out.sections) {
     if (!s || !s.codeFigure || s.codeFigure.kind === 'error-board') continue;
     const k = sig(s.codeFigure);
@@ -373,15 +390,10 @@ function applyFigureBalance(out) {
     // Duplicates never survive. Beyond that: every stage may carry a code visual,
     // and up to two supporting sections (solutions, homework, goal …) may too.
     if (seen.has(k) || (isStage ? stageCount >= 4 : sideCount >= 2)) { delete s.codeFigure; continue; }
+    // Two card-spanning visuals fit; a third costs a page, so it goes.
     if (spansCard(s.codeFigure)) {
-      // Keep the first wide visual; a later one becomes a plain 3-card set if it
-      // can, otherwise it goes, because a third page is worse than a lost figure.
-      // Two fit comfortably now that a wide figure shares the sidebar's row instead
-      // of adding an empty one beside it.
-      if (wideCount >= 2) {
-        if (s.codeFigure.kind === 'steps') s.codeFigure.items = s.codeFigure.items.slice(0, 3);
-        else { delete s.codeFigure; continue; }
-      } else wideCount++;
+      if (wideCount >= 2) { delete s.codeFigure; continue; }
+      wideCount++;
     }
     seen.add(k); if (isStage) stageCount++; else sideCount++;
   }

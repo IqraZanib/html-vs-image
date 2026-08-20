@@ -607,6 +607,22 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
   let prevHeading = '';
   const rot = { n: 0, t: 0, seed: seedOf(`${meta.id || ''}|${meta.subject || ''}|${meta.title || ''}`) };
   const used = new Set(); // no character repeats within one lesson
+  // How many step sets may take the card's full width. Each spanning stacked block
+  // costs roughly 200px, so a lesson that gives every stage one cannot hold two pages
+  // however terse its text. The first two span; the rest ride the figure column.
+  const SPANNING_STEP_BUDGET = 2;
+  const spanningSteps = new Set();
+  {
+    let n = 0;
+    for (const s of (content.sections || [])) {
+      const cf = s && s.codeFigure;
+      // Any step set may take the card's width — a pair of wide cards reads far better
+      // than a pair squeezed into the figure column, and a lesson made only of small
+      // 2-card sets was leaving half a page empty.
+      if (!cf || cf.kind !== 'steps' || (cf.items || []).length < 2) continue;
+      if (n < SPANNING_STEP_BUDGET) { spanningSteps.add(s.id); n++; }
+    }
+  }
   const sections = (content.sections || []).map((section, i) => {
     // Admin blocks (Lesson Details) use a neutral slate tab, not a warm accent.
     const accent = section.type === 'fields' ? '--c-slate' : accentFor(i);
@@ -658,7 +674,8 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
       // A step set of 3+ cards reads as a proper sequence, so it takes the card's
       // width as a ROW; only a pair stays stacked in the figure column.
       const stepCount = (cf.items || []).length;
-      const spans = CF_WIDE.has(cf.kind) || (cf.kind === 'steps' && stepCount >= 3);
+      const spans = CF_WIDE.has(cf.kind)
+        || (cf.kind === 'steps' && stepCount >= 2 && spanningSteps.has(section.id));
       // Stacked cards at the card's full width are far larger than the same number
       // side by side; only 4+ cards need the row, which would otherwise run too tall.
       const spec = cf.kind === 'steps'

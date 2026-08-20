@@ -128,7 +128,7 @@ function handler(req, res) {
           figureReport = validateFigures(parsed, { source: srcForValidation, log });
           structured = JSON.stringify(parsed, null, 2);
         }
-        let { png, pdf, stats, contentId, locale, maxPages } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)
+        let { png, pdf, stats, contentId, locale, maxPages, stripHeight, pageBudget } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)
         // The region pack states its page contract (Yemen: two pages). Fall back to the
         // 2-page checkbox when a pack does not declare one.
         const pageLimit = maxPages || (guide2p ? 2 : null);
@@ -182,7 +182,7 @@ function handler(req, res) {
         if (pageLimit && pdf && pageCount(pdf) > pageLimit) {
           // Two probes, not four: if 88% and 76% both overrun, the figures are not what
           // is making the page long and further shrinking just wastes renders.
-          for (const scale of [0.88, 0.76]) {
+          for (const scale of [0.88, 0.76, 0.64]) {
             const attempt = await renderLessonImage(parsed, { log, pdf: true, figureScale: scale });
             if (pageCount(attempt.pdf) <= pageLimit) {
               ({ png, pdf, stats, contentId, locale } = attempt);
@@ -263,6 +263,23 @@ function handler(req, res) {
               ({ png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }));
             }
             } catch (e) { revert(`the artwork retry failed (${e.message})`); }
+          }
+        }
+        // FILL THE PAGE. Density has only ever shrunk figures; a lesson that lands with
+        // hundreds of pixels spare reads as unfinished, and the figures are exactly what
+        // should have been bigger. Grow them while the page contract still holds.
+        if (pageLimit && pdf && pageCount(pdf) <= pageLimit && stripHeight && pageBudget) {
+          const slack = pageBudget - stripHeight;
+          if (slack > 150) {
+            log(`Page has ${slack}px spare — trying larger figures…`);
+            for (const scale of [1.3, 1.15]) {
+              const attempt = await renderLessonImage(parsed, { log, pdf: true, figureScale: scale });
+              if (attempt.pdf && pageCount(attempt.pdf) <= pageLimit) {
+                ({ png, pdf, stats, contentId, locale, stripHeight } = attempt);
+                log(`  ✓ figures drawn at ${Math.round(scale * 100)}% — the page is fuller`);
+                break;
+              }
+            }
           }
         }
         // Keep every rendered lesson in the repo (pdf + png + the content JSON used).

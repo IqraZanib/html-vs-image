@@ -115,11 +115,31 @@ async function renderLessonImage(content, opts = {}) {
     log('All content images restored from the store — no credits spent.');
   }
 
+  // Load the region design pack FIRST: it may switch off features that predate it
+  // (the character cast, below) and it carries the page contract.
+  let regionPack = null;
+  const themeRegion = String(meta.region || '').toLowerCase();
+  if (themeRegion) {
+    // Cache-busted so a long-running server (LP Studio) always serves the pack's
+    // CURRENT code — theme edits apply on the next render, no restart needed.
+    try {
+      const themePath = require.resolve(`./decorative/regions/${themeRegion}/theme`);
+      delete require.cache[themePath];
+      regionPack = require(themePath);
+    } catch (_) { /* no design pack for this region — default look */ }
+  }
   // Characters are a fallback: only build the (region-appropriate) cast when the
   // lesson has no content images. Region follows the language (ar→Yemen, sw→Kenya).
   const anyImage = Object.values(imagesMap).some((im) => im && im.dataUri);
+  // A pack with its own approved design has no slot for decorative characters — and
+  // the cast is a generator, so letting it fire also spends credits and page height a
+  // fixed-format design cannot afford. Corpus runs showed it pushing zero-artwork
+  // lessons onto a third page.
+  const castAllowed = !(regionPack && regionPack.CHARACTER_CAST === false);
   // Code-only mode spends nothing: the character cast is a generator too, so skip it.
-  const cast = (anyImage || process.env.LP_NO_IMAGES === '1') ? {} : await ensureCast({ apiKey, gatePolicy, locale });
+  const cast = (anyImage || !castAllowed || process.env.LP_NO_IMAGES === '1')
+    ? {} : await ensureCast({ apiKey, gatePolicy, locale });
+  if (!anyImage && !castAllowed) log('  (no illustration in this lesson; this design set does not use the character cast)');
   const { headerHtml, bodyHtml, headCss } = renderDecorativeLesson(content, imagesMap, cast);
   let html = buildShell({ headerHtml, bodyHtml, locale, title: meta.title || contentId });
   // Region DESIGN PACK: each region with an approved design set owns a folder
@@ -131,14 +151,9 @@ async function renderLessonImage(content, opts = {}) {
   let regionCss = '';
   let regionPageStyle = '';
   let regionMaxPages = null;
-  const themeRegion = String(meta.region || '').toLowerCase();
-  if (themeRegion) {
-    // Cache-busted so a long-running server (LP Studio) always serves the pack's
-    // CURRENT code — theme edits apply on the next render, no restart needed.
+  if (regionPack) {
     try {
-      const themePath = require.resolve(`./decorative/regions/${themeRegion}/theme`);
-      delete require.cache[themePath];
-      const pack = require(themePath);
+      const pack = regionPack;
       regionCss = pack.THEME_OVERRIDE_CSS || '';
       regionPageStyle = pack.PAGE_NUMBER_STYLE || '';
       regionMaxPages = Number(pack.MAX_PAGES) || null;
@@ -171,7 +186,14 @@ async function renderLessonImage(content, opts = {}) {
     }
   }
   const png = await screenshot(html);
-  return { png, pdf, html, contentId, locale, stats: statsOut, maxPages: regionMaxPages };
+  // Report how full the page is, so a caller with a page contract can not only shrink
+  // figures to fit but GROW them to fill: a lesson that lands with 450px spare reads
+  // as unfinished, and its figures were the thing that should have been bigger.
+  let stripHeight = null;
+  try { stripHeight = png && png.length > 24 ? Buffer.from(png).readUInt32BE(20) : null; } catch (_) { /* not a PNG buffer */ }
+  const usablePerPage = 1123 - 28 - (regionPageStyle === 'ar-bottom' ? 36 : 12);
+  const pageBudget = regionMaxPages ? regionMaxPages * usablePerPage : null;
+  return { png, pdf, html, contentId, locale, stats: statsOut, maxPages: regionMaxPages, stripHeight, pageBudget };
 }
 
 module.exports = { renderLessonImage, ROOT };

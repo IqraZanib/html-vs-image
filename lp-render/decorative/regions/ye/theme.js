@@ -601,9 +601,45 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .panel.has-inline-img .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:176px;width:100%}
 .section.sec-stage-taqwim .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:158px}
 
+/* ───────────────────────────────────────────────────────────────────────────
+   FIGURE DENSITY (--figscale, 1 by default so nothing changes at rest).
+   Scaling max-height caps turned out to be useless: a figure is usually smaller
+   than its cap, so lowering the cap moves nothing. What actually governs height
+   is the figure's WIDTH (an SVG keeps its aspect) and the hero floor. Those are
+   what scale here.
+
+   And the hero floor now applies only to a real illustration: a stage carrying a
+   small code figure was paying 242px of empty height for a 120px drawing.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root{--figscale:1}
+/* SHRINK by width (an SVG keeps its aspect, so width governs height) but never grow
+   past the column, or the drawing spills out of its card. */
+.panel.has-inline-img .d-code-fig .cf-svg{width:min(100%, calc(100% * var(--figscale)))}
+.panel.has-inline-img .d-inline-img:not(.d-code-fig) img{max-width:min(100%, calc(100% * var(--figscale)))}
+.d-code-board .cb-vis .cf-svg{width:min(88%, calc(88% * var(--figscale)))}
+/* GROW by cap: when a figure is already as wide as its column, only a taller cap lets
+   it get bigger — which is what fills a page that came out sparse. */
+.section.sec-stage-tamhid .d-inline-img.d-code-fig,.section.sec-stage-arad .d-inline-img.d-code-fig{min-height:0}
+.section.sec-stage-tamhid .d-inline-img:not(.d-code-fig),.section.sec-stage-arad .d-inline-img:not(.d-code-fig){min-height:calc(242px * var(--figscale))}
+.panel.has-inline-img .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:calc(176px * var(--figscale))}
+.section.sec-stage-taqwim .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:calc(158px * var(--figscale))}
+.panel.has-inline-img .d-code-fig.cf-k-steps:not(.cf-wide) .cf-svg{max-height:calc(200px * var(--figscale))}
+.section.sec-stage-taqwim .d-code-fig.cf-k-steps:not(.cf-wide) .cf-svg{max-height:calc(170px * var(--figscale))}
+.panel.has-inline-img .d-code-fig.cf-k-labeled-parts .cf-svg{max-height:calc(206px * var(--figscale))}
+.section.sec-stage-tatbiq .d-code-fig .cf-svg{max-height:calc(166px * var(--figscale))}
+.panel.has-inline-img .d-code-fig.cf-wide .cf-svg{max-height:calc(112px * var(--figscale))}
+.section.sec-stage-taqwim .d-code-fig.cf-wide .cf-svg{max-height:calc(140px * var(--figscale))}
+.section.sec-solutions .d-code-fig.cf-wide .cf-svg,.section.sec-homework .d-code-fig.cf-wide .cf-svg{max-height:calc(96px * var(--figscale))}
+.section.sec-errors .d-twin-board .tb-half img{height:calc(170px * var(--figscale))}
+.d-twin-board .tb-half img{height:calc(150px * var(--figscale))}
+.section.sec-errors .d-inline-img img{height:calc(204px * var(--figscale))}
+
 `;
 
 // MAX_PAGES is the pack's page contract: this design set is a two-page daily guide,
 // so a render that overruns is a fault to fix (by drawing the figures smaller), not a
 // longer document to accept. Packs without it are unconstrained.
-module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom', MAX_PAGES: 2 };
+// CHARACTER_CAST: false — this design set has no slot for decorative characters. The
+// legacy fallback (add a cast when a lesson has no content images) was injecting one
+// into the homework card and pushing zero-artwork lessons onto a third page.
+module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom', MAX_PAGES: 2, CHARACTER_CAST: false };

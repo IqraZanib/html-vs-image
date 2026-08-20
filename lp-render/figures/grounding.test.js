@@ -35,3 +35,18 @@ test('function words alone do not ground a label', () => {
 test('a label of only short tokens cannot pass on them', () => {
   assert.strictEqual(labelGrounded('في', LESSON), false);
 });
+
+// A maths lesson's step cards are arithmetic, not words. The word-based rule read
+// «٩ + ٤» as invented content and would have dropped three legitimate cards from the
+// addition lesson in the corpus.
+const SUMS = 'اكتب حقائق الجمع: ٩ + ٤ = ١٣، ٧ + ٩ = ١٦، ٧ + ٥ = ١٢';
+
+test('an arithmetic label is grounded on its digits', () => {
+  for (const l of ['٩ + ٤', '٧ + ٩', '٧+٥']) {
+    assert.strictEqual(labelGrounded(l, SUMS), true, `${l} should be grounded`);
+  }
+});
+
+test('arithmetic the lesson does not contain is still rejected', () => {
+  assert.strictEqual(labelGrounded('٨ + ٦', SUMS), false);
+});

@@ -80,7 +80,7 @@ function validateFigures(guide, { source = null, imageDims = {}, log = null, mod
         add('fail', 'art_asks_labels', `image "${im.id}": brief asks for labels while claiming to be textless (contradictory contract)`, null);
       }
       if (/blank cards?|empty box|placeholder|answer slot|counters visible|blank slots?/i.test(p)) {
-        add('warn', 'brief_invites_placeholders', `image "${im.id}": brief asks for blank cards/boxes/placeholders — the model draws those, and boxes and = signs are teaching content that belongs in code`, null);
+        if (mode !== 'hybrid') add('warn', 'brief_invites_placeholders', `image "${im.id}": brief asks for blank cards/boxes/placeholders — the model draws those, and boxes and = signs are teaching content that belongs in code`, null);
       }
     } else if (/no text|no letters|wordless/i.test(p)) {
       // Labeled mode: the figure is supposed to carry its own Arabic labels.
@@ -267,7 +267,12 @@ function validateFigures(guide, { source = null, imageDims = {}, log = null, mod
 
     // 3. A figure with no caption leaves the pupil guessing what it shows.
     for (const s of sections) {
+      // Figures that carry their own words (step cards, process stages, labelled
+      // parts) explain themselves; the check is for drawings that do not — a bare
+      // grid, a count of shapes, a lone expression.
+      const SELF_LABELLING = new Set(['steps', 'process', 'labeled-parts']);
       if (s && s.codeFigure && s.codeFigure.kind !== 'error-board'
+          && !SELF_LABELLING.has(s.codeFigure.kind)
           && !String(s.codeFigure.caption || '').trim() && !String(s.codeFigure.label || '').trim()) {
         add('warn', 'figure_no_caption', `${s.id}: code figure has neither a label nor a caption`, s.id);
       }
