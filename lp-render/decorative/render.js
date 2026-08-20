@@ -385,9 +385,34 @@ function cfWrap(s, width, size, lines = 2) {
 // numeral badge, a bold label and an optional short caption. No arrows — this is for
 // an ordered set the pupil takes in at a glance (steps of a task, parts of a thing,
 // rules, materials). Every word comes from the lesson; the layout is computed.
-function cfSteps({ items = [], numbered = true }) {
+function cfSteps({ items = [], numbered = true, orient = 'h' }) {
   const S = items.slice(0, 6).filter((s) => s && String(s.label || '').trim());
   if (S.length < 2) return '';
+  // Stacked: the cards fill the figure column the design set already reserves, so a
+  // stage gains a visual without gaining page height.
+  if (orient === 'v') {
+    const CW = 250, LS = 13.5, CS = 10.5, pad = 7;
+    let y = 4, out = '';
+    S.forEach((s, i) => {
+      const lines = cfWrap(s.label, CW - 46, LS, 2);
+      const cap = String(s.caption || '').trim();
+      const h = 14 + lines.length * (LS + 3) + (cap ? CS + 5 : 0);
+      out += '<rect x="4" y="' + y + '" width="' + (CW - 8) + '" height="' + h + '" rx="9" fill="'
+        + CF_TINT[i % CF_TINT.length] + '" stroke="' + CF.stroke + '" stroke-width="2"/>';
+      if (numbered) {
+        out += '<circle cx="' + (CW - 22) + '" cy="' + (y + h / 2) + '" r="10" fill="' + CF.stroke + '"/>'
+          + '<text x="' + (CW - 22) + '" y="' + (y + h / 2 + 4) + '" text-anchor="middle" font-size="11.5"'
+          + ' font-weight="800" fill="#ffffff">' + cfArNum(i + 1) + '</text>';
+      }
+      // The badge sits at the right edge (RTL start), so the text centres in what is left.
+      const tx = (CW - 36) / 2;
+      let ty = y + 12 + LS * 0.8;
+      for (const line of lines) { out += cfText(tx, ty, line, LS, 800); ty += LS + 3; }
+      if (cap) out += cfText(tx, y + h - 6, cfWrap(cap, CW - 50, CS, 1)[0] || '', CS, 600, CF.stroke);
+      y += h + pad;
+    });
+    return cfSvg(out, CW, y);
+  }
   const W = 480, n = S.length, gap = n > 4 ? 7 : 10;
   const BW = (W - 14 - gap * (n - 1)) / n;
   const hasCap = S.some((s) => String(s.caption || '').trim());
@@ -494,7 +519,7 @@ function cfLabeledParts({ object = 'plant', parts = [] }) {
   return cfSvg(out, W, H);
 }
 
-const CF_WIDE = new Set(['process', 'steps', 'labeled-parts']);
+const CF_WIDE = new Set(['process', 'labeled-parts']);
 const CF_KINDS = new Set(['fraction-grid', 'count-set', 'compass', 'compare', 'expression', 'process', 'steps', 'labeled-parts', 'error-board']);
 function cfMini(spec) {
   if (!spec) return '';
@@ -620,8 +645,12 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
       }
       // A process/cycle needs the whole card width or its stage labels become
       // unreadable at half-column size.
-      const wide = CF_WIDE.has(cf.kind) ? ' cf-wide cf-k-' + cf.kind : '';
-      const fig = `<div class="d-inline-img d-code-fig${wide}">${cfMini(cf)}${cf.label ? `<div class="cf-label">${esc(cf.label)}</div>` : ''}${cf.caption ? `<div class="cap">${esc(cleanHeading(cf.caption))}</div>` : ''}</div>`;
+      // A step set of 2–3 cards stacks inside the figure column; 4+ cards need the
+      // card's full width, as a cycle or a labelled diagram always does.
+      const spans = CF_WIDE.has(cf.kind) || (cf.kind === 'steps' && (cf.items || []).length >= 4);
+      const spec = cf.kind === 'steps' ? { ...cf, orient: (cf.items || []).length >= 4 ? 'h' : 'v' } : cf;
+      const wide = spans ? ' cf-wide cf-k-' + cf.kind : ' cf-k-' + cf.kind;
+      const fig = `<div class="d-inline-img d-code-fig${wide}">${cfMini(spec)}${cf.label ? `<div class="cf-label">${esc(cf.label)}</div>` : ''}${cf.caption ? `<div class="cap">${esc(cleanHeading(cf.caption))}</div>` : ''}</div>`;
       return `<section class="section${idCls}">${head}<div class="panel has-inline-img" style="border-color:var(${accent}-soft)"><div class="ii-body">${body}</div>${fig}</div></section>`;
     }
     const inlineIm = !mg && section.image && images[section.image] && images[section.image].dataUri ? images[section.image] : null;

@@ -210,7 +210,14 @@ function validateFigures(guide, { source = null, imageDims = {}, log = null, mod
     if (s.codeFigure) {
       const cf = s.codeFigure;
       if (cf.kind === 'error-board') {
-        if (!cf.wrong || !cf.correct) add('fail', 'board_incomplete', `${s.id}: the board needs both a wrong and a correct side`, s.id);
+        // A board with two labelled halves and no mini-visuals is legitimate: the
+        // ✗/✓ marks, the colour split and both labels are all code-drawn. Only a
+        // HALF-drawn board (one side has a visual, the other does not) is a fault.
+        if (!cf.wrong && !cf.correct) {
+          const lw = String(cf.labelWrong || '').trim(), lc = String(cf.labelCorrect || '').trim();
+          if (!lw || !lc) add('fail', 'board_incomplete', `${s.id}: the board has neither visuals nor both labels`, s.id);
+          else if (lw === lc) add('fail', 'board_identical', `${s.id}: both halves of the board say the same thing`, s.id);
+        } else if (!cf.wrong || !cf.correct) add('fail', 'board_incomplete', `${s.id}: one half of the board has a visual and the other does not`, s.id);
         else {
           if (JSON.stringify(cf.wrong) === JSON.stringify(cf.correct)) {
             add('fail', 'board_identical', `${s.id}: both halves of the board are identical — the mistake is not contrasted`, s.id);

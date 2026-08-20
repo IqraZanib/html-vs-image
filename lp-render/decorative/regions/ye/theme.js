@@ -471,14 +471,28 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
    dependency, which some renderers ignore) */
 .panel.has-inline-img .d-code-fig.cf-wide{grid-column:1 / -1;grid-row:auto}
 .panel.has-inline-img .d-code-fig.cf-wide{width:100%;max-width:100%;margin:4px auto 0;padding:2px;position:static;min-height:0}
-.panel.has-inline-img .d-code-fig.cf-wide .cf-svg{width:100%;max-height:132px;position:static}
+.panel.has-inline-img .d-code-fig.cf-wide .cf-svg{width:100%;max-height:112px;position:static}
 
 
 /* step cards and labelled diagrams span the card like a process does; each kind gets
    the height its drawing actually needs, capped so the lesson still fits two pages */
 .panel.has-inline-img .d-code-fig.cf-k-steps .cf-svg{max-height:118px}
-.panel.has-inline-img .d-code-fig.cf-k-labeled-parts .cf-svg{max-height:158px}
+.panel.has-inline-img .d-code-fig.cf-k-labeled-parts .cf-svg{max-height:192px}
 .section.sec-solutions .d-code-fig.cf-wide .cf-svg,.section.sec-homework .d-code-fig.cf-wide .cf-svg{max-height:96px}
+
+
+/* a stacked step set behaves like a hero figure: it fills the reserved figure
+   column instead of spanning the card, so it adds no page height */
+.panel.has-inline-img .d-code-fig.cf-k-steps:not(.cf-wide){position:static;width:100%;max-width:100%}
+.panel.has-inline-img .d-code-fig.cf-k-steps:not(.cf-wide) .cf-svg{position:static;width:100%;height:auto;max-height:168px}
+.panel.has-inline-img .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:112px}
+
+
+/* the last stage and the closing sections always land on page 2 in this design set,
+   so their figures run a little more compact — shaving page-1 residents instead only
+   moves the page boundary down and gains nothing */
+.section.sec-stage-taqwim .d-code-fig.cf-k-steps:not(.cf-wide) .cf-svg{max-height:126px}
+.section.sec-stage-taqwim .d-code-fig.cf-wide .cf-svg{max-height:100px}
 
 `;
 

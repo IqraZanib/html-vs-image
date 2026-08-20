@@ -10,7 +10,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { renderLessonImage } = require('../lp-render/pipeline');
 const { structureLesson } = require('../lp-render/structure');
-const { condenseToGuide } = require('../lp-render/condense');
+const { condenseToGuide, addFiguresToGuide } = require('../lp-render/condense');
 const { validateFigures } = require('../lp-render/figures/validate');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -55,9 +55,14 @@ function handler(req, res) {
     return send(res, 200, 'application/json', JSON.stringify({ regions }));
   }
   if (req.method === 'POST' && req.url === '/render') {
-    let body = '';
-    req.on('data', (d) => { body += d; if (body.length > 5e6) req.destroy(); });
+    // Collect BYTES, not strings: appending each chunk to a string decodes it on its
+    // own, so a multi-byte character split across two TCP chunks becomes two U+FFFD
+    // replacement marks. A pasted Arabic lesson is big enough to hit that boundary,
+    // and the damage is invisible until it shows up as tofu in the rendered PDF.
+    const chunks = []; let size = 0;
+    req.on('data', (d) => { chunks.push(d); size += d.length; if (size > 5e6) req.destroy(); });
     req.on('end', async () => {
+      const body = Buffer.concat(chunks).toString('utf8');
       const logs = []; const log = (m) => logs.push(m);
       // Proxies and tunnels (Cloudflare et al) kill a response that stays silent for
       // ~100s, while structure+render+imagegen can take minutes. Send the headers now
@@ -132,20 +137,98 @@ function handler(req, res) {
           'The previous attempt was TOO LONG. Cut every word budget by a third; keep only the most essential sentence in each stage body. KEEP EVERY FIGURE — each stage that had an "image" or "codeFigure" must still have one; cut WORDS, never visuals.',
           'STILL TOO LONG. Halve every word budget: stage bodies ≤ 14 words (one imperative sentence), goal ≤ 14, errors sides ≤ 12, solutions items ≤ 12, homework ≤ 20, glossary values ≤ 5, multigrade lines ≤ 8. KEEP EVERY FIGURE — the figures carry the lesson, so never drop an "image" or "codeFigure" to save space; cut words only.',
         ];
+        // A tightening pass rewrites the guide, and it has been observed dropping
+        // every stage figure despite being told not to. Snapshot the figures and put
+        // back whatever a pass loses: the loop is for cutting words, not visuals.
+        const FIGKEYS = ['image', 'codeFigure', 'overlays', 'imageWrong', 'imageCorrect', 'labelWrong', 'labelCorrect'];
+        const snapshotFigures = (g) => {
+          const m = new Map();
+          for (const sec of (g.sections || [])) {
+            if (!sec || !sec.id) continue;
+            const keep = {};
+            for (const k of FIGKEYS) if (sec[k] !== undefined) keep[k] = sec[k];
+            if (keep.image || keep.codeFigure || keep.imageWrong) m.set(sec.id, keep);
+          }
+          return { bySection: m, images: new Map((g.images || []).map((im) => [im.id, im])) };
+        };
+        const restoreFigures = (g, snap) => {
+          let restored = 0;
+          const referenced = new Set();
+          for (const sec of (g.sections || [])) for (const k of ['image', 'imageWrong', 'imageCorrect']) if (sec && sec[k]) referenced.add(sec[k]);
+          for (const sec of (g.sections || [])) {
+            const had = sec && sec.id && snap.bySection.get(sec.id);
+            if (!had || sec.image || sec.codeFigure || sec.imageWrong) continue;
+            for (const k of FIGKEYS) if (had[k] !== undefined) sec[k] = had[k];
+            // an image brief the tightened guide dropped has to come back with it
+            for (const k of ['image', 'imageWrong', 'imageCorrect']) {
+              const id = had[k];
+              if (!id || referenced.has(id)) continue;
+              const brief = snap.images.get(id);
+              g.images = g.images || [];
+              if (brief && !g.images.some((im) => im && im.id === id)) g.images.push(brief);
+            }
+            restored++;
+          }
+          if (restored) log(`  ↺ restored ${restored} figure(s) the tightening pass dropped — the fit loop cuts words, not visuals`);
+          return g;
+        };
+        const figSnapshot = snapshotFigures(parsed);
         for (let pass = 0; guide2p && pdf && pageCount(pdf) > 2 && !looksLikeGuide && pass < TIGHTEN.length; pass++) {
           log(`Guide came out ${pageCount(pdf)} pages — re-condensing tighter (pass ${pass + 1})…`);
           const keepRegion2 = parsed.meta && parsed.meta.region;
           parsed = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log, extra: TIGHTEN[pass] });
           if (keepRegion2) parsed.meta = { ...(parsed.meta || {}), region: keepRegion2 };
+          parsed = restoreFigures(parsed, figSnapshot);
           structured = JSON.stringify(parsed, null, 2);
           ({ png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }));
         }
-        // A tightening pass can still come back light on figures; if the guide lost
-        // them, restore coverage once more (text-only round trip, no image credits).
+        // Whatever the rolls did, no stage ships as bare prose: a narrow text-only
+        // figure pass fills the gaps from the guide's own words, then we re-render.
         if (guide2p && !looksLikeGuide) {
           const stages = ['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim'];
-          const have = stages.filter((id) => { const s = (parsed.sections || []).find((x) => x && x.id === id); return s && (s.image || s.codeFigure); }).length;
-          if (have === 0) log('  ⚠ the tightened guide has no stage figures — the design set expects figures on the stage cards');
+          const bareCount = () => stages.concat('errors').filter((id) => {
+            const sec = (parsed.sections || []).find((x) => x && x.id === id);
+            return sec && !sec.image && !sec.codeFigure && !sec.imageWrong;
+          }).length;
+          if (bareCount()) {
+            log(`${bareCount()} stage(s) came back without a figure — running the figure pass…`);
+            const before = bareCount();
+            ({ guide: parsed } = await addFiguresToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log }));
+            if (bareCount() < before) {
+              structured = JSON.stringify(parsed, null, 2);
+              ({ png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }));
+              // The figures we just added are what must survive the next tightening, so
+              // snapshot AFTER the figure pass — snapshotting the tightened guide would
+              // restore nothing.
+              const snapAfterPass = snapshotFigures(parsed);
+              // the added visuals can push the page count, so tighten once more if needed
+              for (let pass = 0; pdf && pageCount(pdf) > 2 && pass < TIGHTEN.length; pass++) {
+                log(`Guide is ${pageCount(pdf)} pages after the figure pass — tightening (pass ${pass + 1})…`);
+                const keepR = parsed.meta && parsed.meta.region;
+                parsed = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log, extra: TIGHTEN[pass] });
+                if (keepR) parsed.meta = { ...(parsed.meta || {}), region: keepR };
+                parsed = restoreFigures(parsed, snapAfterPass);
+                structured = JSON.stringify(parsed, null, 2);
+                ({ png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }));
+              }
+            }
+          }
+          if (bareCount()) log('  ⚠ ' + bareCount() + ' stage(s) still have no figure — the page will read text-heavy');
+          // A page of pure diagrams is its own kind of dry: the design set expects at
+          // least one real picture. One text-only retry when a roll authored none.
+          if (!(parsed.images || []).length) {
+            log('This roll authored no illustration at all — asking once for one picture…');
+            const keepR3 = parsed.meta && parsed.meta.region;
+            const withArt = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log,
+              extra: 'This guide has NO illustration. Keep every figure and all the text as they are, and additionally author EXACTLY ONE textless illustration in "images" for the single most scene-like stage (children or objects doing the activity, absolutely no text in the image), referenced by that section\'s "image" field. Change nothing else.' });
+            if (keepR3) withArt.meta = { ...(withArt.meta || {}), region: keepR3 };
+            const merged = restoreFigures(withArt, snapshotFigures(parsed));
+            if ((merged.images || []).length) {
+              parsed = merged;
+              structured = JSON.stringify(parsed, null, 2);
+              ({ png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }));
+            }
+          }
         }
         // Keep every rendered lesson in the repo (pdf + png + the content JSON used).
         try {
