@@ -41,7 +41,7 @@ EDITORIAL RULES — how to choose well (these decide quality; follow them for AN
 - GLOSSARY (section 10): CONCEPT terms (the skill words: المطابقة، التمييز البصري، التطابق، القيمة المنزلية) — NOT the lesson's vocabulary items that pupils learn inside the lesson (not أبي/أمي, not the numbers list). Definitions from the source where given.
 - MULTIGRADE (section 11): derive the lower grade from the source's scaffolding, the current grade = the lesson as-is, the higher grade from the source's extension activity. If the source has neither, write the natural simpler/harder variant of the SAME activity.
 - HOMEWORK/CORNER (section 12): the source's homework items numbered and near-verbatim, then the re-teach trigger, then exactly ONE reflection question.
-- NUMERALS: in Arabic lessons use Eastern Arabic numerals everywhere (٣٢، ٤٥ دقيقة، صفحة ٨٠) — including times, pages and marks. NEVER mix Latin digits (1,2,3) into Arabic text: Yemeni teachers flagged mixed numerals in a review as confusing for pupils.
+- NUMERALS: in Arabic lessons use Eastern Arabic numerals everywhere (٣٢، ٤٥ دقيقة، صفحة ٨٠) — including times, pages and marks. NEVER mix Latin digits (1,2,3) into Arabic text: Yemeni teachers flagged mixed numerals in a review as confusing for pupils. This applies ONLY to reader-visible Arabic strings — every JSON NUMBER (parts, shaded, total, len, and any value outside quotes) MUST be written with plain ASCII digits, e.g. "total": 16, never "total": ١٦, or the guide will not parse.
 - KINESTHETIC (teacher request from the Yemen A/B review — "the students would love to be kinesthetic in the lessons they learn"): every stage body must contain something the pupils physically DO — touch, hold, point, stand, raise a hand, fold, cut, count on fingers, act out, walk to the board. Name the real object from the source (the string, the apple, the cards). If the source's stage is passive, convert it into the nearest physical version of the SAME activity rather than inventing new content.
 - ANSWERS ARE NEVER OMITTED: the solutions section must always carry the lesson's actual answers (a review found missing answer keys to be a hard failure). Never leave it empty or generic.
 - STAGE MINUTES: sum to the source's period length when known.
@@ -145,7 +145,13 @@ async function callOnce(content, { apiKey, fetchImpl, extra, system }) {
   const text = json.choices && json.choices[0] && json.choices[0].message && json.choices[0].message.content;
   const m = String(text || '').match(/\{[\s\S]*\}/);
   if (!m) throw new Error('condense: model returned no JSON');
-  return JSON.parse(m[0]);
+  // Models sometimes write Eastern Arabic numerals as JSON VALUES (total: ١٦),
+  // which is not valid JSON. Convert digits only where a number is expected —
+  // after ':' or ',' or '[' and before ',' '}' ']' — never inside strings.
+  const AR = '٠١٢٣٤٥٦٧٨٩';
+  const repaired = m[0].replace(/([:,\[]\s*)([٠-٩]+(?:\.[٠-٩]+)?)(\s*[,}\]])/g,
+    (_, pre, num, post) => pre + num.replace(/[٠-٩]/g, (d) => String(AR.indexOf(d))) + post);
+  return JSON.parse(repaired);
 }
 
 // Validate a code-figure spec: unknown kinds and out-of-range numbers are dropped
