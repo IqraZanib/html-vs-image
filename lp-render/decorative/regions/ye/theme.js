@@ -544,6 +544,63 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
   bottom:var(--notes-bw);right:var(--notes-bw);background-position:center 7px;padding-bottom:7px;
   border-radius:0 10px 10px 0}
 
+
+/* ───────────────────────────────────────────────────────────────────────────
+   BIGGER FIGURES. Two things were holding them small:
+   (1) the shared theme caps every inline figure at max-width:240px, so a figure
+       sat in 240px of the 394px column this design set reserves for it;
+   (2) figures scale to CONTAIN, so with the width freed the binding dimension
+       becomes the height cap — raising the cap is what actually enlarges them.
+   Page 1 ends 15px short of its limit, so تمهيد/عرض can only take a little;
+   page 2 had ~114px spare, which goes to تطبيق/تقويم.
+   ─────────────────────────────────────────────────────────────────────────── */
+.panel.has-inline-img .d-inline-img{max-width:100%}
+.panel.has-inline-img .d-code-fig{max-width:100%}
+/* On a card whose figure spans the full width, the text row still used only the
+   narrow first column while the 394px figure column sat empty beside it — so the
+   prose ran 8 lines deep and ate the height the figure wanted. Let the text span
+   both columns on that row; the تحقق sidebar keeps the third. */
+.panel.has-inline-img:has(.cf-wide) .d-step:first-child{grid-column:1 / 3}
+
+/* the figure column, used in full */
+.section.sec-stage-tamhid .d-inline-img,.section.sec-stage-arad .d-inline-img{min-height:196px}
+.section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:196px}
+.section.sec-stage-tatbiq .d-code-fig .cf-svg{max-height:166px;width:100%}
+.section.sec-stage-taqwim .d-code-fig.cf-k-steps:not(.cf-wide) .cf-svg{max-height:170px}
+.section.sec-stage-taqwim .d-code-fig.cf-wide .cf-svg{max-height:140px}
+/* the wide labelled diagram gets the same treatment within what page 1 allows */
+.panel.has-inline-img .d-code-fig.cf-k-labeled-parts .cf-svg{max-height:206px}
+
+
+/* ───────────────────────────────────────────────────────────────────────────
+   FIGURES ARE THE POINT OF THE PAGE — size them generously.
+   On a wide-figure card the تحقق sidebar sat in the text row only, so a 145px
+   sidebar beside 60px of text forced 85px of empty height, and the figure had to
+   fit in what was left. Let the sidebar span BOTH rows: the wasted height goes to
+   the figure instead. Roughly 100px per wide-figure card.
+   ─────────────────────────────────────────────────────────────────────────── */
+.panel.has-inline-img:has(.cf-wide){grid-template-rows:auto auto;align-items:start}
+.panel.has-inline-img:has(.cf-wide) .d-step:first-child{grid-column:1 / 3;grid-row:1}
+.panel.has-inline-img:has(.cf-wide) .d-step:last-child{grid-column:3;grid-row:1 / span 2;align-self:stretch}
+.panel.has-inline-img:has(.cf-wide) .d-code-fig.cf-wide{grid-column:1 / 3;grid-row:2}
+
+
+/* a step ROW spanning the card: tall enough that the numerals and labels read at a
+   glance, which is the whole point of the visual */
+.panel.has-inline-img .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:150px}
+.section.sec-stage-taqwim .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:150px}
+/* a stacked PAIR fills its column instead of sitting small inside it */
+.panel.has-inline-img .d-code-fig.cf-k-steps:not(.cf-wide) .cf-svg{max-height:200px}
+/* the illustration: fill the figure column instead of leaving white space beside a
+   small picture — the box now follows the picture's own 4:3 shape */
+.section.sec-stage-tamhid .d-inline-img,.section.sec-stage-arad .d-inline-img{min-height:242px}
+
+
+/* a spanning STACKED step set: full card width, cards tall enough to read at arm's
+   length — this is the shape that replaced a small figure lost in its column */
+.panel.has-inline-img .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:176px;width:100%}
+.section.sec-stage-taqwim .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:158px}
+
 `;
 
 module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom' };

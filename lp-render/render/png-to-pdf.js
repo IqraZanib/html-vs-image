@@ -94,7 +94,12 @@ async function composeWithChromium(shotBuf, geom, opts = {}) {
     const limit = start + usable;
     const within = cuts.filter((c) => c > start + 40 && c <= limit);
     let end = within.length ? within[within.length - 1] : Math.min(limit, height);
-    if (height - end < 48) end = height; // absorb trailing padding — no phantom page
+    // Absorb a small trailing remainder so a few px of padding does not earn its own
+    // page — but ONLY when the page still fits. The clip is a fixed `usable` box with
+    // overflow:hidden, so extending it past that silently CUT the content off (a
+    // homework card lost half its instructions this way, while the render still
+    // reported two pages, which is also why the fit loop never noticed).
+    if (height - end < 48 && height - start <= usable) end = height;
     pages.push([start, Math.min(end, height)]);
     start = end;
   }

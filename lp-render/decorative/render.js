@@ -280,9 +280,14 @@ function cfCompass({ north, east, south, west, center }) {
 
 // Two labelled bars for length / size / quantity comparisons.
 function cfCompare({ items = [] }) {
-  const W = 240, H = 170; let out = '';
+  const W = 240;
+  const rows = Math.min(3, Math.max(1, items.filter((it) => it).length));
+  // The height was fixed at 170px, which fits two bars: with three, the last bar's
+  // label fell outside the viewBox and was silently clipped — the figure looked
+  // complete but one item had lost its name. Derive the height from the row count.
+  const H = 30 + rows * 56; let out = '';
   items.slice(0, 3).forEach((it, i) => {
-    const y = 44 + i * 56, len = Math.max(0.15, Math.min(1, Number(it.len) || 0.6)) * 170;
+    const y = 30 + i * 56, len = Math.max(0.15, Math.min(1, Number(it.len) || 0.6)) * 170;
     out += '<rect x="' + ((W - 170) / 2) + '" y="' + y + '" width="' + len + '" height="16" rx="8" fill="'
       + (it.mark === 'good' ? CF.good : it.mark === 'bad' ? CF.bad : CF.accent) + '"/>';
     if (it.label) out += cfText(W / 2, y + 38, it.label, 12.5);
@@ -385,16 +390,19 @@ function cfWrap(s, width, size, lines = 2) {
 // numeral badge, a bold label and an optional short caption. No arrows — this is for
 // an ordered set the pupil takes in at a glance (steps of a task, parts of a thing,
 // rules, materials). Every word comes from the lesson; the layout is computed.
-function cfSteps({ items = [], numbered = true, orient = 'h' }) {
+function cfSteps({ items = [], numbered = true, orient = 'h', wide = false }) {
   const S = items.slice(0, 6).filter((s) => s && String(s.label || '').trim());
   if (S.length < 2) return '';
   // Stacked: the cards fill the figure column the design set already reserves, so a
   // stage gains a visual without gaining page height.
   if (orient === 'v') {
-    const CW = 250, LS = 13.5, CS = 10.5, pad = 7;
+    // The canvas width decides how large the cards can render: a 250-wide viewBox
+    // inside a 583-wide card hits its height cap while still looking small. A set
+    // that spans the card draws on a wider canvas — same height, far bigger cards.
+    const CW = wide ? 430 : 250, LS = wide ? 15 : 13.5, CS = wide ? 11.5 : 10.5, pad = wide ? 9 : 7;
     let y = 4, out = '';
     S.forEach((s, i) => {
-      const lines = cfWrap(s.label, CW - 46, LS, 2);
+      const lines = cfWrap(s.label, CW - 52, LS, 2);
       const cap = String(s.caption || '').trim();
       const h = 14 + lines.length * (LS + 3) + (cap ? CS + 5 : 0);
       out += '<rect x="4" y="' + y + '" width="' + (CW - 8) + '" height="' + h + '" rx="9" fill="'
@@ -647,8 +655,15 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
       // unreadable at half-column size.
       // A step set of 2–3 cards stacks inside the figure column; 4+ cards need the
       // card's full width, as a cycle or a labelled diagram always does.
-      const spans = CF_WIDE.has(cf.kind) || (cf.kind === 'steps' && (cf.items || []).length >= 4);
-      const spec = cf.kind === 'steps' ? { ...cf, orient: (cf.items || []).length >= 4 ? 'h' : 'v' } : cf;
+      // A step set of 3+ cards reads as a proper sequence, so it takes the card's
+      // width as a ROW; only a pair stays stacked in the figure column.
+      const stepCount = (cf.items || []).length;
+      const spans = CF_WIDE.has(cf.kind) || (cf.kind === 'steps' && stepCount >= 3);
+      // Stacked cards at the card's full width are far larger than the same number
+      // side by side; only 4+ cards need the row, which would otherwise run too tall.
+      const spec = cf.kind === 'steps'
+        ? { ...cf, orient: stepCount >= 4 ? 'h' : 'v', wide: spans && stepCount < 4 }
+        : cf;
       const wide = spans ? ' cf-wide cf-k-' + cf.kind : ' cf-k-' + cf.kind;
       const fig = `<div class="d-inline-img d-code-fig${wide}">${cfMini(spec)}${cf.label ? `<div class="cf-label">${esc(cf.label)}</div>` : ''}${cf.caption ? `<div class="cap">${esc(cleanHeading(cf.caption))}</div>` : ''}</div>`;
       return `<section class="section${idCls}">${head}<div class="panel has-inline-img" style="border-color:var(${accent}-soft)"><div class="ii-body">${body}</div>${fig}</div></section>`;

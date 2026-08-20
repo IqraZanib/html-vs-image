@@ -325,7 +325,7 @@ function applyFigureBalance(out) {
   // A figure that must span the card costs real page height, and two pages will
   // not hold more than one of them.
   const spansCard = (cf) => cf.kind === 'process' || cf.kind === 'labeled-parts'
-    || (cf.kind === 'steps' && (cf.items || []).length >= 4);
+    || (cf.kind === 'steps' && (cf.items || []).length >= 3);
   for (const s of out.sections) {
     if (!s || !s.codeFigure || s.codeFigure.kind === 'error-board') continue;
     const k = sig(s.codeFigure);
@@ -336,7 +336,9 @@ function applyFigureBalance(out) {
     if (spansCard(s.codeFigure)) {
       // Keep the first wide visual; a later one becomes a plain 3-card set if it
       // can, otherwise it goes, because a third page is worse than a lost figure.
-      if (wideCount >= 1) {
+      // Two fit comfortably now that a wide figure shares the sidebar's row instead
+      // of adding an empty one beside it.
+      if (wideCount >= 2) {
         if (s.codeFigure.kind === 'steps') s.codeFigure.items = s.codeFigure.items.slice(0, 3);
         else { delete s.codeFigure; continue; }
       } else wideCount++;
