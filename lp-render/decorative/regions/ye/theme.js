@@ -525,6 +525,25 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
   border:1.6px solid currentColor;background:#fff;width:23px;height:23px;font-size:15.5px;
   display:flex;align-items:center;justify-content:center;border-radius:50%;line-height:1}
 
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Teacher-notes strip: the box is ::after and its ملاحظات tab is ::before on the
+   same section, so neither can measure the other. Their heights were hard-coded
+   separately and drifted — a later round trimmed the box to 66px while the tab
+   stayed at 72px, so the tab stood 8px above the box's top and floated 2px above
+   its bottom. ONE variable now drives both, and the tab is derived from it, so
+   changing the strip's height can never leave the tab behind again.
+   ─────────────────────────────────────────────────────────────────────────── */
+.section.sec-stage-taqwim{--notes-h:66px;--notes-bw:2px}
+/* border-box so --notes-h IS the outer height; padding and the dotted rules are
+   unchanged, so the strip renders exactly as before */
+.section.sec-stage-taqwim::after{box-sizing:border-box;height:var(--notes-h);border-width:var(--notes-bw)}
+/* the tab fills the box's inner height and sits flush in its bottom-inline-start
+   corner, framed by the navy border on three sides instead of overhanging it */
+.section.sec-stage-taqwim::before{height:calc(var(--notes-h) - var(--notes-bw) * 2);
+  bottom:var(--notes-bw);right:var(--notes-bw);background-position:center 7px;padding-bottom:7px;
+  border-radius:0 10px 10px 0}
+
 `;
 
 module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom' };
