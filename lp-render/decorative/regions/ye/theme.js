@@ -603,4 +603,7 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 
 `;
 
-module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom' };
+// MAX_PAGES is the pack's page contract: this design set is a two-page daily guide,
+// so a render that overruns is a fault to fix (by drawing the figures smaller), not a
+// longer document to accept. Packs without it are unconstrained.
+module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom', MAX_PAGES: 2 };

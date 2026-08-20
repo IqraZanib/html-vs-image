@@ -128,7 +128,10 @@ function handler(req, res) {
           figureReport = validateFigures(parsed, { source: srcForValidation, log });
           structured = JSON.stringify(parsed, null, 2);
         }
-        let { png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)
+        let { png, pdf, stats, contentId, locale, maxPages } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)
+        // The region pack states its page contract (Yemen: two pages). Fall back to the
+        // 2-page checkbox when a pack does not declare one.
+        const pageLimit = maxPages || (guide2p ? 2 : null);
         // Fit loop: the guide promises 2 pages — if the condensed lesson still paginates
         // longer, re-condense with escalating tightness (up to two retries: dense
         // lessons at large type sizes routinely survive a single pass).
@@ -173,6 +176,19 @@ function handler(req, res) {
           return g;
         };
         const figSnapshot = snapshotFigures(parsed);
+        // DENSITY FIRST: a guide that overruns because its figures are large is fixed
+        // by drawing them a little smaller, which costs nothing and keeps every figure.
+        // Only when that is not enough do we start cutting the teacher's words.
+        if (pageLimit && pdf && pageCount(pdf) > pageLimit) {
+          for (const scale of [0.9, 0.82, 0.74, 0.66]) {
+            const attempt = await renderLessonImage(parsed, { log, pdf: true, figureScale: scale });
+            if (pageCount(attempt.pdf) <= pageLimit) {
+              ({ png, pdf, stats, contentId, locale } = attempt);
+              log(`  ✓ fits ${pageLimit} page(s) at ${Math.round(scale * 100)}% figure density — no text was cut`);
+              break;
+            }
+          }
+        }
         for (let pass = 0; guide2p && pdf && pageCount(pdf) > 2 && !looksLikeGuide && pass < TIGHTEN.length; pass++) {
           log(`Guide came out ${pageCount(pdf)} pages — re-condensing tighter (pass ${pass + 1})…`);
           const keepRegion2 = parsed.meta && parsed.meta.region;

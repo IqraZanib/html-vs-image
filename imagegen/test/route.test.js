@@ -3,29 +3,34 @@ const test = require('node:test');
 const assert = require('node:assert');
 const { route, modelInput } = require('../route');
 
-test('decorative_scene goes straight to nano-banana-2-lite (qwen2 fallback)', () => {
-  const r = route('decorative_scene');
-  assert.strictEqual(r.needsImage, true);
-  assert.strictEqual(r.ladder[0], 'nano-banana-2-lite');
-  assert.strictEqual(r.ladder[1], 'qwen2/text-to-image');
+// SINGLE-MODEL POLICY (owner decision, 2026-08-18): every generated image comes from
+// nano-banana-2-lite, whatever the content kind or the script. These tests used to
+// assert the old cost ladder (seedream / qwen2 / nano-banana-2 escalations); they now
+// guard against those escalations coming back, which is what would quietly raise the
+// per-lesson cost again.
+test('every image kind routes to the one model, with no fallback ladder', () => {
+  for (const kind of ['decorative_scene', 'labeled_diagram']) {
+    const r = route(kind);
+    assert.strictEqual(r.needsImage, true, `${kind} should need an image`);
+    assert.deepStrictEqual(r.ladder, ['nano-banana-2-lite'], `${kind} must not escalate`);
+  }
 });
 
-test('Latin-script labeled_diagram goes to seedream-v4 first (nano-banana-2 fallback)', () => {
-  const r = route('labeled_diagram', 'en');
-  assert.strictEqual(r.needsImage, true);
-  assert.strictEqual(r.ladder[0], 'bytedance/seedream-v4-text-to-image');
-  assert.strictEqual(r.ladder[1], 'nano-banana-2');
+test('the script no longer changes the model — that is the point of one model', () => {
+  for (const loc of ['en', 'sw', 'ar', 'ur']) {
+    assert.deepStrictEqual(route('labeled_diagram', loc).ladder, ['nano-banana-2-lite'],
+      `${loc} should route to the single model`);
+  }
 });
 
-test('Kiswahili (Latin) diagram still routes like English', () => {
-  assert.strictEqual(route('labeled_diagram', 'sw').ladder[0], 'bytedance/seedream-v4-text-to-image');
-});
-
-test('Arabic/Urdu (complex script) diagram goes to the strongest model FIRST', () => {
-  for (const loc of ['ar', 'ur']) {
-    const r = route('labeled_diagram', loc);
-    assert.strictEqual(r.ladder[0], 'nano-banana-2', `${loc} should start at nano-banana-2`);
-    assert.strictEqual(r.ladder[1], 'gpt-image-2-text-to-image');
+test('LP_ART_MODEL overrides the model for artwork runs', () => {
+  const prev = process.env.LP_ART_MODEL;
+  process.env.LP_ART_MODEL = 'z-image';
+  try {
+    assert.deepStrictEqual(route('decorative_scene').ladder, ['z-image']);
+    assert.deepStrictEqual(route('labeled_diagram', 'ar').ladder, ['z-image']);
+  } finally {
+    if (prev === undefined) delete process.env.LP_ART_MODEL; else process.env.LP_ART_MODEL = prev;
   }
 });
 

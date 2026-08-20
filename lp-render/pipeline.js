@@ -130,6 +130,7 @@ async function renderLessonImage(content, opts = {}) {
   // or changing one pack cannot affect another region's output.
   let regionCss = '';
   let regionPageStyle = '';
+  let regionMaxPages = null;
   const themeRegion = String(meta.region || '').toLowerCase();
   if (themeRegion) {
     // Cache-busted so a long-running server (LP Studio) always serves the pack's
@@ -140,10 +141,18 @@ async function renderLessonImage(content, opts = {}) {
       const pack = require(themePath);
       regionCss = pack.THEME_OVERRIDE_CSS || '';
       regionPageStyle = pack.PAGE_NUMBER_STYLE || '';
+      regionMaxPages = Number(pack.MAX_PAGES) || null;
       log(`  ⛨ region design pack "${themeRegion}" applied`);
     } catch (_) { /* no design pack for this region — default look */ }
   }
   html = html.replace('</head>', `<style>${THEME_CSS}</style>${regionCss ? `<style>${regionCss}</style>` : ''}${headCss ? `<style>${headCss}</style>` : ''}</head>`);
+  // Figure density: a caller that has to fit a fixed number of pages can shrink
+  // every figure together rather than lose one. 1 (or absent) changes nothing.
+  const figureScale = Number(opts.figureScale);
+  if (figureScale > 0 && figureScale !== 1) {
+    html = html.replace('</head>', `<style>:root{--figscale:${figureScale}}</style></head>`);
+    log(`  ⤡ figure density ${Math.round(figureScale * 100)}% (fitting the page budget)`);
+  }
 
   // The PDF is a second full render; skip it when only the PNG is needed (e.g. the web
   // interface) to roughly halve the render step.
@@ -162,7 +171,7 @@ async function renderLessonImage(content, opts = {}) {
     }
   }
   const png = await screenshot(html);
-  return { png, pdf, html, contentId, locale, stats: statsOut };
+  return { png, pdf, html, contentId, locale, stats: statsOut, maxPages: regionMaxPages };
 }
 
 module.exports = { renderLessonImage, ROOT };

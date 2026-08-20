@@ -270,6 +270,31 @@ RULES:
 Return ONLY this JSON, nothing else:
 { "figures": { "<section id>": { <one figure spec> }, … } }`;
 
+// A figure's labels must come from the lesson, not from the model's imagination. The
+// figure pass is where invention creeps in (it writes short imperatives), so every
+// label has to share a real word with the guide's own text. Function words do not
+// count — matching on «في» would let anything through.
+const AR_STOP = new Set(['في', 'من', 'على', 'إلى', 'عن', 'مع', 'ثم', 'أن', 'إن', 'لا', 'ما', 'هو', 'هي',
+  'هذا', 'هذه', 'ذلك', 'التي', 'الذي', 'كل', 'بعد', 'قبل', 'عند', 'حتى', 'أو', 'و', 'ال']);
+function labelGrounded(label, haystack) {
+  const words = String(label || '').split(/[\s،.:؛!؟"«»()]+/).filter(Boolean);
+  const content = words.filter((w) => w.length >= 3 && !AR_STOP.has(w));
+  if (!content.length) return false;
+  // Strip a leading conjunction/article so «والجذور» matches «الجذور», and a trailing
+  // feminine/plural ending so «صورة» matches «صور» — without this, ordinary Arabic
+  // morphology reads as invented content.
+  const stem = (w) => w.replace(/^(?:و|ف|ب|ل|ك)?(?:ال)?/, '');
+  const forms = (w) => {
+    const st = stem(w);
+    const out = [w, st];
+    for (const suf of ['ة', 'ه', 'ات', 'ان', 'ين', 'ون', 'ا', 'ي']) {
+      if (st.endsWith(suf) && st.length - suf.length >= 3) out.push(st.slice(0, -suf.length));
+    }
+    return out.filter((f) => f.length >= 3);
+  };
+  return content.some((w) => forms(w).some((f) => haystack.includes(f)));
+}
+
 async function addFiguresToGuide(guide, { apiKey, fetchImpl = defaultFetch, log = () => {} } = {}) {
   const STAGES = ['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim'];
   const sections = Array.isArray(guide.sections) ? guide.sections : [];
@@ -306,6 +331,21 @@ async function addFiguresToGuide(guide, { apiKey, fetchImpl = defaultFetch, log 
     if (!s || !s.id || hasFig(s) || !figures[s.id]) continue;
     const clean = sanitizeCodeFigure(figures[s.id]);
     if (!clean) continue;
+    // Drop any label the lesson does not actually support, and drop the whole figure
+    // if too little survives — a figure of invented labels is worse than no figure.
+    const hay = JSON.stringify({ meta: guide.meta, sections: view });
+    if (Array.isArray(clean.items)) {
+      const kept = clean.items.filter((it) => labelGrounded(it.label, hay));
+      if (kept.length !== clean.items.length) {
+        log(`  – dropped ${clean.items.length - kept.length} invented label(s) from ${s.id}`);
+      }
+      if (kept.length < 2) continue;
+      clean.items = kept;
+    }
+    if (Array.isArray(clean.stages) && clean.stages.some((st) => !labelGrounded(st.label, hay))) {
+      log(`  – ${s.id}: process stages are not grounded in the lesson — figure dropped`);
+      continue;
+    }
     s.codeFigure = clean;
     added++;
   }
@@ -520,4 +560,4 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
   return out;
 }
 
-module.exports = { condenseToGuide, addFiguresToGuide };
+module.exports = { condenseToGuide, addFiguresToGuide, labelGrounded };

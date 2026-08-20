@@ -1,6 +1,9 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert');
+// The gate ships OFF by default (owner decision: it must never blank a card), so a
+// test that exercises its verdict parsing has to switch it on deliberately.
+process.env.KIE_GATE_ON = '1';
 const { checkImage } = require('../quality_gate');
 
 const chat = (content) => ({ statusCode: 200, body: JSON.stringify({ choices: [{ message: { content } }] }) });
