@@ -119,3 +119,63 @@ test('a process whose stages are not in the source is flagged', () => {
     stages: [{ label: 'تبخر' }, { label: 'تكاثف' }, { label: 'انفجار' }] } }] };
   assert.ok(validateFigures(guide, { source }).findings.some((f) => f.code === 'process_stage_not_in_source'));
 });
+
+/* ── step cards, labelled parts, and visual coverage ───────────────────────── */
+const PLANT_SRC = { sections: [{ body: 'أجزاء النبات: الجذر يمتص الماء، والساق يحمل، والورقة تصنع الغذاء، ثم الزهرة. خطوات: نضع البذرة ثم نسقي الماء' }] };
+
+test('step cards with repeated labels fail', () => {
+  const guide = { meta: { locale: 'ar' }, images: [], sections: [{ id: 'stage-tatbiq', codeFigure: { kind: 'steps', items: [{ label: 'نسقي الماء' }, { label: 'نسقي الماء' }] } }] };
+  assert.ok(validateFigures(guide, { source: PLANT_SRC }).findings.some((f) => f.code === 'steps_duplicate'));
+});
+
+test('a single step card is not a sequence', () => {
+  const guide = { meta: { locale: 'ar' }, images: [], sections: [{ id: 'stage-tatbiq', codeFigure: { kind: 'steps', items: [{ label: 'نضع البذرة' }] } }] };
+  assert.ok(validateFigures(guide, { source: PLANT_SRC }).findings.some((f) => f.code === 'steps_count'));
+});
+
+test('step labels absent from the lesson are flagged', () => {
+  const guide = { meta: { locale: 'ar' }, images: [], sections: [{ id: 'stage-tatbiq', codeFigure: { kind: 'steps', items: [{ label: 'نضع البذرة' }, { label: 'نقطع الشجرة' }] } }] };
+  const r = validateFigures(guide, { source: PLANT_SRC });
+  assert.ok(r.findings.some((f) => f.code === 'steps_not_in_source'));
+});
+
+test('valid step cards pass', () => {
+  const guide = { meta: { locale: 'ar' }, images: [], sections: [{ id: 'stage-tatbiq', codeFigure: { kind: 'steps', items: [{ label: 'نضع البذرة' }, { label: 'نسقي الماء' }] } }] };
+  assert.strictEqual(validateFigures(guide, { source: PLANT_SRC }).ok, true);
+});
+
+test('a labelled part the object cannot draw fails', () => {
+  const guide = { meta: { locale: 'ar' }, images: [], sections: [{ id: 'stage-arad', codeFigure: { kind: 'labeled-parts', object: 'plant', parts: [{ part: 'wing', label: 'جناح' }, { part: 'stem', label: 'الساق' }] } }] };
+  assert.ok(validateFigures(guide, { source: PLANT_SRC }).findings.some((f) => f.code === 'parts_unknown_anchor'));
+});
+
+test('the same part labelled twice fails', () => {
+  const guide = { meta: { locale: 'ar' }, images: [], sections: [{ id: 'stage-arad', codeFigure: { kind: 'labeled-parts', object: 'plant', parts: [{ part: 'leaf', label: 'الورقة' }, { part: 'leaf', label: 'الجذر' }] } }] };
+  assert.ok(validateFigures(guide, { source: PLANT_SRC }).findings.some((f) => f.code === 'parts_duplicate'));
+});
+
+test('a valid labelled plant diagram passes', () => {
+  const guide = { meta: { locale: 'ar' }, images: [], sections: [{ id: 'stage-arad', codeFigure: { kind: 'labeled-parts', object: 'plant', parts: [
+    { part: 'root', label: 'الجذر' }, { part: 'stem', label: 'الساق' }, { part: 'leaf', label: 'الورقة' }] } }] };
+  assert.strictEqual(validateFigures(guide, { source: PLANT_SRC }).ok, true);
+});
+
+test('stages left as bare prose are reported', () => {
+  const bare = ['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim'].map((id) => ({ id, items: [{ body: 'نص' }] }));
+  const r = validateFigures({ meta: { locale: 'ar' }, images: [], sections: bare }, { source: PLANT_SRC });
+  assert.ok(r.findings.some((f) => f.code === 'stage_without_figure'), 'expected stage_without_figure');
+  assert.strictEqual(r.ok, false, 'a lesson with no figure at all must not pass');
+});
+
+test('one bare stage among figured ones is a warning, not a failure', () => {
+  const sections = [
+    { id: 'stage-tamhid', image: 'a1' },
+    { id: 'stage-arad', codeFigure: { kind: 'steps', items: [{ label: 'نضع البذرة' }, { label: 'نسقي الماء' }] } },
+    { id: 'stage-tatbiq', codeFigure: { kind: 'labeled-parts', object: 'plant', parts: [{ part: 'root', label: 'الجذر' }, { part: 'leaf', label: 'الورقة' }] } },
+    { id: 'stage-taqwim', items: [{ body: 'نص' }] },
+  ];
+  const r = validateFigures({ meta: { locale: 'ar' }, images: [artBrief], sections }, { source: PLANT_SRC });
+  const f = r.findings.find((x) => x.code === 'stage_without_figure');
+  assert.ok(f && f.level === 'warn', 'expected a warning');
+  assert.strictEqual(r.ok, true);
+});

@@ -89,7 +89,8 @@ const IMAGES_RICH_HYBRID = `IMAGES — HYBRID FIGURES: the image model draws TEX
 
 WHAT EACH SECTION CARRIES:
 - stage-tamhid, stage-arad, stage-tatbiq, stage-taqwim: each carries EITHER an authored textless image ("image": "<id>") OR a CODE-DRAWN figure ("codeFigure"). *** PREFER codeFigure whenever the teaching point is a direction, a comparison, a count, a part-of-a-whole, a fraction, or a key expression — the renderer draws those exactly and legibly. Use a generated image only for real-world scenes, people and objects (supporting artwork). ***
-  BALANCE (the page must feel illustrated, not diagrammatic): use a codeFigure wherever exactness matters, up to THREE stage sections, and never the same kind twice; the other stages carry textless illustrations as supporting artwork. There is no fixed figure count — give a stage a figure when it earns one, and leave prose alone when a figure would only decorate. The errors board does not count towards the three.
+  VISUAL DENSITY — READ THIS TWICE. A stage that is only a paragraph of instructions is a failure: teachers reported the pages as text-heavy. EVERY stage section must carry a figure — a textless illustration where the point is a real scene, a codeFigure everywhere else — and when a stage is mostly instructions, give it a "steps" card set built from the stage's own words. Keep each stage's prose SHORT (one or two sentences) and let the visual carry the rest. The "solutions" and "homework" sections may each carry a codeFigure too (e.g. "steps" for what to do at home). Never invent content for a figure: every label must be a word the lesson already uses.
+  BALANCE: use a codeFigure wherever exactness matters and never the same figure twice; the other stages carry textless illustrations as supporting artwork. There is no fixed figure count — give a stage a figure when it earns one, and leave prose alone when a figure would only decorate. The errors board does not count towards the three.
   codeFigure kinds — pick the one that fits, all take optional "label" (big caption under the drawing, Eastern numerals) and "caption" (short Arabic line):
   · { "kind":"fraction-grid", "shape":"square"|"circle", "parts":N, "shaded":K } — one whole split into N equal parts with K shaded.
   · { "kind":"count-set", "shape":"circle"|"square"|"triangle", "total":N, "shaded":K } — N separate objects, K highlighted (counting, grouping, "K of N").
@@ -97,6 +98,8 @@ WHAT EACH SECTION CARRIES:
   · { "kind":"compare", "items":[ { "label":"<short Arabic>", "len":0.0-1.0, "mark":"good"|"bad"|null }, … ] } — two or three labelled bars for length/size/quantity comparisons.
   · { "kind":"expression", "text":"<a short expression or key term, e.g. ٢/٤>" } — drawn as large text, never generated.
   · { "kind":"process", "layout":"cycle"|"linear", "stages":[ { "label":"<short Arabic stage name>", "caption":"<optional 2–4 word note>" }, … 3 to 6 of them ] } — labelled stages with code-drawn arrows between them. *** USE THIS whenever the lesson teaches a SEQUENCE or a CYCLE: one thing leading to the next (water cycle, plant growth, wudu steps, life cycles, any ordered procedure). "cycle" closes the loop; "linear" is a right-to-left sequence with a start and an end. Take the stage names VERBATIM from the lesson source, in the source's order — never invent or reorder them, and never use a comparison or a compass for a process. ***
+  · { "kind":"steps", "items":[ { "label":"<short Arabic, ≤ 4 words>", "caption":"<optional 2–3 word note>" }, … 2 to 6 of them ] } — numbered colour-coded cards read right-to-left. *** USE THIS for any ordered or grouped set the pupil should see at a glance: the steps of a task, the parts of a thing, the materials needed, two or three rules, what to do first/next/last. This is the default way to turn a text-heavy stage into a visual. ***
+  · { "kind":"labeled-parts", "object":"plant", "parts":[ { "part":"root"|"stem"|"leaf"|"flower"|"fruit"|"seed"|"soil", "label":"<the Arabic name from the lesson>" }, … 2 to 6 ] } — a code-drawn object with Arabic labels pointing at the right part. *** USE THIS whenever the lesson names the parts of a plant. ***
 - errors: *** STRONGLY PREFER a fully code-drawn board *** — set "codeFigure": { "kind":"error-board", "wrong": <any codeFigure kind above, minus label/caption>, "correct": <same>, "labelWrong":"<short Arabic ≤ 4 words>", "labelCorrect":"<short Arabic ≤ 4 words>" }. The renderer draws the split board, the ✗ and ✓ marks, both mini-visuals and both captions — so the mistake is shown exactly (e.g. wrong = expression "٤/٢", correct = expression "٢/٤"; or wrong = count-set with the wrong number shaded, correct = the right one; or wrong/correct = compare bars). ONLY when the misconception cannot be drawn this way (it is about behaviour, a physical action or a place) fall back to two textless images: "imageWrong"/"imageCorrect" ids plus "labelWrong"/"labelCorrect".
 - homework: a SMALL textless image of the physical task when there is one.
 
@@ -193,6 +196,25 @@ function sanitizeCodeFigure(cf, depth = 0) {
       // 48 chars: enough for a short sequence like «تبخر ← تكاثف ← هطول المطر»
       // (24 was cutting Arabic words in half).
       const text = s(cf.text, 48); return text ? { kind: 'expression', text, label, caption } : null;
+    }
+    case 'steps': {
+      const items = (Array.isArray(cf.items) ? cf.items : []).slice(0, 6)
+        .map((it) => ({ label: s(it && it.label, 34), caption: s(it && it.caption, 26) }))
+        .filter((it) => it.label);
+      if (items.length < 2) return null;
+      const seenS = new Set();
+      for (const it of items) { if (seenS.has(it.label)) return null; seenS.add(it.label); }
+      return { kind: 'steps', items, label, caption };
+    }
+    case 'labeled-parts': {
+      const OK = new Set(['root', 'stem', 'leaf', 'flower', 'fruit', 'seed', 'soil']);
+      const parts = (Array.isArray(cf.parts) ? cf.parts : []).slice(0, 6)
+        .map((p) => ({ part: String((p && p.part) || '').trim().toLowerCase(), label: s(p && p.label, 30) }))
+        .filter((p) => OK.has(p.part) && p.label);
+      const seenP = new Set();
+      const uniq = parts.filter((p) => (seenP.has(p.part) ? false : (seenP.add(p.part), true)));
+      if (uniq.length < 2) return null;
+      return { kind: 'labeled-parts', object: 'plant', parts: uniq, label, caption };
     }
     case 'process': {
       const stages = (Array.isArray(cf.stages) ? cf.stages : []).slice(0, 6)
@@ -340,13 +362,18 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
   // keep the first; and no more than two stage sections may be code-drawn, so the
   // page keeps its supporting illustrations instead of turning into a diagram sheet.
   {
-    const sig = (cf) => JSON.stringify([cf.kind, cf.shape, cf.parts, cf.shaded, cf.total, cf.north, cf.east, cf.text, (cf.items || []).map((i) => i.label)]);
-    const seen = new Set(); let stageCount = 0;
+    const sig = (cf) => JSON.stringify([cf.kind, cf.shape, cf.parts, cf.shaded, cf.total, cf.north, cf.east, cf.text,
+      (cf.items || []).map((i) => i.label), (cf.stages || []).map((i) => i.label), (cf.parts || []).map ? (cf.parts || []).map((p) => p && p.label) : cf.parts]);
+    const seen = new Set(); let stageCount = 0, sideCount = 0;
+    const STAGES = new Set(['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim']);
     for (const s of out.sections) {
       if (!s || !s.codeFigure || s.codeFigure.kind === 'error-board') continue;
       const k = sig(s.codeFigure);
-      if (seen.has(k) || stageCount >= 3) { delete s.codeFigure; continue; }
-      seen.add(k); stageCount++;
+      const isStage = STAGES.has(s.id);
+      // Duplicates never survive. Beyond that: every stage may carry a code visual,
+      // and up to two supporting sections (solutions, homework, goal …) may too.
+      if (seen.has(k) || (isStage ? stageCount >= 4 : sideCount >= 2)) { delete s.codeFigure; continue; }
+      seen.add(k); if (isStage) stageCount++; else sideCount++;
     }
   }
   // LANGUAGE SAFETY: the guide must never disagree with its own text about language.

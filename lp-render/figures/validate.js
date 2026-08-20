@@ -145,6 +145,33 @@ function validateFigures(guide, { source = null, imageDims = {}, log = null, mod
         for (const it of items) if (!isArabicLabel(it.label)) add('warn', 'compare_label_not_arabic', `${at}: bar label "${it.label}" is not Arabic`, sectionId);
         break;
       }
+      case 'steps': {
+        const items = Array.isArray(cf.items) ? cf.items : [];
+        if (items.length < 2 || items.length > 6) add('fail', 'steps_count', `${at}: step cards need 2–6 items, got ${items.length}`, sectionId);
+        const labels = items.map((x) => String((x && x.label) || '').trim());
+        if (labels.some((l) => !l)) add('fail', 'steps_unlabelled', `${at}: every step card needs a label`, sectionId);
+        if (new Set(labels).size !== labels.length) add('fail', 'steps_duplicate', `${at}: a step card label is repeated`, sectionId);
+        for (const l of labels) if (l && !isArabicLabel(l)) add('warn', 'steps_label_not_arabic', `${at}: step label "${l}" is not Arabic`, sectionId);
+        if (src) {
+          const missing = labels.filter((l) => l && !src.includes(l));
+          if (missing.length) add('warn', 'steps_not_in_source', `${at}: step label(s) ${missing.map((m) => '«' + m + '»').join(', ')} do not appear in the lesson source`, sectionId);
+        }
+        break;
+      }
+      case 'labeled-parts': {
+        const OK = new Set(['root', 'stem', 'leaf', 'flower', 'fruit', 'seed', 'soil']);
+        const parts = Array.isArray(cf.parts) ? cf.parts : [];
+        if (parts.length < 2 || parts.length > 6) add('fail', 'parts_count', `${at}: a labelled diagram needs 2–6 parts, got ${parts.length}`, sectionId);
+        const names = parts.map((p) => String((p && p.part) || '').trim());
+        for (const n of names) if (!OK.has(n)) add('fail', 'parts_unknown_anchor', `${at}: "${n}" is not a part this object can draw`, sectionId);
+        if (new Set(names).size !== names.length) add('fail', 'parts_duplicate', `${at}: the same part is labelled twice`, sectionId);
+        for (const p of parts) {
+          const l = String((p && p.label) || '').trim();
+          if (!l) add('fail', 'parts_unlabelled', `${at}: every labelled part needs its Arabic name`, sectionId);
+          else if (!isArabicLabel(l)) add('warn', 'parts_label_not_arabic', `${at}: part label "${l}" is not Arabic`, sectionId);
+        }
+        break;
+      }
       case 'process': {
         const st = Array.isArray(cf.stages) ? cf.stages : [];
         if (st.length < 3 || st.length > 6) add('fail', 'process_stage_count', `${at}: a process needs 3–6 stages, got ${st.length}`, sectionId);
@@ -236,6 +263,19 @@ function validateFigures(guide, { source = null, imageDims = {}, log = null, mod
       if (s && s.codeFigure && s.codeFigure.kind !== 'error-board'
           && !String(s.codeFigure.caption || '').trim() && !String(s.codeFigure.label || '').trim()) {
         add('warn', 'figure_no_caption', `${s.id}: code figure has neither a label nor a caption`, s.id);
+      }
+    }
+  }
+  // Visual coverage: a full lesson where the stages are bare prose is the
+  // text-heavy page teachers complained about, so it is a finding, not a taste call.
+  {
+    const STAGES = ['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim'];
+    const stages = sections.filter((s) => s && STAGES.includes(s.id));
+    if (stages.length >= 3) {
+      const bare = stages.filter((s) => !s.image && !s.codeFigure && !s.imageWrong && !s.imageCorrect);
+      if (bare.length) {
+        add(bare.length >= stages.length - 1 ? 'fail' : 'warn', 'stage_without_figure',
+          `${bare.map((s) => s.id).join(', ')}: stage carries no figure — the page reads as plain text`, bare[0].id);
       }
     }
   }

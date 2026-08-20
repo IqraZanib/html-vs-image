@@ -357,7 +357,145 @@ function cfProcess({ layout = 'cycle', stages = [] }) {
   return cfSvg(out, W, H);
 }
 
-const CF_KINDS = new Set(['fraction-grid', 'count-set', 'compass', 'compare', 'expression', 'process', 'error-board']);
+
+const CF_TINT = ['#fcd8d8', '#e7eef8', '#e9f2e5', '#fcf0d8', '#f1e7f5', '#dcf2f2'];
+const CF_AR_DIGITS = '٠١٢٣٤٥٦٧٨٩';
+const cfArNum = (n) => String(n).replace(/\d/g, (d) => CF_AR_DIGITS[+d]);
+
+// SVG text does not wrap, so break an Arabic label into at most two or three lines on
+// word boundaries. Arabic glyphs run ~0.52em, so chars-per-line is derived from the
+// box width rather than guessed.
+function cfWrap(s, width, size, lines = 2) {
+  const per = Math.max(6, Math.floor(width / (size * 0.52)));
+  const words = String(s || '').trim().split(/\s+/);
+  const out = [];
+  let cur = '';
+  for (const w of words) {
+    if (!cur) cur = w;
+    else if ((cur + ' ' + w).length <= per) cur += ' ' + w;
+    else { out.push(cur); cur = w; if (out.length === lines - 1) break; }
+  }
+  if (cur && out.length < lines) out.push(cur);
+  const used = out.join(' ').split(/\s+/).length;
+  if (used < words.length && out.length) out[out.length - 1] += '…';
+  return out;
+}
+
+// STEP / PART CARDS: 2–6 colour-coded tiles read RIGHT-TO-LEFT, each with an Arabic
+// numeral badge, a bold label and an optional short caption. No arrows — this is for
+// an ordered set the pupil takes in at a glance (steps of a task, parts of a thing,
+// rules, materials). Every word comes from the lesson; the layout is computed.
+function cfSteps({ items = [], numbered = true }) {
+  const S = items.slice(0, 6).filter((s) => s && String(s.label || '').trim());
+  if (S.length < 2) return '';
+  const W = 480, n = S.length, gap = n > 4 ? 7 : 10;
+  const BW = (W - 14 - gap * (n - 1)) / n;
+  const hasCap = S.some((s) => String(s.caption || '').trim());
+  const LS = n > 4 ? 11 : 12.5, CS = 9.5;
+  const labelLines = S.map((s) => cfWrap(s.label, BW - 12, LS, 2));
+  const maxL = Math.max(...labelLines.map((l) => l.length));
+  const BH = 30 + maxL * (LS + 3) + (hasCap ? CS + 7 : 0);
+  const y0 = 6;
+  let out = '';
+  for (let i = 0; i < n; i++) {
+    // RTL: card 1 sits on the right, so the row reads with the Arabic.
+    const x = W - 7 - BW - i * (BW + gap), cx = x + BW / 2;
+    out += '<rect x="' + x + '" y="' + y0 + '" width="' + BW + '" height="' + BH + '" rx="10" fill="'
+      + CF_TINT[i % CF_TINT.length] + '" stroke="' + CF.stroke + '" stroke-width="2"/>';
+    if (numbered) {
+      out += '<circle cx="' + (x + BW - 15) + '" cy="' + (y0 + 15) + '" r="10.5" fill="' + CF.stroke + '"/>'
+        + '<text x="' + (x + BW - 15) + '" y="' + (y0 + 19.5) + '" text-anchor="middle" font-size="12"'
+        + ' font-weight="800" fill="#ffffff">' + cfArNum(i + 1) + '</text>';
+    }
+    let ty = y0 + 32;
+    for (const line of labelLines[i]) { out += cfText(cx, ty, line, LS, 800); ty += LS + 3; }
+    const cap = String(S[i].caption || '').trim();
+    if (cap) out += cfText(cx, y0 + BH - 9, cfWrap(cap, BW - 10, CS, 1)[0] || '', CS, 600, CF.stroke);
+  }
+  return cfSvg(out, W, BH + 12);
+}
+
+// Anchor points on each code-drawn object, so a label always points at the right
+// place. Adding an object means adding its drawing and its anchors — nothing else.
+const CF_OBJECTS = {
+  plant: {
+    // A part that exists on both sides of the plant carries a mirror anchor, so a
+    // chip on the left points at the LEFT leaf instead of dragging a leader line
+    // across the whole drawing.
+    anchors: { flower: [240, 38], fruit: [266, 68], leaf: [292, 100], stem: [240, 76], soil: [132, 156], root: [240, 184], seed: [240, 170] },
+    mirror: { leaf: [188, 118], fruit: [216, 68] },
+    draw() {
+      const g = CF.good, s = CF.stroke;
+      // The soil band stops short of the edges so the label chips have clear space
+      // on both sides — a full-width band forces leader lines to cross it.
+      return '<rect x="120" y="150" width="240" height="10" rx="5" fill="#c8a06a" stroke="' + s + '" stroke-width="2"/>'
+        // roots + seed
+        + '<path d="M 240 158 L 240 186 M 240 168 L 216 186 M 240 168 L 264 186 M 240 178 L 228 192 M 240 178 L 252 192" stroke="#8a6a3a" stroke-width="3" stroke-linecap="round" fill="none"/>'
+        + '<ellipse cx="240" cy="170" rx="7" ry="5" fill="#8a6a3a" stroke="' + s + '" stroke-width="1.5"/>'
+        // fruits on short stalks, one each side of the stem
+        + '<path d="M 240 64 L 258 66 M 240 64 L 222 66" stroke="' + g + '" stroke-width="2.5" stroke-linecap="round"/>'
+        + '<circle cx="264" cy="68" r="7" fill="#d9534f" stroke="' + s + '" stroke-width="2"/>'
+        + '<circle cx="216" cy="68" r="7" fill="#d9534f" stroke="' + s + '" stroke-width="2"/>'
+        // stem
+        + '<path d="M 240 152 L 240 52" stroke="' + g + '" stroke-width="6" stroke-linecap="round"/>'
+        // leaves
+        + '<path d="M 240 100 C 262 82 292 84 300 96 C 288 112 258 114 240 100 Z" fill="' + g + '" stroke="' + s + '" stroke-width="2"/>'
+        + '<path d="M 240 116 C 218 98 188 100 180 112 C 192 128 222 130 240 116 Z" fill="' + g + '" stroke="' + s + '" stroke-width="2"/>'
+        // flower
+        + '<circle cx="240" cy="34" r="11" fill="' + CF.fill + '" stroke="' + s + '" stroke-width="2"/>'
+        + '<circle cx="222" cy="42" r="9" fill="#e8778f" stroke="' + s + '" stroke-width="2"/>'
+        + '<circle cx="258" cy="42" r="9" fill="#e8778f" stroke="' + s + '" stroke-width="2"/>'
+        + '<circle cx="240" cy="50" r="9" fill="#e8778f" stroke="' + s + '" stroke-width="2"/>'
+        + '<circle cx="240" cy="42" r="7.5" fill="' + CF.fill + '" stroke="' + s + '" stroke-width="2"/>';
+    },
+  },
+};
+
+// LABELLED PARTS: a code-drawn object with Arabic label chips and leader lines
+// pointing at named anchors. The drawing and the pointing are geometry, so a label
+// can never drift onto the wrong part the way a generated caption can.
+function cfLabeledParts({ object = 'plant', parts = [] }) {
+  const obj = CF_OBJECTS[object];
+  if (!obj) return '';
+  const P = parts.slice(0, 6).filter((p) => p && obj.anchors[p.part] && String(p.label || '').trim());
+  if (P.length < 2) return '';
+  const W = 480, H = 208;
+  let out = obj.draw();
+  // Top to bottom, and each chip goes on the side its own part already leans to, so
+  // a leader line never crosses the drawing. Parts sitting on the centre line
+  // alternate; a part that exists on both sides (mirror) moves to the emptier side.
+  const ordered = P.slice().sort((a, b) => obj.anchors[a.part][1] - obj.anchors[b.part][1]);
+  const used = { left: [], right: [] };
+  let centre = 0;
+  ordered.forEach((p, i) => {
+    let [ax, ay] = obj.anchors[p.part];
+    const nat = Math.abs(ax - 240) > 12 ? (ax > 240 ? 'right' : 'left') : (centre++ % 2 === 0 ? 'right' : 'left');
+    const other = nat === 'right' ? 'left' : 'right';
+    const mir = obj.mirror && obj.mirror[p.part]; // the copy on the opposite side
+    const side = mir && used[nat].length > used[other].length + 1 ? other : nat;
+    if (side !== nat && mir) [ax, ay] = mir;
+    const right = side === 'right';
+    const lines = cfWrap(p.label, 150, 12, 1);
+    const cw = Math.min(160, Math.max(58, (lines[0] || '').length * 7.4 + 18)), ch = 26;
+    let cy = Math.max(17, Math.min(H - 15, ay));
+    // push down until clear of the last chip on this side
+    for (const prev of used[side]) if (Math.abs(cy - prev) < ch + 5) cy = prev + ch + 5;
+    cy = Math.min(H - 15, cy);
+    used[side].push(cy);
+    const cx = right ? W - 8 - cw / 2 : 8 + cw / 2;
+    const inner = right ? cx - cw / 2 : cx + cw / 2;
+    out += '<line x1="' + inner + '" y1="' + cy + '" x2="' + ax + '" y2="' + ay + '" stroke="' + CF.stroke
+      + '" stroke-width="1.8" stroke-dasharray="4 3"/>'
+      + '<circle cx="' + ax + '" cy="' + ay + '" r="4" fill="' + CF.stroke + '"/>'
+      + '<rect x="' + (cx - cw / 2) + '" y="' + (cy - ch / 2) + '" width="' + cw + '" height="' + ch
+      + '" rx="8" fill="' + CF_TINT[i % CF_TINT.length] + '" stroke="' + CF.stroke + '" stroke-width="2"/>'
+      + cfText(cx, cy + 4.5, lines[0] || '', 12, 800);
+  });
+  return cfSvg(out, W, H);
+}
+
+const CF_WIDE = new Set(['process', 'steps', 'labeled-parts']);
+const CF_KINDS = new Set(['fraction-grid', 'count-set', 'compass', 'compare', 'expression', 'process', 'steps', 'labeled-parts', 'error-board']);
 function cfMini(spec) {
   if (!spec) return '';
   switch (spec.kind) {
@@ -366,6 +504,8 @@ function cfMini(spec) {
     case 'compass': return cfCompass(spec);
     case 'compare': return cfCompare(spec);
     case 'process': return cfProcess(spec);
+    case 'steps': return cfSteps(spec);
+    case 'labeled-parts': return cfLabeledParts(spec);
     case 'expression': return cfExpression(spec);
     default: return '';
   }
@@ -480,7 +620,7 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
       }
       // A process/cycle needs the whole card width or its stage labels become
       // unreadable at half-column size.
-      const wide = cf.kind === 'process' ? ' cf-wide' : '';
+      const wide = CF_WIDE.has(cf.kind) ? ' cf-wide cf-k-' + cf.kind : '';
       const fig = `<div class="d-inline-img d-code-fig${wide}">${cfMini(cf)}${cf.label ? `<div class="cf-label">${esc(cf.label)}</div>` : ''}${cf.caption ? `<div class="cap">${esc(cleanHeading(cf.caption))}</div>` : ''}</div>`;
       return `<section class="section${idCls}">${head}<div class="panel has-inline-img" style="border-color:var(${accent}-soft)"><div class="ii-body">${body}</div>${fig}</div></section>`;
     }
