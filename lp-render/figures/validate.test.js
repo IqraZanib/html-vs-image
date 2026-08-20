@@ -106,7 +106,7 @@ test('a process with too few stages fails', () => {
 
 test('a valid process against a matching source passes clean', () => {
   const source = { sections: [{ body: 'دورة الماء: تبخر ثم تكاثف ثم هطول ثم تجمع' }] };
-  const guide = { images: [artBrief], sections: [{ id: 'stage-arad', codeFigure: { kind: 'process', layout: 'cycle',
+  const guide = { meta: { locale: 'ar' }, images: [artBrief], sections: [{ id: 'stage-arad', codeFigure: { kind: 'process', layout: 'cycle',
     stages: [{ label: 'تبخر' }, { label: 'تكاثف' }, { label: 'هطول' }, { label: 'تجمع' }] } }] };
   const r = validateFigures(guide, { source });
   assert.strictEqual(r.fails, 0);
