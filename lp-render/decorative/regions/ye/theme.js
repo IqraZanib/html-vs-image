@@ -464,6 +464,15 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-stage-tamhid .d-code-fig .cf-svg,.section.sec-stage-arad .d-code-fig .cf-svg{max-height:150px}
 .d-code-fig.cf-wide,.d-inline-img.cf-wide{width:100% !important;max-width:100% !important;flex:0 0 100% !important}
 
+
+/* a process/cycle figure takes the whole card, stacked under the text, so its
+   stage labels stay legible instead of shrinking into the figure column */
+/* the panel is a 3-column grid; span the figure across all of it (no :has()
+   dependency, which some renderers ignore) */
+.panel.has-inline-img .d-code-fig.cf-wide{grid-column:1 / -1;grid-row:auto}
+.panel.has-inline-img .d-code-fig.cf-wide{width:100%;max-width:100%;margin:4px auto 0;padding:2px;position:static;min-height:0}
+.panel.has-inline-img .d-code-fig.cf-wide .cf-svg{width:100%;max-height:132px;position:static}
+
 `;
 
 module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom' };

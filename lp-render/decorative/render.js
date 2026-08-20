@@ -306,8 +306,8 @@ function cfProcess({ layout = 'cycle', stages = [] }) {
   const defs = '<defs><marker id="cfPA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
     + '<path d="M 0 0 L 10 5 L 0 10 z" fill="' + CF.stroke + '"/></marker></defs>';
   const box = (cx, cy, w, h, i, s) => {
-    const label = cfText(cx, cy + (s.caption ? -1 : 4), s.label, S.length > 4 ? 11.5 : 13, 700);
-    const cap = s.caption ? cfText(cx, cy + 13, s.caption, 9.5, 600, CF.stroke) : '';
+    const label = cfText(cx, cy + (s.caption ? -2 : 5), s.label, S.length > 4 ? 14 : 16, 700);
+    const cap = s.caption ? cfText(cx, cy + 15, s.caption, 12, 600, CF.stroke) : '';
     return '<rect x="' + (cx - w / 2) + '" y="' + (cy - h / 2) + '" width="' + w + '" height="' + h
       + '" rx="9" fill="' + TINT[i % TINT.length] + '" stroke="' + CF.stroke + '" stroke-width="2"/>' + label + cap;
   };
@@ -323,7 +323,7 @@ function cfProcess({ layout = 'cycle', stages = [] }) {
   };
 
   if (layout === 'linear') {
-    const W = 480, BH = 46, BW = Math.min(120, (W - 40 - (S.length - 1) * 26) / S.length);
+    const W = 430, BH = 52, BW = Math.min(126, (W - 40 - (S.length - 1) * 26) / S.length);
     const gap = (W - 30 - S.length * BW) / Math.max(1, S.length - 1);
     const cy = 40 + (S.some((s) => s.caption) ? 6 : 0);
     let out = defs, xs = [];
@@ -339,8 +339,10 @@ function cfProcess({ layout = 'cycle', stages = [] }) {
 
   // cycle: stages on an ellipse, running counter-clockwise so the order reads
   // right-to-left like the Arabic around it; the last arrow closes the loop.
-  const W = 480, H = 290, cx0 = W / 2, cy0 = H / 2, rx = 170, ry = 96;
-  const BW = S.length > 4 ? 104 : 118, BH = 44;
+  // flat and wide: the card is wide, so a squat ellipse keeps the labels large
+  // without adding page height.
+  const W = 470, H = 196, cx0 = W / 2, cy0 = H / 2, rx = 176, ry = 62;
+  const BW = S.length > 4 ? 108 : 122, BH = 44;
   let out = defs, pts = [];
   for (let i = 0; i < S.length; i++) {
     const th = -Math.PI / 2 - (2 * Math.PI * i) / S.length;
@@ -476,7 +478,10 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
       if (cf.kind === 'error-board') {
         return `<section class="section${idCls}">${head}<div class="panel has-twin-board" style="border-color:var(${accent}-soft)"><div class="ii-body">${body}</div>${cfErrorBoard(cf)}</div></section>`;
       }
-      const fig = `<div class="d-inline-img d-code-fig">${cfMini(cf)}${cf.label ? `<div class="cf-label">${esc(cf.label)}</div>` : ''}${cf.caption ? `<div class="cap">${esc(cleanHeading(cf.caption))}</div>` : ''}</div>`;
+      // A process/cycle needs the whole card width or its stage labels become
+      // unreadable at half-column size.
+      const wide = cf.kind === 'process' ? ' cf-wide' : '';
+      const fig = `<div class="d-inline-img d-code-fig${wide}">${cfMini(cf)}${cf.label ? `<div class="cf-label">${esc(cf.label)}</div>` : ''}${cf.caption ? `<div class="cap">${esc(cleanHeading(cf.caption))}</div>` : ''}</div>`;
       return `<section class="section${idCls}">${head}<div class="panel has-inline-img" style="border-color:var(${accent}-soft)"><div class="ii-body">${body}</div>${fig}</div></section>`;
     }
     const inlineIm = !mg && section.image && images[section.image] && images[section.image].dataUri ? images[section.image] : null;
