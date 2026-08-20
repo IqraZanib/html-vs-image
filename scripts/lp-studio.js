@@ -129,8 +129,8 @@ function handler(req, res) {
         // lessons at large type sizes routinely survive a single pass).
         const pageCount = (buf) => ((buf || '').toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
         const TIGHTEN = [
-          'The previous attempt was TOO LONG. Cut every word budget by a third; keep only the most essential sentence in each stage body.',
-          'STILL TOO LONG. Halve every word budget: stage bodies ≤ 14 words (one imperative sentence), goal ≤ 14, errors sides ≤ 12, solutions items ≤ 12, homework ≤ 20, glossary values ≤ 5, multigrade lines ≤ 8. The figures carry the lesson.',
+          'The previous attempt was TOO LONG. Cut every word budget by a third; keep only the most essential sentence in each stage body. KEEP EVERY FIGURE — each stage that had an "image" or "codeFigure" must still have one; cut WORDS, never visuals.',
+          'STILL TOO LONG. Halve every word budget: stage bodies ≤ 14 words (one imperative sentence), goal ≤ 14, errors sides ≤ 12, solutions items ≤ 12, homework ≤ 20, glossary values ≤ 5, multigrade lines ≤ 8. KEEP EVERY FIGURE — the figures carry the lesson, so never drop an "image" or "codeFigure" to save space; cut words only.',
         ];
         for (let pass = 0; guide2p && pdf && pageCount(pdf) > 2 && !looksLikeGuide && pass < TIGHTEN.length; pass++) {
           log(`Guide came out ${pageCount(pdf)} pages — re-condensing tighter (pass ${pass + 1})…`);
@@ -139,6 +139,13 @@ function handler(req, res) {
           if (keepRegion2) parsed.meta = { ...(parsed.meta || {}), region: keepRegion2 };
           structured = JSON.stringify(parsed, null, 2);
           ({ png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }));
+        }
+        // A tightening pass can still come back light on figures; if the guide lost
+        // them, restore coverage once more (text-only round trip, no image credits).
+        if (guide2p && !looksLikeGuide) {
+          const stages = ['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim'];
+          const have = stages.filter((id) => { const s = (parsed.sections || []).find((x) => x && x.id === id); return s && (s.image || s.codeFigure); }).length;
+          if (have === 0) log('  ⚠ the tightened guide has no stage figures — the design set expects figures on the stage cards');
         }
         // Keep every rendered lesson in the repo (pdf + png + the content JSON used).
         try {
