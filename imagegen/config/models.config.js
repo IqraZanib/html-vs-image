@@ -17,7 +17,9 @@ const MODELS = {
   'google/nano-banana': { input: { aspect_ratio: '4:3' } },
   'ideogram/v3-text-to-image': { input: { aspect_ratio: '4:3' } },
   'google/imagen4-fast': { input: { aspect_ratio: '4:3' } },
-  'z-image': { input: { aspect_ratio: '4:3' } },
+  // z-image documents a 1000-character prompt limit; longer prompts are rejected
+  // outright, which shows up as a dropped image rather than an error.
+  'z-image': { input: { aspect_ratio: '4:3' }, maxPrompt: 1000 },
   'seedream/5-lite-text-to-image': { input: { image_size: 'landscape_4_3', image_resolution: '1K' } },
 };
 // SINGLE-MODEL POLICY (company decision 2026-08-18): every image type uses
