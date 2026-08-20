@@ -50,6 +50,11 @@ const COMPLEX_SCRIPT = new Set(['ar', 'ur', 'sd', 'fa', 'ps']);
 
 // Resolve the model list for a category, honouring the lesson locale for diagrams.
 function ladderFor(category, locale) {
+  // ARTWORK MODEL OVERRIDE: with LP_ART_MODEL set, every illustration comes from
+  // that one model. Used for the open-source artwork track (LP_ART_MODEL=z-image),
+  // where the model draws wordless art and code renders all teaching content.
+  const forced = process.env.LP_ART_MODEL;
+  if (forced && MODELS[forced]) return [forced];
   if (category === 'labeled_diagram' && COMPLEX_SCRIPT.has(String(locale || '').toLowerCase())) {
     return LADDERS.labeled_diagram_complex;
   }

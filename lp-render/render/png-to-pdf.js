@@ -45,6 +45,10 @@ async function htmlToPixelPdf(html, opts = {}) {
         // be cut THROUGH the figure: inner boundaries are legal only BELOW the
         // figure's bottom edge. Cards without figures offer all inner boundaries.
         const fig = sec.querySelector('.d-inline-img, .char-fig');
+        // A card holding a CODE-drawn figure is atomic: its figure is followed by a
+        // value label and caption, so a cut 'below the figure' would slice the card
+        // and orphan that text. Only the card's own bottom is a legal boundary.
+        if (sec.querySelector('.d-code-fig, .d-code-board')) return;
         const figBottom = fig ? y(fig, 'bottom') : -Infinity;
         sec.querySelectorAll(
           '.d-bullets > li, .d-steps > .d-step, .d-rubric > .rrow, .d-imgrow, .d-qa, ' +
