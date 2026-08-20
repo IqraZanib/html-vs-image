@@ -180,7 +180,9 @@ function handler(req, res) {
         // by drawing them a little smaller, which costs nothing and keeps every figure.
         // Only when that is not enough do we start cutting the teacher's words.
         if (pageLimit && pdf && pageCount(pdf) > pageLimit) {
-          for (const scale of [0.9, 0.82, 0.74, 0.66]) {
+          // Two probes, not four: if 88% and 76% both overrun, the figures are not what
+          // is making the page long and further shrinking just wastes renders.
+          for (const scale of [0.88, 0.76]) {
             const attempt = await renderLessonImage(parsed, { log, pdf: true, figureScale: scale });
             if (pageCount(attempt.pdf) <= pageLimit) {
               ({ png, pdf, stats, contentId, locale } = attempt);
@@ -189,14 +191,26 @@ function handler(req, res) {
             }
           }
         }
+        // Everything from here on is an OPTIMISATION of a render we already have. A
+        // flaky model call must not cost us the lesson: keep the last good state and
+        // fall back to it. (A corpus run lost a whole lesson to one bad response.)
+        let best = { parsed, structured, png, pdf, stats, contentId, locale };
+        const keepBest = () => { best = { parsed, structured, png, pdf, stats, contentId, locale }; };
+        const revert = (why) => {
+          log(`  ⚠ ${why} — keeping the last good render instead of failing the lesson`);
+          ({ parsed, structured, png, pdf, stats, contentId, locale } = best);
+        };
         for (let pass = 0; guide2p && pdf && pageCount(pdf) > 2 && !looksLikeGuide && pass < TIGHTEN.length; pass++) {
           log(`Guide came out ${pageCount(pdf)} pages — re-condensing tighter (pass ${pass + 1})…`);
           const keepRegion2 = parsed.meta && parsed.meta.region;
-          parsed = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log, extra: TIGHTEN[pass] });
-          if (keepRegion2) parsed.meta = { ...(parsed.meta || {}), region: keepRegion2 };
-          parsed = restoreFigures(parsed, figSnapshot);
-          structured = JSON.stringify(parsed, null, 2);
-          ({ png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }));
+          try {
+            parsed = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log, extra: TIGHTEN[pass] });
+            if (keepRegion2) parsed.meta = { ...(parsed.meta || {}), region: keepRegion2 };
+            parsed = restoreFigures(parsed, figSnapshot);
+            structured = JSON.stringify(parsed, null, 2);
+            ({ png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }));
+            keepBest();
+          } catch (e) { revert(`tightening pass ${pass + 1} failed (${e.message})`); break; }
         }
         // Whatever the rolls did, no stage ships as bare prose: a narrow text-only
         // figure pass fills the gaps from the guide's own words, then we re-render.
@@ -209,6 +223,7 @@ function handler(req, res) {
           if (bareCount()) {
             log(`${bareCount()} stage(s) came back without a figure — running the figure pass…`);
             const before = bareCount();
+            try {
             ({ guide: parsed } = await addFiguresToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log }));
             if (bareCount() < before) {
               structured = JSON.stringify(parsed, null, 2);
@@ -228,13 +243,16 @@ function handler(req, res) {
                 ({ png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }));
               }
             }
+            } catch (e) { revert(`the figure pass failed (${e.message})`); }
           }
           if (bareCount()) log('  ⚠ ' + bareCount() + ' stage(s) still have no figure — the page will read text-heavy');
           // A page of pure diagrams is its own kind of dry: the design set expects at
           // least one real picture. One text-only retry when a roll authored none.
           if (!(parsed.images || []).length) {
             log('This roll authored no illustration at all — asking once for one picture…');
+            keepBest();
             const keepR3 = parsed.meta && parsed.meta.region;
+            try {
             const withArt = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log,
               extra: 'This guide has NO illustration. Keep every figure and all the text as they are, and additionally author EXACTLY ONE textless illustration in "images" for the single most scene-like stage (children or objects doing the activity, absolutely no text in the image), referenced by that section\'s "image" field. Change nothing else.' });
             if (keepR3) withArt.meta = { ...(withArt.meta || {}), region: keepR3 };
@@ -244,6 +262,7 @@ function handler(req, res) {
               structured = JSON.stringify(parsed, null, 2);
               ({ png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }));
             }
+            } catch (e) { revert(`the artwork retry failed (${e.message})`); }
           }
         }
         // Keep every rendered lesson in the repo (pdf + png + the content JSON used).

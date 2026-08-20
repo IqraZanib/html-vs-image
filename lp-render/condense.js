@@ -414,15 +414,23 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
   const richFigures = RICH_FIGURE_REGIONS.has(String((content.meta && content.meta.region) || '').toLowerCase());
   const system = buildSystem(richFigures);
   if (richFigures) log('Figure policy: rich (region design set) — every card carries a teaching figure.');
-  let out;
-  try {
-    out = await callOnce(content, { apiKey, fetchImpl, extra, system });
-  } catch (e) {
-    // Models occasionally emit truncated/invalid JSON — one strict retry.
-    log(`  (condense output invalid — retrying once: ${e.message})`);
-    out = await callOnce(content, { apiKey, fetchImpl, system,
-      extra: `${extra ? extra + '\n' : ''}CRITICAL: your previous output was INVALID JSON. Return one complete, valid, parseable JSON object and nothing else.` });
+  // A lesson can need several condense calls (tighten passes, the figure pass), and a
+  // single flaky response used to sink the whole render. Retry with a short backoff:
+  // the failures seen in a corpus run were transient, not deterministic.
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  let out; let lastErr;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      out = await callOnce(content, { apiKey, fetchImpl, system,
+        extra: attempt === 0 ? extra
+          : `${extra ? extra + '\n' : ''}CRITICAL: your previous output was INVALID JSON. Return one complete, valid, parseable JSON object and nothing else.` });
+      break;
+    } catch (e) {
+      lastErr = e;
+      if (attempt < 2) { log(`  (condense attempt ${attempt + 1} failed: ${e.message} — retrying)`); await sleep(2000 * (attempt + 1)); }
+    }
   }
+  if (!out) throw lastErr;
   if (!Array.isArray(out.sections) || out.sections.length < 8) throw new Error('condense: bad guide shape');
   const ids = new Set(out.sections.map((s) => s && s.id));
   for (const need of ['goal', 'stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim']) {
