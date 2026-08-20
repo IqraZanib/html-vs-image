@@ -189,6 +189,33 @@ function validateFigures(guide, { source = null, imageDims = {}, log = null, mod
     }
   }
 
+  // ── Teacher-review gates (Yemen A/B study, 15 teachers) ────────────────────
+  // Only meaningful for a COMPLETE guide: a fixture or partial object has no stages.
+  // A real guide has all twelve template sections; a focused fixture has a few.
+  if (sections.length >= 6 && sections.some((s) => s && /^stage-/.test(String(s.id || '')))) {
+    // 1. A missing answer key was one of the study's hard failures.
+    const sol = sections.find((s) => s && s.id === 'solutions');
+    const solItems = sol && Array.isArray(sol.items) ? sol.items.filter((it) => it && (it.text || it.body)) : [];
+    if (!sol) add('fail', 'answers_missing', 'no solutions section — the lesson ships without an answer key', 'solutions');
+    else if (!solItems.length) add('fail', 'answers_empty', 'the solutions section carries no answers', 'solutions');
+
+    // 2. Mixed numerals: teachers flagged ١٢٣ appearing beside 123.
+    const readable = sections.filter((s) => s && s.id !== 'lesson-line')
+      .map((s) => JSON.stringify(s)).join(' ');
+    const hasEastern = /[٠-٩]/.test(readable);
+    const latinInArabic = (readable.match(/[ء-ي][^"]{0,12}?\d/g) || []).length;
+    if (hasEastern && latinInArabic > 0) {
+      add('warn', 'mixed_numerals', `Arabic text mixes Latin digits with Eastern numerals in ${latinInArabic} place(s) — teachers flagged this as confusing`, null);
+    }
+
+    // 3. A figure with no caption leaves the pupil guessing what it shows.
+    for (const s of sections) {
+      if (s && s.codeFigure && s.codeFigure.kind !== 'error-board'
+          && !String(s.codeFigure.caption || '').trim() && !String(s.codeFigure.label || '').trim()) {
+        add('warn', 'figure_no_caption', `${s.id}: code figure has neither a label nor a caption`, s.id);
+      }
+    }
+  }
   const fails = findings.filter((f) => f.level === 'fail');
   if (log) {
     if (!findings.length) log('  ✓ figure validation: no findings');

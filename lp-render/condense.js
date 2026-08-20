@@ -41,7 +41,9 @@ EDITORIAL RULES — how to choose well (these decide quality; follow them for AN
 - GLOSSARY (section 10): CONCEPT terms (the skill words: المطابقة، التمييز البصري، التطابق، القيمة المنزلية) — NOT the lesson's vocabulary items that pupils learn inside the lesson (not أبي/أمي, not the numbers list). Definitions from the source where given.
 - MULTIGRADE (section 11): derive the lower grade from the source's scaffolding, the current grade = the lesson as-is, the higher grade from the source's extension activity. If the source has neither, write the natural simpler/harder variant of the SAME activity.
 - HOMEWORK/CORNER (section 12): the source's homework items numbered and near-verbatim, then the re-teach trigger, then exactly ONE reflection question.
-- NUMERALS: in Arabic lessons use Eastern Arabic numerals everywhere (٣٢، ٤٥ دقيقة، صفحة ٨٠) — including times, pages and marks.
+- NUMERALS: in Arabic lessons use Eastern Arabic numerals everywhere (٣٢، ٤٥ دقيقة، صفحة ٨٠) — including times, pages and marks. NEVER mix Latin digits (1,2,3) into Arabic text: Yemeni teachers flagged mixed numerals in a review as confusing for pupils.
+- KINESTHETIC (teacher request from the Yemen A/B review — "the students would love to be kinesthetic in the lessons they learn"): every stage body must contain something the pupils physically DO — touch, hold, point, stand, raise a hand, fold, cut, count on fingers, act out, walk to the board. Name the real object from the source (the string, the apple, the cards). If the source's stage is passive, convert it into the nearest physical version of the SAME activity rather than inventing new content.
+- ANSWERS ARE NEVER OMITTED: the solutions section must always carry the lesson's actual answers (a review found missing answer keys to be a hard failure). Never leave it empty or generic.
 - STAGE MINUTES: sum to the source's period length when known.
 
 __IMAGES_BLOCK__
