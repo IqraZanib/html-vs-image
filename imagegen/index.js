@@ -54,7 +54,8 @@ async function resolveSegmentImages(segment = {}, opts = {}) {
       // the pixels and re-rolls when the model ignored it. A culturally wrong picture
       // in a Yemeni classroom is worse than none, so we do not ship a failure.
       if (gate.pass && cultureRulesFor(region)) {
-        let fit = await cultureImpl({ apiKey, imageUrl: gen.url, region });
+        const wantTextless = /no text|no letters|wordless/i.test(prompt) || process.env.LP_FIGURE_MODE === 'hybrid';
+        let fit = await cultureImpl({ apiKey, imageUrl: gen.url, region, textless: wantTextless });
         let rolls = 0;
         while (fit.checked && !fit.pass && rolls < 2) {
           rolls++;
@@ -63,7 +64,7 @@ async function resolveSegmentImages(segment = {}, opts = {}) {
           if (!re.ok) break;
           if (typeof re.creditsConsumed === 'number') budget.spend(re.creditsConsumed);
           gen = re;
-          fit = await cultureImpl({ apiKey, imageUrl: gen.url, region });
+          fit = await cultureImpl({ apiKey, imageUrl: gen.url, region, textless: wantTextless });
         }
         report.push({ blockType: block.type, model, event: 'culture', pass: fit.pass, checked: fit.checked, reason: fit.reason, rolls });
         if (fit.checked && !fit.pass) {

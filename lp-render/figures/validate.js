@@ -80,7 +80,11 @@ function validateFigures(guide, { source = null, imageDims = {}, log = null, mod
         add('fail', 'art_asks_labels', `image "${im.id}": brief asks for labels while claiming to be textless (contradictory contract)`, null);
       }
       if (/blank cards?|empty box|placeholder|answer slot|counters visible|blank slots?/i.test(p)) {
-        if (mode !== 'hybrid') add('warn', 'brief_invites_placeholders', `image "${im.id}": brief asks for blank cards/boxes/placeholders — the model draws those, and boxes and = signs are teaching content that belongs in code`, null);
+        // In HYBRID mode this matters MORE, not less: a brief that asks for cards,
+        // boards or blanks is exactly what makes a model draw letters on them, and the
+        // artwork is supposed to be wordless. (A lesson about letter cards is the
+        // hardest case — there the illustration should show the activity, not the props.)
+        add('warn', 'brief_invites_placeholders', `image "${im.id}": brief asks for blank cards/boxes/placeholders — the model draws those, and boxes and = signs are teaching content that belongs in code`, null);
       }
     } else if (/no text|no letters|wordless/i.test(p)) {
       // Labeled mode: the figure is supposed to carry its own Arabic labels.

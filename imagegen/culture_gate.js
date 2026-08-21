@@ -25,18 +25,19 @@ function cultureRulesFor(region) {
   return reg && reg.check && Array.isArray(reg.check.require) ? reg.check : null;
 }
 
-function buildAsk(rules) {
+function buildAsk(rules, textless) {
   // Ask for EVIDENCE OF A VIOLATION, not proof of compliance. A checklist of
   // requirements made the model treat anything it could not confirm as a failure — it
   // rejected images whose teacher was perfectly correct because a child wore a t-shirt.
   // Rejection now needs something clearly visible and wrong.
   return `You are checking one illustration drawn for a ${rules.label} primary-school lesson.
 
-Look ONLY at the ADULTS (the teacher). Ignore the children's clothing, the furniture, the
-board, and anything you cannot see clearly.
+For the cultural checks look ONLY at the ADULTS (the teacher): ignore the children's
+clothing, the furniture and anything you cannot see clearly. For any check about written
+characters, look at the WHOLE picture including boards, cards and pages.
 
 Answer "fail" ONLY if you can CLEARLY SEE at least one of these in the picture:
-${rules.forbid.map((r, i) => `${i + 1}. ${r}`).join('\n')}
+${rules.forbid.concat(textless ? ['any letters, words, numbers or written characters drawn anywhere in the picture — on a board, a card, a page or a sign (this artwork must be completely wordless; every label is added afterwards in code)'] : []).map((r, i) => `${i + 1}. ${r}`).join('\n')}
 
 If you see none of those, or the picture shows no adult at all, answer "pass".
 Do not fail for anything not on that list. Do not fail because detail is missing.
@@ -46,7 +47,7 @@ Reply with JSON only: {"pass": true|false, "reason": "one short sentence naming 
 
 // { pass, reason, checked }  — checked:false means the verdict is unknown (gate off,
 // no rules for the region, or the checker itself failed), never a silent pass.
-async function checkCulture({ apiKey, imageUrl, region, fetchImpl = defaultFetch } = {}) {
+async function checkCulture({ apiKey, imageUrl, region, textless = false, fetchImpl = defaultFetch } = {}) {
   const mode = cultureMode();
   if (mode === 'off') return { pass: true, checked: false, reason: 'culture gate off' };
   const rules = cultureRulesFor(region);
@@ -54,7 +55,7 @@ async function checkCulture({ apiKey, imageUrl, region, fetchImpl = defaultFetch
 
   const body = JSON.stringify({
     messages: [{ role: 'user', content: [
-      { type: 'text', text: buildAsk(rules) },
+      { type: 'text', text: buildAsk(rules, textless) },
       { type: 'image_url', image_url: { url: imageUrl } },
     ] }],
   });
