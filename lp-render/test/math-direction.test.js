@@ -63,18 +63,20 @@ function tokenCentres(sel, tokens) {
   const nodes = []; let flat = '';
   const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
   let n; while ((n = w.nextNode())) { nodes.push({ n, start: flat.length }); flat += n.nodeValue || ''; }
+  // Position AND which line it landed on: a run that wraps mid-expression restarts
+  // at the right edge, and comparing x across that break looks like a reversal.
   const centre = (from, len) => {
     const rec = nodes.filter((z) => z.start <= from).pop();
     const rg = document.createRange();
     rg.setStart(rec.n, from - rec.start); rg.setEnd(rec.n, from - rec.start + len);
     const b = rg.getBoundingClientRect();
-    return b.width ? (b.left + b.right) / 2 : null;
+    return b.width ? { x: (b.left + b.right) / 2, line: Math.round(b.top / 4) } : null;
   };
   const out = []; let cursor = 0;
   for (const t of tokens) {
     const i = flat.indexOf(t, cursor);
     if (i < 0) return { error: `token «${t}» not found after ${cursor} in «${flat}»` };
-    out.push({ token: t, x: centre(i, t.length) });
+    out.push({ token: t, ...centre(i, t.length) });
     cursor = i + t.length;
   }
   // also: the digits of the first multi-digit number must not be mirrored
@@ -82,7 +84,7 @@ function tokenCentres(sel, tokens) {
   let digits = null;
   if (multi) {
     const i = flat.indexOf(multi);
-    digits = [centre(i, 1), centre(i + 1, 1)];
+    digits = [centre(i, 1), centre(i + 1, 1)];  // same line by construction here
   }
   return { centres: out, digits };
 }
@@ -114,11 +116,13 @@ test('arithmetic inside Arabic prose flows right-to-left, like the prose', async
     for (const [id, , tokens] of CASES) {
       const r = await measure(`#c-${id}`, tokens);
       assert.ok(!r.error, `${id}: ${r.error}`);
-      const xs = r.centres.map((c) => c.x);
-      assert.ok(xs.every((x, i) => i === 0 || x < xs[i - 1]),
-        `${id}: tokens ${JSON.stringify(tokens)} should step right-to-left, measured ${JSON.stringify(xs)}`);
+      const steps = r.centres.filter((c, i) => i === 0 || c.line === r.centres[i - 1].line);
+      assert.ok(r.centres.every((c, i) => i === 0 || c.line !== r.centres[i - 1].line || c.x < r.centres[i - 1].x),
+        `${id}: tokens ${JSON.stringify(tokens)} should step right-to-left within a line, measured `
+        + JSON.stringify(r.centres.map((c) => [Math.round(c.x), c.line])));
+      assert.ok(steps.length >= 2, `${id}: nothing comparable measured`);
       if (r.digits) {
-        assert.ok(r.digits[0] < r.digits[1],
+        assert.ok(r.digits[0].x < r.digits[1].x,
           `${id}: the digits of a single number must stay left-to-right, measured ${JSON.stringify(r.digits)}`);
       }
     }
