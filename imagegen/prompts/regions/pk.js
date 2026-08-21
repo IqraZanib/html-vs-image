@@ -1,5 +1,20 @@
 'use strict';
 module.exports = {
+  // What a reviewer must be able to confirm in the GENERATED PIXELS. The prompt asks
+  // for this; the culture gate verifies it and re-rolls when the model ignores it.
+  check: {
+    label: 'Pakistan',
+    require: [
+      'adult women wear a shalwar-kameez with a dupatta covering the hair',
+      'adult men wear a shalwar-kameez',
+      'people look South Asian (Pakistani)',
+    ],
+    forbid: [
+      'an adult woman with uncovered hair or in Western dress',
+      'European, African or East Asian facial features on the adults',
+      'landmarks, flags or signage from another country',
+    ],
+  },
   // Bump when the art direction changes: the asset-store key includes it, so cached
   // artwork drawn under the old direction is not silently reused.
   version: 2,

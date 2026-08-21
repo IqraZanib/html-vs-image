@@ -1,6 +1,21 @@
 'use strict';
 // Kenya art direction — see ye.js for why clothing and setting live in the pack.
 module.exports = {
+  // What a reviewer must be able to confirm in the GENERATED PIXELS. The prompt asks
+  // for this; the culture gate verifies it and re-rolls when the model ignores it.
+  check: {
+    label: 'Kenya',
+    require: [
+      'people look Kenyan: dark brown skin, African features',
+      'children in Kenyan-style school uniforms (sweaters, shorts or pinafores)',
+      'adults in smart everyday Kenyan clothing, or a bright printed dress',
+    ],
+    forbid: [
+      'European, Arab or East Asian facial features on the adults',
+      'landmarks, flags or signage from another country',
+      'clothing or architecture from outside East Africa',
+    ],
+  },
   // Bump when the art direction changes: the asset-store key includes it, so cached
   // artwork drawn under the old direction is not silently reused.
   version: 2,

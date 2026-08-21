@@ -1,6 +1,21 @@
 'use strict';
 // Tanzania art direction — its design pack exists, so its art direction should too.
 module.exports = {
+  // What a reviewer must be able to confirm in the GENERATED PIXELS. The prompt asks
+  // for this; the culture gate verifies it and re-rolls when the model ignores it.
+  check: {
+    label: 'Tanzania',
+    require: [
+      'people look Tanzanian: dark brown skin, African features',
+      'children in white shirts with navy or green shorts, skirts or pinafores',
+      'adults in smart everyday Tanzanian clothing, or a kitenge-print dress',
+    ],
+    forbid: [
+      'European, Arab or East Asian facial features on the adults',
+      'landmarks, flags or signage from another country',
+      'clothing or architecture from outside East Africa',
+    ],
+  },
   // Bump when the art direction changes: the asset-store key includes it, so cached
   // artwork drawn under the old direction is not silently reused.
   version: 2,
