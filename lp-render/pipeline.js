@@ -15,6 +15,13 @@ const { htmlToPixelPdf } = require('./render/png-to-pdf');
 const { ensureCast } = require('./decorative/characters');
 const store = require('./store/assets');
 const { resolveRegion } = require('../imagegen/prompts/regions');
+
+// An image the generator has already given up on must not be attempted again inside
+// the same run. The fit/density loop re-renders a lesson several times, and each
+// re-render was retrying every dropped image from scratch — including its culture
+// re-rolls — so one stubborn brief could cost a dozen generations and minutes of wall
+// clock. Remember the failure and make that decision once.
+const GAVE_UP = new Set();
 const { resolveSegmentImages } = require('../imagegen');
 const { chromium } = require('../node_modules/playwright-core');
 
@@ -78,6 +85,7 @@ async function renderLessonImage(content, opts = {}) {
   const cacheKey = (prompt) => store.keyFor(`${prompt}|region:${artRegion}|art:v${artVersion}`);
   for (const im of wanted) {
     const key = cacheKey(im.prompt);
+    if (GAVE_UP.has(key)) { statsOut.dropped++; log(`  ⊘ image "${im.id}" skipped — already rejected earlier in this run`); continue; }
     if (!fresh) {
       const hit = store.get(key);
       if (hit) { imagesMap[im.id] = { dataUri: hit.dataUri, label: im.label, cover: im.concept !== 'diagram' }; statsOut.restored++; log(`  ⤿ image "${im.id}" restored from store (no credits)`); continue; }
@@ -122,6 +130,7 @@ async function renderLessonImage(content, opts = {}) {
         // failure, and the operator needs to know which one happened.
         const why = (got && got.reason) || 'no model passed the quality gate';
         log(`  ✗ image "${im.id}" dropped — ${why}`);
+        GAVE_UP.add(key); // do not pay for this again on the next re-render
       }
     }
   } else if (wanted.length) {
