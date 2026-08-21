@@ -25,7 +25,7 @@ function writeIndex(ix) {
 function get(key) {
   const ix = readIndex();
   const e = ix[key];
-  if (!e) return null;
+  if (!e || e.rejected) return null;
   const p = path.join(DIR, e.file);
   if (!fs.existsSync(p)) return null;
   return { dataUri: `data:${e.mime};base64,${fs.readFileSync(p).toString('base64')}`, meta: e };
@@ -47,6 +47,22 @@ function put(key, dataUri, meta = {}) {
 }
 
 function has(key) { const ix = readIndex(); return !!(ix[key] && fs.existsSync(path.join(DIR, ix[key].file))); }
+
+// A brief the gates have rejected twice should not be re-litigated on every future
+// run: each attempt costs a generation plus a vision check, and the answer has not
+// changed. The rejection is recorded next to the images so it survives a restart.
+// Set LP_RETRY_REJECTED=1 to try again (e.g. after changing the rules).
+function markRejected(key, reason) {
+  const ix = readIndex();
+  ix[key] = { rejected: true, reason: String(reason || '').slice(0, 200), at: new Date().toISOString() };
+  writeIndex(ix);
+}
+function isRejected(key) {
+  if (process.env.LP_RETRY_REJECTED === '1') return null;
+  const ix = readIndex();
+  const e = ix[key];
+  return e && e.rejected ? e : null;
+}
 function stats() { const ix = readIndex(); return { count: Object.keys(ix).length, dir: DIR }; }
 
-module.exports = { keyFor, get, put, has, stats, DIR };
+module.exports = { keyFor, get, put, has, stats, markRejected, isRejected, DIR };

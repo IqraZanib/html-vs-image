@@ -218,9 +218,17 @@ const CF = { fill: '#f5c33b', empty: '#ffffff', stroke: '#2f3e63', ink: '#0a1220
 function cfSvg(inner, w = 240, h = 200, cls = 'cf-svg') {
   return '<svg class="' + cls + '" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">' + inner + '</svg>';
 }
+// Arabic labels are RTL, but a mathematical expression is not: «١٢ ÷ ٢ = ٦» inside an
+// RTL run can be reordered by the bidi algorithm, so the drawing would disagree with
+// the equation the lesson meant. Anything that is digits and operators only is emitted
+// left-to-right, isolated from its surroundings.
+const MATHY = /^[\s\u0660-\u06690-9+\-×÷*/=<>().,:]+$/;
 function cfText(x, y, s, size = 13, weight = 700, fill = CF.ink, anchor = 'middle') {
+  const txt = String(s || '');
+  const dir = txt.trim() && MATHY.test(txt) ? 'ltr' : 'rtl';
   return '<text x="' + x + '" y="' + y + '" text-anchor="' + anchor + '" font-size="' + size
-    + '" font-weight="' + weight + '" fill="' + fill + '" direction="rtl">' + esc(String(s || '')) + '</text>';
+    + '" font-weight="' + weight + '" fill="' + fill + '" direction="' + dir + '"'
+    + (dir === 'ltr' ? ' style="unicode-bidi:isolate"' : '') + '>' + esc(txt) + '</text>';
 }
 
 // N parts of one shape, K shaded (square grid or circle pie) — exact fractions.

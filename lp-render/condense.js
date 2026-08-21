@@ -7,6 +7,7 @@
 // the hand-curated reference guides), and reuses the source's image prompts
 // VERBATIM so the asset store restores them free.
 const { defaultFetch } = require('../imagegen/kie/client');
+const { fixGuide } = require('./text/arabic-hygiene');
 
 const CHAT_URL = 'https://api.kie.ai/gpt-5-2/v1/chat/completions';
 
@@ -550,6 +551,10 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
       if (cleaned) im.label = cleaned;
     }
   }
+  // Correct the known Arabic errors a reviewer has already caught once (agreement,
+  // imperatives, letter names, canonical glossary wording). In code, so the same
+  // mistake cannot come back on the next roll.
+  fixGuide(out, { log });
   applyFigureBalance(out);
   // LANGUAGE SAFETY: the guide must never disagree with its own text about language.
   // A wrong locale (seen: "en" on an Arabic lesson) flips the whole page to LTR and

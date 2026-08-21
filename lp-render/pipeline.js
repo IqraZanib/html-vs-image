@@ -15,6 +15,7 @@ const { htmlToPixelPdf } = require('./render/png-to-pdf');
 const { ensureCast } = require('./decorative/characters');
 const store = require('./store/assets');
 const { resolveRegion } = require('../imagegen/prompts/regions');
+const { fixGuide } = require('./text/arabic-hygiene');
 
 // An image the generator has already given up on must not be attempted again inside
 // the same run. The fit/density loop re-renders a lesson several times, and each
@@ -72,6 +73,10 @@ async function renderLessonImage(content, opts = {}) {
   const meta = content.meta || {};
   const locale = meta.locale || 'en';
   const contentId = meta.id || 'lesson';
+  // A guide handed straight to the renderer (a re-render of something already
+  // reviewed) must get the same corrections as a freshly condensed one — otherwise the
+  // fixes only reach new content.
+  if (String(locale).startsWith('ar')) fixGuide(content, { log });
   const wanted = Array.isArray(content.images) ? content.images : [];
   const statsOut = { restored: 0, generated: 0, dropped: 0 };
 
@@ -86,6 +91,12 @@ async function renderLessonImage(content, opts = {}) {
   for (const im of wanted) {
     const key = cacheKey(im.prompt);
     if (GAVE_UP.has(key)) { statsOut.dropped++; log(`  ⊘ image "${im.id}" skipped — already rejected earlier in this run`); continue; }
+    const priorReject = store.isRejected(key);
+    if (priorReject) {
+      statsOut.dropped++;
+      log(`  ⊘ image "${im.id}" skipped — rejected on an earlier run (${priorReject.reason}); set LP_RETRY_REJECTED=1 to try again`);
+      continue;
+    }
     if (!fresh) {
       const hit = store.get(key);
       if (hit) { imagesMap[im.id] = { dataUri: hit.dataUri, label: im.label, cover: im.concept !== 'diagram' }; statsOut.restored++; log(`  ⤿ image "${im.id}" restored from store (no credits)`); continue; }
@@ -131,6 +142,8 @@ async function renderLessonImage(content, opts = {}) {
         const why = (got && got.reason) || 'no model passed the quality gate';
         log(`  ✗ image "${im.id}" dropped — ${why}`);
         GAVE_UP.add(key); // do not pay for this again on the next re-render
+        // and remember it across runs: the gates will not change their mind by themselves
+        if (/culture_reject/.test(why)) store.markRejected(key, why);
       }
     }
   } else if (wanted.length) {
