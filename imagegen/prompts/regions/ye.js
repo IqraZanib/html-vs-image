@@ -7,16 +7,19 @@ module.exports = {
   // for this; the culture gate verifies it and re-rolls when the model ignores it.
   check: {
     label: 'Yemen',
+    // Judge the ADULTS strictly — that is where the drift happens and what a reviewer
+    // notices. Children in ordinary school clothes are fine: requiring covered hair on
+    // primary-age girls made the gate reject images whose teacher was perfectly correct.
     require: [
-      'every adult woman wears a loose, full-length abaya or jilbab AND a headscarf that fully covers her hair and neck',
-      'adult men wear an ankle-length thobe, or a shirt with a futa/wrap — not Western business or casual wear',
-      'people look Arab (Yemeni): dark hair and eyes, warm olive-to-brown skin',
-      'children are modestly dressed; girls\' hair is covered with a small white scarf',
+      'every adult woman shown wears a loose, full-length abaya or jilbab AND a headscarf covering her hair and neck',
+      'every adult man shown wears an ankle-length thobe or a plain shirt — not a suit, blazer or tie',
+      'the adults look Arab (Yemeni): dark hair and eyes, warm olive-to-brown skin',
+      'the children are in ordinary, modest school clothes (nothing sleeveless, tight or immodest)',
     ],
     forbid: [
-      'an adult woman with uncovered hair, or in a short skirt, tight clothes, sleeveless top or Western dress',
-      'a teacher in a suit, blazer, jeans, or other Western professional styling',
-      'East Asian, European or Sub-Saharan African facial features on the adults',
+      'an adult woman with uncovered hair, or in a short skirt, tight clothing, sleeveless top or Western dress',
+      'an adult in Western professional styling — suit, blazer, tie, or business attire',
+      'East Asian, European or Sub-Saharan African facial features on the ADULTS',
       'crosses, church spires, cathedrals, or any non-Islamic religious symbol',
       'landmarks, flags or signage from another country',
     ],

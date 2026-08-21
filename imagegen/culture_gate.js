@@ -26,17 +26,22 @@ function cultureRulesFor(region) {
 }
 
 function buildAsk(rules) {
-  return `You are reviewing an illustration drawn for a ${rules.label} primary-school lesson.
-Judge ONLY whether the people, clothing, and setting fit ${rules.label} — not whether the picture is pretty or on-topic.
+  // Ask for EVIDENCE OF A VIOLATION, not proof of compliance. A checklist of
+  // requirements made the model treat anything it could not confirm as a failure — it
+  // rejected images whose teacher was perfectly correct because a child wore a t-shirt.
+  // Rejection now needs something clearly visible and wrong.
+  return `You are checking one illustration drawn for a ${rules.label} primary-school lesson.
 
-It PASSES only if all of these hold (ignore any that the picture gives no evidence for, e.g. no adult is shown):
-${rules.require.map((r, i) => `${i + 1}. ${r}`).join('\n')}
+Look ONLY at the ADULTS (the teacher). Ignore the children's clothing, the furniture, the
+board, and anything you cannot see clearly.
 
-It FAILS if ANY of these appear:
+Answer "fail" ONLY if you can CLEARLY SEE at least one of these in the picture:
 ${rules.forbid.map((r, i) => `${i + 1}. ${r}`).join('\n')}
 
-Be strict about clothing and faces: a teacher who would look at home in a European or American classroom is a FAIL for ${rules.label}.
-Reply with JSON only: {"pass": true|false, "reason": "one short sentence naming what you saw"}.`;
+If you see none of those, or the picture shows no adult at all, answer "pass".
+Do not fail for anything not on that list. Do not fail because detail is missing.
+
+Reply with JSON only: {"pass": true|false, "reason": "one short sentence naming exactly what you saw"}.`;
 }
 
 // { pass, reason, checked }  — checked:false means the verdict is unknown (gate off,

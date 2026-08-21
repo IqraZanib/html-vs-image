@@ -116,7 +116,13 @@ async function renderLessonImage(content, opts = {}) {
         store.put(key, dataUri, { model: got.model, concept: im.concept, prompt: im.prompt });
         imagesMap[im.id] = { dataUri, label: im.label, cover: im.concept !== 'diagram' };
         statsOut.generated++; log(`  ✓ image "${im.id}" generated (${got.model}) → saved to store`);
-      } else { statsOut.dropped++; log(`  ✗ image "${im.id}" dropped — no model passed the quality gate`); }
+      } else {
+        statsOut.dropped++;
+        // Say WHY: a regional-fit rejection is a different problem from a generation
+        // failure, and the operator needs to know which one happened.
+        const why = (got && got.reason) || 'no model passed the quality gate';
+        log(`  ✗ image "${im.id}" dropped — ${why}`);
+      }
     }
   } else if (wanted.length) {
     log('All content images restored from the store — no credits spent.');

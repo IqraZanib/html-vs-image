@@ -7,7 +7,7 @@ module.exports = {
     label: 'Kenya',
     require: [
       'people look Kenyan: dark brown skin, African features',
-      'children in Kenyan-style school uniforms (sweaters, shorts or pinafores)',
+      'the children are in ordinary school clothes',
       'adults in smart everyday Kenyan clothing, or a bright printed dress',
     ],
     forbid: [

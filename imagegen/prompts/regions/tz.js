@@ -7,7 +7,7 @@ module.exports = {
     label: 'Tanzania',
     require: [
       'people look Tanzanian: dark brown skin, African features',
-      'children in white shirts with navy or green shorts, skirts or pinafores',
+      'the children are in ordinary school clothes',
       'adults in smart everyday Tanzanian clothing, or a kitenge-print dress',
     ],
     forbid: [
