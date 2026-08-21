@@ -7,7 +7,11 @@ const { esc } = require('../template/shell');
 const { icon, hasIcon } = require('../template/icons');
 const { headerMotifs, headTwinkle, sparkle } = require('./motifs');
 const { accentFor } = require('./theme');
-const { renderMath, richText, katexCss, cleanHeading } = require('../math/math');
+const { renderMath, richText, katexCss, cleanHeading, isolateMath } = require('../math/math');
+
+// Label text: escaped, then any arithmetic run isolated left-to-right so «٢/٤» or
+// «١٥ ÷ ٥ = ٣» in a caption or a board label cannot be mirrored by the RTL page.
+const lbl = (v) => isolateMath(esc(cleanHeading(v == null ? '' : v)));
 
 const ALPHA = 'abcdefghijklmnopqrstuvwxyz';
 const mark = (kind, i) => (kind === 'alpha' ? ALPHA[i] + ')' : kind === 'num' ? String(i + 1) : '•');
@@ -228,7 +232,7 @@ function cfText(x, y, s, size = 13, weight = 700, fill = CF.ink, anchor = 'middl
   const dir = txt.trim() && MATHY.test(txt) ? 'ltr' : 'rtl';
   return '<text x="' + x + '" y="' + y + '" text-anchor="' + anchor + '" font-size="' + size
     + '" font-weight="' + weight + '" fill="' + fill + '" direction="' + dir + '"'
-    + (dir === 'ltr' ? ' style="unicode-bidi:isolate"' : '') + '>' + esc(txt) + '</text>';
+    + (dir === 'ltr' ? ' style="unicode-bidi:isolate-override"' : '') + '>' + esc(txt) + '</text>';
 }
 
 // N parts of one shape, K shaded (square grid or circle pie) — exact fractions.
@@ -305,7 +309,12 @@ function cfCompare({ items = [] }) {
 
 // A large expression/word (e.g. ٢/٤ or a key term) drawn as text, not generated.
 function cfExpression({ text }) {
-  return '<div class="cf-expr">' + esc(String(text || '')) + '</div>';
+  // Only force left-to-right when the content really IS maths. isolate-override forces
+  // EVERY character to the container's direction, so applying it to an Arabic phrase
+  // («تبخر ≠ تكاثف») renders the words backwards — which is exactly what happened.
+  const t = String(text || '');
+  const mathy = t.trim() && MATHY.test(t);
+  return '<div class="cf-expr' + (mathy ? ' ltr-math" dir="ltr"' : '"') + '>' + esc(t) + '</div>';
 }
 
 
@@ -626,7 +635,7 @@ function cfMini(spec) {
 function cfErrorBoard(cf) {
   const half = (spec, mark, cls, label) => '<div class="cb-half ' + cls + '"><div class="cb-mark">' + mark + '</div>'
     + '<div class="cb-vis">' + cfMini(spec) + '</div>'
-    + (label ? '<div class="cb-label">' + esc(cleanHeading(label)) + '</div>' : '') + '</div>';
+    + (label ? '<div class="cb-label">' + lbl(label) + '</div>' : '') + '</div>';
   return '<div class="d-code-board">' + half(cf.wrong, '✗', 'cb-wrong', cf.labelWrong)
     + '<div class="cb-divider"></div>' + half(cf.correct, '✓', 'cb-correct', cf.labelCorrect) + '</div>';
 }
@@ -761,7 +770,7 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
         ? { ...cf, orient: stepCount >= 4 ? 'h' : 'v', wide: spans && stepCount < 4 }
         : cf;
       const wide = spans ? ' cf-wide cf-k-' + cf.kind : ' cf-k-' + cf.kind;
-      const fig = `<div class="d-inline-img d-code-fig${wide}">${cfMini(spec)}${cf.label ? `<div class="cf-label">${esc(cf.label)}</div>` : ''}${cf.caption ? `<div class="cap">${esc(cleanHeading(cf.caption))}</div>` : ''}</div>`;
+      const fig = `<div class="d-inline-img d-code-fig${wide}">${cfMini(spec)}${cf.label ? `<div class="cf-label">${lbl(cf.label)}</div>` : ''}${cf.caption ? `<div class="cap">${lbl(cf.caption)}</div>` : ''}</div>`;
       return `<section class="section${idCls}">${head}<div class="panel has-inline-img" style="border-color:var(${accent}-soft)"><div class="ii-body">${body}</div>${fig}</div></section>`;
     }
     const inlineIm = !mg && section.image && images[section.image] && images[section.image].dataUri ? images[section.image] : null;

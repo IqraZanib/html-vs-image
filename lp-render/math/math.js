@@ -72,12 +72,28 @@ function mdInline(escaped) {
   s = s.replace(/(^|<br>)(\s*)([^:<>\n]{2,42}):(?=\s|<br>|$)/g, '$1$2<b>$3:</b>');
   return s;
 }
+// An arithmetic run inside RTL Arabic is laid out mirrored: the digits are strong
+// Arabic-Number characters but the operators between them are NEUTRAL, so they take
+// the paragraph's right-to-left direction and «١٥ ÷ ٥ = ٣» renders as «٣ = ٥ ÷ ١٥».
+// The equation on the page then disagrees with the equation the lesson means.
+//
+// So every arithmetic run gets its own left-to-right, bidi-isolated container. Digits
+// on their own (a page number, a count of minutes) are left alone — only a run with an
+// operator or an equals sign is maths.
+const MATH_RUN = /[٠-٩0-9]+(?:\s*[+\-×÷*/]\s*[٠-٩0-9]+)*\s*=\s*[٠-٩0-9]+|[٠-٩0-9]+\s*[+\-×÷*/]\s*[٠-٩0-9]+/g;
+
+function isolateMath(html) {
+  // Runs on ESCAPED html, so it must not break entities or tags: the pattern only
+  // matches digits, operators and spaces, none of which appear inside a tag name.
+  return html.replace(MATH_RUN, (m) => `<span class="ltr-math" dir="ltr">${m}</span>`);
+}
+
 function richText(raw, { engine = 'katex' } = {}) {
   const s = String(raw == null ? '' : raw);
   return s.split(/(\$\$[^$]+\$\$|\$[^$]+\$)/g).map((p) => {
     if (/^\$\$[^$]+\$\$$/.test(p)) return renderMath(p.slice(2, -2), { display: true, engine });
     if (/^\$[^$]+\$$/.test(p)) return renderMath(p.slice(1, -1), { display: false, engine });
-    return mdInline(esc(p));
+    return isolateMath(mdInline(esc(p)));
   }).join('');
 }
 
@@ -86,4 +102,4 @@ function cleanHeading(raw) {
   return String(raw == null ? '' : raw).replace(/[*_`#]+/g, '').replace(/\s+/g, ' ').trim();
 }
 
-module.exports = { renderMath, renderKatex, renderMathjaxSvg, katexCss, richText, cleanHeading };
+module.exports = { renderMath, renderKatex, renderMathjaxSvg, katexCss, richText, cleanHeading, isolateMath, MATH_RUN };

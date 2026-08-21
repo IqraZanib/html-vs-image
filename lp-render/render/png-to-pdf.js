@@ -84,6 +84,25 @@ async function htmlToPixelPdf(html, opts = {}) {
           }
         });
       });
+      // MATH DIRECTION: an arithmetic run must read left-to-right on the page. Measure
+      // the first and last character of each run: if the first sits to the RIGHT of the
+      // last, the equation is mirrored and disagrees with the lesson.
+      const MATH_RE = /[\u0660-\u06690-9]+(?:\s*[+\-\u00d7\u00f7*/]\s*[\u0660-\u06690-9]+)*\s*=\s*[\u0660-\u06690-9]+/;
+      {
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        let node;
+        while ((node = walker.nextNode())) {
+          const s = node.nodeValue || '';
+          const m = s.match(MATH_RE);
+          if (!m) continue;
+          const i = s.indexOf(m[0]);
+          const r1 = document.createRange(); r1.setStart(node, i); r1.setEnd(node, i + 1);
+          const r2 = document.createRange(); r2.setStart(node, i + m[0].length - 1); r2.setEnd(node, i + m[0].length);
+          const a = r1.getBoundingClientRect(); const z = r2.getBoundingClientRect();
+          if (!a.width || !z.width) continue;
+          if (a.left > z.left) overflow.push({ kind: 'math_reversed', text: m[0] });
+        }
+      }
       // and HTML text spilling out of its panel
       document.querySelectorAll('.panel').forEach((panel) => {
         const pb = panel.getBoundingClientRect();

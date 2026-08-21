@@ -641,6 +641,27 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .d-twin-board .tb-half img{height:calc(150px * var(--figscale))}
 .section.sec-errors .d-inline-img img{height:calc(204px * var(--figscale))}
 
+
+/* MATHS IS NOT PROSE. An arithmetic run inside RTL Arabic is laid out mirrored — the
+   digits are strong Arabic-Number characters but the operators between them are
+   neutral and take the paragraph direction, so «١٥ ÷ ٥ = ٣» renders as «٣ = ٥ ÷ ١٥».
+   Every arithmetic run is wrapped in .ltr-math and forced left-to-right. */
+/* isolate is NOT enough: Arabic-Indic digits carry an intrinsic Arabic-Number class,
+   so even inside an LTR isolate the number sequence still resolves right-to-left.
+   isolate-override forces every character to the container's direction, which is the
+   only thing that actually puts «١٥ ÷ ٥ = ٣» in the order the lesson means. */
+.ltr-math{direction:ltr !important;unicode-bidi:isolate-override !important;display:inline-block}
+/* NB: no blanket rule on .cf-expr — an expression figure often holds an Arabic
+   phrase, and forcing LTR on that renders the words backwards. The renderer adds
+   .ltr-math only when the content is digits and operators. */
+
+/* A process/cycle diagram is the MAIN visual of its stage, so it gets real size rather
+   than sitting small inside a wide card — roughly 1.6x what it had. Density still
+   scales it to fit, so this is a ceiling and not a fixed height. */
+.panel.has-inline-img .d-code-fig.cf-k-process .cf-svg{max-height:calc(240px * var(--figscale))}
+.section.sec-stage-taqwim .d-code-fig.cf-k-process .cf-svg{max-height:calc(210px * var(--figscale))}
+.panel.has-inline-img .d-code-fig.cf-k-process{width:100%}
+
 `;
 
 // MAX_PAGES is the pack's page contract: this design set is a two-page daily guide,
