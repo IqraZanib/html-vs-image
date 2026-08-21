@@ -228,8 +228,10 @@ function cfSvg(inner, w = 240, h = 200, cls = 'cf-svg') {
 // left-to-right, isolated from its surroundings.
 const MATHY = /^[\s\u0660-\u06690-9+\-×÷*/=<>().,:]+$/;
 function cfText(x, y, s, size = 13, weight = 700, fill = CF.ink, anchor = 'middle') {
-  const txt = String(s || '');
+  let txt = String(s || '');
   const dir = txt.trim() && MATHY.test(txt) ? 'ltr' : 'rtl';
+  // No Unicode isolate here either: measured, it re-enables bidi inside the override
+  // and reverses the expression. direction + unicode-bidi:isolate-override is enough.
   return '<text x="' + x + '" y="' + y + '" text-anchor="' + anchor + '" font-size="' + size
     + '" font-weight="' + weight + '" fill="' + fill + '" direction="' + dir + '"'
     + (dir === 'ltr' ? ' style="unicode-bidi:isolate-override"' : '') + '>' + esc(txt) + '</text>';
