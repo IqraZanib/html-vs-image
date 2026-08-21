@@ -7,11 +7,11 @@ const { esc } = require('../template/shell');
 const { icon, hasIcon } = require('../template/icons');
 const { headerMotifs, headTwinkle, sparkle } = require('./motifs');
 const { accentFor } = require('./theme');
-const { renderMath, richText, katexCss, cleanHeading, isolateMath } = require('../math/math');
+const { renderMath, richText, katexCss, cleanHeading } = require('../math/math');
 
-// Label text: escaped, then any arithmetic run isolated left-to-right so «٢/٤» or
-// «١٥ ÷ ٥ = ٣» in a caption or a board label cannot be mirrored by the RTL page.
-const lbl = (v) => isolateMath(esc(cleanHeading(v == null ? '' : v)));
+// Label text: escaped and stripped of markdown noise. Direction is the page's —
+// see cfText for why arithmetic is not special-cased.
+const lbl = (v) => esc(cleanHeading(v == null ? '' : v));
 
 const ALPHA = 'abcdefghijklmnopqrstuvwxyz';
 const mark = (kind, i) => (kind === 'alpha' ? ALPHA[i] + ')' : kind === 'num' ? String(i + 1) : '•');
@@ -222,19 +222,14 @@ const CF = { fill: '#f5c33b', empty: '#ffffff', stroke: '#2f3e63', ink: '#0a1220
 function cfSvg(inner, w = 240, h = 200, cls = 'cf-svg') {
   return '<svg class="' + cls + '" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">' + inner + '</svg>';
 }
-// Arabic labels are RTL, but a mathematical expression is not: «١٢ ÷ ٢ = ٦» inside an
-// RTL run can be reordered by the bidi algorithm, so the drawing would disagree with
-// the equation the lesson meant. Anything that is digits and operators only is emitted
-// left-to-right, isolated from its surroundings.
-const MATHY = /^[\s\u0660-\u06690-9+\-×÷*/=<>().,:]+$/;
+// Labels — including equations — carry the lesson's own direction. An Arabic
+// expression is written with its first operand on the right, so rtl is correct for
+// both prose and arithmetic; forcing ltr on digit-and-operator strings is what made
+// «١٦ ÷ ٤ = ٤» read backwards in figures. See lp-render/math/math.js.
 function cfText(x, y, s, size = 13, weight = 700, fill = CF.ink, anchor = 'middle') {
-  let txt = String(s || '');
-  const dir = txt.trim() && MATHY.test(txt) ? 'ltr' : 'rtl';
-  // No Unicode isolate here either: measured, it re-enables bidi inside the override
-  // and reverses the expression. direction + unicode-bidi:isolate-override is enough.
+  const txt = String(s || '');
   return '<text x="' + x + '" y="' + y + '" text-anchor="' + anchor + '" font-size="' + size
-    + '" font-weight="' + weight + '" fill="' + fill + '" direction="' + dir + '"'
-    + (dir === 'ltr' ? ' style="unicode-bidi:isolate-override"' : '') + '>' + esc(txt) + '</text>';
+    + '" font-weight="' + weight + '" fill="' + fill + '" direction="rtl">' + esc(txt) + '</text>';
 }
 
 // N parts of one shape, K shaded (square grid or circle pie) — exact fractions.
@@ -311,12 +306,10 @@ function cfCompare({ items = [] }) {
 
 // A large expression/word (e.g. ٢/٤ or a key term) drawn as text, not generated.
 function cfExpression({ text }) {
-  // Only force left-to-right when the content really IS maths. isolate-override forces
-  // EVERY character to the container's direction, so applying it to an Arabic phrase
-  // («تبخر ≠ تكاثف») renders the words backwards — which is exactly what happened.
+  // No direction override: an Arabic phrase («تبخر ≠ تكاثف») and an Arabic equation
+  // are both written right-to-left at token level.
   const t = String(text || '');
-  const mathy = t.trim() && MATHY.test(t);
-  return '<div class="cf-expr' + (mathy ? ' ltr-math" dir="ltr"' : '"') + '>' + esc(t) + '</div>';
+  return '<div class="cf-expr">' + esc(t) + '</div>';
 }
 
 
@@ -830,4 +823,6 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
   return { headerHtml, bodyHtml: body, headCss };
 }
 
-module.exports = { renderDecorativeLesson };
+// cfText is exported for lp-render/test/math-direction.test.js: the direction of a
+// figure label is a rule worth asserting directly, not only through a full render.
+module.exports = { renderDecorativeLesson, cfText };
