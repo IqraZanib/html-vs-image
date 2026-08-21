@@ -76,3 +76,21 @@ test('a finding spread across a label and its caption is still fixed', () => {
   assert.strictEqual(guide.sections[0].codeFigure.stages[1].caption, 'ثانيًا', 'other stages untouched');
   assert.ok(changes.some((c) => c.rule === 'wudu_naming'));
 });
+
+// DIACRITICS WERE THE BLIND SPOT. The generated text says «تلُ الآية» and «ذو نُواس»
+// with harakat, so patterns written against bare letters silently never matched — and
+// the verification shared the same flaw, so it passed a set that still had both.
+test('rules match through harakat', () => {
+  assert.match(fixString('تلُ الآية واسأل'), /اتلُ الآية/);
+  assert.match(fixString('الذين حرّضوا ذو نُواس'), /حرّضوا ذا نُواس/);
+  assert.match(fixString('وإيمانُ يحبني'), /وإيمانُ تحبني/);
+});
+
+test('the diacritics already on a word are preserved, not stripped', () => {
+  assert.strictEqual(fixString('الذين حرّضوا ذو نُواس'), 'الذين حرّضوا ذا نُواس');
+});
+
+test('«ذو نواس» after a copula is correct Arabic and must be left alone', () => {
+  // «الملك هو ذو نُواس» is nominative and right; only the post-verb case changes.
+  assert.strictEqual(fixString('الملك هو ذو نُواس'), 'الملك هو ذو نُواس');
+});

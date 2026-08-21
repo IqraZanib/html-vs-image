@@ -11,13 +11,24 @@
 // caught «وإيمان يحبني» for a girl's name; the fix is the morphology, not that phrase.
 const FEMALE_NAMES = ['إيمان', 'سبأ', 'هدى', 'سلمى', 'فاطمة', 'زينب', 'مريم', 'أمي', 'أختي', 'الأم', 'البنت', 'التلميذة'];
 
+// Diacritics are the trap: the generated text says «تلُ الآية» and «ذو نُواس», so a
+// pattern written against the bare letters never matches. Every rule below is built
+// with tolerance for harakat and tatweel between letters — and the verification uses
+// the same helper, because a check with the same blind spot as the fix is no check.
+const HARAKAT = '[\u064B-\u0652\u0670\u0640]*';
+function tolerant(word) {
+  // Tolerance must also come AFTER the last letter: «تلُ» carries its damma there, and
+  // without the trailing class the pattern stops one character short and never matches.
+  return word.split('').map((ch) => ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join(HARAKAT) + HARAKAT;
+}
+
 const RULES = [
   // ── verb agreement after a female subject ──────────────────────────────────
   ...FEMALE_NAMES.map((name) => ({
     id: 'fem_agreement',
     note: `${name} is female, so the verb takes ت- not ي-`,
     // «إيمان يحبني» → «إيمان تحبني». Only the 3rd-person present prefix.
-    find: new RegExp(`(${name}\\s+)ي([\\u0621-\\u064A]{2,})`, 'g'),
+    find: new RegExp(`(${tolerant(name)}\\s+)ي([\\u0621-\\u064A]{2,})`, 'g'),
     to: (m, pre, rest) => `${pre}ت${rest}`,
   })),
 
@@ -42,11 +53,14 @@ const RULES = [
   { id: 'letter_names', note: 'spell the letter names out',
     find: /بين\s+ب\s+و\s*ن\s+و\s*ي(?![ء-ي])/g, to: () => 'بين الباء والنون والياء' },
 
-  { id: 'imperative_tala', note: 'تل → اتلُ (correct imperative)',
-    find: /(^|[\s«"(])تل\s+الآية/g, to: (m, pre) => `${pre}اتلُ الآية` },
+  { id: 'imperative_tala', note: 'تل → اتلُ (correct imperative), diacritics and all',
+    find: new RegExp(`(^|[\\s«"(])${tolerant('تل')}\\s+${tolerant('الآية')}`, 'g'),
+    to: (m, pre) => `${pre}اتلُ الآية` },
 
   { id: 'accusative_dhu', note: 'after a verb the name takes the accusative: ذا نواس',
-    find: /(حرّضوا|حرضوا)\s+ذو\s+نواس/g, to: (m, v) => `${v} ذا نواس` },
+    // keeps whatever diacritics the name already carries («نُواس» stays «نُواس»)
+    find: new RegExp(`(${tolerant('حرّضوا')}|${tolerant('حرضوا')})\\s+${tolerant('ذو')}\\s+(${tolerant('نواس')})`, 'g'),
+    to: (m, verb, name) => `${verb} ذا ${name}` },
 
   { id: 'theft_phrasing', note: 'natural Arabic for the burglary sentence',
     find: /فعل\s+اللصوص\s+بالدكان\s+السرقة[^.،]*/g, to: () => 'سرق اللصوص الدكان وكسروا الباب' },
@@ -141,4 +155,4 @@ function fixGuide(guide, { log = null } = {}) {
   return { guide, changes };
 }
 
-module.exports = { fixGuide, fixString, RULES, FEMALE_NAMES, GLOSSARY };
+module.exports = { fixGuide, fixString, RULES, FEMALE_NAMES, GLOSSARY, tolerant, HARAKAT };
