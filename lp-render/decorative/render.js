@@ -310,16 +310,23 @@ function cfProcess({ layout = 'cycle', stages = [] }) {
   const TINT = ['#fcd8d8', '#e7eef8', '#e9f2e5', '#fcf0d8', '#f1e7f5', '#dcf2f2'];
   const defs = '<defs><marker id="cfPA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
     + '<path d="M 0 0 L 10 5 L 0 10 z" fill="' + CF.stroke + '"/></marker></defs>';
-  const box = (cx, cy, w, h, i, s) => {
-    // Fit each stage name to its own box: one fixed size for every stage is what let a
-    // long name («هطول المطر») run past the edge of the rectangle.
-    const base = S.length > 4 ? 14 : 16;
-    const fit = cfFit(s.label, w - 12, base, 2, 9, 700);
-    const capFit = s.caption ? cfFit(String(s.caption), w - 10, 12, 1, 8, 600) : null;
-    let ty = cy + (capFit ? -4 : 5) - (fit.lines.length - 1) * (fit.size / 2);
+  // Fit every stage name FIRST, then size the boxes to whatever the longest needs. A
+  // fixed box height with adaptive text is how a two-line stage name ended up
+  // standing above the top edge of its rectangle.
+  const fitStage = (st, w) => ({
+    fit: cfFit(st.label, w - 14, S.length > 4 ? 14 : 16, 2, 9, 700),
+    capFit: st.caption ? cfFit(String(st.caption), w - 12, 12, 1, 8, 600) : null,
+  });
+  const boxHeightFor = (fits) => Math.max(48, ...fits.map((f) =>
+    16 + f.fit.lines.length * (f.fit.size + 2) + (f.capFit ? f.capFit.size + 6 : 0)));
+  const box = (cx, cy, w, h, i, s, pre) => {
+    const { fit, capFit } = pre || fitStage(s, w);
+    // top-align the label block: growing to two lines then never pushes the first
+    // line out through the top of the box
+    let ty = cy - h / 2 + 8 + fit.size * 0.85;
     let label = '';
     for (const line of fit.lines) { label += cfText(cx, ty, line, fit.size, 700); ty += fit.size + 2; }
-    const cap = capFit ? cfText(cx, cy + h / 2 - 9, capFit.lines[0] || '', capFit.size, 600, CF.stroke) : '';
+    const cap = capFit ? cfText(cx, cy + h / 2 - 7, capFit.lines[0] || '', capFit.size, 600, CF.stroke) : '';
     // grouped: rect first, then its text, so overflow is checkable against the box
     return '<g class="cf-card"><rect x="' + (cx - w / 2) + '" y="' + (cy - h / 2) + '" width="' + w + '" height="' + h
       + '" rx="9" fill="' + TINT[i % TINT.length] + '" stroke="' + CF.stroke + '" stroke-width="2"/>' + label + cap + '</g>';
@@ -336,7 +343,9 @@ function cfProcess({ layout = 'cycle', stages = [] }) {
   };
 
   if (layout === 'linear') {
-    const W = 430, BH = 52, BW = Math.min(126, (W - 40 - (S.length - 1) * 26) / S.length);
+    const W = 430, BW = Math.min(126, (W - 40 - (S.length - 1) * 26) / S.length);
+    const preL = S.map((st) => fitStage(st, BW));
+    const BH = boxHeightFor(preL);
     const gap = (W - 30 - S.length * BW) / Math.max(1, S.length - 1);
     const cy = 40 + (S.some((s) => s.caption) ? 6 : 0);
     let out = defs, xs = [];
@@ -344,7 +353,7 @@ function cfProcess({ layout = 'cycle', stages = [] }) {
     for (let i = 0; i < S.length; i++) {
       const cx = W - 15 - BW / 2 - i * (BW + gap);
       xs.push(cx);
-      out += box(cx, cy, BW, BH, i, S[i]);
+      out += box(cx, cy, BW, BH, i, S[i], preL[i]);
     }
     for (let i = 0; i < S.length - 1; i++) out += arrow(xs[i], cy, xs[i + 1], cy, BW, BH);
     return cfSvg(out, W, cy + BH / 2 + 14);
@@ -355,7 +364,9 @@ function cfProcess({ layout = 'cycle', stages = [] }) {
   // flat and wide: the card is wide, so a squat ellipse keeps the labels large
   // without adding page height.
   const W = 470, H = 196, cx0 = W / 2, cy0 = H / 2, rx = 176, ry = 62;
-  const BW = S.length > 4 ? 108 : 122, BH = 54; // room for a two-line stage name
+  const BW = S.length > 4 ? 108 : 122;
+  const preC = S.map((st) => fitStage(st, BW));
+  const BH = boxHeightFor(preC); // whatever the longest stage name needs
   let out = defs, pts = [];
   for (let i = 0; i < S.length; i++) {
     const th = -Math.PI / 2 - (2 * Math.PI * i) / S.length;
@@ -366,7 +377,7 @@ function cfProcess({ layout = 'cycle', stages = [] }) {
     const [x1, y1] = pts[i], [x2, y2] = pts[(i + 1) % S.length];
     out += arrow(x1, y1, x2, y2, BW, BH);
   }
-  for (let i = 0; i < S.length; i++) out += box(pts[i][0], pts[i][1], BW, BH, i, S[i]);
+  for (let i = 0; i < S.length; i++) out += box(pts[i][0], pts[i][1], BW, BH, i, S[i], preC[i]);
   return cfSvg(out, W, H);
 }
 
@@ -442,7 +453,9 @@ function cfSteps({ items = [], numbered = true, orient = 'h', wide = false }) {
       const capFit = cap ? cfFit(cap, TXTW, CS, 1, 8, 600) : null;
       // +9 rather than +5: Arabic descenders («ي», «ج») reach further below the baseline
       // than a naive line-height allows, and they were poking through the card edge.
-      const h = 14 + fit.lines.length * (fit.size + 3) + (cap ? capFit.size + 9 : 0);
+      // Arabic descenders («ة», «ب», «ج») reach about 0.36em below the baseline, so a
+      // card sized on line-height alone lets them poke through its bottom edge.
+      const h = 19 + fit.lines.length * (fit.size + 3) + (cap ? capFit.size + 9 : 0);
       // Each card is a group: its rect first, then its text, so overflow can be
       // checked against the box the text is supposed to sit in.
       out += '<g class="cf-card">'
@@ -455,7 +468,7 @@ function cfSteps({ items = [], numbered = true, orient = 'h', wide = false }) {
       }
       // The badge sits at the right edge (RTL start), so the text centres in what is left.
       const tx = (CW - 40) / 2;
-      let ty = y + 12 + fit.size * 0.8;
+      let ty = y + 13 + fit.size * 0.8;
       for (const line of fit.lines) { out += cfText(tx, ty, line, fit.size, 800); ty += fit.size + 3; }
       if (cap) out += cfText(tx, y + h - 9, capFit.lines[0] || '', capFit.size, 600, CF.stroke);
       out += '</g>';
@@ -475,7 +488,7 @@ function cfSteps({ items = [], numbered = true, orient = 'h', wide = false }) {
   const capFits = S.map((s) => (String(s.caption || '').trim() ? cfFit(String(s.caption).trim(), BW - 12, CS, 1, 8, 600) : null));
   const CSf = Math.min(CS, ...capFits.filter(Boolean).map((f) => f.size));
   const maxL = Math.max(...labelLines.map((l) => l.length));
-  const BH = 30 + maxL * (LSf + 3) + (hasCap ? CSf + 11 : 0);
+  const BH = 35 + maxL * (LSf + 3) + (hasCap ? CSf + 11 : 0);
   const y0 = 6;
   let out = '';
   for (let i = 0; i < n; i++) {
