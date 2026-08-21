@@ -1,6 +1,16 @@
 'use strict';
 const S = require('../scaffold');
 
+// Every illustration carries its region's art direction: setting, clothing, what an
+// adult in the scene wears, and what would look out of place. Kept as one short line
+// so a model with a hard prompt limit does not lose it to compaction.
+function cultureLine(r) {
+  if (!r) return '';
+  return [r.setting ? `set in ${r.setting}` : '', r.dress ? `children dressed as ${r.dress}` : '', r.teacher || '']
+    .filter(Boolean).join('; ');
+}
+function avoidLine(r) { return r && r.avoid ? r.avoid : ''; }
+
 function charactersLine(spec) {
   if (!spec.characters.length) return '';
   return 'showing ' + spec.characters.map((c) => `${c.name} (${c.appearance})`).join(' and ');
@@ -15,10 +25,11 @@ const TEMPLATES = {
       S.SCENE_STYLE,
       `Scene: ${brief}`,
       charactersLine(ctx.chars),
-      `set in ${ctx.region.setting}`,
+      cultureLine(ctx.region),
       ctx.region.note,
       S.QUALITY,
       textless ? S.NEGATIVE_TEXTLESS : S.NEGATIVE_SCENE,
+      avoidLine(ctx.region),
     ]);
   },
   'labeled_diagram.default': (ctx) => {
@@ -29,8 +40,10 @@ const TEMPLATES = {
       S.DIAGRAM_STYLE_TEXTLESS,
       `Illustration of: ${brief}`,
       ctx.grade ? `for grade ${ctx.grade}` : '',
+      cultureLine(ctx.region),
       S.QUALITY,
       S.NEGATIVE_TEXTLESS,
+      avoidLine(ctx.region),
     ]);
     return S.join([
       S.DIAGRAM_STYLE,

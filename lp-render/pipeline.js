@@ -14,6 +14,7 @@ const { renderDecorativeLesson } = require('./decorative/render');
 const { htmlToPixelPdf } = require('./render/png-to-pdf');
 const { ensureCast } = require('./decorative/characters');
 const store = require('./store/assets');
+const { resolveRegion } = require('../imagegen/prompts/regions');
 const { resolveSegmentImages } = require('../imagegen');
 const { chromium } = require('../node_modules/playwright-core');
 
@@ -69,8 +70,14 @@ async function renderLessonImage(content, opts = {}) {
 
   const imagesMap = {};
   const toGen = [];
+  // Cache identity = the brief + the region + that region's art-direction version.
+  // Keyed on the brief alone, changing how Yemeni teachers are dressed changed
+  // nothing: every lesson just restored the old picture.
+  const artRegion = String(meta.region || ({ sw: 'ke', ar: 'ye' })[locale] || 'pk').toLowerCase();
+  const artVersion = (resolveRegion(artRegion) || {}).version || 1;
+  const cacheKey = (prompt) => store.keyFor(`${prompt}|region:${artRegion}|art:v${artVersion}`);
   for (const im of wanted) {
-    const key = store.keyFor(im.prompt);
+    const key = cacheKey(im.prompt);
     if (!fresh) {
       const hit = store.get(key);
       if (hit) { imagesMap[im.id] = { dataUri: hit.dataUri, label: im.label, cover: im.concept !== 'diagram' }; statsOut.restored++; log(`  ⤿ image "${im.id}" restored from store (no credits)`); continue; }
@@ -151,6 +158,7 @@ async function renderLessonImage(content, opts = {}) {
   let regionCss = '';
   let regionPageStyle = '';
   let regionMaxPages = null;
+  let overflowFindings = [];
   if (regionPack) {
     try {
       const pack = regionPack;
@@ -178,7 +186,16 @@ async function renderLessonImage(content, opts = {}) {
     // preview, no section leaking, real margins. Falls back to the Chromium vector PDF if
     // python3 + pillow + img2pdf are not available.
     try {
-      pdf = await htmlToPixelPdf(html, regionPageStyle ? { pageStyle: regionPageStyle, footerText: (content.meta && content.meta.footer) || '' } : {});
+      // No instructional text may leave its container: the composer measures the real
+      // laid-out DOM and reports before the PDF is built.
+      const onFindings = (list) => {
+        for (const f of (list || []).slice(0, 8)) log(`  ⚠ ${f.kind}: «${f.text}» does not fit inside its box`);
+        if ((list || []).length > 8) log(`  ⚠ …and ${list.length - 8} more overflow finding(s)`);
+        overflowFindings = list || [];
+      };
+      pdf = await htmlToPixelPdf(html, regionPageStyle
+        ? { pageStyle: regionPageStyle, footerText: (content.meta && content.meta.footer) || '', onFindings }
+        : { onFindings });
     } catch (e) {
       log(`  (pixel-perfect PDF unavailable — ${e.message}; using vector fallback)`);
       pdf = await htmlToPdf(html, { pageMode: 'paged', pdfOptions: { printBackground: true } });
@@ -193,7 +210,7 @@ async function renderLessonImage(content, opts = {}) {
   try { stripHeight = png && png.length > 24 ? Buffer.from(png).readUInt32BE(20) : null; } catch (_) { /* not a PNG buffer */ }
   const usablePerPage = 1123 - 28 - (regionPageStyle === 'ar-bottom' ? 36 : 12);
   const pageBudget = regionMaxPages ? regionMaxPages * usablePerPage : null;
-  return { png, pdf, html, contentId, locale, stats: statsOut, maxPages: regionMaxPages, stripHeight, pageBudget };
+  return { png, pdf, html, contentId, locale, stats: statsOut, maxPages: regionMaxPages, stripHeight, pageBudget, overflow: overflowFindings };
 }
 
 module.exports = { renderLessonImage, ROOT };

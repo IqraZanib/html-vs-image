@@ -229,7 +229,11 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
       figure-driven cards (تطبيق/تقويم) keep flow layout. */
 .section.sec-stage-tamhid .d-inline-img,.section.sec-stage-arad .d-inline-img{position:relative;align-self:stretch;min-height:230px}
 .section.sec-stage-tamhid .d-inline-img img,.section.sec-stage-arad .d-inline-img img{position:absolute;left:0;top:0;width:100%;height:calc(100% - 24px);object-fit:contain;max-height:none}
-.section.sec-stage-tamhid .d-inline-img .cap,.section.sec-stage-arad .d-inline-img .cap{position:absolute;bottom:0;left:0;right:0}
+/* This pins the caption to the bottom of a hero IMAGE, whose box is positioned. A
+   CODE figure's box is static, so an absolute caption escaped it and landed at the
+   foot of the page — two of them stacked on each other, 440px from their figures.
+   Restrict it to real images. */
+.section.sec-stage-tamhid .d-inline-img:not(.d-code-fig) .cap,.section.sec-stage-arad .d-inline-img:not(.d-code-fig) .cap{position:absolute;bottom:0;left:0;right:0}
 .section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:166px}
 /* 7) footer: stronger, pilot-proportioned band */
 .lp-footer{border-top:2px solid var(--navy);font-size:11.5px;padding:6px 4px 0;margin:8px 22px 0}
@@ -621,13 +625,16 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
    it get bigger — which is what fills a page that came out sparse. */
 .section.sec-stage-tamhid .d-inline-img.d-code-fig,.section.sec-stage-arad .d-inline-img.d-code-fig{min-height:0}
 .section.sec-stage-tamhid .d-inline-img:not(.d-code-fig),.section.sec-stage-arad .d-inline-img:not(.d-code-fig){min-height:calc(242px * var(--figscale))}
-.panel.has-inline-img .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:calc(176px * var(--figscale))}
-.section.sec-stage-taqwim .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:calc(158px * var(--figscale))}
 .panel.has-inline-img .d-code-fig.cf-k-steps:not(.cf-wide) .cf-svg{max-height:calc(200px * var(--figscale))}
 .section.sec-stage-taqwim .d-code-fig.cf-k-steps:not(.cf-wide) .cf-svg{max-height:calc(170px * var(--figscale))}
-.panel.has-inline-img .d-code-fig.cf-k-labeled-parts .cf-svg{max-height:calc(206px * var(--figscale))}
 .section.sec-stage-tatbiq .d-code-fig .cf-svg{max-height:calc(166px * var(--figscale))}
 .panel.has-inline-img .d-code-fig.cf-wide .cf-svg{max-height:calc(112px * var(--figscale))}
+/* kind-specific caps must come AFTER the generic cf-wide cap: same specificity, so
+   source order decides, and the generic 112px was silently flattening the labelled
+   diagram to a fifth of the height it was given. */
+.panel.has-inline-img .d-code-fig.cf-k-labeled-parts .cf-svg{max-height:calc(258px * var(--figscale))}
+.panel.has-inline-img .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:calc(176px * var(--figscale))}
+.section.sec-stage-taqwim .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:calc(158px * var(--figscale))}
 .section.sec-stage-taqwim .d-code-fig.cf-wide .cf-svg{max-height:calc(140px * var(--figscale))}
 .section.sec-solutions .d-code-fig.cf-wide .cf-svg,.section.sec-homework .d-code-fig.cf-wide .cf-svg{max-height:calc(96px * var(--figscale))}
 .section.sec-errors .d-twin-board .tb-half img{height:calc(170px * var(--figscale))}

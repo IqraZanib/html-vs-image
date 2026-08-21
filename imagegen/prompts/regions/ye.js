@@ -1,9 +1,17 @@
 'use strict';
+// Yemen art direction. The region pack governs not just colours and layout but what
+// the people, clothing, buildings and objects in an illustration look like — a
+// reviewer flagged a teacher in generic Western dress, which no palette rule fixes.
 module.exports = {
+  // Bump when the art direction changes: the asset-store key includes it, so cached
+  // artwork drawn under the old direction is not silently reused.
+  version: 2,
   id: 'ye',
   dress: 'Yemeni school clothing — girls in small white headscarves and modest uniforms, boys in simple light shirts',
-  setting: 'a Yemeni classroom or town setting (traditional Yemeni buildings, a small school)',
+  teacher: 'any adult woman wears a long loose dark abaya with a plain headscarf fully covering her hair; any adult man wears a plain ankle-length white thobe',
+  setting: 'a Yemeni classroom or town setting (traditional tower houses in mud brick and stone, a small school)',
   names: 'Yemeni names (Salma, Yusuf, Huda, Faisal)',
   palette: 'warm, bright, friendly colours',
-  note: 'culturally grounded and respectful; classroom-appropriate for young children',
+  avoid: 'no Western dress, no sleeveless or tight clothing, no uncovered adult women, no crosses or church architecture, no non-Yemeni landmarks or flags',
+  note: 'culturally grounded in Yemen and respectful; classroom-appropriate for young children',
 };

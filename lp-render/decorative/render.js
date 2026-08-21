@@ -311,10 +311,18 @@ function cfProcess({ layout = 'cycle', stages = [] }) {
   const defs = '<defs><marker id="cfPA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
     + '<path d="M 0 0 L 10 5 L 0 10 z" fill="' + CF.stroke + '"/></marker></defs>';
   const box = (cx, cy, w, h, i, s) => {
-    const label = cfText(cx, cy + (s.caption ? -2 : 5), s.label, S.length > 4 ? 14 : 16, 700);
-    const cap = s.caption ? cfText(cx, cy + 15, s.caption, 12, 600, CF.stroke) : '';
-    return '<rect x="' + (cx - w / 2) + '" y="' + (cy - h / 2) + '" width="' + w + '" height="' + h
-      + '" rx="9" fill="' + TINT[i % TINT.length] + '" stroke="' + CF.stroke + '" stroke-width="2"/>' + label + cap;
+    // Fit each stage name to its own box: one fixed size for every stage is what let a
+    // long name («هطول المطر») run past the edge of the rectangle.
+    const base = S.length > 4 ? 14 : 16;
+    const fit = cfFit(s.label, w - 12, base, 2, 9, 700);
+    const capFit = s.caption ? cfFit(String(s.caption), w - 10, 12, 1, 8, 600) : null;
+    let ty = cy + (capFit ? -4 : 5) - (fit.lines.length - 1) * (fit.size / 2);
+    let label = '';
+    for (const line of fit.lines) { label += cfText(cx, ty, line, fit.size, 700); ty += fit.size + 2; }
+    const cap = capFit ? cfText(cx, cy + h / 2 - 9, capFit.lines[0] || '', capFit.size, 600, CF.stroke) : '';
+    // grouped: rect first, then its text, so overflow is checkable against the box
+    return '<g class="cf-card"><rect x="' + (cx - w / 2) + '" y="' + (cy - h / 2) + '" width="' + w + '" height="' + h
+      + '" rx="9" fill="' + TINT[i % TINT.length] + '" stroke="' + CF.stroke + '" stroke-width="2"/>' + label + cap + '</g>';
   };
   // arrow from box i to box j, trimmed to the boxes' edges
   const arrow = (x1, y1, x2, y2, w, h) => {
@@ -347,7 +355,7 @@ function cfProcess({ layout = 'cycle', stages = [] }) {
   // flat and wide: the card is wide, so a squat ellipse keeps the labels large
   // without adding page height.
   const W = 470, H = 196, cx0 = W / 2, cy0 = H / 2, rx = 176, ry = 62;
-  const BW = S.length > 4 ? 108 : 122, BH = 44;
+  const BW = S.length > 4 ? 108 : 122, BH = 54; // room for a two-line stage name
   let out = defs, pts = [];
   for (let i = 0; i < S.length; i++) {
     const th = -Math.PI / 2 - (2 * Math.PI * i) / S.length;
@@ -370,8 +378,31 @@ const cfArNum = (n) => String(n).replace(/\d/g, (d) => CF_AR_DIGITS[+d]);
 // SVG text does not wrap, so break an Arabic label into at most two or three lines on
 // word boundaries. Arabic glyphs run ~0.52em, so chars-per-line is derived from the
 // box width rather than guessed.
-function cfWrap(s, width, size, lines = 2) {
-  const per = Math.max(6, Math.floor(width / (size * 0.52)));
+// Fit text to a box: wrap it, and if a line still would not fit, step the font size
+// down until it does. Bold Arabic runs wider than regular, so the advance factor
+// follows the weight — guessing one factor for both is what let text escape its card.
+function cfAdvance(size, weight) { return size * (weight >= 700 ? 0.56 : 0.5); }
+function cfFit(text, width, size, maxLines = 2, minSize = 8.5, weight = 800) {
+  const inner = Math.max(10, width);
+  const fits = (lines, sz) => Math.max(0, ...lines.map((l) => l.length * cfAdvance(sz, weight))) <= inner;
+  const whole = (lines) => !lines.some((l) => l.endsWith('…'));
+  // First choice: the largest size at which every word survives and every line fits.
+  // Dropping words is worse than smaller type — a truncated instruction is unusable.
+  for (let sz = size; sz >= minSize; sz -= 0.5) {
+    const lines = cfWrap(text, inner, sz, maxLines, weight);
+    if (whole(lines) && fits(lines, sz)) return { lines, size: sz };
+  }
+  // Second choice: keep the words, allow one more line.
+  for (let sz = size; sz >= minSize; sz -= 0.5) {
+    const lines = cfWrap(text, inner, sz, maxLines + 1, weight);
+    if (whole(lines) && fits(lines, sz)) return { lines, size: sz };
+  }
+  // Last resort: floor size, ellipsised — but it will never spill out of the box.
+  return { lines: cfWrap(text, inner, minSize, maxLines + 1, weight), size: minSize };
+}
+
+function cfWrap(s, width, size, lines = 2, weight = 800) {
+  const per = Math.max(6, Math.floor(width / cfAdvance(size, weight)));
   const words = String(s || '').trim().split(/\s+/);
   const out = [];
   let cur = '';
@@ -402,10 +433,20 @@ function cfSteps({ items = [], numbered = true, orient = 'h', wide = false }) {
     const CW = wide ? 430 : 250, LS = wide ? 15 : 13.5, CS = wide ? 11.5 : 10.5, pad = wide ? 9 : 7;
     let y = 4, out = '';
     S.forEach((s, i) => {
-      const lines = cfWrap(s.label, CW - 52, LS, 2);
+      // The text area is the card minus the badge and padding on both sides. Fitting
+      // to that width — rather than wrapping at a guessed size — is what keeps the
+      // words inside the card.
+      const TXTW = CW - 62;
+      const fit = cfFit(s.label, TXTW, LS, 2);
       const cap = String(s.caption || '').trim();
-      const h = 14 + lines.length * (LS + 3) + (cap ? CS + 5 : 0);
-      out += '<rect x="4" y="' + y + '" width="' + (CW - 8) + '" height="' + h + '" rx="9" fill="'
+      const capFit = cap ? cfFit(cap, TXTW, CS, 1, 8, 600) : null;
+      // +9 rather than +5: Arabic descenders («ي», «ج») reach further below the baseline
+      // than a naive line-height allows, and they were poking through the card edge.
+      const h = 14 + fit.lines.length * (fit.size + 3) + (cap ? capFit.size + 9 : 0);
+      // Each card is a group: its rect first, then its text, so overflow can be
+      // checked against the box the text is supposed to sit in.
+      out += '<g class="cf-card">'
+        + '<rect x="4" y="' + y + '" width="' + (CW - 8) + '" height="' + h + '" rx="9" fill="'
         + CF_TINT[i % CF_TINT.length] + '" stroke="' + CF.stroke + '" stroke-width="2"/>';
       if (numbered) {
         out += '<circle cx="' + (CW - 22) + '" cy="' + (y + h / 2) + '" r="10" fill="' + CF.stroke + '"/>'
@@ -413,10 +454,11 @@ function cfSteps({ items = [], numbered = true, orient = 'h', wide = false }) {
           + ' font-weight="800" fill="#ffffff">' + cfArNum(i + 1) + '</text>';
       }
       // The badge sits at the right edge (RTL start), so the text centres in what is left.
-      const tx = (CW - 36) / 2;
-      let ty = y + 12 + LS * 0.8;
-      for (const line of lines) { out += cfText(tx, ty, line, LS, 800); ty += LS + 3; }
-      if (cap) out += cfText(tx, y + h - 6, cfWrap(cap, CW - 50, CS, 1)[0] || '', CS, 600, CF.stroke);
+      const tx = (CW - 40) / 2;
+      let ty = y + 12 + fit.size * 0.8;
+      for (const line of fit.lines) { out += cfText(tx, ty, line, fit.size, 800); ty += fit.size + 3; }
+      if (cap) out += cfText(tx, y + h - 9, capFit.lines[0] || '', capFit.size, 600, CF.stroke);
+      out += '</g>';
       y += h + pad;
     });
     return cfSvg(out, CW, y);
@@ -425,15 +467,22 @@ function cfSteps({ items = [], numbered = true, orient = 'h', wide = false }) {
   const BW = (W - 14 - gap * (n - 1)) / n;
   const hasCap = S.some((s) => String(s.caption || '').trim());
   const LS = n > 4 ? 11 : 12.5, CS = 9.5;
-  const labelLines = S.map((s) => cfWrap(s.label, BW - 12, LS, 2));
+  // Fit every card to the narrowest common width, then use ONE size for the row so
+  // the cards stay visually consistent.
+  const fits = S.map((s) => cfFit(s.label, BW - 16, LS, 2));
+  const LSf = Math.min(...fits.map((f) => f.size));
+  const labelLines = S.map((s) => cfFit(s.label, BW - 16, LSf, 2).lines);
+  const capFits = S.map((s) => (String(s.caption || '').trim() ? cfFit(String(s.caption).trim(), BW - 12, CS, 1, 8, 600) : null));
+  const CSf = Math.min(CS, ...capFits.filter(Boolean).map((f) => f.size));
   const maxL = Math.max(...labelLines.map((l) => l.length));
-  const BH = 30 + maxL * (LS + 3) + (hasCap ? CS + 7 : 0);
+  const BH = 30 + maxL * (LSf + 3) + (hasCap ? CSf + 11 : 0);
   const y0 = 6;
   let out = '';
   for (let i = 0; i < n; i++) {
     // RTL: card 1 sits on the right, so the row reads with the Arabic.
     const x = W - 7 - BW - i * (BW + gap), cx = x + BW / 2;
-    out += '<rect x="' + x + '" y="' + y0 + '" width="' + BW + '" height="' + BH + '" rx="10" fill="'
+    out += '<g class="cf-card">'
+      + '<rect x="' + x + '" y="' + y0 + '" width="' + BW + '" height="' + BH + '" rx="10" fill="'
       + CF_TINT[i % CF_TINT.length] + '" stroke="' + CF.stroke + '" stroke-width="2"/>';
     if (numbered) {
       out += '<circle cx="' + (x + BW - 15) + '" cy="' + (y0 + 15) + '" r="10.5" fill="' + CF.stroke + '"/>'
@@ -441,9 +490,9 @@ function cfSteps({ items = [], numbered = true, orient = 'h', wide = false }) {
         + ' font-weight="800" fill="#ffffff">' + cfArNum(i + 1) + '</text>';
     }
     let ty = y0 + 32;
-    for (const line of labelLines[i]) { out += cfText(cx, ty, line, LS, 800); ty += LS + 3; }
-    const cap = String(S[i].caption || '').trim();
-    if (cap) out += cfText(cx, y0 + BH - 9, cfWrap(cap, BW - 10, CS, 1)[0] || '', CS, 600, CF.stroke);
+    for (const line of labelLines[i]) { out += cfText(cx, ty, line, LSf, 800); ty += LSf + 3; }
+    if (capFits[i]) out += cfText(cx, y0 + BH - 11, capFits[i].lines[0] || '', CSf, 600, CF.stroke);
+    out += '</g>';
   }
   return cfSvg(out, W, BH + 12);
 }
@@ -492,8 +541,14 @@ function cfLabeledParts({ object = 'plant', parts = [] }) {
   if (!obj) return '';
   const P = parts.slice(0, 6).filter((p) => p && obj.anchors[p.part] && String(p.label || '').trim());
   if (P.length < 2) return '';
-  const W = 480, H = 208;
-  let out = obj.draw();
+  // The drawing is the point of this figure, but it only occupied about a quarter of
+  // the width — the label chips claimed the edges and the plant sat small in the
+  // middle. Scale the object up about its own centre and give the figure the height
+  // that needs; the anchors scale with it so every leader line still lands correctly.
+  const W = 480, H = 236, K = 1.35, CX = 240, CY = 112;
+  const tf = (pt) => [CX + K * (pt[0] - CX), CY + K * (pt[1] - CY)];
+  let out = `<g transform="translate(${(CX - K * CX).toFixed(2)} ${(CY - K * CY).toFixed(2)}) scale(${K})">`
+    + obj.draw() + '</g>';
   // Top to bottom, and each chip goes on the side its own part already leans to, so
   // a leader line never crosses the drawing. Parts sitting on the centre line
   // alternate; a part that exists on both sides (mirror) moves to the emptier side.
@@ -501,15 +556,17 @@ function cfLabeledParts({ object = 'plant', parts = [] }) {
   const used = { left: [], right: [] };
   let centre = 0;
   ordered.forEach((p, i) => {
-    let [ax, ay] = obj.anchors[p.part];
+    let [ax, ay] = tf(obj.anchors[p.part]);
     const nat = Math.abs(ax - 240) > 12 ? (ax > 240 ? 'right' : 'left') : (centre++ % 2 === 0 ? 'right' : 'left');
     const other = nat === 'right' ? 'left' : 'right';
     const mir = obj.mirror && obj.mirror[p.part]; // the copy on the opposite side
     const side = mir && used[nat].length > used[other].length + 1 ? other : nat;
-    if (side !== nat && mir) [ax, ay] = mir;
+    if (side !== nat && mir) [ax, ay] = tf(mir);
     const right = side === 'right';
-    const lines = cfWrap(p.label, 150, 12, 1);
-    const cw = Math.min(160, Math.max(58, (lines[0] || '').length * 7.4 + 18)), ch = 26;
+    // The chip is sized to the FITTED text, so a long part name can never spill out.
+    const fit = cfFit(p.label, 156, 12, 1, 8.5, 800);
+    const lines = fit.lines;
+    const cw = Math.min(172, Math.max(58, (lines[0] || '').length * cfAdvance(fit.size, 800) + 22)), ch = 28;
     let cy = Math.max(17, Math.min(H - 15, ay));
     // push down until clear of the last chip on this side
     for (const prev of used[side]) if (Math.abs(cy - prev) < ch + 5) cy = prev + ch + 5;
@@ -520,9 +577,10 @@ function cfLabeledParts({ object = 'plant', parts = [] }) {
     out += '<line x1="' + inner + '" y1="' + cy + '" x2="' + ax + '" y2="' + ay + '" stroke="' + CF.stroke
       + '" stroke-width="1.8" stroke-dasharray="4 3"/>'
       + '<circle cx="' + ax + '" cy="' + ay + '" r="4" fill="' + CF.stroke + '"/>'
+      + '<g class="cf-card">'
       + '<rect x="' + (cx - cw / 2) + '" y="' + (cy - ch / 2) + '" width="' + cw + '" height="' + ch
       + '" rx="8" fill="' + CF_TINT[i % CF_TINT.length] + '" stroke="' + CF.stroke + '" stroke-width="2"/>'
-      + cfText(cx, cy + 4.5, lines[0] || '', 12, 800);
+      + cfText(cx, cy + 4.5, lines[0] || '', fit.size, 800) + '</g>';
   });
   return cfSvg(out, W, H);
 }

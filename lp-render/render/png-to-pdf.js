@@ -57,10 +57,50 @@ async function htmlToPixelPdf(html, opts = {}) {
       });
       const footer = document.querySelector('.lp-footer');
       if (footer) { cuts.push(y(footer, 'top')); cuts.push(y(footer, 'bottom')); }
-      return { cuts, height: document.documentElement.scrollHeight, width: document.documentElement.scrollWidth,
+      // OVERFLOW GUARD: no instructional text may leave its container. Checked here
+      // because this is the one place the real laid-out DOM exists, before the PDF is
+      // sliced. Each code-drawn card is a <g class="cf-card"> whose first child is its
+      // rect, so a label can be measured against the box it belongs to.
+      const overflow = [];
+      const outside = (inner, outer, pad) => inner.left < outer.left - pad || inner.right > outer.right + pad
+        || inner.top < outer.top - pad || inner.bottom > outer.bottom + pad;
+      document.querySelectorAll('g.cf-card').forEach((card) => {
+        const rect = card.querySelector('rect');
+        if (!rect) return;
+        const rb = rect.getBoundingClientRect();
+        card.querySelectorAll('text').forEach((t) => {
+          const tb = t.getBoundingClientRect();
+          if (tb.width && outside(tb, rb, 1.5)) {
+            overflow.push({ kind: 'text_outside_card', text: (t.textContent || '').trim().slice(0, 28) });
+          }
+        });
+      });
+      document.querySelectorAll('svg.cf-svg').forEach((svg) => {
+        const sb = svg.getBoundingClientRect();
+        svg.querySelectorAll('text').forEach((t) => {
+          const tb = t.getBoundingClientRect();
+          if (tb.width && outside(tb, sb, 1)) {
+            overflow.push({ kind: 'text_outside_figure', text: (t.textContent || '').trim().slice(0, 28) });
+          }
+        });
+      });
+      // and HTML text spilling out of its panel
+      document.querySelectorAll('.panel').forEach((panel) => {
+        const pb = panel.getBoundingClientRect();
+        panel.querySelectorAll('.cf-label, .cap, .cb-label, .tb-label').forEach((el) => {
+          const eb = el.getBoundingClientRect();
+          if (eb.width && outside(eb, pb, 2)) {
+            overflow.push({ kind: 'caption_outside_card', text: (el.textContent || '').trim().slice(0, 28) });
+          }
+        });
+      });
+      return { cuts, overflow, height: document.documentElement.scrollHeight, width: document.documentElement.scrollWidth,
         bg: getComputedStyle(document.body).backgroundColor || '#ffffff' };
     });
     shot = await page.screenshot({ fullPage: true });
+    // Hand the overflow findings to the caller BEFORE the PDF exists, so a page that
+    // clips a label is reported rather than quietly shipped.
+    if (typeof opts.onFindings === 'function' && geom && Array.isArray(geom.overflow)) opts.onFindings(geom.overflow);
   } finally { await browser.close(); }
 
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'lppdf-'));

@@ -180,15 +180,24 @@ function handler(req, res) {
         // by drawing them a little smaller, which costs nothing and keeps every figure.
         // Only when that is not enough do we start cutting the teacher's words.
         if (pageLimit && pdf && pageCount(pdf) > pageLimit) {
-          // Two probes, not four: if 88% and 76% both overrun, the figures are not what
-          // is making the page long and further shrinking just wastes renders.
-          for (const scale of [0.88, 0.76, 0.64]) {
+          // Step down until it fits, then step back UP to the midpoint of the last
+          // failure — a coarse ladder overshoots and leaves the figures smaller than
+          // the page actually requires (88% fitted with 189px still spare).
+          let lastFail = 1;
+          for (const scale of [0.94, 0.86, 0.78, 0.7, 0.62]) {
             const attempt = await renderLessonImage(parsed, { log, pdf: true, figureScale: scale });
-            if (pageCount(attempt.pdf) <= pageLimit) {
-              ({ png, pdf, stats, contentId, locale } = attempt);
-              log(`  ✓ fits ${pageLimit} page(s) at ${Math.round(scale * 100)}% figure density — no text was cut`);
-              break;
+            if (pageCount(attempt.pdf) > pageLimit) { lastFail = scale; continue; }
+            let best = { attempt, scale };
+            const mid = Math.round(((scale + lastFail) / 2) * 100) / 100;
+            if (mid > scale + 0.02) {
+              const up = await renderLessonImage(parsed, { log, pdf: true, figureScale: mid });
+              if (up.pdf && pageCount(up.pdf) <= pageLimit) best = { attempt: up, scale: mid };
             }
+            // stripHeight MUST come along: the page-filling pass below reads it, and
+            // leaving it stale meant that pass never ran.
+            ({ png, pdf, stats, contentId, locale, stripHeight } = best.attempt);
+            log(`  ✓ fits ${pageLimit} page(s) at ${Math.round(best.scale * 100)}% figure density — no text was cut`);
+            break;
           }
         }
         // Everything from here on is an OPTIMISATION of a render we already have. A
