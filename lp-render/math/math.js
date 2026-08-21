@@ -82,10 +82,22 @@ function mdInline(escaped) {
 // operator or an equals sign is maths.
 const MATH_RUN = /[٠-٩0-9]+(?:\s*[+\-×÷*/]\s*[٠-٩0-9]+)*\s*=\s*[٠-٩0-9]+|[٠-٩0-9]+\s*[+\-×÷*/]\s*[٠-٩0-9]+/g;
 
+// Belt and braces. CSS direction/unicode-bidi depends on the stylesheet reaching the
+// element and on the renderer honouring it; the Unicode isolate characters do not.
+// U+2066 LEFT-TO-RIGHT ISOLATE … U+2069 POP DIRECTIONAL ISOLATE force the run to be
+// laid out left-to-right as its own isolated unit, whatever the surrounding paragraph
+// direction is, and they survive into any consumer of the HTML.
+const LRI = '\u2066';
+const PDI = '\u2069';
+
 function isolateMath(html) {
   // Runs on ESCAPED html, so it must not break entities or tags: the pattern only
   // matches digits, operators and spaces, none of which appear inside a tag name.
-  return html.replace(MATH_RUN, (m) => `<span class="ltr-math" dir="ltr">${m}</span>`);
+  // NOTE: do NOT add U+2066/U+2069 here. Measured: a Unicode isolate INSIDE an
+  // isolate-override container re-enables normal bidi resolution for its content, and
+  // Arabic-Indic digits then order right-to-left again — it reverses the equation.
+  // The CSS override alone is what produces the correct order.
+  return html.replace(MATH_RUN, (m) => `<bdi class="ltr-math" dir="ltr">${m}</bdi>`);
 }
 
 function richText(raw, { engine = 'katex' } = {}) {
@@ -102,4 +114,4 @@ function cleanHeading(raw) {
   return String(raw == null ? '' : raw).replace(/[*_`#]+/g, '').replace(/\s+/g, ' ').trim();
 }
 
-module.exports = { renderMath, renderKatex, renderMathjaxSvg, katexCss, richText, cleanHeading, isolateMath, MATH_RUN };
+module.exports = { renderMath, renderKatex, renderMathjaxSvg, katexCss, richText, cleanHeading, isolateMath, MATH_RUN, LRI, PDI };
