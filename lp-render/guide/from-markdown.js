@@ -187,11 +187,51 @@ function fencedFigure(body) {
   return { kind: 'steps', items: lines.slice(0, 6).map((l) => ({ label: l, caption: '' })) };
 }
 
+// ── visuals built from structures the lesson already contains ──────────────────
+// The complaint was that examples and activities sit in prose. They do not have to:
+// this lesson carries matching pairs, classroom quotes and board work, all of which
+// are drawable from the source's own words.
+
+// «[رجل] ← أَبِي» — a matching exercise. Each pair becomes a card: the prompt on the
+// card, the answer as its caption. This is the single most common example shape in
+// these lessons and it was being rendered as a run of bracketed text.
+function pairsFigure(body) {
+  const pairs = [...String(body).matchAll(/\[([^\]]{1,16})\]\s*[←→]\s*([^\s،.:]{1,16})/g)]
+    .map((m) => ({ label: m[1].trim(), caption: m[2].trim() }));
+  const seen = new Set();
+  const uniq = pairs.filter((p) => !seen.has(p.label) && seen.add(p.label));
+  return uniq.length >= 2 ? { kind: 'steps', items: uniq.slice(0, 6) } : null;
+}
+
+// «Teacher says: "…"» — the classroom voice. Drawn as a large centred card it reads as
+// a callout a teacher can glance at, instead of disappearing into a paragraph.
+function quoteFigure(body) {
+  const q = [...String(body).matchAll(/Teacher says:?\s*"([^"]{6,90})"/g)].map((m) => m[1].trim());
+  if (!q.length) return null;
+  return { kind: 'expression', text: q[0], caption: q.length > 1 ? 'يقول المعلم' : '' };
+}
+
+// «أ ب ي → أَبِي (٣ حروف)» — letter building. The arrow form is the teaching point.
+function buildFigure(body) {
+  const rows = [...String(body).matchAll(/([أ-ي](?:\s+[أ-ي]){1,5})\s*[←→]\s*([^\s(،.]{2,14})/g)]
+    .map((m) => ({ label: m[2].trim(), caption: m[1].trim() }));
+  const seen = new Set();
+  const uniq = rows.filter((r) => !seen.has(r.label) && seen.add(r.label));
+  return uniq.length >= 2 ? { kind: 'steps', items: uniq.slice(0, 6) } : null;
+}
+
 function figureFor(rawBody) {
-  // Order matters. A bulleted list is the stage's real activity steps and makes the
-  // best cards; a table's rows are next. A fenced block is LAST because it is a chant
-  // in a warm-up (good) but letter-by-letter board spelling elsewhere (poor labels) —
-  // preferring it produced cards reading «أ | أ | أح م د», which is visual noise.
+  // Order matters, most meaningful first: a matching exercise or a letter build IS the
+  // example, so it beats a generic list; a classroom quote beats prose; a bulleted list
+  // is the stage's real activity steps; a table's rows next. A fenced block is LAST
+  // because it is a chant in a warm-up (good) but letter-by-letter board spelling
+  // elsewhere (poor labels) — preferring it produced cards reading «أ | أ | أح م د».
+  const pf = pairsFigure(rawBody);
+  if (pf) return pf;
+  const bf = buildFigure(rawBody);
+  if (bf) return bf;
+  const qf = quoteFigure(rawBody);
+  if (qf) return qf;
   const lf = stepsFigure(listItems(rawBody));
   if (lf) return lf;
   const tf = tableFigure(rawBody);
@@ -399,7 +439,27 @@ function buildGuideFromMarkdown(md, { region = '', locale = 'ar', subject = '', 
   } else {
     meta.title = topic || 'Lesson guide';
   }
-  return { meta, images: [], sections };
+  // ONE WORDLESS ILLUSTRATION BRIEF, authored from the lesson's own topic. The image
+  // model is the only source of artwork (labels stay code-drawn), and with an empty
+  // credit balance nothing generates — the pipeline logs the drop and the LP still
+  // renders. Authoring it anyway means the artwork appears on a top-up with no code
+  // change. Region art direction (dress, teacher, setting) comes from the ye pack.
+  const images = [];
+  const warmup = sections.find((x) => x.id === 'stage-tamhid');
+  if (warmup && topic) {
+    images.push({
+      id: 'lesson-scene',
+      concept: 'scene',
+      label: topic.slice(0, 40),
+      prompt: 'Flat vector educational illustration, clean children\'s textbook style, soft '
+        + 'colours. A primary-school classroom scene for a lesson about ' + topic + '. '
+        + 'The image contains ABSOLUTELY NO text, no letters, no numbers, no symbols, and no '
+        + 'blank cards, frames or placeholders; boards, pages and walls are completely empty '
+        + 'surfaces with nothing drawn on them.',
+    });
+    warmup.image = 'lesson-scene';
+  }
+  return { meta, images, sections };
 }
 
 module.exports = { buildGuideFromMarkdown, blocks, roleOf, plain, tableRows, listItems };
