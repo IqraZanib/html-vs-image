@@ -12,6 +12,7 @@ const { renderLessonImage } = require('../lp-render/pipeline');
 const { structureLesson } = require('../lp-render/structure');
 const { condenseToGuide, addFiguresToGuide } = require('../lp-render/condense');
 const { validateFigures } = require('../lp-render/figures/validate');
+const { checkVerbatim } = require('../lp-render/text/verbatim');
 
 const ROOT = path.resolve(__dirname, '..');
 // Load the kie.ai key from the git-ignored .env-api if it isn't already in the env.
@@ -100,7 +101,7 @@ function handler(req, res) {
         // mapping, not a length target — it does not exist to hit a page count.
         // Content already in the guide shape passes through untouched.
         const srcForValidation = parsed; // the structured lesson, before condensing
-        let figureReport = null;
+        let figureReport = null; let verbatimReport = null;
         const looksLikeGuide = Array.isArray(parsed.sections) && parsed.sections.some((x) => x && x.id === 'stage-tamhid');
         if (guide2p && !looksLikeGuide) {
           if (!process.env.KIE_API_KEY) throw new Error('The guide structure needs a kie.ai key for the condense step.');
@@ -127,6 +128,9 @@ function handler(req, res) {
           // Accuracy net (§6/§7): validate the figure SPECS against the source lesson
           // before any image is generated, so wrong values surface as findings.
           figureReport = validateFigures(parsed, { source: srcForValidation, log });
+          // Design is our job; editing the teacher's words is not. Prove it every run:
+          // every reader-visible string must appear in the source, template chrome aside.
+          verbatimReport = checkVerbatim(parsed, srcForValidation, { log });
           structured = JSON.stringify(parsed, null, 2);
         }
         let { png, pdf, stats, contentId, locale, maxPages } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)
@@ -268,9 +272,16 @@ function handler(req, res) {
             figureReport = validateFigures(parsed, { source: srcForValidation, imageDims: dims, log });
           } catch (e) { log(`  (resolution check skipped: ${e.message})`); }
         }
+        // Re-check what ACTUALLY ships: the figure pass and the artwork retry can
+        // re-run the restructuring step, so the report must describe the final guide,
+        // not the first draft of it.
+        if (guide2p && !looksLikeGuide) {
+          try { verbatimReport = checkVerbatim(parsed, srcForValidation, { log }); }
+          catch (e) { log(`  (verbatim re-check skipped: ${e.message})`); }
+        }
         finish({
           ok: true,
-          figureReport,
+          figureReport, verbatimReport,
           png: 'data:image/png;base64,' + png.toString('base64'),
           pdf: pdf ? 'data:application/pdf;base64,' + pdf.toString('base64') : null,
           logs, stats, structured,

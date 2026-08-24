@@ -65,7 +65,28 @@ test('the condenser is not told to hit a page count', () => {
   assert.ok(!/2-page/.test(src), 'a 2-page target is back in the condenser');
   assert.ok(!/must fit 2 A4 pages/.test(src), 'the page-fit instruction is back');
   assert.ok(!/prefer dropping detail/.test(src), 'the drop-detail instruction is back');
-  assert.match(src, /There is NO page target/, 'the condenser should say length is not a constraint');
+  assert.match(src, /THERE ARE NO WORD BUDGETS AND NO PAGE TARGET/,
+    'the condenser should state that length is not a constraint');
+});
+
+test('the condenser carries no word budgets and no rewriting licence', () => {
+  // The budgets were a temporary measure for the two-page review format. Design work is
+  // not licence to edit a teacher's lesson.
+  // Assert on the PROMPT, not the file: comments quote the old rules deliberately, and
+  // that history is worth keeping readable.
+  const raw = fs.readFileSync(path.join(__dirname, '..', 'condense.js'), 'utf8');
+  const src = raw.split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n');
+  assert.ok(!/STAGE BODIES ≤/.test(src), 'stage-body word budget is back');
+  assert.ok(!/FIGURE-RICH TEXT BUDGETS/.test(src), 'the figure-rich text budgets are back');
+  assert.ok(!/do NOT restate it in the prose/.test(src),
+    'the rule telling the model to drop text the figure shows is back');
+  assert.ok(!/the stage's activities condensed/.test(src), 'the stage body is being condensed again');
+  assert.match(src, /VERBATIM, NOT REWRITTEN/, 'the verbatim rule is missing');
+  assert.match(src, /VISUALS ARE ADDITIVE/, 'visuals must be additive, not a text substitute');
+  // the only surviving length limits are on labels drawn inside a figure
+  const caps = src.match(/≤ \d+ words/g) || [];
+  assert.ok(caps.every((c) => c === '≤ 4 words'),
+    `only drawn-label caps may remain, found ${JSON.stringify([...new Set(caps)])}`);
 });
 
 test('no figure is deleted to save page height', () => {
