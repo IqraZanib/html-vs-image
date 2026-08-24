@@ -669,6 +669,18 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .panel.has-inline-img:has(.d-bullets) .d-code-fig{width:100%;max-width:none;margin:10px auto 0;position:static}
 .panel.has-inline-img:has(.d-bullets) .d-code-fig .cf-svg{max-height:none;width:100%}
 
+
+/* A design-shaped card carrying ONE labelled part: prose beside its figure. The pilot
+   anatomy is three columns (body | figure | تحقق) and relies on .d-steps to fill the
+   flanking columns; a part card has a plain .d-text and no تحقق, so the third column
+   would sit empty and the text would be squeezed. Two columns in the pilot's own
+   proportion, figure beside the text where it belongs. */
+.panel.has-inline-img:has(.d-text):not(:has(.d-steps)):not(:has(.d-bullets)){
+  grid-template-columns:minmax(0,1fr) minmax(0,52%);align-items:center}
+.panel.has-inline-img:has(.d-text):not(:has(.d-steps)):not(:has(.d-bullets)) .ii-body{display:block}
+.panel.has-inline-img:has(.d-text):not(:has(.d-steps)):not(:has(.d-bullets)) .d-code-fig{
+  grid-column:2;grid-row:1;margin:0;position:static}
+
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

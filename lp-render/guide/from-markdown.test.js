@@ -79,30 +79,33 @@ test('stage times and gradual-release pills come from the source headings', () =
   assert.match(tamhid.time, /أنا أفعل/);
 });
 
-test('Explore and Explain both reach العرض, each under its own heading', () => {
+test('Explore and Explain both reach العرض as their own cards', () => {
   const two = LESSON.replace('#### Practice', '#### Explain (الشرح) — 10 دقائق\nيشرح المعلم الفرق بين الكلمات.\n\n#### Practice');
   const g = buildGuideFromMarkdown(two, { region: 'ye', locale: 'ar' });
-  const arad = g.sections.find((s) => s.id === 'stage-arad');
-  const blob = arad.body || (arad.items || []).map((i) => `${i.label || ''} ${i.body || i.text || ''}`).join(' ');
+  const arad = g.sections.filter((s) => s.id === 'stage-arad');
+  assert.ok(arad.length >= 2, 'each source block gets at least one card');
+  const blob = arad.map((s) => `${s.heading} ${s.body}`).join(' ');
   assert.match(blob, /Explore|الاستكشاف/);
   assert.match(blob, /Explain|الشرح/);
   assert.match(blob, /يشرح المعلم الفرق بين الكلمات/, 'the second block keeps its text');
 });
 
-test('a stage becomes one row card per labelled part, not a wall of prose', () => {
-  // The first version emitted one prose blob per stage and the LP read as text after
-  // text. The lesson labels its own parts, so each label is a card. 'bullets' also
-  // avoids the amber تحقق strip, which is sized for a one-line criterion.
+test('each labelled part becomes its own design-shaped card', () => {
+  // One card per stage with all its text made the full LP read as a document. The pack's
+  // anatomy is text-beside-figure and only works at the size of a single part, so each
+  // part is its own card in the stage's colour, titled and self-identifying.
   const withParts = LESSON.replace(
     'يبدأ المعلم بالنظر إلى صفحة 32 من الكتاب مباشرة كنشاط تمهيدي.',
     '**نشاط الافتتاح:** يبدأ المعلم بالنظر إلى صفحة 32.\n\n**السؤال الجوهري:** من هم أفراد أسرتك؟');
   const g = buildGuideFromMarkdown(withParts, { region: 'ye', locale: 'ar' });
-  const tamhid = g.sections.find((s) => s.id === 'stage-tamhid');
-  assert.strictEqual(tamhid.type, 'bullets');
-  assert.ok(tamhid.items.length >= 2, 'one card per labelled part');
-  assert.match(tamhid.items[0].text, /نشاط الافتتاح/);
-  assert.match(tamhid.items[1].text, /السؤال الجوهري/);
-  assert.match(tamhid.time, /أنا أفعل/, 'the stage keeps its time and gradual-release pill');
+  const cards = g.sections.filter((s) => s.id === 'stage-tamhid');
+  assert.ok(cards.length >= 2, 'one card per labelled part');
+  assert.ok(cards.every((c) => c.type === 'text'), 'a part card is a text card');
+  assert.match(cards[0].heading, /التمهيد/, 'every card names its stage');
+  assert.match(cards[0].heading, /نشاط الافتتاح/);
+  assert.match(cards[1].heading, /السؤال الجوهري/);
+  assert.match(cards[0].time, /أنا أفعل/, 'the first card of a stage carries the time pill');
+  assert.ok(!cards[1].time, 'and later cards do not repeat it');
 });
 
 test('every stage that can carry a visual gets one', () => {

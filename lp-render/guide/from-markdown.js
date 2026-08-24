@@ -153,22 +153,23 @@ function stepsFigure(items) {
 // blob per stage, which is why the LP read as text after text. Each labelled part is a
 // card of its own now: same words, structure the reader can scan.
 function labelledParts(body) {
-  const src = stripTables(String(body)).replace(/```/g, '');
+  const src = stripTables(String(body));   // fences kept: figureFor reads them
   const re = /\*\*([^*\n]{2,80}?):\*\*/g;
   const marks = [];
   let m;
   while ((m = re.exec(src))) marks.push({ label: m[1].trim(), at: m.index, end: re.lastIndex });
   if (!marks.length) {
     const t = plain(body);
-    return t ? [{ label: '', body: t }] : [];
+    return t ? [{ label: '', body: t, raw: String(body) }] : [];
   }
   const parts = [];
-  const lead = plain(src.slice(0, marks[0].at));
-  if (lead) parts.push({ label: '', body: lead });
+  const lead = src.slice(0, marks[0].at);
+  if (plain(lead)) parts.push({ label: '', body: plain(lead), raw: lead });
   marks.forEach((mk, i) => {
     const upto = i + 1 < marks.length ? marks[i + 1].at : src.length;
-    const text = plain(src.slice(mk.end, upto));
-    if (text) parts.push({ label: mk.label, body: text });
+    const raw = src.slice(mk.end, upto);
+    const text = plain(raw);
+    if (text) parts.push({ label: mk.label, body: text, raw });
   });
   return parts;
 }
@@ -272,36 +273,37 @@ function buildGuideFromMarkdown(md, { region = '', locale = 'ar', subject = '', 
   for (const id of ['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim']) {
     const found = byRole.get(id);
     if (!found) continue;
-    const raw = found.map((b) => b.body).join('\n');
-    // Every labelled part of every source block for this stage becomes its own row
-    // card. Where a stage has more than one source block (Explore + Explain both being
-    // العرض), the block's heading is carried as the first card's label so the reader
-    // still sees the source's own structure.
-    const items = [];
+    // ONE CARD PER LABELLED PART, not one card per stage. Putting a whole stage's text
+    // into a single card and hanging one figure underneath is what made the full LP read
+    // as a text document: the pack's card anatomy is text-beside-figure, and it cannot
+    // apply to 2,400 characters. The lesson's own parts are 100–650 characters each —
+    // the size that anatomy was designed for — so each becomes its own card in the
+    // stage's colour, carrying its own title, its own text and its own figure.
+    let first = true;
     for (const b of found) {
-      const head = found.length > 1 ? b.title.replace(/\s*—.*$/, '').trim() : '';
-      const parts = labelledParts(b.body);
-      parts.forEach((p, i) => {
-        const role = p.label ? liftRole(p.label) : null;
+      const blockHead = b.title.replace(/\s*—.*$/, '').trim();
+      for (const part of labelledParts(b.body)) {
+        const role = part.label ? liftRole(part.label) : null;
         if (role) {
           if (!lifted.has(role)) lifted.set(role, []);
-          lifted.get(role).push({ label: p.label, body: p.body });
-          return;   // it belongs to its own card, not to this stage
+          lifted.get(role).push({ label: part.label, body: part.body });
+          continue;
         }
-        const label = [i === 0 ? head : '', p.label].filter(Boolean).join(' · ');
-        items.push({ text: label ? `**${label}:** ${p.body}` : p.body });
-      });
+        // Every card says which stage it belongs to: a teacher on page 3 should not have
+        // to scroll back to find out they are still in العرض.
+        const title = [HEADINGS_AR[id], part.label || blockHead].filter(Boolean).join(' · ');
+        const sec = { id, heading: title, type: 'text', body: part.body };
+        if (first) {
+          const mins = found.map((x) => minutesOf(x.title)).find(Boolean) || '';
+          const pill = [mins, GRR[id]].filter(Boolean).join(' · ');
+          if (pill) sec.time = pill;
+          first = false;
+        }
+        const fig = figureFor(part.raw || '');
+        if (fig) sec.codeFigure = fig;
+        push(sec);
+      }
     }
-    if (!items.length) continue;
-    const mins = found.map((b) => minutesOf(b.title)).find(Boolean) || '';
-    // 'bullets' renders as the pack's white row-cards with circled Arabic-Indic badges:
-    // full card width, one card per part, and no item lands in the amber تحقق strip —
-    // that slot is sized for a one-line criterion, not for lesson prose.
-    const sec = { id, heading: HEADINGS_AR[id], type: 'bullets', marker: 'num',
-      time: [mins, GRR[id]].filter(Boolean).join(' · '), items };
-    const fig = figureFor(raw);
-    if (fig) sec.codeFigure = fig;
-    push(sec);
   }
 
   // the roles lifted out of the stages

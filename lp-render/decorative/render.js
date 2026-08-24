@@ -690,23 +690,13 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
   let prevHeading = '';
   const rot = { n: 0, t: 0, seed: seedOf(`${meta.id || ''}|${meta.subject || ''}|${meta.title || ''}`) };
   const used = new Set(); // no character repeats within one lesson
-  // How many step sets may take the card's full width. This was two because a spanning
-  // block costs ~200px and more than two could not hold a two-page contract. With no
-  // page contract the limit is legibility, not height: a spanning set reads better, so
-  // let every step set that wants the width have it.
-  const SPANNING_STEP_BUDGET = Infinity;
-  const spanningSteps = new Set();
-  {
-    let n = 0;
-    for (const s of (content.sections || [])) {
-      const cf = s && s.codeFigure;
-      // Any step set may take the card's width — a pair of wide cards reads far better
-      // than a pair squeezed into the figure column, and a lesson made only of small
-      // 2-card sets was leaving half a page empty.
-      if (!cf || cf.kind !== 'steps' || (cf.items || []).length < 2) continue;
-      if (n < SPANNING_STEP_BUDGET) { spanningSteps.add(s.id); n++; }
-    }
-  }
+  // WHETHER A STEP SET TAKES THE CARD'S FULL WIDTH is a layout question about the
+  // figure, not a page budget. It used to be capped at two per lesson to protect a
+  // two-page contract; when that contract went I lifted the cap to Infinity, which made
+  // EVERY step set span — so every figure dropped below its text and the card stopped
+  // being the pilot's text-beside-figure anatomy. A row of 4+ cards genuinely needs the
+  // width; 2 or 3 cards read better beside the text, in the figure column.
+  const SPANNING_MIN_CARDS = 4;
   const sections = (content.sections || []).map((section, i) => {
     // Admin blocks (Lesson Details) use a neutral slate tab, not a warm accent.
     const accent = section.type === 'fields' ? '--c-slate' : accentFor(i);
@@ -759,7 +749,7 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
       // width as a ROW; only a pair stays stacked in the figure column.
       const stepCount = (cf.items || []).length;
       const spans = CF_WIDE.has(cf.kind)
-        || (cf.kind === 'steps' && stepCount >= 2 && spanningSteps.has(section.id));
+        || (cf.kind === 'steps' && stepCount >= SPANNING_MIN_CARDS);
       // Stacked cards at the card's full width are far larger than the same number
       // side by side; only 4+ cards need the row, which would otherwise run too tall.
       const spec = cf.kind === 'steps'

@@ -96,8 +96,11 @@ test('no figure is deleted to save page height', () => {
   assert.ok(!/wideCount/.test(src), 'the card-spanning figure cap is back');
   assert.ok(!/a third costs a page/.test(src), 'page-cost reasoning is back in figure balance');
   const render = fs.readFileSync(path.join(__dirname, '..', 'decorative', 'render.js'), 'utf8');
-  assert.match(render, /SPANNING_STEP_BUDGET = Infinity/,
-    'the spanning-step budget is capped again — that cap existed to hold two pages');
+  // The per-lesson cap on card-spanning step sets existed to protect the two-page
+  // contract. It is gone; whether a set spans is now decided by its own card count,
+  // which is a legibility question and carries no page budget.
+  assert.ok(!/SPANNING_STEP_BUDGET/.test(render), 'the page-driven spanning budget is back');
+  assert.match(render, /SPANNING_MIN_CARDS/, 'spanning should be decided by card count');
 });
 
 test('a declared page cap is reported, never enforced', () => {
