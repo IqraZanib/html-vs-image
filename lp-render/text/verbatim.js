@@ -131,7 +131,11 @@ function stripGoalLabel(text) {
 // so a whole-string match would call them deviations. Split and require every fragment.
 function fragments(text) {
   return String(text)
-    .split(/(?<=[.!?؟])\s+|[\n؛]+|\s+·\s+|(?<=:)\s+/)
+    // Also split on markdown table cells and bold-run boundaries. A flattened table
+    // («الكلمة | عدد الحروف | من هو؟ أَبِي | 3 | الوالد …») is every one of the
+    // source's own cells joined for display; splitting only on sentence ends made it
+    // look like a rewrite when not a word had changed.
+    .split(/(?<=[.!?؟])\s+|[\n؛|]+|\s+·\s+|(?<=:)\s+|(?=\*\*)|(?<=\*\*)/)
     .map((x) => x.trim())
     .filter((x) => norm(x).split(' ').length >= 3);   // ignore stubs like "صفحة ٨٠"
 }

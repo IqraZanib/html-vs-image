@@ -13,6 +13,7 @@ const { structureLesson } = require('../lp-render/structure');
 const { condenseToGuide, addFiguresToGuide } = require('../lp-render/condense');
 const { validateFigures } = require('../lp-render/figures/validate');
 const { checkVerbatim } = require('../lp-render/text/verbatim');
+const { buildGuideFromMarkdown } = require('../lp-render/guide/from-markdown');
 
 const ROOT = path.resolve(__dirname, '..');
 // Load the kie.ai key from the git-ignored .env-api if it isn't already in the env.
@@ -77,13 +78,28 @@ function handler(req, res) {
         const { content, region } = parsedBody;
         // Default ON — clients that predate the checkbox get the guide structure too.
         const guide2p = parsedBody.guide2p !== false;
+        // guideMode: 'code' (default) maps the lesson onto the template IN CODE, with no
+        // model call at all. 'llm' is the old restructuring step, kept for input that has
+        // no headings to map. The default matters: a design/rendering layer must not
+        // depend on a language model to reach its own template, must not rewrite the
+        // teacher's words, and must not stop working when a credit balance runs out.
+        const guideMode = parsedBody.guideMode === 'llm' ? 'llm' : 'code';
         let parsed = null; let structured = null;
         // First, try to read the paste as a ready content JSON.
         if (typeof content !== 'string') parsed = content;
         else { try { parsed = JSON.parse(content); } catch (_) { parsed = null; } }
-        // A usable content JSON MUST have a sections array. Anything else — raw
-        // lesson text, or a JSON in some other shape (an API dump, a blob with the
-        // lesson inside a text field) — is structured into the schema first.
+        // Raw lesson TEXT (markdown, as the lesson artifacts carry it) is mapped by code.
+        if (!parsed && typeof content === 'string' && guideMode === 'code') {
+          log('Raw lesson text → guide template, mapped in code (no model call, no credits).');
+          parsed = buildGuideFromMarkdown(content, { region: region || 'ye', locale: 'ar' });
+          structured = JSON.stringify(parsed, null, 2);
+          const chars = parsed.sections.reduce((a, x) => a + (x.body ? x.body.length
+            : (x.items || []).reduce((b, i) => b + String(i.body || i.text || i.value || '').length, 0)), 0);
+          log(`  ✓ ${parsed.sections.length} section(s), ${chars} characters of the lesson's own text — nothing rewritten`);
+        }
+        // A usable content JSON MUST have a sections array. Anything else — a JSON in
+        // some other shape (an API dump, a blob with the lesson inside a text field) —
+        // is structured into the schema first. This path still needs a model.
         if (!parsed || !Array.isArray(parsed.sections)) {
           log('Input is not a lesson content JSON — structuring it into the schema first…');
           if (!process.env.KIE_API_KEY) throw new Error('Structuring needs a kie.ai key. Paste a content JSON (with a "sections" array), or start the server with KIE_API_KEY set.');
@@ -103,9 +119,9 @@ function handler(req, res) {
         const srcForValidation = parsed; // the structured lesson, before condensing
         let figureReport = null; let verbatimReport = null;
         const looksLikeGuide = Array.isArray(parsed.sections) && parsed.sections.some((x) => x && x.id === 'stage-tamhid');
-        if (guide2p && !looksLikeGuide) {
+        if (guide2p && !looksLikeGuide && guideMode === 'llm') {
           if (!process.env.KIE_API_KEY) throw new Error('The guide structure needs a kie.ai key for the condense step.');
-          log('Mapping the full lesson onto the guide template…');
+          log('Mapping the full lesson onto the guide template (model path — guideMode=llm)…');
           const keepRegion = parsed.meta && parsed.meta.region;
           parsed = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log });
           if (keepRegion) parsed.meta = { ...(parsed.meta || {}), region: keepRegion };

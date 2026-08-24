@@ -166,6 +166,14 @@ async function callOnce(content, { apiKey, fetchImpl, extra, system }) {
   });
   const res = await fetchImpl(CHAT_URL, { method: 'POST', headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' }, body });
   const json = JSON.parse(typeof res.body === 'string' ? res.body : res.body.toString('utf8'));
+  // The provider answers an error with {code, msg} and no choices. Reported as "no
+  // parseable JSON" this looked like a model failure and sent a reviewer chasing prompt
+  // edits, when the real message was "Credits insufficient". Say what the API said.
+  if (!json.choices && (json.code || json.msg)) {
+    const err = new Error(`condense: provider error ${json.code || '?'} — ${json.msg || 'no message'}`);
+    err.providerCode = json.code;
+    throw err;
+  }
   const text = json.choices && json.choices[0] && json.choices[0].message && json.choices[0].message.content;
   const m = String(text || '').match(/\{[\s\S]*\}/);
   if (!m) {
