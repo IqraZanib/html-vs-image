@@ -147,6 +147,61 @@ function stepsFigure(items) {
   return picked.length >= 2 ? { kind: 'steps', items: picked } : null;
 }
 
+// The lesson already labels its own parts — «**نشاط الافتتاح (Getting Started):**»,
+// «**السؤال الجوهري:**», «**BOARD:**», «**Exit Ticket:**» — 45 distinct labels in the
+// test lesson. The first version of this mapper flattened all of that into one prose
+// blob per stage, which is why the LP read as text after text. Each labelled part is a
+// card of its own now: same words, structure the reader can scan.
+function labelledParts(body) {
+  const src = stripTables(String(body)).replace(/```/g, '');
+  const re = /\*\*([^*\n]{2,80}?):\*\*/g;
+  const marks = [];
+  let m;
+  while ((m = re.exec(src))) marks.push({ label: m[1].trim(), at: m.index, end: re.lastIndex });
+  if (!marks.length) {
+    const t = plain(body);
+    return t ? [{ label: '', body: t }] : [];
+  }
+  const parts = [];
+  const lead = plain(src.slice(0, marks[0].at));
+  if (lead) parts.push({ label: '', body: lead });
+  marks.forEach((mk, i) => {
+    const upto = i + 1 < marks.length ? marks[i + 1].at : src.length;
+    const text = plain(src.slice(mk.end, upto));
+    if (text) parts.push({ label: mk.label, body: text });
+  });
+  return parts;
+}
+
+// The stage's own shape decides its visual: rows of a table, a bulleted list, or an
+// arithmetic run. Labels are short slices of the source's own words.
+function fencedFigure(body) {
+  // A chant or a short block of lines set in ``` — the memorable bit of a warm-up.
+  // Its lines become step cards so the page shows it instead of burying it in prose.
+  const m = String(body).match(/```([\s\S]*?)```/);
+  if (!m) return null;
+  const lines = m[1].split('\n').map((l) => l.replace(/\s{2,}.*$/, '').trim())
+    .filter((l) => l && l.split(/\s+/).length <= 6);
+  if (lines.length < 2) return null;
+  return { kind: 'steps', items: lines.slice(0, 6).map((l) => ({ label: l, caption: '' })) };
+}
+
+function figureFor(rawBody) {
+  // Order matters. A bulleted list is the stage's real activity steps and makes the
+  // best cards; a table's rows are next. A fenced block is LAST because it is a chant
+  // in a warm-up (good) but letter-by-letter board spelling elsewhere (poor labels) —
+  // preferring it produced cards reading «أ | أ | أح م د», which is visual noise.
+  const lf = stepsFigure(listItems(rawBody));
+  if (lf) return lf;
+  const tf = tableFigure(rawBody);
+  if (tf) return tf;
+  const ff = fencedFigure(rawBody);
+  if (ff) return ff;
+  const eq = String(rawBody).match(/[٠-٩0-9]+\s*[+\-×÷]\s*[٠-٩0-9]+\s*=\s*[٠-٩0-9]+/);
+  if (eq) return { kind: 'expression', text: eq[0] };
+  return null;
+}
+
 // A table's rows as step cards: label = first cell, caption = the next. The source's
 // own cells, drawn by code, in the design's own component.
 function tableFigure(body) {
@@ -200,33 +255,28 @@ function buildGuideFromMarkdown(md, { region = '', locale = 'ar', subject = '', 
   for (const id of ['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim']) {
     const found = byRole.get(id);
     if (!found) continue;
-    // Each source block becomes its own labelled item, keeping the source heading as
-    // the label. ALWAYS label it, even when a stage has only one block: the Yemen pack
-    // styles a stage's last step item as the amber تحقق strip, so an empty label there
-    // renders as a bare ✓ in an empty box.
-    const items = found.map((b) => ({
-      label: b.title.replace(/\s*—.*$/, '').trim(),
-      body: plain(b.body),
-    })).filter((x) => x.body);
+    const raw = found.map((b) => b.body).join('\n');
+    // Every labelled part of every source block for this stage becomes its own row
+    // card. Where a stage has more than one source block (Explore + Explain both being
+    // العرض), the block's heading is carried as the first card's label so the reader
+    // still sees the source's own structure.
+    const items = [];
+    for (const b of found) {
+      const head = found.length > 1 ? b.title.replace(/\s*—.*$/, '').trim() : '';
+      const parts = labelledParts(b.body);
+      parts.forEach((p, i) => {
+        const label = [i === 0 ? head : '', p.label].filter(Boolean).join(' · ');
+        items.push({ text: label ? `**${label}:** ${p.body}` : p.body });
+      });
+    }
     if (!items.length) continue;
     const mins = found.map((b) => minutesOf(b.title)).find(Boolean) || '';
-    // WHICH SHAPE THE CARD TAKES. The pack's stage card is a three-column grid whose
-    // LAST step item is the narrow amber تحقق strip — sized for a one-line criterion.
-    // Full-length lesson text in that slot renders as a ~100px column running off the
-    // page, and a single item lands in the strip too, so it arrives styled as a
-    // checkpoint it is not. So: a stage carrying real prose ships as a full-width text
-    // card (same title, colour, time pill and panel — the design is untouched), and the
-    // steps shape is kept for the short, genuinely step-like case.
-    const total = items.reduce((a, x) => a + x.body.length, 0);
-    const asProse = items.length === 1 || total > 400;
-    const sec = asProse
-      ? { id, heading: HEADINGS_AR[id], type: 'text',
-          time: [mins, GRR[id]].filter(Boolean).join(' · '),
-          body: items.map((x) => (x.label ? `**${x.label}:** ${x.body}` : x.body)).join('\n\n') }
-      : { id, heading: HEADINGS_AR[id], type: 'steps',
-          time: [mins, GRR[id]].filter(Boolean).join(' · '), items };
-    const raw = found.map((b) => b.body).join('\n');
-    const fig = tableFigure(raw) || stepsFigure(listItems(raw));
+    // 'bullets' renders as the pack's white row-cards with circled Arabic-Indic badges:
+    // full card width, one card per part, and no item lands in the amber تحقق strip —
+    // that slot is sized for a one-line criterion, not for lesson prose.
+    const sec = { id, heading: HEADINGS_AR[id], type: 'bullets', marker: 'num',
+      time: [mins, GRR[id]].filter(Boolean).join(' · '), items };
+    const fig = figureFor(raw);
     if (fig) sec.codeFigure = fig;
     push(sec);
   }

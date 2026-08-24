@@ -656,6 +656,19 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-stage-taqwim .d-code-fig.cf-k-process .cf-svg{max-height:calc(210px * var(--figscale))}
 .panel.has-inline-img .d-code-fig.cf-k-process{width:100%}
 
+
+/* RAW-TEXT MODE. A stage whose body is ROW CARDS (.d-bullets) is not the pilot's
+   three-column anatomy. That grid exists for body | figure | تحقق and relies on
+   .d-steps using display:contents to fill columns 1 and 3; with row cards there is no
+   .d-steps, so columns 2 and 3 sit empty while the cards squeeze into ~40% of the card
+   and the figure falls off the page. One column, cards full width, figure below.
+   Scoped by :has() so the approved step-shaped anatomy is untouched. */
+.panel.has-inline-img:has(.d-bullets){display:block}
+.panel.has-inline-img:has(.d-bullets) .ii-body{display:block;width:100%}
+.panel.has-inline-img:has(.d-bullets) .d-inline-img,
+.panel.has-inline-img:has(.d-bullets) .d-code-fig{width:100%;max-width:none;margin:10px auto 0;position:static}
+.panel.has-inline-img:has(.d-bullets) .d-code-fig .cf-svg{max-height:none;width:100%}
+
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

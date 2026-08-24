@@ -83,20 +83,38 @@ test('Explore and Explain both reach العرض, each under its own heading', ()
   const two = LESSON.replace('#### Practice', '#### Explain (الشرح) — 10 دقائق\nيشرح المعلم الفرق بين الكلمات.\n\n#### Practice');
   const g = buildGuideFromMarkdown(two, { region: 'ye', locale: 'ar' });
   const arad = g.sections.find((s) => s.id === 'stage-arad');
-  const blob = arad.body || (arad.items || []).map((i) => `${i.label} ${i.body}`).join(' ');
+  const blob = arad.body || (arad.items || []).map((i) => `${i.label || ''} ${i.body || i.text || ''}`).join(' ');
   assert.match(blob, /Explore|الاستكشاف/);
   assert.match(blob, /Explain|الشرح/);
   assert.match(blob, /يشرح المعلم الفرق بين الكلمات/, 'the second block keeps its text');
 });
 
-test('a stage carrying real prose ships as a full-width text card', () => {
-  // The pack's last step item is the narrow amber تحقق strip. Long text there renders
-  // as a ~100px column running off the page, so prose stages must not use that shape.
+test('a stage becomes one row card per labelled part, not a wall of prose', () => {
+  // The first version emitted one prose blob per stage and the LP read as text after
+  // text. The lesson labels its own parts, so each label is a card. 'bullets' also
+  // avoids the amber تحقق strip, which is sized for a one-line criterion.
+  const withParts = LESSON.replace(
+    'يبدأ المعلم بالنظر إلى صفحة 32 من الكتاب مباشرة كنشاط تمهيدي.',
+    '**نشاط الافتتاح:** يبدأ المعلم بالنظر إلى صفحة 32.\n\n**السؤال الجوهري:** من هم أفراد أسرتك؟');
+  const g = buildGuideFromMarkdown(withParts, { region: 'ye', locale: 'ar' });
+  const tamhid = g.sections.find((s) => s.id === 'stage-tamhid');
+  assert.strictEqual(tamhid.type, 'bullets');
+  assert.ok(tamhid.items.length >= 2, 'one card per labelled part');
+  assert.match(tamhid.items[0].text, /نشاط الافتتاح/);
+  assert.match(tamhid.items[1].text, /السؤال الجوهري/);
+  assert.match(tamhid.time, /أنا أفعل/, 'the stage keeps its time and gradual-release pill');
+});
+
+test('every stage that can carry a visual gets one', () => {
+  // Text after text was the complaint. A stage with a chant, a list, a table or an
+  // arithmetic run must render a code figure built from those same words.
   const g = buildGuideFromMarkdown(LESSON, { region: 'ye', locale: 'ar' });
   const tamhid = g.sections.find((s) => s.id === 'stage-tamhid');
-  assert.strictEqual(tamhid.type, 'text');
-  assert.ok(tamhid.body.length > 100);
-  assert.match(tamhid.time, /أنا أفعل/, 'the stage keeps its time and gradual-release pill');
+  assert.ok(tamhid.codeFigure, 'the fenced chant should become a figure');
+  assert.strictEqual(tamhid.codeFigure.kind, 'steps');
+  assert.match(JSON.stringify(tamhid.codeFigure), /أُسْرَتِي/, 'built from the chant lines');
+  const arad = g.sections.find((s) => s.id === 'stage-arad');
+  assert.ok(arad.codeFigure, 'a bulleted stage should become a figure');
 });
 
 test('the vocabulary table becomes the glossary', () => {
