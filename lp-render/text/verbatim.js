@@ -26,6 +26,8 @@ const CHROME = new Set([
   'هدف اليوم', "today's goal", 'التمهيد', 'العرض', 'التطبيق', 'التقويم والختام',
   'مصطلحات', 'تكييف متعدد الصفوف', 'الواجب المنزلي · ركن المعلم',
   'اخطاء شائعة — انتبه لها', 'اخطاء شائعة - انتبه لها',
+  // labels the renderer puts on a drawn ✗/✓ board
+  'خطا شائع', 'التصحيح', 'صواب', 'خطا',
 ]);
 // Keys that never hold lesson prose.
 const SKIP_KEYS = new Set(['id', 'type', 'kind', 'marker', 'heading', 'time', 'label',
@@ -135,7 +137,10 @@ function fragments(text) {
     // («الكلمة | عدد الحروف | من هو؟ أَبِي | 3 | الوالد …») is every one of the
     // source's own cells joined for display; splitting only on sentence ends made it
     // look like a rewrite when not a word had changed.
-    .split(/(?<=[.!?؟])\s+|[\n؛|]+|\s+·\s+|(?<=:)\s+|(?=\*\*)|(?<=\*\*)/)
+    // A closing quote may follow the full stop — «…ونتأكد من الترتيب." بعض الطلاب…» is
+    // two sentences, and without allowing for it the splitter saw one long run and
+    // reported a seam that is simply a quoted sentence ending.
+    .split(/(?<=[.!?؟]["»'”]?)\s+|[\n؛|]+|\s+·\s+|(?<=:)\s+|(?=\*\*)|(?<=\*\*)/)
     .map((x) => x.trim())
     .filter((x) => norm(x).split(' ').length >= 3);   // ignore stubs like "صفحة ٨٠"
 }

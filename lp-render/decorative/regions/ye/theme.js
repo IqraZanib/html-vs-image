@@ -681,6 +681,32 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .panel.has-inline-img:has(.d-text):not(:has(.d-steps)):not(:has(.d-bullets)) .d-code-fig{
   grid-column:2;grid-row:1;margin:0;position:static}
 
+
+/* ── RAW-TEXT LP: prominence and rhythm ─────────────────────────────────────────
+   The caps above were tuned for the two-page format, where every pixel was
+   contested: figures live at 112–168px so four stages plus the whole back page
+   could fit. A raw-text LP has no page contract, so that thrift buys nothing and
+   costs the design its visuals. Where a stage card carries one labelled part, the
+   figure gets the size the pilot gives it. */
+.section[class*="sec-stage-"] .panel.has-inline-img:has(.d-text) .d-code-fig .cf-svg{
+  max-height:250px !important;width:100% !important}
+.section[class*="sec-stage-"] .panel.has-inline-img:has(.d-text) .d-code-fig{padding:2px}
+.section[class*="sec-stage-"] .panel.has-inline-img:has(.d-text) .d-code-fig.cf-wide .cf-svg{
+  max-height:200px !important}
+
+/* A card of pure prose is the thing that reads as a wall. It cannot be shortened —
+   the lesson's words are the deliverable — but it can be set in two columns like a
+   textbook, which halves the line count and the apparent density. Only cards with no
+   figure: a card that already has a visual has its own rhythm. */
+.section[class*="sec-stage-"] .panel:not(:has(.d-code-fig)):not(:has(.d-inline-img)) .d-text{
+  column-count:2;column-gap:24px;column-rule:1px solid #e8ebf2;text-align:justify}
+.section[class*="sec-stage-"] .panel:not(:has(.d-code-fig)) .d-text{line-height:1.62}
+
+/* Breathing room between cards, and a lighter card edge so a page of many cards
+   reads as a sequence rather than a grid of boxes. */
+.section[class*="sec-stage-"]{margin:0 0 7px}
+.section[class*="sec-stage-"] .panel{padding:34px 16px 9px}
+
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

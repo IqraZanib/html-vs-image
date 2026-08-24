@@ -220,12 +220,39 @@ function buildFigure(body) {
   return uniq.length >= 2 ? { kind: 'steps', items: uniq.slice(0, 6) } : null;
 }
 
+// «Watch out:» — the lesson's own warning about what pupils get wrong, and the
+// correction that follows it. Drawn as the pilot's ✗/✓ split board: the mistake on one
+// side, the fix on the other, both labelled with the lesson's own words.
+function errorBoardFigure(body) {
+  const t = String(body);
+  if (!/watch out|تنبيه|احذر/i.test(t) && !/التصحيح|الصحيح/.test(t)) return null;
+  const fix = t.match(/(?:التصحيح|الصواب|الصحيح)\s*[:،]?\s*([^.!؟\n]{6,60})/);
+  const err = t.match(/(?:بعض الطلاب|قد يخلط|يخلط|الخطأ)\s*[:،]?\s*([^.!؟\n]{6,60})/);
+  if (!fix || !err) return null;
+  const short = (x) => x.trim().split(/\s+/).slice(0, 5).join(' ');
+  return { kind: 'error-board',
+    wrong: { kind: 'expression', text: short(err[1]) },
+    correct: { kind: 'expression', text: short(fix[1]) },
+    labelWrong: 'خطأ شائع', labelCorrect: 'التصحيح' };
+}
+
+// The lesson's key words as a card set — the «family words» of this lesson, taken from
+// the vocabulary table it already provides. Attached to the first stage card that has
+// no figure of its own, so page 1 opens with something to look at.
+function wordCardsFigure(rows) {
+  if (!rows || rows.length < 2) return null;
+  return { kind: 'steps',
+    items: rows.slice(0, 6).map((r) => ({ label: r.label, caption: r.value.split(/\s+/).slice(0, 3).join(' ') })) };
+}
+
 function figureFor(rawBody) {
   // Order matters, most meaningful first: a matching exercise or a letter build IS the
   // example, so it beats a generic list; a classroom quote beats prose; a bulleted list
   // is the stage's real activity steps; a table's rows next. A fenced block is LAST
   // because it is a chant in a warm-up (good) but letter-by-letter board spelling
   // elsewhere (poor labels) — preferring it produced cards reading «أ | أ | أح م د».
+  const eb = errorBoardFigure(rawBody);
+  if (eb) return eb;
   const pf = pairsFigure(rawBody);
   if (pf) return pf;
   const bf = buildFigure(rawBody);
@@ -390,10 +417,41 @@ function buildGuideFromMarkdown(md, { region = '', locale = 'ar', subject = '', 
     push({ id: 'homework', heading: HEADINGS_AR.homework, type: 'note',
       body: hwLift.map((x) => `**${x.label}:** ${x.body}`).join(' ') });
   }
+  // The «Watch out» text IS a misconception and its correction — the content the pilot's
+  // ✗/✓ twin card exists for. Split it at the lesson's own markers so the pair carries
+  // the lesson's sentences, add the drawn board beside them, and keep whatever is left
+  // as the note underneath so nothing is dropped.
   const ecLift = lifted.get('errors-caption');
   if (ecLift && ecLift.length) {
-    push({ id: 'errors-caption', heading: 'ملاحظة', type: 'text',
-      body: ecLift.map((x) => `**${x.label}:** ${x.body}`).join(' ') });
+    const all = ecLift.map((x) => x.body).join(' ');
+    const fixM = all.match(/(?:التصحيح|الصواب)\s*[:،]\s*([^.!؟]{6,120})/);
+    const errM = all.match(/((?:بعض الطلاب|كثير من الطلاب)[^.!؟]{6,140})/);
+    if (fixM && errM) {
+      // A drawn label must say something on its own. Taking the first four words gave
+      // «في هذا العمر يخلطون» — a mid-sentence fragment. The confusion pair is the
+      // teaching point, so use it when the sentence names one.
+      const shortLbl = (x) => {
+        const pair = x.match(/يخلطون\s+بين\s+("?[^"،.]{1,12}"?)\s*و\s*("?[^"،.]{1,12}"?)/);
+        if (pair) return `${pair[1]} / ${pair[2]}`.replace(/"/g, '');
+        return x.trim().split(/\s+/).slice(0, 4).join(' ');
+      };
+      push({ id: 'errors', heading: HEADINGS_AR.errors, type: 'qa',
+        items: [{ q: '✗ خطأ', a: errM[1].trim() }, { q: '✓ صواب', a: fixM[1].trim() }],
+        codeFigure: { kind: 'error-board',
+          wrong: { kind: 'expression', text: shortLbl(errM[1].replace(/^(?:بعض|كثير من) الطلاب\s*/, '')) },
+          correct: { kind: 'expression', text: shortLbl(fixM[1]) },
+          labelWrong: 'خطأ شائع', labelCorrect: 'التصحيح' } });
+      // Join what is left with a separator rather than splicing the sentences together:
+      // cutting two non-adjacent sentences out of a paragraph and butting the remainders
+      // against each other creates a seam that is not in the source. Keeping them as
+      // separate pieces preserves every word AND keeps each piece a real source slice.
+      const rest = all.replace(errM[1], '§').replace(fixM[0], '§')
+        .split('§').map((x) => x.trim()).filter((x) => x.length > 20).join(' · ');
+      if (rest) push({ id: 'errors-caption', heading: 'ملاحظة', type: 'text', body: rest });
+    } else {
+      push({ id: 'errors-caption', heading: 'ملاحظة', type: 'text',
+        body: ecLift.map((x) => `**${x.label}:** ${x.body}`).join(' ') });
+    }
   }
 
   const sol = byRole.get('solutions');
@@ -427,6 +485,15 @@ function buildGuideFromMarkdown(md, { region = '', locale = 'ar', subject = '', 
   if (hw) {
     const body = plain(hw.map((b) => b.body).join('\n'));
     if (body) push({ id: 'homework', heading: HEADINGS_AR.homework, type: 'note', body });
+  }
+
+  // Give page 1 something to look at: the lesson's own vocabulary as a card set, on the
+  // first stage card that has no figure of its own.
+  const vocab = byRole.get('glossary');
+  if (vocab) {
+    const wc = wordCardsFigure(tableRows(vocab.map((b) => b.body).join('\n')));
+    const target = sections.find((x) => String(x.id).startsWith('stage-') && !x.codeFigure);
+    if (wc && target) target.codeFigure = wc;
   }
 
   sections.sort((a, b) => ORDER.indexOf(a.id) - ORDER.indexOf(b.id));
