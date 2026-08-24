@@ -212,6 +212,28 @@ function tableFigure(body) {
     items: rows.slice(0, 6).map((r) => ({ label: r.label, caption: r.value })) };
 }
 
+// The pilot card is text | figure | تحقق, and that amber sidebar is a signature of the
+// approved design. The lesson supplies its own check text: exercises carry
+// «MODEL ANSWER», «الحل الصحيح» or «الإجابة». Splitting a part at that marker fills both
+// slots with the source's own words — the instruction on one side, the answer the teacher
+// checks against on the other — so the anatomy is complete without inventing anything.
+// The asterisks are OPTIONAL: the source writes «**MODEL ANSWER**:» in some places and
+// a bare «MODEL ANSWER:» in others. Requiring one found nothing.
+const CHECK_MARK = /(?=(?:\*{0,2})\s*(?:MODEL ANSWER|الحل الصحيح|الحل:|الإجابة الصحيحة|الإجابة:))/i;
+function splitCheck(text) {
+  const t = String(text);
+  const m = t.search(CHECK_MARK);
+  if (m <= 40) return { body: t, check: '' };          // nothing before the marker
+  const body = t.slice(0, m).trim();
+  const check = t.slice(m).trim();
+  // The amber sidebar is a ~90px column sized for ONE line. Measured: a 600-character
+  // model answer in there runs the whole page height and cost three extra pages. Short
+  // checks go to the sidebar; a long answer becomes its own card instead.
+  if (check.length < 12) return { body: t, check: '' };
+  if (check.length > 160) return { body, check: '', longCheck: check };
+  return { body, check };
+}
+
 function buildGuideFromMarkdown(md, { region = '', locale = 'ar', subject = '', grade = '' } = {}) {
   const bs = blocks(md);
   if (!bs.length) throw new Error('from-markdown: no markdown headings found in the lesson');
@@ -292,7 +314,13 @@ function buildGuideFromMarkdown(md, { region = '', locale = 'ar', subject = '', 
         // Every card says which stage it belongs to: a teacher on page 3 should not have
         // to scroll back to find out they are still in العرض.
         const title = [HEADINGS_AR[id], part.label || blockHead].filter(Boolean).join(' · ');
-        const sec = { id, heading: title, type: 'text', body: part.body };
+        // Fill the pilot's two text slots from the part's own words when it carries a
+        // model answer; otherwise a plain text card.
+        const sp = splitCheck(part.body);
+        const sec = sp.check
+          ? { id, heading: title, type: 'steps',
+              items: [{ label: '', body: sp.body }, { label: 'تحقق', body: sp.check }] }
+          : { id, heading: title, type: 'text', body: sp.longCheck ? sp.body : part.body };
         if (first) {
           const mins = found.map((x) => minutesOf(x.title)).find(Boolean) || '';
           const pill = [mins, GRR[id]].filter(Boolean).join(' · ');
@@ -302,6 +330,11 @@ function buildGuideFromMarkdown(md, { region = '', locale = 'ar', subject = '', 
         const fig = figureFor(part.raw || '');
         if (fig) sec.codeFigure = fig;
         push(sec);
+        // A long model answer is its own card — same stage colour, titled «… · الحل» —
+        // rather than being squeezed into a sidebar built for one line.
+        if (sp.longCheck) {
+          push({ id, heading: `${title} · الحل`, type: 'text', body: sp.longCheck });
+        }
       }
     }
   }
