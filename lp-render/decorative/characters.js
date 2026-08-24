@@ -11,7 +11,7 @@ const https = require('node:https');
 const { generateImage } = require('./../../imagegen/kie/generate');
 const { checkImage } = require('./../../imagegen/quality_gate');
 
-const LADDER = ['nano-banana-2-lite', 'flux-2/pro-text-to-image'];
+const LADDER = ['nano-banana-2-lite']; // single-model policy (2026-08-18)
 const RETRIES = { 'nano-banana-2-lite': 4, 'flux-2/pro-text-to-image': 1 };
 const PARAMS = { 'nano-banana-2-lite': { aspect_ratio: '3:4' }, 'flux-2/pro-text-to-image': { aspect_ratio: '2:3', resolution: '1K' } };
 const STYLE = 'full body, isolated on a plain solid white background, no text and no words anywhere, clean thick black outlines, bright flat colors, friendly children educational storybook style';

@@ -31,6 +31,7 @@ async function resolveSegmentImages(segment = {}, opts = {}) {
     const expectation = block.text || segment.topic || category;
 
     let resolved = null;
+    let lastRejected = null; // gate-soft: presence beats absence (owner decision 2026-08-18)
     for (const model of ladder) {
       const key = cacheKey(category, prompt, model);
       const cached = await cache.get(key);
@@ -46,6 +47,7 @@ async function resolveSegmentImages(segment = {}, opts = {}) {
 
       const gate = await gateImpl({ apiKey, imageUrl: gen.url, expectation, policy: opts.gatePolicy });
       report.push({ blockType: block.type, model, credits: gen.creditsConsumed, gate: gate.pass, reason: gate.reason });
+      if (!gate.pass) lastRejected = { model, asset: { url: gen.url, model }, credits: gen.creditsConsumed, reason: 'gate_soft: shipped unverified (' + gate.reason + ')' };
       if (gate.pass) {
         const asset = { url: gen.url, model };
         await cache.set(key, asset);
@@ -54,9 +56,12 @@ async function resolveSegmentImages(segment = {}, opts = {}) {
       }
     }
 
+    // Gate-soft policy: a rejected-but-generated image beats an empty slot. The
+    // reason string carries the gate verdict so logs show what shipped unverified.
+    if (!resolved && lastRejected) resolved = lastRejected;
     return resolved
       ? { blockType: block.type, category, needsImage: true, model: resolved.model, asset: resolved.asset, reason: resolved.reason, creditsConsumed: resolved.credits }
-      : { blockType: block.type, category, needsImage: true, model: null, asset: null, reason: 'fallback: no model passed the quality gate' };
+      : { blockType: block.type, category, needsImage: true, model: null, asset: null, reason: 'fallback: generation itself failed' };
   };
 
   // Blocks are independent, so resolve them concurrently (output order preserved).

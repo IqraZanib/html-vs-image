@@ -1,905 +1,1829 @@
 {
- "3531b9000d8a36c0": {
-  "file": "3531b9000d8a36c0.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "a clear educational labeled chart of the human breathing system for a Grade 5 Science lesson, clearly labelling the nose, the trachea (wind pipe), the two lungs, and the diaphragm, flat infographic style, correct anatomy, plain background"
- },
- "fb5c2db48240c64b": {
-  "file": "fb5c2db48240c64b.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "clear simple educational pictures of the human lungs and the human nose side by side, labelled, correct anatomy, flat illustration, plain background, suitable for a Grade 5 Science classroom"
- },
- "9aebaed02219d9e6": {
-  "file": "9aebaed02219d9e6.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "a clear educational science diagram of a lung model made with balloons: a plastic bottle with two balloons inside representing the two lungs and a stretched rubber sheet at the bottom representing the diaphragm, with a simple arrow showing air moving in and out, labelled 'balloons = lungs' and 'rubber sheet = diaphragm', flat infographic style, correct and simple, plain background"
- },
- "34f43d25885a1f3a": {
-  "file": "34f43d25885a1f3a.png",
-  "mime": "image/png",
-  "model": "flux-2/pro-text-to-image",
-  "concept": "scene",
-  "prompt": "a happy child athlete running in a race on a school sports field, smiling, bright cheerful flat cartoon illustration, plain simple background"
- },
- "b87d75babac36448": {
-  "file": "b87d75babac36448.jpg",
-  "mime": "image/jpeg",
-  "model": "qwen2/text-to-image",
-  "concept": "scene",
-  "prompt": "a cheerful child riding a bicycle on a countryside road, smiling, colourful illustration for a children's maths lesson"
- },
- "e506277180bd3a92": {
-  "file": "e506277180bd3a92.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "A clear educational diagram of the water cycle showing evaporation, condensation, precipitation, and collection with labeled arrows."
- },
- "3b088c1a00f5a968": {
-  "file": "3b088c1a00f5a968.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "A kettle with water boiling and steam rising, suitable for a Grade 4 science lesson demonstration."
- },
- "f7e8d457bad62c74": {
-  "file": "f7e8d457bad62c74.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "A clear educational diagram of the water cycle showing the stages named in the lesson: evaporation, condensation, and precipitation."
- },
- "713ea738a2de2588": {
-  "file": "713ea738a2de2588.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "scene",
-  "prompt": "A kettle with water boiling and steam rising, used to demonstrate evaporation in a classroom."
- },
- "78ddcf1199df3107": {
-  "file": "78ddcf1199df3107.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Grade 1 pupils using stones and fingers to combine two groups of objects to learn addition from 1 to 10."
- },
- "d6e2ffd0af7152fe": {
-  "file": "d6e2ffd0af7152fe.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "Concrete to Pictorial to Abstract addition diagram showing stones, drawings of circles, and the equation 3 + 2 = 5."
- },
- "88fad65a8849a8bb": {
-  "file": "88fad65a8849a8bb.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "scene",
-  "prompt": "A simple educational illustration for Grade 1 math: Ali has 4 mangoes and Fatima gives him 2 more mangoes. Show the two groups of mangoes clearly with a child-friendly classroom style."
- },
- "5ad97a65923e9e67": {
-  "file": "5ad97a65923e9e67.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "Mawe ya Juma, mawe ya Asha, and jumla ya mawe showing 3 + 2 = 5 on a board"
- },
- "ce854b05b97016c6": {
-  "file": "ce854b05b97016c6.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "Michoro ya kuongeza kwa kutumia vikundi vya duara: OO + OOO, OOOO + O, na OOOOO + OO."
- },
- "792340987d59d4a5": {
-  "file": "792340987d59d4a5.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "Mchoro wa kujumlisha mawe 3 na mawe 2 kuwa mawe 5"
- },
- "9ea2b407c231a5bc": {
-  "file": "9ea2b407c231a5bc.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "Plus sign and equal sign in a simple addition equation"
- },
- "713f25dc10835e6b": {
-  "file": "713f25dc10835e6b.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Two students using bottle caps to practice addition"
- },
- "67c8c57f2234ed51": {
-  "file": "67c8c57f2234ed51.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Mbuzi 3 kwenye zizi na mama anaongeza mbuzi 3 wengine"
- },
- "5d8c34171b77d845": {
-  "file": "5d8c34171b77d845.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Mawe na vidole yanayotumika kuunganisha makundi mawili ya vitu."
- },
- "cc93aab8f0bd2949": {
-  "file": "cc93aab8f0bd2949.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "3 + 2 = 5 addition equation with plus sign and equal sign"
- },
- "3ee4f59562769e62": {
-  "file": "3ee4f59562769e62.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "students using bottle caps for addition practice"
- },
- "fdb5a75c7fb1f0eb": {
-  "file": "fdb5a75c7fb1f0eb.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "Mchoro unaoonyesha mawe 3 yakijumlishwa na mawe 2 kupata mawe 5."
- },
- "4c31e4edfac15994": {
-  "file": "4c31e4edfac15994.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "scene",
-  "prompt": "عائلة يمنية بسيطة"
- },
- "fbf1b44cdf1d1d68": {
-  "file": "fbf1b44cdf1d1d68.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "جدول يوضح أبي، أمي، أحمد، سبأ، إيمان"
- },
- "f87e572c206b9da0": {
-  "file": "f87e572c206b9da0.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "جدول يوضح: أبي، أمي، أحمد، سبأ، إيمان"
- },
- "9a22c577a79f45fb": {
-  "file": "9a22c577a79f45fb.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "scene",
-  "prompt": "صورة لعائلة يمنية بسيطة"
- },
- "e50cf6a572a86273": {
-  "file": "e50cf6a572a86273.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "جدول يوضح أبي وأمي وأحمد وسبأ وإيمان"
- },
- "a8601e28c4781ba5": {
-  "file": "a8601e28c4781ba5.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "رسمة قلب كبير وبداخله كلمة أسرتي"
- },
- "edf633841bf60908": {
-  "file": "edf633841bf60908.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "مخطط مُسمى يوضح: أبي، أمي، أحمد، سبأ، إيمان"
- },
- "abae60389e9fac92": {
-  "file": "abae60389e9fac92.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "Diagramu yenye mawe yanayoonyesha 3 + 2 = 5 kwa wanafunzi wa Pakistan"
- },
- "08bdfa38f3348d6c": {
-  "file": "08bdfa38f3348d6c.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "Labelled diagram showing stones used to demonstrate 3 + 2 = 5 for pupils in a Kenyan classroom"
- },
- "c791170753559dd1": {
-  "file": "c791170753559dd1.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "scene",
-  "prompt": "Watoto wa Kenya wakitumia mawe kujumlisha makundi mawili ya mawe darasani"
- },
- "933ffb2539b9d406": {
-  "file": "933ffb2539b9d406.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "Labelled diagram showing the equation 3 + 2 = 5 with the plus sign and equal sign explained using groups of objects for Pakistani primary school learners"
- },
- "5b2ad2e8a68fe772": {
-  "file": "5b2ad2e8a68fe772.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "scene",
-  "prompt": "Watoto wa Kenya wakijumlisha makundi mawili ya mawe darasani"
- },
- "c656a80bf9e6988d": {
-  "file": "c656a80bf9e6988d.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Watoto wa Kenya/Tanzania darasani wakitumia mawe madogo kuunganisha makundi mawili ya vitu na kuhesabu jumla."
- },
- "27dae0a3ed72a5e3": {
-  "file": "27dae0a3ed72a5e3.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "Mchoro wa mawe matatu pamoja na mawe mawili ukionyesha 3 + 2 = 5."
- },
- "0c23978f293c52db": {
-  "file": "0c23978f293c52db.jpg",
-  "mime": "image/jpeg",
-  "model": "bytedance/seedream-v4-text-to-image",
-  "concept": "scene",
-  "prompt": "Wanafunzi wa Tanzania au Kenya katika darasa wakijumlisha vitu kwa kuweka mawe 4 upande mmoja na vifuniko 3 vya chupa upande mwingine, kisha kuhesabu jumla 7."
- },
- "7a837dc059072606": {
-  "file": "7a837dc059072606.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "Mchoro wa kielimu unaoonyesha hesabu 3 + 2 = 5, ikiwa na vikundi vitatu na viwili vya vitu vinavyowekwa pamoja ili kuonyesha jumla ya tano."
- },
- "226887ba6b3f1b56": {
-  "file": "226887ba6b3f1b56.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "مخطط مُسمّى يوضح: أبي، أمي، أحمد، سبأ، إيمان"
- },
- "e2a2892bffb5c39d": {
-  "file": "e2a2892bffb5c39d.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "Mchoro wa hisabati unaoonyesha alama ya kujumlisha +, alama ya usawa =, na mfano 3 + 2 = 5"
- },
- "662eefce4e005ad4": {
-  "file": "662eefce4e005ad4.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Watoto wa Tanzania/Kenya darasani wakitumia mawe kuunganisha makundi mawili ya vitu na kuhesabu jumla"
- },
- "6de6e61ee6e14871": {
-  "file": "6de6e61ee6e14871.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "A cheerful Kenyan boy in a bright school uniform pouring water from a jug into a measuring bucket outdoors, with jerry cans, plastic bottles and cups beside him, warm morning light, friendly"
- },
- "83fd46ab2e35f2d1": {
-  "file": "83fd46ab2e35f2d1.jpg",
-  "mime": "image/jpeg",
-  "model": "qwen2/text-to-image",
-  "concept": "scene",
-  "prompt": "Kenyan schoolchildren in uniform pouring water from a bottle into a bucket, smiling"
- },
- "babfe30b724eb9e3": {
-  "file": "babfe30b724eb9e3.jpg",
-  "mime": "image/jpeg",
-  "model": "qwen2/text-to-image",
-  "concept": "scene",
-  "prompt": "a one-litre plastic bottle beside a blue bucket being filled with water on a table"
- },
- "d54444af76d694ec": {
-  "file": "d54444af76d694ec.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Kenyan Grade 3 learners measuring water with a 1-litre container using buckets, bottles, jerry cans and cups in a classroom."
- },
- "a9897f982f88de51": {
-  "file": "a9897f982f88de51.jpg",
-  "mime": "image/jpeg",
-  "model": "bytedance/seedream-v4-text-to-image",
-  "concept": "diagram",
-  "prompt": "A diagram of a 1-litre container pouring water into a bucket, labelled in English with: 1 litre, bucket, water."
- },
- "5c8967eb945bd4e0": {
-  "file": "5c8967eb945bd4e0.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "رسم توضيحي مُسمى يبين قطعة مستقيمة بين نقطتين وشكلاً رباعياً مكوناً من أربعة أضلاع"
- },
- "d248c203e504067b": {
-  "file": "d248c203e504067b.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "رسم توضيحي مُسمى لمكعب ومخروط يوضح الأوجه والقاعدة الدائرية والرأس المدبب"
- },
- "90028a430825e457": {
-  "file": "90028a430825e457.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "Labelled diagram showing mb, nd, and ngw with the example words mbuzi, mbegu, ndoo, ndizi, and ngwena."
- },
- "f33f15adbff84894": {
-  "file": "f33f15adbff84894.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Pakistani teacher showing pictures of a goat and bananas to primary school children during a Kiswahili lesson."
- },
- "af840d6b6791d53f": {
-  "file": "af840d6b6791d53f.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "Labelled diagram showing a goat, bananas, a bucket, seeds, and a crocodile"
- },
- "87590c2e6fa4ff99": {
-  "file": "87590c2e6fa4ff99.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "saa ya ukutani inayotumia namba za Kirumi"
- },
- "165b297bfa7c7f26": {
-  "file": "165b297bfa7c7f26.jpg",
-  "mime": "image/jpeg",
-  "model": "bytedance/seedream-v4-text-to-image",
-  "concept": "diagram",
-  "prompt": "alama kuu za Kirumi I, V, X zikiwa zimeonyeshwa pamoja na thamani zake"
- },
- "49db8f90ae547610": {
-  "file": "49db8f90ae547610.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "Labeled diagram showing Roman numerals I, II, III, IV, V, VI, VII, VIII, IX, X matched with numbers 1 to 10"
- },
- "7e137573f2863d07": {
-  "file": "7e137573f2863d07.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "scene",
-  "prompt": "Pakistani primary school children working in pairs using matchsticks to form Roman numerals in a classroom"
- },
- "455aeb84f196f3f5": {
-  "file": "455aeb84f196f3f5.jpg",
-  "mime": "image/jpeg",
-  "model": "bytedance/seedream-v4-text-to-image",
-  "concept": "diagram",
-  "prompt": "Labelled diagram showing Roman numerals I, V, and X with their values 1, 5, and 10"
- },
- "0f9eec274412c037": {
-  "file": "0f9eec274412c037.jpg",
-  "mime": "image/jpeg",
-  "model": "bytedance/seedream-v4-text-to-image",
-  "concept": "diagram",
-  "prompt": "Labelled diagram comparing IV equals 4 and VI equals 6"
- },
- "71d7bc76dd051f45": {
-  "file": "71d7bc76dd051f45.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "Labelled diagram showing the Roman numerals I to X matched with the numbers 1 to 10."
- },
- "4c57c0d70d2bbf6e": {
-  "file": "4c57c0d70d2bbf6e.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "A clock face labelled with Roman numerals I to XII."
- },
- "95233ee196fed651": {
-  "file": "95233ee196fed651.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "رسم توضيحي لشارع يحتوي على رصيف وشارع ورصيف مع خطوط عبور المشاة"
- },
- "5141db5647e85b83": {
-  "file": "5141db5647e85b83.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "أطفال باكستانيون في طريق آمن يمشون على الرصيف ويساعدون الآخرين ويعبرون من مكان عبور المشاة"
- },
- "45313d2c27fac23b": {
-  "file": "45313d2c27fac23b.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "رسم توضيحي مُسمّى يبين الرصيف والشارع ومكان عبور المشاة بالخطوط البيضاء"
- },
- "36f603eb5c2b7fe2": {
-  "file": "36f603eb5c2b7fe2.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "scene",
-  "prompt": "طفل باكستاني يزيل حجراً من الطريق لحماية المارة"
- },
- "e500b061ae263542": {
-  "file": "e500b061ae263542.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "A labelled diagram showing Roman numerals I, V, X and examples II, III, IV, VI, IX with their values."
- },
- "f44c605d6fa55290": {
-  "file": "f44c605d6fa55290.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "A wall clock using Roman numerals in a classroom."
- },
- "aabd9de645d9bd0d": {
-  "file": "aabd9de645d9bd0d.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "Labelled diagram showing Roman numerals I to X matched with numbers 1 to 10."
- },
- "1b5e90b7d585d593": {
-  "file": "1b5e90b7d585d593.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Pakistani children reciting the poem 'Golden Sun' aloud with actions while learning about the gifts of the sun."
- },
- "1b5051c41722b008": {
-  "file": "1b5051c41722b008.jpg",
-  "mime": "image/jpeg",
-  "model": "bytedance/seedream-v4-text-to-image",
-  "concept": "diagram",
-  "prompt": "A caterpillar with the words lamb, climb, and thumb shown to illustrate the silent letter b."
- },
- "1fb7e48f3d2d5222": {
-  "file": "1fb7e48f3d2d5222.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Pakistani Grade 3 pupils in a classroom looking at a sunrise picture and learning about the gifts of the sun: light, life and warmth."
- },
- "cc28d33b81a9a894": {
-  "file": "cc28d33b81a9a894.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "A labelled diagram showing a caterpillar on a leaf and a butterfly near flowers, with the life-cycle picture labels written in English."
- },
- "6125951c5f6952bc": {
-  "file": "6125951c5f6952bc.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "A caterpillar on a plant, showing its brown and furry appearance."
- },
- "7ee7188be58ed04b": {
-  "file": "7ee7188be58ed04b.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "A Pakistani classroom scene with pupils looking at a sunrise picture and discussing what changes around them when the sun comes out in the morning."
- },
- "307885acbb06ff30": {
-  "file": "307885acbb06ff30.jpg",
-  "mime": "image/jpeg",
-  "model": "bytedance/seedream-v4-text-to-image",
-  "concept": "diagram",
-  "prompt": "A life-cycle diagram of a caterpillar becoming a butterfly, with each stage labelled in English."
- },
- "cf8058b20575312d": {
-  "file": "cf8058b20575312d.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Pakistani children observing and talking about the golden sun, showing light, life, and warmth."
- },
- "e733293d24eedd29": {
-  "file": "e733293d24eedd29.jpg",
-  "mime": "image/jpeg",
-  "model": "bytedance/seedream-v4-text-to-image",
-  "concept": "diagram",
-  "prompt": "A labelled English diagram showing a lamb, a person climbing, and a thumb, with the silent letter b identified in the words lamb, climb, thumb."
- },
- "99f280a745f35742": {
-  "file": "99f280a745f35742.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "A diagram showing the words lamb, climb, thumb with the silent b highlighted, with labels in English."
- },
- "83fb9fa4b1d46607": {
-  "file": "83fb9fa4b1d46607.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Pakistani children reciting the poem 'Golden Sun' aloud with actions while learning about light, life, and warmth from the sun."
- },
- "dcb7005a7066ae94": {
-  "file": "dcb7005a7066ae94.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "A textbook illustration of the sun showing its gifts of light, life, and warmth, with the words light, life, warmth labelled in English and Urdu."
- },
- "fd85578d1bfc122c": {
-  "file": "fd85578d1bfc122c.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "A textbook illustration of a caterpillar on a leaf with the stages of its life cycle, showing the caterpillar's brown colour and the words caterpillar and butterfly labelled in English."
- },
- "7165be6f9ca6cee1": {
-  "file": "7165be6f9ca6cee1.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Pakistani Grade 3 and Grade 4 children learning English poems about nature, reciting poems with actions and reading together in a classroom, with the golden sun and a caterpillar represented as the lesson subjects."
- },
- "9c80ee3673477d24": {
-  "file": "9c80ee3673477d24.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Pakistani schoolchildren reciting the poem 'Golden Sun' aloud with actions, with the golden sun representing light, life, and warmth."
- },
- "9486715e2e2c722d": {
-  "file": "9486715e2e2c722d.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "A clear English phonics diagram showing the silent letter 'b' in the words lamb, climb, and thumb, with each word labelled in English."
- },
- "f32059c285bd9fd4": {
-  "file": "f32059c285bd9fd4.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Pakistani Grade 3 pupils reciting 'Golden Sun' with actions while looking at a sunrise picture and pointing to the sun."
- },
- "e480444feeed91a2": {
-  "file": "e480444feeed91a2.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "A labelled caterpillar life-cycle picture with the labels written in English: caterpillar, butterfly, leaf, flowers."
- },
- "4aa85c3ae61164b0": {
-  "file": "4aa85c3ae61164b0.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "An educational diagram showing the sun with light, life, and warmth, alongside the words lamb, climb, thumb with the silent b identified."
- },
- "2dda6bcbad8441a1": {
-  "file": "2dda6bcbad8441a1.jpg",
-  "mime": "image/jpeg",
-  "model": "bytedance/seedream-v4-text-to-image",
-  "concept": "diagram",
-  "prompt": "A place-value representation using sticks, paper squares, and pebbles to represent 1, 10, 100, 1 000, 10 000, 100 000, with each place labelled in English."
- },
- "784cf70aacb4e6f6": {
-  "file": "784cf70aacb4e6f6.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "A place-value chart showing 69 273 with the digits positioned in their place values and the expanded form 60 000 + 9 000 + 200 + 70 + 3."
- },
- "316c1dbfe299e857": {
-  "file": "316c1dbfe299e857.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "A place-value chart showing 456 907 with the digits positioned in their place values and the expanded form 400 000 + 50 000 + 6 000 + 900 + 7."
- },
- "2dde7016a8981bb6": {
-  "file": "2dde7016a8981bb6.jpg",
-  "mime": "image/jpeg",
-  "model": "bytedance/seedream-v4-text-to-image",
-  "concept": "diagram",
-  "prompt": "A classroom mathematics board showing examples of numbers written in words and in expanded form."
- },
- "bf5392f901012e1b": {
-  "file": "bf5392f901012e1b.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Amina sees a price board in the bazaar and reads 78 500 digit by digit; her father puts each digit in its own place."
- },
- "35fa1ca566799ffe": {
-  "file": "35fa1ca566799ffe.jpg",
-  "mime": "image/jpeg",
-  "model": "bytedance/seedream-v4-text-to-image",
-  "concept": "diagram",
-  "prompt": "A place-value reading diagram comparing 363104 with 363 104 and showing how the space makes the number easier to read, with the number written clearly in English."
- },
- "56cc2c175b1d364f": {
-  "file": "56cc2c175b1d364f.jpg",
-  "mime": "image/jpeg",
-  "model": "bytedance/seedream-v4-text-to-image",
-  "concept": "diagram",
-  "prompt": "A number-reading diagram comparing 363104 with 363 104 and showing the space after every three digits, with the example three hundred and sixty-three thousand, one hundred and four."
- },
- "a1d98eec48e72fe1": {
-  "file": "a1d98eec48e72fe1.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "A place-value chart showing 69 273 and 456 907 being read by Grade 4 and Grade 5 students, with place values and numbers clearly visible."
- },
- "e6561134e9286602": {
-  "file": "e6561134e9286602.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "A place-value reading diagram comparing 363104 with 363 104 and showing how the space makes the number easier to read as three hundred and sixty-three thousand, one hundred and four, with labels in English."
- },
- "78def2cbafb62bf7": {
-  "file": "78def2cbafb62bf7.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Pakistani schoolchildren using number cards to make the greatest 5-digit number and then adding one more card to make a 6-digit number."
- },
- "2678804cc872df74": {
-  "file": "2678804cc872df74.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "Place-value diagram showing 1 → 10 → 100 → 1,000 → 10,000 → 100,000, with each step to the left growing ten times bigger."
- },
- "e872c8c7a3c77223": {
-  "file": "e872c8c7a3c77223.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "A place-value chart showing 69 273 and 456 907, with digits positioned in their place-value columns and expanded forms beneath the numbers."
- },
- "237eafdcecfe7674": {
-  "file": "237eafdcecfe7674.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "A six-digit place-value chart demonstrating 456 907 = 400 000 + 50 000 + 6 000 + 900 + 7, with the digits aligned by place value."
- },
- "445dc2cac115e5b1": {
-  "file": "445dc2cac115e5b1.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "A place-value diagram showing 62 897 with the digit 6 highlighted in the Ten Thousands place, and 242 140 with the two digits 2 highlighted at different place values."
- },
- "ed038fcb0e36a876": {
-  "file": "ed038fcb0e36a876.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "happy schoolchildren in a classroom learning Mathematics, friendly"
- },
- "ef17c1c947822f74": {
-  "file": "ef17c1c947822f74.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "a clear educational labeled diagram of the water cycle for a Grade 3 Science lesson: sun shining over a lake, arrows showing evaporation rising, condensation forming clouds, precipitation falling as rain, and collection into a river flowing back to the lake, each stage labelled in simple English (Evaporation, Condensation, Precipitation, Collection), flat infographic style, bright friendly colours, plain background"
- },
- "0ffd71241f29098f": {
-  "file": "0ffd71241f29098f.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "a simple educational illustration for Grade 3 Science showing rain falling from grey clouds onto green hills and filling a small river, a village school building in the background, flat illustration style, bright friendly colours, no text labels, plain background"
- },
- "32206ed6f44d2bc6": {
-  "file": "32206ed6f44d2bc6.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "a clear educational labeled diagram of the water cycle for a Grade 3 Science lesson in Kiswahili: sun shining over a lake, arrows showing evaporation rising, condensation forming clouds, rain falling, and collection into a river flowing back to the lake, each stage labelled in simple Kiswahili exactly as follows: Mvukizo (evaporation), Mgando (condensation), Mvua (rain), Mkusanyiko (collection), flat infographic style, bright friendly colours, plain background, correct Kiswahili spelling"
- },
- "f79caae75225b282": {
-  "file": "f79caae75225b282.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "a simple educational labeled illustration for a Grade 3 Science lesson in Kenya showing rain falling from grey clouds onto green hills and filling a small river, a rural Kenyan village school building with a red roof in the background, acacia trees, with simple Kiswahili labels pointing to each part exactly as follows: Mawingu (clouds), Mvua (rain), Milima (hills), Mto (river), flat illustration style, bright friendly colours, correct Kiswahili spelling, plain background"
- },
- "05ad212c3d623c4f": {
-  "file": "05ad212c3d623c4f.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "an educational labeled illustration of a Tanzanian primary school classroom: smiling pupils at wooden desks counting small sticks tied into bundles with string, a friendly teacher pointing at bundles on a table, with simple Kiswahili labels exactly as follows: Fungu la Vijiti (bundle of sticks), Vijiti (loose sticks), Mwalimu (teacher), flat illustration style, bright friendly colours, correct Kiswahili spelling, plain background"
- },
- "9df2e5adf9f8f0d8": {
-  "file": "9df2e5adf9f8f0d8.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "أسرة يمنية تضم أباً وأماً وثلاثة أطفال: أحمد وسبأ وإيمان، في مشهد عائلي يساعد الطلاب على التعرف على أفراد الأسرة."
- },
- "50ec055ba93df691": {
-  "file": "50ec055ba93df691.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "رسم تعليمي لأب وأم وطفل وطفلتين، مع بطاقات الكلمات: أبي، أمي، أحمد، سبأ، إيمان، وأسهم واضحة للمطابقة، مع كل الكلمات والملصقات داخل الصورة مكتوبة بالعربية."
- },
- "b3bcc241c8975ea0": {
-  "file": "b3bcc241c8975ea0.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "مخطط تعليمي على السبورة يوضح الكلمات أَبِي، أُمِّي، أَحْمَد، سَبَأ، إِيمَان مع تفكيك كل كلمة إلى حروفها وعدد الحروف، مع كل الكلمات والعناوين داخل الصورة مكتوبة بالعربية."
- },
- "54a2bfd27e1b9b26": {
-  "file": "54a2bfd27e1b9b26.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "أطفال يمنيون في الصف الأول الأساسي ينظرون إلى صفحة 32 من كتاب الطالب، مع صور أبي وأمي وأحمد وسبأ وإيمان أمامهم."
- },
- "f8c3d8daebf56125": {
-  "file": "f8c3d8daebf56125.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "رسم توضيحي لعائلة تضم أباً وأماً وطفلاً وطفلتين، مع كل فرد مرتبط بالكلمة المناسبة: أبي، أمي، أحمد، سبأ، إيمان. جميع الكلمات داخل الصورة مكتوبة بالعربية."
- },
- "3901f9f46184bdf3": {
-  "file": "3901f9f46184bdf3.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "رسم تعليمي لعائلة مع صور رجل وامرأة وطفل وبنتين، مع كل صورة مرتبطة بكلمة عربية مكتوبة: أَبِي، أُمِّي، أَحْمَد، سَبَأ، إِيمَان. تكون الكلمات والملصقات داخل الصورة باللغة العربية."
- },
- "d7b4976e5bdaab31": {
-  "file": "d7b4976e5bdaab31.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "صور بسيطة لأفراد أسرة: أب، أم، طفل، طفلتان، مع الكلمات أبي، أمي، أحمد، سبأ، إيمان، وكل صورة مرتبطة بالكلمة الصحيحة، مع كل الكلمات والعناوين داخل الصورة باللغة العربية"
- },
- "ab3d9e670c60bdbf": {
-  "file": "ab3d9e670c60bdbf.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "Pakistani Grade 1 students counting 5 stones together aloud."
- },
- "5070de4281e254ca": {
-  "file": "5070de4281e254ca.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "أطفال يمنيون في الصف الأول في فصل دراسي ينظرون إلى صفحة 32 في كتابهم، مع صور أبي وأمي وأحمد وسبأ وإيمان، ويشاركون في نشاط التعرف على أفراد الأسرة."
- },
- "2fc6d8b8c187352b": {
-  "file": "2fc6d8b8c187352b.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "رسم توضيحي لعائلة تتكون من أب وأم وطفل وطفلتين، مع كل فرد مرتبط بالكلمة المناسبة: أبي، أمي، أحمد، سبأ، إيمان. يجب أن تكون جميع الكلمات الظاهرة داخل الصورة باللغة العربية."
- },
- "8ea3413d5a570e1a": {
-  "file": "8ea3413d5a570e1a.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "صور رجل وامرأة وطفل وطفلتان مع كلمات الأسرة أبي، أمي، أحمد، سبأ، إيمان مرتبطة بالصور، مع كل كلمة مكتوبة باللغة العربية."
- },
- "a409eeb1b7585ff4": {
-  "file": "a409eeb1b7585ff4.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "رسم توضيحي لأفراد أسرة يوضح الأب والأم وأحمد وسبأ وإيمان، مع كل فرد مرفقاً بتسمية عربية واضحة: أبي، أمي، أحمد، سبأ، إيمان. يجب أن تكون جميع الكلمات الظاهرة داخل الصورة باللغة العربية."
- },
- "084d9aed8373a080": {
-  "file": "084d9aed8373a080.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "سبورة تعليمية تعرض كلمات أُسْرَتِي: أَبِي، أُمِّي، أَحْمَد، سَبَأ، إِيمَان، مع تفكيك كل كلمة إلى حروفها وعدد الحروف، وكل جزء مُسمّى باللغة العربية."
- },
- "55fc15090220c948": {
-  "file": "55fc15090220c948.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "رجل، امرأة، طفل، بنتان، مع الكلمات العربية أَحْمَد، أَبِي، أُمِّي، سَبَأ، إِيمَان، مع كل صورة وكلمتها الدالة عليها، وكل الكلمات والملصقات داخل الصورة مكتوبة بالعربية."
- },
- "bfb4117f8b4671c7": {
-  "file": "bfb4117f8b4671c7.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "بطاقتان كبيرتان مكتوب عليهما بخط النسخ الواضح: أَحْمَد على البطاقة الأولى و سَبَأ على البطاقة الثانية، ويد طفل تشير إلى بطاقة أَحْمَد، رسم توضيحي مسطح بسيط بألوان دافئة، كل النص بالعربية فقط وبإملاء صحيح"
- },
- "6b0f8ccd484ad50a": {
-  "file": "6b0f8ccd484ad50a.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "سبورة خضراء بسيطة وعليها خمس بطاقات بيضاء، على كل بطاقة كلمة واحدة بخط النسخ الكبير الواضح: أَبِي، أُمِّي، أَحْمَد، سَبَأ، إِيمَان، رسم مسطح بسيط، كل النص بالعربية بإملاء صحيح"
- },
- "caafb799622bc033": {
-  "file": "caafb799622bc033.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "تمرين وصل بسيط لصف أول: عمود فيه ثلاث كلمات بخط النسخ الواضح: أَبِي، أُمِّي، أَحْمَد، وعمود مقابل فيه ثلاث صور بسيطة: رجل، امرأة، طفل، وخطوط تصل كل كلمة بصورتها الصحيحة، رسم مسطح بألوان دافئة، كل النص بالعربية بإملاء صحيح"
- },
- "c0dbd1dfed0cdf5c": {
-  "file": "c0dbd1dfed0cdf5c.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "أطفال يمنيون في الصف الثاني الأساسي يمدّون خيوطًا صغيرة بشكل مستقيم بين أيديهم ثم يتركونها تتدلى لتصبح متعرجة، مع معلم يوجّه النشاط."
- },
- "4230cc5ef8e74a70": {
-  "file": "4230cc5ef8e74a70.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "رسم تعليمي يوضح مجسم المكعب ومجسم المخروط، مع كل مجسم مبيّن بوضوح وموسوم باللغة العربية: المكعب، المخروط."
- },
- "804eae4a89c11a85": {
-  "file": "804eae4a89c11a85.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "رسم تعليمي يوضح القطعة المستقيمة والقطعة غير المستقيمة والشكل الرباعي باستخدام نقاط وخطوط وأضلاع، مع كل التسميات باللغة العربية."
- },
- "d38defee5cc620ba": {
-  "file": "d38defee5cc620ba.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "رسم تعليمي يوضح مكعبًا ومخروطًا مع توضيح الوجوه المسطحة والقاعدة الدائرية والرأس المدبب، مع كل التسميات باللغة العربية."
- },
- "98a9ae70d008a768": {
-  "file": "98a9ae70d008a768.jpg",
-  "mime": "image/jpeg",
-  "model": "nano-banana-2-lite",
-  "concept": "scene",
-  "prompt": "أطفال يمنيون في فصل دراسي يطبقون تمارين الأشكال الهندسية والقطع المستقيمة باستخدام المسطرة والنقاط على الورقة والسبورة."
- },
- "6ebb82f7eb565389": {
-  "file": "6ebb82f7eb565389.png",
-  "mime": "image/png",
-  "model": "gpt-image-2-text-to-image",
-  "concept": "diagram",
-  "prompt": "Diagram showing a straight line segment between two points and a quadrilateral formed by four straight sides, with each part labelled in Arabic: القطعة المستقيمة، الشكل الرباعي."
- },
- "8373aba8a7b1c227": {
-  "file": "8373aba8a7b1c227.png",
-  "mime": "image/png",
-  "model": "nano-banana-2",
-  "concept": "diagram",
-  "prompt": "Diagram showing a cube and a cone, with each shape labelled in Arabic: المكعب، المخروط، قاعدة دائرية، رأس مدبب."
- }
+  "3531b9000d8a36c0": {
+    "file": "3531b9000d8a36c0.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "a clear educational labeled chart of the human breathing system for a Grade 5 Science lesson, clearly labelling the nose, the trachea (wind pipe), the two lungs, and the diaphragm, flat infographic style, correct anatomy, plain background"
+  },
+  "fb5c2db48240c64b": {
+    "file": "fb5c2db48240c64b.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "clear simple educational pictures of the human lungs and the human nose side by side, labelled, correct anatomy, flat illustration, plain background, suitable for a Grade 5 Science classroom"
+  },
+  "9aebaed02219d9e6": {
+    "file": "9aebaed02219d9e6.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "a clear educational science diagram of a lung model made with balloons: a plastic bottle with two balloons inside representing the two lungs and a stretched rubber sheet at the bottom representing the diaphragm, with a simple arrow showing air moving in and out, labelled 'balloons = lungs' and 'rubber sheet = diaphragm', flat infographic style, correct and simple, plain background"
+  },
+  "34f43d25885a1f3a": {
+    "file": "34f43d25885a1f3a.png",
+    "mime": "image/png",
+    "model": "flux-2/pro-text-to-image",
+    "concept": "scene",
+    "prompt": "a happy child athlete running in a race on a school sports field, smiling, bright cheerful flat cartoon illustration, plain simple background"
+  },
+  "b87d75babac36448": {
+    "file": "b87d75babac36448.jpg",
+    "mime": "image/jpeg",
+    "model": "qwen2/text-to-image",
+    "concept": "scene",
+    "prompt": "a cheerful child riding a bicycle on a countryside road, smiling, colourful illustration for a children's maths lesson"
+  },
+  "e506277180bd3a92": {
+    "file": "e506277180bd3a92.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "A clear educational diagram of the water cycle showing evaporation, condensation, precipitation, and collection with labeled arrows."
+  },
+  "3b088c1a00f5a968": {
+    "file": "3b088c1a00f5a968.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "A kettle with water boiling and steam rising, suitable for a Grade 4 science lesson demonstration."
+  },
+  "f7e8d457bad62c74": {
+    "file": "f7e8d457bad62c74.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "A clear educational diagram of the water cycle showing the stages named in the lesson: evaporation, condensation, and precipitation."
+  },
+  "713ea738a2de2588": {
+    "file": "713ea738a2de2588.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "A kettle with water boiling and steam rising, used to demonstrate evaporation in a classroom."
+  },
+  "78ddcf1199df3107": {
+    "file": "78ddcf1199df3107.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Grade 1 pupils using stones and fingers to combine two groups of objects to learn addition from 1 to 10."
+  },
+  "d6e2ffd0af7152fe": {
+    "file": "d6e2ffd0af7152fe.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Concrete to Pictorial to Abstract addition diagram showing stones, drawings of circles, and the equation 3 + 2 = 5."
+  },
+  "88fad65a8849a8bb": {
+    "file": "88fad65a8849a8bb.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "A simple educational illustration for Grade 1 math: Ali has 4 mangoes and Fatima gives him 2 more mangoes. Show the two groups of mangoes clearly with a child-friendly classroom style."
+  },
+  "5ad97a65923e9e67": {
+    "file": "5ad97a65923e9e67.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mawe ya Juma, mawe ya Asha, and jumla ya mawe showing 3 + 2 = 5 on a board"
+  },
+  "ce854b05b97016c6": {
+    "file": "ce854b05b97016c6.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Michoro ya kuongeza kwa kutumia vikundi vya duara: OO + OOO, OOOO + O, na OOOOO + OO."
+  },
+  "792340987d59d4a5": {
+    "file": "792340987d59d4a5.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mchoro wa kujumlisha mawe 3 na mawe 2 kuwa mawe 5"
+  },
+  "9ea2b407c231a5bc": {
+    "file": "9ea2b407c231a5bc.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Plus sign and equal sign in a simple addition equation"
+  },
+  "713f25dc10835e6b": {
+    "file": "713f25dc10835e6b.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Two students using bottle caps to practice addition"
+  },
+  "67c8c57f2234ed51": {
+    "file": "67c8c57f2234ed51.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Mbuzi 3 kwenye zizi na mama anaongeza mbuzi 3 wengine"
+  },
+  "5d8c34171b77d845": {
+    "file": "5d8c34171b77d845.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Mawe na vidole yanayotumika kuunganisha makundi mawili ya vitu."
+  },
+  "cc93aab8f0bd2949": {
+    "file": "cc93aab8f0bd2949.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "3 + 2 = 5 addition equation with plus sign and equal sign"
+  },
+  "3ee4f59562769e62": {
+    "file": "3ee4f59562769e62.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "students using bottle caps for addition practice"
+  },
+  "fdb5a75c7fb1f0eb": {
+    "file": "fdb5a75c7fb1f0eb.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mchoro unaoonyesha mawe 3 yakijumlishwa na mawe 2 kupata mawe 5."
+  },
+  "4c31e4edfac15994": {
+    "file": "4c31e4edfac15994.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "عائلة يمنية بسيطة"
+  },
+  "fbf1b44cdf1d1d68": {
+    "file": "fbf1b44cdf1d1d68.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "جدول يوضح أبي، أمي، أحمد، سبأ، إيمان"
+  },
+  "f87e572c206b9da0": {
+    "file": "f87e572c206b9da0.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "جدول يوضح: أبي، أمي، أحمد، سبأ، إيمان"
+  },
+  "9a22c577a79f45fb": {
+    "file": "9a22c577a79f45fb.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "صورة لعائلة يمنية بسيطة"
+  },
+  "e50cf6a572a86273": {
+    "file": "e50cf6a572a86273.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "جدول يوضح أبي وأمي وأحمد وسبأ وإيمان"
+  },
+  "a8601e28c4781ba5": {
+    "file": "a8601e28c4781ba5.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "رسمة قلب كبير وبداخله كلمة أسرتي"
+  },
+  "edf633841bf60908": {
+    "file": "edf633841bf60908.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "مخطط مُسمى يوضح: أبي، أمي، أحمد، سبأ، إيمان"
+  },
+  "abae60389e9fac92": {
+    "file": "abae60389e9fac92.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Diagramu yenye mawe yanayoonyesha 3 + 2 = 5 kwa wanafunzi wa Pakistan"
+  },
+  "08bdfa38f3348d6c": {
+    "file": "08bdfa38f3348d6c.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Labelled diagram showing stones used to demonstrate 3 + 2 = 5 for pupils in a Kenyan classroom"
+  },
+  "c791170753559dd1": {
+    "file": "c791170753559dd1.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "Watoto wa Kenya wakitumia mawe kujumlisha makundi mawili ya mawe darasani"
+  },
+  "933ffb2539b9d406": {
+    "file": "933ffb2539b9d406.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Labelled diagram showing the equation 3 + 2 = 5 with the plus sign and equal sign explained using groups of objects for Pakistani primary school learners"
+  },
+  "5b2ad2e8a68fe772": {
+    "file": "5b2ad2e8a68fe772.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "Watoto wa Kenya wakijumlisha makundi mawili ya mawe darasani"
+  },
+  "c656a80bf9e6988d": {
+    "file": "c656a80bf9e6988d.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Watoto wa Kenya/Tanzania darasani wakitumia mawe madogo kuunganisha makundi mawili ya vitu na kuhesabu jumla."
+  },
+  "27dae0a3ed72a5e3": {
+    "file": "27dae0a3ed72a5e3.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mchoro wa mawe matatu pamoja na mawe mawili ukionyesha 3 + 2 = 5."
+  },
+  "0c23978f293c52db": {
+    "file": "0c23978f293c52db.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "scene",
+    "prompt": "Wanafunzi wa Tanzania au Kenya katika darasa wakijumlisha vitu kwa kuweka mawe 4 upande mmoja na vifuniko 3 vya chupa upande mwingine, kisha kuhesabu jumla 7."
+  },
+  "7a837dc059072606": {
+    "file": "7a837dc059072606.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mchoro wa kielimu unaoonyesha hesabu 3 + 2 = 5, ikiwa na vikundi vitatu na viwili vya vitu vinavyowekwa pamoja ili kuonyesha jumla ya tano."
+  },
+  "226887ba6b3f1b56": {
+    "file": "226887ba6b3f1b56.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "مخطط مُسمّى يوضح: أبي، أمي، أحمد، سبأ، إيمان"
+  },
+  "e2a2892bffb5c39d": {
+    "file": "e2a2892bffb5c39d.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Mchoro wa hisabati unaoonyesha alama ya kujumlisha +, alama ya usawa =, na mfano 3 + 2 = 5"
+  },
+  "662eefce4e005ad4": {
+    "file": "662eefce4e005ad4.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Watoto wa Tanzania/Kenya darasani wakitumia mawe kuunganisha makundi mawili ya vitu na kuhesabu jumla"
+  },
+  "6de6e61ee6e14871": {
+    "file": "6de6e61ee6e14871.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "A cheerful Kenyan boy in a bright school uniform pouring water from a jug into a measuring bucket outdoors, with jerry cans, plastic bottles and cups beside him, warm morning light, friendly"
+  },
+  "83fd46ab2e35f2d1": {
+    "file": "83fd46ab2e35f2d1.jpg",
+    "mime": "image/jpeg",
+    "model": "qwen2/text-to-image",
+    "concept": "scene",
+    "prompt": "Kenyan schoolchildren in uniform pouring water from a bottle into a bucket, smiling"
+  },
+  "babfe30b724eb9e3": {
+    "file": "babfe30b724eb9e3.jpg",
+    "mime": "image/jpeg",
+    "model": "qwen2/text-to-image",
+    "concept": "scene",
+    "prompt": "a one-litre plastic bottle beside a blue bucket being filled with water on a table"
+  },
+  "d54444af76d694ec": {
+    "file": "d54444af76d694ec.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Kenyan Grade 3 learners measuring water with a 1-litre container using buckets, bottles, jerry cans and cups in a classroom."
+  },
+  "a9897f982f88de51": {
+    "file": "a9897f982f88de51.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "diagram",
+    "prompt": "A diagram of a 1-litre container pouring water into a bucket, labelled in English with: 1 litre, bucket, water."
+  },
+  "5c8967eb945bd4e0": {
+    "file": "5c8967eb945bd4e0.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي مُسمى يبين قطعة مستقيمة بين نقطتين وشكلاً رباعياً مكوناً من أربعة أضلاع"
+  },
+  "d248c203e504067b": {
+    "file": "d248c203e504067b.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي مُسمى لمكعب ومخروط يوضح الأوجه والقاعدة الدائرية والرأس المدبب"
+  },
+  "90028a430825e457": {
+    "file": "90028a430825e457.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Labelled diagram showing mb, nd, and ngw with the example words mbuzi, mbegu, ndoo, ndizi, and ngwena."
+  },
+  "f33f15adbff84894": {
+    "file": "f33f15adbff84894.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Pakistani teacher showing pictures of a goat and bananas to primary school children during a Kiswahili lesson."
+  },
+  "af840d6b6791d53f": {
+    "file": "af840d6b6791d53f.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Labelled diagram showing a goat, bananas, a bucket, seeds, and a crocodile"
+  },
+  "87590c2e6fa4ff99": {
+    "file": "87590c2e6fa4ff99.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "saa ya ukutani inayotumia namba za Kirumi"
+  },
+  "165b297bfa7c7f26": {
+    "file": "165b297bfa7c7f26.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "diagram",
+    "prompt": "alama kuu za Kirumi I, V, X zikiwa zimeonyeshwa pamoja na thamani zake"
+  },
+  "49db8f90ae547610": {
+    "file": "49db8f90ae547610.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Labeled diagram showing Roman numerals I, II, III, IV, V, VI, VII, VIII, IX, X matched with numbers 1 to 10"
+  },
+  "7e137573f2863d07": {
+    "file": "7e137573f2863d07.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "Pakistani primary school children working in pairs using matchsticks to form Roman numerals in a classroom"
+  },
+  "455aeb84f196f3f5": {
+    "file": "455aeb84f196f3f5.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "diagram",
+    "prompt": "Labelled diagram showing Roman numerals I, V, and X with their values 1, 5, and 10"
+  },
+  "0f9eec274412c037": {
+    "file": "0f9eec274412c037.jpg",
+    "mime": "image/jpeg",
+    "model": "bytedance/seedream-v4-text-to-image",
+    "concept": "diagram",
+    "prompt": "Labelled diagram comparing IV equals 4 and VI equals 6"
+  },
+  "71d7bc76dd051f45": {
+    "file": "71d7bc76dd051f45.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Labelled diagram showing the Roman numerals I to X matched with the numbers 1 to 10."
+  },
+  "4c57c0d70d2bbf6e": {
+    "file": "4c57c0d70d2bbf6e.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "A clock face labelled with Roman numerals I to XII."
+  },
+  "95233ee196fed651": {
+    "file": "95233ee196fed651.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي لشارع يحتوي على رصيف وشارع ورصيف مع خطوط عبور المشاة"
+  },
+  "5141db5647e85b83": {
+    "file": "5141db5647e85b83.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال باكستانيون في طريق آمن يمشون على الرصيف ويساعدون الآخرين ويعبرون من مكان عبور المشاة"
+  },
+  "45313d2c27fac23b": {
+    "file": "45313d2c27fac23b.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي مُسمّى يبين الرصيف والشارع ومكان عبور المشاة بالخطوط البيضاء"
+  },
+  "36f603eb5c2b7fe2": {
+    "file": "36f603eb5c2b7fe2.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "scene",
+    "prompt": "طفل باكستاني يزيل حجراً من الطريق لحماية المارة"
+  },
+  "e500b061ae263542": {
+    "file": "e500b061ae263542.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "A labelled diagram showing Roman numerals I, V, X and examples II, III, IV, VI, IX with their values."
+  },
+  "f44c605d6fa55290": {
+    "file": "f44c605d6fa55290.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "A wall clock using Roman numerals in a classroom."
+  },
+  "aabd9de645d9bd0d": {
+    "file": "aabd9de645d9bd0d.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Labelled diagram showing Roman numerals I to X matched with numbers 1 to 10."
+  },
+  "ef17c1c947822f74": {
+    "file": "ef17c1c947822f74.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "a clear educational labeled diagram of the water cycle for a Grade 3 Science lesson: sun shining over a lake, arrows showing evaporation rising, condensation forming clouds, precipitation falling as rain, and collection into a river flowing back to the lake, each stage labelled in simple English (Evaporation, Condensation, Precipitation, Collection), flat infographic style, bright friendly colours, plain background"
+  },
+  "0ffd71241f29098f": {
+    "file": "0ffd71241f29098f.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "a simple educational illustration for Grade 3 Science showing rain falling from grey clouds onto green hills and filling a small river, a village school building in the background, flat illustration style, bright friendly colours, no text labels, plain background"
+  },
+  "32206ed6f44d2bc6": {
+    "file": "32206ed6f44d2bc6.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "a clear educational labeled diagram of the water cycle for a Grade 3 Science lesson in Kiswahili: sun shining over a lake, arrows showing evaporation rising, condensation forming clouds, rain falling, and collection into a river flowing back to the lake, each stage labelled in simple Kiswahili exactly as follows: Mvukizo (evaporation), Mgando (condensation), Mvua (rain), Mkusanyiko (collection), flat infographic style, bright friendly colours, plain background, correct Kiswahili spelling"
+  },
+  "f79caae75225b282": {
+    "file": "f79caae75225b282.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "a simple educational labeled illustration for a Grade 3 Science lesson in Kenya showing rain falling from grey clouds onto green hills and filling a small river, a rural Kenyan village school building with a red roof in the background, acacia trees, with simple Kiswahili labels pointing to each part exactly as follows: Mawingu (clouds), Mvua (rain), Milima (hills), Mto (river), flat illustration style, bright friendly colours, correct Kiswahili spelling, plain background"
+  },
+  "05ad212c3d623c4f": {
+    "file": "05ad212c3d623c4f.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "an educational labeled illustration of a Tanzanian primary school classroom: smiling pupils at wooden desks counting small sticks tied into bundles with string, a friendly teacher pointing at bundles on a table, with simple Kiswahili labels exactly as follows: Fungu la Vijiti (bundle of sticks), Vijiti (loose sticks), Mwalimu (teacher), flat illustration style, bright friendly colours, correct Kiswahili spelling, plain background"
+  },
+  "9df2e5adf9f8f0d8": {
+    "file": "9df2e5adf9f8f0d8.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أسرة يمنية تضم أباً وأماً وثلاثة أطفال: أحمد وسبأ وإيمان، في مشهد عائلي يساعد الطلاب على التعرف على أفراد الأسرة."
+  },
+  "50ec055ba93df691": {
+    "file": "50ec055ba93df691.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي لأب وأم وطفل وطفلتين، مع بطاقات الكلمات: أبي، أمي، أحمد، سبأ، إيمان، وأسهم واضحة للمطابقة، مع كل الكلمات والملصقات داخل الصورة مكتوبة بالعربية."
+  },
+  "b3bcc241c8975ea0": {
+    "file": "b3bcc241c8975ea0.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "مخطط تعليمي على السبورة يوضح الكلمات أَبِي، أُمِّي، أَحْمَد، سَبَأ، إِيمَان مع تفكيك كل كلمة إلى حروفها وعدد الحروف، مع كل الكلمات والعناوين داخل الصورة مكتوبة بالعربية."
+  },
+  "54a2bfd27e1b9b26": {
+    "file": "54a2bfd27e1b9b26.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في الصف الأول الأساسي ينظرون إلى صفحة 32 من كتاب الطالب، مع صور أبي وأمي وأحمد وسبأ وإيمان أمامهم."
+  },
+  "f8c3d8daebf56125": {
+    "file": "f8c3d8daebf56125.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي لعائلة تضم أباً وأماً وطفلاً وطفلتين، مع كل فرد مرتبط بالكلمة المناسبة: أبي، أمي، أحمد، سبأ، إيمان. جميع الكلمات داخل الصورة مكتوبة بالعربية."
+  },
+  "3901f9f46184bdf3": {
+    "file": "3901f9f46184bdf3.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي لعائلة مع صور رجل وامرأة وطفل وبنتين، مع كل صورة مرتبطة بكلمة عربية مكتوبة: أَبِي، أُمِّي، أَحْمَد، سَبَأ، إِيمَان. تكون الكلمات والملصقات داخل الصورة باللغة العربية."
+  },
+  "d7b4976e5bdaab31": {
+    "file": "d7b4976e5bdaab31.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "صور بسيطة لأفراد أسرة: أب، أم، طفل، طفلتان، مع الكلمات أبي، أمي، أحمد، سبأ، إيمان، وكل صورة مرتبطة بالكلمة الصحيحة، مع كل الكلمات والعناوين داخل الصورة باللغة العربية"
+  },
+  "ab3d9e670c60bdbf": {
+    "file": "ab3d9e670c60bdbf.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Pakistani Grade 1 students counting 5 stones together aloud."
+  },
+  "5070de4281e254ca": {
+    "file": "5070de4281e254ca.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في الصف الأول في فصل دراسي ينظرون إلى صفحة 32 في كتابهم، مع صور أبي وأمي وأحمد وسبأ وإيمان، ويشاركون في نشاط التعرف على أفراد الأسرة."
+  },
+  "2fc6d8b8c187352b": {
+    "file": "2fc6d8b8c187352b.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي لعائلة تتكون من أب وأم وطفل وطفلتين، مع كل فرد مرتبط بالكلمة المناسبة: أبي، أمي، أحمد، سبأ، إيمان. يجب أن تكون جميع الكلمات الظاهرة داخل الصورة باللغة العربية."
+  },
+  "8ea3413d5a570e1a": {
+    "file": "8ea3413d5a570e1a.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "صور رجل وامرأة وطفل وطفلتان مع كلمات الأسرة أبي، أمي، أحمد، سبأ، إيمان مرتبطة بالصور، مع كل كلمة مكتوبة باللغة العربية."
+  },
+  "a409eeb1b7585ff4": {
+    "file": "a409eeb1b7585ff4.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي لأفراد أسرة يوضح الأب والأم وأحمد وسبأ وإيمان، مع كل فرد مرفقاً بتسمية عربية واضحة: أبي، أمي، أحمد، سبأ، إيمان. يجب أن تكون جميع الكلمات الظاهرة داخل الصورة باللغة العربية."
+  },
+  "084d9aed8373a080": {
+    "file": "084d9aed8373a080.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "سبورة تعليمية تعرض كلمات أُسْرَتِي: أَبِي، أُمِّي، أَحْمَد، سَبَأ، إِيمَان، مع تفكيك كل كلمة إلى حروفها وعدد الحروف، وكل جزء مُسمّى باللغة العربية."
+  },
+  "55fc15090220c948": {
+    "file": "55fc15090220c948.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رجل، امرأة، طفل، بنتان، مع الكلمات العربية أَحْمَد، أَبِي، أُمِّي، سَبَأ، إِيمَان، مع كل صورة وكلمتها الدالة عليها، وكل الكلمات والملصقات داخل الصورة مكتوبة بالعربية."
+  },
+  "bfb4117f8b4671c7": {
+    "file": "bfb4117f8b4671c7.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "بطاقتان كبيرتان مكتوب عليهما بخط النسخ الواضح: أَحْمَد على البطاقة الأولى و سَبَأ على البطاقة الثانية، ويد طفل تشير إلى بطاقة أَحْمَد، رسم توضيحي مسطح بسيط بألوان دافئة، كل النص بالعربية فقط وبإملاء صحيح"
+  },
+  "6b0f8ccd484ad50a": {
+    "file": "6b0f8ccd484ad50a.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "سبورة خضراء بسيطة وعليها خمس بطاقات بيضاء، على كل بطاقة كلمة واحدة بخط النسخ الكبير الواضح: أَبِي، أُمِّي، أَحْمَد، سَبَأ، إِيمَان، رسم مسطح بسيط، كل النص بالعربية بإملاء صحيح"
+  },
+  "caafb799622bc033": {
+    "file": "caafb799622bc033.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "تمرين وصل بسيط لصف أول: عمود فيه ثلاث كلمات بخط النسخ الواضح: أَبِي، أُمِّي، أَحْمَد، وعمود مقابل فيه ثلاث صور بسيطة: رجل، امرأة، طفل، وخطوط تصل كل كلمة بصورتها الصحيحة، رسم مسطح بألوان دافئة، كل النص بالعربية بإملاء صحيح"
+  },
+  "c0dbd1dfed0cdf5c": {
+    "file": "c0dbd1dfed0cdf5c.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في الصف الثاني الأساسي يمدّون خيوطًا صغيرة بشكل مستقيم بين أيديهم ثم يتركونها تتدلى لتصبح متعرجة، مع معلم يوجّه النشاط."
+  },
+  "4230cc5ef8e74a70": {
+    "file": "4230cc5ef8e74a70.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي يوضح مجسم المكعب ومجسم المخروط، مع كل مجسم مبيّن بوضوح وموسوم باللغة العربية: المكعب، المخروط."
+  },
+  "804eae4a89c11a85": {
+    "file": "804eae4a89c11a85.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي يوضح القطعة المستقيمة والقطعة غير المستقيمة والشكل الرباعي باستخدام نقاط وخطوط وأضلاع، مع كل التسميات باللغة العربية."
+  },
+  "d38defee5cc620ba": {
+    "file": "d38defee5cc620ba.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي يوضح مكعبًا ومخروطًا مع توضيح الوجوه المسطحة والقاعدة الدائرية والرأس المدبب، مع كل التسميات باللغة العربية."
+  },
+  "98a9ae70d008a768": {
+    "file": "98a9ae70d008a768.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في فصل دراسي يطبقون تمارين الأشكال الهندسية والقطع المستقيمة باستخدام المسطرة والنقاط على الورقة والسبورة."
+  },
+  "6ebb82f7eb565389": {
+    "file": "6ebb82f7eb565389.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Diagram showing a straight line segment between two points and a quadrilateral formed by four straight sides, with each part labelled in Arabic: القطعة المستقيمة، الشكل الرباعي."
+  },
+  "8373aba8a7b1c227": {
+    "file": "8373aba8a7b1c227.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Diagram showing a cube and a cone, with each shape labelled in Arabic: المكعب، المخروط، قاعدة دائرية، رأس مدبب."
+  },
+  "32a13cd5a5ef8ce0": {
+    "file": "32a13cd5a5ef8ce0.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "تلاميذ يمنيون في الصف الثاني الأساسي يستخدمون المسطرة والخيوط والبطاقات الورقية لتعلم القطعة المستقيمة والأشكال الهندسية، مع علبة كرتونية مربعة وقمع لتمثيل المكعب والمخروط."
+  },
+  "71abd4432431eccc": {
+    "file": "71abd4432431eccc.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي يوضح القطعة المستقيمة والشكل الرباعي والمكعب والمخروط مع كل جزء أو اسم مكتوب باللغة العربية، مع تسميات: القطعة المستقيمة، الشكل الرباعي، المكعب، المخروط."
+  },
+  "59d019e51578c793": {
+    "file": "59d019e51578c793.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي لنشاط مطابقة الأشكال يوضح شكلين لهما نفس الشكل والحجم مع بطاقات ملوّنة، مع كتابة التسميات باللغة العربية."
+  },
+  "203e3b9ff80f65a1": {
+    "file": "203e3b9ff80f65a1.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي للقطعة المستقيمة مقارنة بخط متعرج، وأشكال مثل المثلث والمستطيل والدائرة، مع كل جزء مُسمى باللغة العربية."
+  },
+  "85ebd61402dcdd78": {
+    "file": "85ebd61402dcdd78.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي لمجسم مكعب ومجسم مخروط مع أمثلة بسيطة مثل علبة وقمع، مع كل اسم مُسمى باللغة العربية."
+  },
+  "7aa510f47fb3a6b8": {
+    "file": "7aa510f47fb3a6b8.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في طريقهم إلى المدرسة، يمشون على الرصيف ويعبرون الشارع من المكان المخصص للمشاة، مع رجل المرور يساعد في تنظيم العبور وطفل صغير وشخص أعمى يحتاج إلى المساعدة."
+  },
+  "cf9d41e17d175048": {
+    "file": "cf9d41e17d175048.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي للطريق يوضح الرصيف، المُشاة، المكان المخصص للمشاة، رَجُل المرور، الأذى، الأعمى، وعبور الشارع، مع كل جزء labelled in Arabic: الرصيف، المُشاة، المكان المخصص للمشاة، رَجُل المرور، الأذى، الأعمى، عبور الشارع."
+  },
+  "bd387fa470116e1d": {
+    "file": "bd387fa470116e1d.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي لشارع ورصيف وخط مشاة، يوضح خطوات العبور الصحيحة: ١- أقف عند الرصيف، ٢- أنظر يمينًا، ٣- أنظر يسارًا، ٤- أعبر من الخط الأبيض، مع كل جزء وخطوة labelled in Arabic."
+  },
+  "bb23c6534f99b895": {
+    "file": "bb23c6534f99b895.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي لمفردات السلامة في الطريق: الرصيف، المشاة، رجل المرور، الأذى، مع كل جزء labelled in Arabic."
+  },
+  "78e24e19ca009f86": {
+    "file": "78e24e19ca009f86.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي لشارع بين رصيفين، مع خط أبيض واحد أو أكثر مرسوم في وسط الشارع بين الرصيفين لتمثيل مكان عبور المشاة، مع كتابة رصيف وشارع ومكان عبور المشاة بالعربية داخل الرسم."
+  },
+  "e290c14a46935b2e": {
+    "file": "e290c14a46935b2e.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في سياق أسري يمثلون أَبِي وأُمِّي وأَحْمَد وسَبَأ وإِيمَان."
+  },
+  "bf5560567d9e4034": {
+    "file": "bf5560567d9e4034.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "صور لأب وأم وطفل وطفلتين بجانب بطاقات الكلمات أبي، أمي، أحمد، سبأ، إيمان، مع كل كلمة مكتوبة بالعربية."
+  },
+  "c400ea4fc4b1069f": {
+    "file": "c400ea4fc4b1069f.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي يوضح خمس صور: رجل، امرأة، طفل، بنت، بنت، مع الكلمات أَحْمَد، أَبِي، أُمِّي، سَبَأ، إِيمَان، مع كل كلمة مكتوبة بالعربية."
+  },
+  "3550f0bfae961bea": {
+    "file": "3550f0bfae961bea.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي لأسرة مع أفرادها الأب والأم وطفل وطفلتين، مع كل اسم مكتوب بالعربية: أبي، أمي، أحمد، سبأ، إيمان."
+  },
+  "81d0c4d79634f990": {
+    "file": "81d0c4d79634f990.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "ورقة تعليمية تعرض خمس صور: صورة رجل، صورة امرأة، صورة طفل، صورة بنت، وصورة بنت أخرى، مع الكلمات العربية أَحْمَد، أَبِي، أُمِّي، سَبَأ، إِيمَان للمطابقة بينها. جميع الكلمات والملصقات داخل الصورة مكتوبة بالعربية."
+  },
+  "c74010bfc656a688": {
+    "file": "c74010bfc656a688.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي لأسرة تضم أباً وأماً وطفلاً وطفلتين، مع كل فرد مرتبط بالكلمة المناسبة: أَبِي، أُمِّي، أَحْمَد، سَبَأ، إِيمَان، مع كتابة الكلمات بالعربية."
+  },
+  "934f5be5367307ba": {
+    "file": "934f5be5367307ba.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "تلاميذ يمنيون في الصف الثاني الأساسي داخل فصل دراسي ينظرون إلى خيط صغير؛ بعضهم يمد الخيط بشكل مستقيم بين يديه ثم يتركه يتدلى ليصبح متعرجًا، مع المعلم يوضح الفرق بين الشكل المستقيم والمتعرج."
+  },
+  "16f5921f97e9f4c9": {
+    "file": "16f5921f97e9f4c9.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "ورقة تعليمية فيها نقاط متباعدة وتلاميذ يوصلون 4 نقاط بأربع قطع مستقيمة بالمسطرة لتكوين شكل رباعي، مع كل التسميات داخل الصورة باللغة العربية."
+  },
+  "9bd53ab714e8105f": {
+    "file": "9bd53ab714e8105f.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي للمكعب والمخروط يوضح الوجوه المسطحة المربعة للمكعب والقاعدة الدائرية والرأس المدبب للمخروط، مع التسميات داخل الصورة باللغة العربية: المكعب، المخروط، 6 وجوه مسطحة مربعة، قاعدة دائرية، رأس مدبب."
+  },
+  "2623ed3467763560": {
+    "file": "2623ed3467763560.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "مكعب مع أجزائه وخصائصه الأساسية، مع كتابة التسميات داخل الصورة باللغة العربية"
+  },
+  "e1cf4adbd416009f": {
+    "file": "e1cf4adbd416009f.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في طريقهم إلى المدرسة يمشون على الرصيف ويعبرون الشارع من المكان المخصص للمشاة، مع رجل مرور يساعد في تنظيم حركة السيارات وطفل يساعد شخصًا أعمى."
+  },
+  "224c75b74b4dc5d0": {
+    "file": "224c75b74b4dc5d0.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "مخطط تعليمي يوضح آداب المشي في الطريق: المشي على الرصيف، العبور من المكان المخصص للمشاة، مساعدة رجل المرور والأعمى والطفل الصغير، إزالة الأذى من الطريق، وعدم اللعب في الطريق العام، مع كل جزء مميز بملصق باللغة العربية."
+  },
+  "92da3cc3c0f55c84": {
+    "file": "92da3cc3c0f55c84.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي لخطوات العبور الصحيحة: رصيف، طفل يقف عند الرصيف، ينظر يمينًا، ينظر يسارًا، ثم يعبر من الخط الأبيض. كل جزء مُسمّى باللغة العربية: \"الرصيف\"، \"شارع\"، \"خط المشاة\"، \"أنظر يمينًا\"، \"أنظر يسارًا\"، \"أعبر من الخط الأبيض\"."
+  },
+  "af8229fde4a4aadc": {
+    "file": "af8229fde4a4aadc.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "مخطط تعليمي لسلامة المشي في الطريق يوضح أربعة سلوكيات: طفل يمشي على الرصيف، طفل يلعب وسط الشارع، طفل يعبر من خط المشاة، وطفل يرمي القشر في الطريق، مع تمييز السلوكيات الصحيحة والخاطئة، وكل الكلمات والملصقات داخل الصورة مكتوبة بالعربية."
+  },
+  "8cd5518b74057f94": {
+    "file": "8cd5518b74057f94.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "إشارة مرور بثلاث دوائر مرتبة من الأعلى إلى الأسفل: أحمر، أصفر، أخضر، مع توضيح معاني الألوان سِر، استعد، توقّف. جميع الكلمات داخل الصورة مكتوبة بالعربية."
+  },
+  "960eef39e2bcb2c2": {
+    "file": "960eef39e2bcb2c2.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "ثلاث دوائر متشابهة وشكل رابع مختلف هو مثلث، مع توضيح الشكل المختلف. أي كلمات أو تسميات داخل الصورة تكون باللغة العربية."
+  },
+  "006b6a87f06822bb": {
+    "file": "006b6a87f06822bb.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "خط الأعداد من ٠ إلى ١٨ مع توضيح البدء من ٦ والقفز ٨ خطوات حتى ١٤، مع كل التسميات والأرقام داخل الصورة باللغة العربية وبالأرقام العربية الهندية."
+  },
+  "1b7a10a9041c8c41": {
+    "file": "1b7a10a9041c8c41.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي يوضح التشابه بين حروف ب و ن و ي ومكان النقاط وعددها: ب نقطة واحدة تحت، ن نقطة واحدة فوق، ي نقطتان تحت في آخر الكلمة، مع كل جزء مُسمّى بالعربية."
+  },
+  "6b6f8ff33761b264": {
+    "file": "6b6f8ff33761b264.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "رجل يمني يبني بيتاً بالطوب وبنت يمنية تحمل عنباً، في مشهد تعليمي مرتبط بالنص."
+  },
+  "3eb8ef9fcce3ddaf": {
+    "file": "3eb8ef9fcce3ddaf.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "عنقود عنب أخضر وأسود مرتبط بدرس «عِنَبَاً»، مع توضيح الكلمة «عِنَبَاً» باللغة العربية."
+  },
+  "3cc8cc4ea2f87185": {
+    "file": "3cc8cc4ea2f87185.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في فصل دراسي ينظرون إلى نبات نعناع أو فجل حقيقي وكوب شفاف مزروع فيه فول، مع ظهور النبات وأجزاءه بصورة واضحة."
+  },
+  "210859bc4ec33cfc": {
+    "file": "210859bc4ec33cfc.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي واضح لنبات كامل يوضح الجذور والساق والأوراق والزهرة والثمرة، مع كل جزء labelled in Arabic: الجذور، الساق، الأوراق، الزهرة، الثمرة."
+  },
+  "e84a12bac2049e20": {
+    "file": "e84a12bac2049e20.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي يوضح مراحل نمو نبات الفول من البذرة في التربة إلى الجذور ثم الساق والأوراق ثم الأزهار والثمار، مع كل مرحلة labelled باللغة العربية."
+  },
+  "5b567ddd05ec49c9": {
+    "file": "5b567ddd05ec49c9.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي يوضح أربع مراحل لنمو نبات الفول بالترتيب: بذرة في تربة، جذور تنمو، ساق وأوراق، أزهار وثمار، مع الأرقام ١، ٢، ٣، ٤ وتسميات باللغة العربية."
+  },
+  "0abfe0986fc2c6fa": {
+    "file": "0abfe0986fc2c6fa.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "تلاميذ يمنيون من الصف الثاني الأساسي يطبقون الوضوء عمليًا في مكان الوضوء بالمدرسة، مع معلم يوجههم خطوة خطوة باستخدام الماء."
+  },
+  "8a4235b03e3c20a4": {
+    "file": "8a4235b03e3c20a4.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "مخطط تعليمي يوضح خطوات الوضوء الكاملة الإحدى عشرة بالترتيب: النية، غسل الكفين، المضمضة، الاستنشاق، غسل الوجه واليدين، مسح الرأس والأذنين، غسل الرجلين، مع أرقام الخطوات من 1 إلى 11. كل الأجزاء والعبارات داخل الصورة مكتوبة باللغة العربية وبالخط العربي."
+  },
+  "9707a57444da40bc": {
+    "file": "9707a57444da40bc.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "جدول مفردات عربي يوضح الكلمات: يَتْعَبُ، يَسْهَرُ، يَتَفَقَّدَ، يَطْمَئِنَّ، مع معانيها بالعربية، وكل النصوص داخل الصورة باللغة العربية."
+  },
+  "12c62f23ae1aa704": {
+    "file": "12c62f23ae1aa704.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم بسيط يوضح مسار والد أحمد من البيت إلى بيت الجد ليتفقد أبويه ويطمئن عليهما: بيت ← سهم ← بيت الجد، مع كل تسمية مكتوبة بالعربية."
+  },
+  "c3d3a0877a92c210": {
+    "file": "c3d3a0877a92c210.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أسرة يمنية مكوّنة من أب وأم وأطفال، مع مشهد يوضح تقدير الأطفال لوالديهم ومساعدتهم في الحياة اليومية."
+  },
+  "96fddf3647d487b2": {
+    "file": "96fddf3647d487b2.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في فصل دراسي يراقبون المعلم وهو يقسم تفاحة إلى نصفين متساويين أمامهم."
+  },
+  "5024db0ac8553149": {
+    "file": "5024db0ac8553149.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "دائرة مقسمة إلى جزأين متساويين مع جزء مظلل، ومربع مقسم إلى أربعة أجزاء متساوية مع جزأين مظللين، مع توضيح ١/٢ و٢/٤. جميع الكلمات والأرقام داخل الصورة باللغة العربية."
+  },
+  "5ab8700661ee8e67": {
+    "file": "5ab8700661ee8e67.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "شكلان تعليميان: دائرة مقسومة إلى جزأين متساويين مع جزء واحد مظلل، ومربع مقسوم إلى أربعة أجزاء متساوية مع جزأين مظللين، لتمثيل ١/٢ و٢/٤، مع كل الكلمات أو labels داخل الصورة مكتوبة بالعربية."
+  },
+  "3e170e3af704372b": {
+    "file": "3e170e3af704372b.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي لعائلة حقائق الضرب والقسمة يربط بين ٣ أعداد ويوضح جملتي الضرب وجملتي القسمة، مع كل تسمية مكتوبة بالعربية."
+  },
+  "09d3cd2cdd134b42": {
+    "file": "09d3cd2cdd134b42.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "مخطط تعليمي واضح لدورة الماء في الطبيعة يوضح التبخر، التكاثف، هطول المطر، المياه الجارية، والمياه الجوفية، مع الأسهم التي توضح حركة الماء المستمرة. جميع الكلمات والملصقات داخل الصورة باللغة العربية وبخط عربي واضح."
+  },
+  "12138482d6dc999d": {
+    "file": "12138482d6dc999d.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "مخطط تعليمي لدورة الماء في الطبيعة يوضح تبخر الماء، تكاثف بخار الماء، هطول المطر، والمياه الجارية، مع الكلمات: تبخر، تكاثف، هطول المطر، المياه الجارية مكتوبة باللغة العربية."
+  },
+  "8c194033e44effbc": {
+    "file": "8c194033e44effbc.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي لطفل واقف ووجهه نحو الشرق، مع تحديد الجهات الثلاث الأخرى حوله بالأسهم والكتابة: شرق، غرب، شمال، جنوب، وكل الكلمات داخل الصورة باللغة العربية."
+  },
+  "8419e6d6af542956": {
+    "file": "8419e6d6af542956.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في الصف الثالث الأساسي يقرؤون قصة عن كلب وفي لصاحبه، مع كتاب القراءة مفتوح على صفحة 45 وصورة كلب مرتبطة بموضوع الدرس."
+  },
+  "ebd47a6274396d50": {
+    "file": "ebd47a6274396d50.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "مخطط تعليمي يوضح كلمات: الهزال، وَفِيّة، النِّباح، المخبأ، اللصوص، المجوهرات، تابَعَ أثرَهم، اشتدّ، القبض على، مع صور أو رموز توضح معانيها، وكل كلمة ووسم داخل الصورة مكتوب بالعربية."
+  },
+  "24b453488f455a6f": {
+    "file": "24b453488f455a6f.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "معلم يكتب نموذج الجملة العربية بخط النسخ على السبورة، بينما ينقلها الطلاب في دفاتر الخط."
+  },
+  "27b77b4283cbc78d": {
+    "file": "27b77b4283cbc78d.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "خريطة بسيطة توضح موقع اليمن ونجران، مع كل تسمية مكتوبة بالعربية: اليمن، نجران"
+  },
+  "bfb30b53e0891524": {
+    "file": "bfb30b53e0891524.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "تلاميذ يمنيون في الصف الثاني الأساسي يستخدمون خيوطًا لتمثيل خط مستقيم وخط متعرج في درس الرياضيات."
+  },
+  "f0c3ca7f4f367e95": {
+    "file": "f0c3ca7f4f367e95.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي للأشكال الهندسية يتضمن قطعة مستقيمة وشكل رباعي وأشكال غير رباعية، مع كل جزء labelled in Arabic."
+  },
+  "63a60578523287d3": {
+    "file": "63a60578523287d3.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي يوضح المكعب والمخروط مع وجوه المكعب المسطحة المربعة وقاعدة المخروط الدائرية ورأسه المدبب، مع كل جزء مُسمّى باللغة العربية، مثل: المكعب، المخروط، وجوه مسطحة مربعة، قاعدة دائرية، رأس مدبب."
+  },
+  "3f143084ed6da97a": {
+    "file": "3f143084ed6da97a.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي يوضح قطعة مستقيمة مرسومة بالمسطرة دون انحناء مقارنة بقطعة متعرجة، مع مربع ومستطيل ومتوازي أضلاع ومثلث ودائرة وشكل خماسي، وكل جزء مُسمّى بالعربية."
+  },
+  "a35f22938da0801a": {
+    "file": "a35f22938da0801a.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي لعائلة يمنية تضم أب وأم وطفل وطفلتين، مع وضع تسميات على كل فرد باللغة العربية: أبي، أمي، أحمد، سبأ، إيمان"
+  },
+  "6fdd0fbdfceac5d9": {
+    "file": "6fdd0fbdfceac5d9.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "جدول يوضح الكلمات: أَبِي، أُمِّي، أَحْمَد، سَبَأ، إِيمَان مع عدد الحروف ومن هو، وجميع العناوين والتسميات مكتوبة باللغة العربية: الكلمة، عدد الحروف، من هو؟، الوالد، الوالدة، الابن، البنت الأولى، البنت الثانية"
+  },
+  "df6249017f95e4ad": {
+    "file": "df6249017f95e4ad.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A teacher holds two large word cards while a pupil points to the card naming the boy; the actual exit task shows أحمد selected over سبأ. Labelled in Arabic exactly as follows: «أحمد», «سبأ», «اسم الولد». No other text, no decoration."
+  },
+  "ba75e7752b8f3ea0": {
+    "file": "ba75e7752b8f3ea0.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A first-grade pupil solves the real Page 32 matching exercise in a notebook, drawing lines from the family pictures to the correct words: رجل ← «أَبِي»، امرأة ← «أُمِّي»، طفل ← «أَحْمَد»، بنت١ ← «سَبَأ»، بنت٢ ← «إِيمَان». Labelled in Arabic exactly as follows: «أَبِي», «أُمِّي», «أَحْمَد», «سَبَأ», «إِيمَان». No other text, no decoration."
+  },
+  "cc1bbe07bf9e4c32": {
+    "file": "cc1bbe07bf9e4c32.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: one half shows «أبي» and «أمي» treated as identical under a large red ✗; the other half shows «أبي» and «أمي» distinguished by their middle letters under a large green ✓. Labelled in Arabic exactly as follows: «أبي», «أمي», «ب», «م». No other text, no decoration."
+  },
+  "5a4283326ec81218": {
+    "file": "5a4283326ec81218.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في الصف الأول ينظرون إلى صفحة 32 في كتابهم، وفي الصفحة صور أبي وأمي وأحمد وسبأ وإيمان، استعداداً للتعرف على أفراد الأسرة."
+  },
+  "e9e18e765e71a812": {
+    "file": "e9e18e765e71a812.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي يوضح أفراد أسرة: أب، أم، طفل، وطفلتين، مع بطاقات الكلمات أبي، أمي، أحمد، سبأ، إيمان، وكل جزء labelled in Arabic."
+  },
+  "cd0daca90530dd1d": {
+    "file": "cd0daca90530dd1d.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A first-grade pupil works in a notebook, connecting the real lesson pictures to the correct Arabic word cards. Show رجل connected to «أبي», امرأة to «أمي», طفل to «أحمد», and two girls to «سبأ» and «إيمان». Labelled in Arabic exactly as follows: «أبي», «أمي», «أحمد», «سبأ». No other text, no decoration."
+  },
+  "a0b129bba563bb8d": {
+    "file": "a0b129bba563bb8d.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A first-grade pupil performs the exit task by pointing to the correct card between two Arabic word cards, «أحمد» and «سبأ», with «أحمد» selected. Labelled in Arabic exactly as follows: «أحمد», «سبأ», «الولد». No other text, no decoration."
+  },
+  "79ba64843daba865": {
+    "file": "79ba64843daba865.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: one half shows the lesson's real example done WRONG, ٤/٢, under a large red ✗; the other half shows the CORRECT version, ٢/٤, under a large green ✓. Labelled in Arabic exactly as follows: «البسط», «المقام», «٢/٤». No other text, no decoration."
+  },
+  "a906fdd6b1513ec9": {
+    "file": "a906fdd6b1513ec9.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "معلم يمني في فصل دراسي يمني يعرض تفاحة حقيقية مقطوعة إلى نصفين متساويين أمام أطفال يمنيين، مع كل نصف مرفوع بيد، لشرح مفهوم النصف ١/٢."
+  },
+  "d99f38df7c72b840": {
+    "file": "d99f38df7c72b840.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم يوضح دائرة مقسومة إلى جزأين متساويين مع تظليل جزء واحد، ومربع مقسوم إلى أربعة أجزاء متساوية مع تظليل جزأين، مع كتابة عدد الأجزاء المتساوية وعدد الأجزاء المظللة والكسر لكل شكل، وجميع التسميات داخل الصورة باللغة العربية مثل: عدد الأجزاء المتساوية، عدد الأجزاء المظللة، الكسر، النصف، ربعان"
+  },
+  "e59e34a6bc678517": {
+    "file": "e59e34a6bc678517.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "شكلان تعليميان: دائرة مقسومة إلى جزأين متساويين مع جزء واحد مظلل، ومربع مقسوم إلى أربعة أجزاء متساوية مع جزأين مظللين، لتمثيل ١/٢ و٢/٤، مع كل التسميات داخل الصورة باللغة العربية."
+  },
+  "8fd0fba1d35fcfb4": {
+    "file": "8fd0fba1d35fcfb4.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "أشكال هندسية مقسمة إلى أجزاء متساوية: دوائر ومربعات ومثلثات تمثل النصف ١/٢ والثلث ١/٣ والربع ١/٤ وربعان ٢/٤، مع تظليل الأجزاء المطلوبة وكتابة الكسور وتسميات البسط والمقام باللغة العربية."
+  },
+  "ba6b5a74f9123a4d": {
+    "file": "ba6b5a74f9123a4d.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في فصل دراسي ينظرون إلى معلم يقسم تفاحة إلى نصفين متساويين أمامهم لتوضيح النصف ١/٢."
+  },
+  "74266a9260db9d9e": {
+    "file": "74266a9260db9d9e.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "الدائرة مقسمة إلى جزأين متساويين مع جزء واحد مظلل، والمربع مقسم إلى أربعة أجزاء متساوية مع جزأين مظللين، مع توضيح الكسور ١/٢ و٢/٤، وكل التسميات داخل الصورة باللغة العربية."
+  },
+  "189b082b81d8fe25": {
+    "file": "189b082b81d8fe25.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "شكلان تعليميان لبطاقة الخروج: دائرة مقسومة إلى جزأين متساويين ومظلل جزء واحد، ومربع مقسوم إلى أربعة أجزاء متساوية ومظلل جزءان، مع توضيح ١/٢ و٢/٤، ومع كل الكلمات والأرقام داخل الصورة مكتوبة بالعربية."
+  },
+  "1386f5d3d341a48a": {
+    "file": "1386f5d3d341a48a.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: one half shows the lesson's real example ٢/٤ written wrong as ٤/٢ under a large red ✗; the other half shows ٢/٤ under a large green ✓. Labelled in Arabic exactly as follows: «البسط», «المقام». No other text, no decoration."
+  },
+  "38eb9cbd920d58a8": {
+    "file": "38eb9cbd920d58a8.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Flat vector educational illustration, clean textbook style. A teacher holds a real apple beside a classroom board showing the apple divided into two equal halves. The key fraction is written plainly on the board. Labelled in Arabic exactly as follows: «تفاحة», «نصف», «١/٢». No other text, no decoration."
+  },
+  "07db7128f66e6fe4": {
+    "file": "07db7128f66e6fe4.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A teacher works at a chalkboard showing one square divided into four equal parts with two parts shaded, and the worked fraction ٢/٤. Labelled in Arabic exactly as follows: «أجزاء», «مظللة», «٢/٤». No other text, no decoration."
+  },
+  "e1325b0a22d6ccb0": {
+    "file": "e1325b0a22d6ccb0.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil works in a mathematics notebook on the actual exercise: three equal circles with one shaded, writing ١/٣ as the answer. Labelled in Arabic exactly as follows: «دوائر», «مظللة», «١/٣». No other text, no decoration."
+  },
+  "70f76b888bc68d26": {
+    "file": "70f76b888bc68d26.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil completes an exit ticket showing a circle divided into two equal parts with one shaded and a square divided into four equal parts with two shaded; the answers ١/٢ and ٢/٤ are visible. Labelled in Arabic exactly as follows: «دائرة», «مربع», «١/٢», «٢/٤». No other text, no decoration."
+  },
+  "6cde65d5e3295987": {
+    "file": "6cde65d5e3295987.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A simple home activity diagram shows one real bread loaf divided into two equal halves, with one half indicated as the portion being named. Labelled in Arabic exactly as follows: «رغيف», «نصف», «١/٢». No other text, no decoration."
+  },
+  "f735038971b461da": {
+    "file": "f735038971b461da.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: one half shows a short straight segment and a long straight segment under a large red ✗ misconception that length determines straightness; the other half shows the correct straight segments of different lengths under a large green ✓. Labelled in Arabic exactly as follows: «قصيرة», «طويلة», «مستقيمة». No other text, no decoration."
+  },
+  "06ddc338b2008b8f": {
+    "file": "06ddc338b2008b8f.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي يوضح مكعبًا ومخروطًا مع إبراز أوجه المكعب وقاعدته الدائرية ورأس المخروط المدبب، مع كل تسمية مكتوبة بالعربية: \"مكعب\" و\"مخروط\" و\"وجوه مسطحة\" و\"قاعدة دائرية\" و\"رأس مدبب\"."
+  },
+  "4c49bac51fa6ca06": {
+    "file": "4c49bac51fa6ca06.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil's notebook shows four marked points connected with a ruler by four straight segments into one closed quadrilateral, with the completed answer visible. Labelled in Arabic exactly as follows: «أربع نقاط», «أربع أضلاع», «شكل رباعي». No other text, no decoration."
+  },
+  "e46cdf117a80eb43": {
+    "file": "e46cdf117a80eb43.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil performs the exit task on a small worksheet: a straight segment receives a check mark, a cube receives a check mark, and a cone receives an X. Labelled in Arabic exactly as follows: «مستقيمة», «مكعب», «مخروط». No other text, no decoration."
+  },
+  "a6fcc86984c9abe1": {
+    "file": "a6fcc86984c9abe1.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي لأسرة تضم أباً وأماً وطفلاً وطفلتين، مع ربط صورة كل فرد بالكلمة المناسبة: أبي، أمي، أحمد، سبأ، إيمان. جميع الكلمات داخل الصورة مكتوبة بالعربية."
+  },
+  "d548912768ce981f": {
+    "file": "d548912768ce981f.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: one half shows word matching done WRONG under a large red ✗ with «أبي» matched to mother image; the other half shows the CORRECT version under a large green ✓ with «أمي» matched to mother image. Labelled in Arabic exactly as follows: «أبي», «أمي», «ام». No other text, no decoration."
+  },
+  "5ecc89166e13cb7d": {
+    "file": "5ecc89166e13cb7d.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. Pupil notebook page. Exercise solved with visible answer linking boy image to «أحمد». Labelled in Arabic exactly as follows: «أحمد», «ولد», «اسم». No other text, no decoration."
+  },
+  "25c616b5e89956df": {
+    "file": "25c616b5e89956df.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. Exit-task cards on a desk. Pupil points to the correct card «أحمد» instead of «سبأ». Labelled in Arabic exactly as follows: «أحمد», «سبأ», «ولد». No other text, no decoration."
+  },
+  "1f159e6ac5b1ac7c": {
+    "file": "1f159e6ac5b1ac7c.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: one half shows a short straight segment and a long straight segment treated as different kinds of lines under a large red ✗; the other half shows both as straight segments under a large green ✓. Labelled in Arabic exactly as follows: «قصيرة», «طويلة», «مستقيمة». No other text, no decoration."
+  },
+  "3527252ab7f6d74e": {
+    "file": "3527252ab7f6d74e.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "تلاميذ يمنيون في الصف الثاني الأساسي داخل فصل دراسي ينظرون إلى خيط صغير؛ بعضهم يمد الخيط بشكل مستقيم بين يديه وبعضهم يتركه يتدلى ليصبح متعرجًا."
+  },
+  "778f3c2304310f4f": {
+    "file": "778f3c2304310f4f.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي لمجسم مكعب ومجسم مخروط، مع توضيح أن المكعب له 6 وجوه مربعة الشكل وأن المخروط له قاعدة دائرية ورأس مدبب، مع كل التسميات داخل الصورة باللغة العربية مثل: المكعب، المخروط، قاعدة دائرية، رأس مدبب."
+  },
+  "f7240c25c6174e65": {
+    "file": "f7240c25c6174e65.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "تلاميذ يمنيون في فصل دراسي يطبقون تمارين الأشكال الهندسية باستخدام المسطرة والنقاط ومجسمات المكعب والمخروط."
+  },
+  "c3477e538e63ad08": {
+    "file": "c3477e538e63ad08.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي للمكعب والمخروط والأشكال الرباعية مع كل جزء مُسمّى باللغة العربية: المكعب، وجوه مسطحة، المخروط، قاعدة دائرية، رأس مدبب، مربع، مستطيل، متوازي الأضلاع."
+  },
+  "ff2746a2944a8db0": {
+    "file": "ff2746a2944a8db0.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: one half shows a child walking in the street under a large red ✗; the other shows a child walking on the sidewalk under a large green ✓. Labelled in Arabic exactly as follows: «الشارع», «الرصيف». No other text, no decoration."
+  },
+  "1c52934d396a732b": {
+    "file": "1c52934d396a732b.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Flat vector educational illustration, clean textbook style. Classroom scene with chalk, a simple sidewalk and a pedestrian crossing drawn on the floor, while the teacher points to a board showing the day's key distinction. The board shows «الرصيف» and «الشارع». Labelled in Arabic exactly as follows: «الرصيف», «الشارع», «المشاة». No other text, no decoration."
+  },
+  "feeb4be96fa92a45": {
+    "file": "feeb4be96fa92a45.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A classroom chalkboard shows one worked example of a child crossing safely: standing at the sidewalk, looking right, then left, then crossing at the white pedestrian line. The teaching surface carries «المكان المخصص للمشاة». Labelled in Arabic exactly as follows: «الرصيف», «يمين», «يسار», «المشاة». No other text, no decoration."
+  },
+  "2ec2297c1c918ad0": {
+    "file": "2ec2297c1c918ad0.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil completes an exit task on a notebook page, answering where to walk safely with the visible answer «الرصيف». Labelled in Arabic exactly as follows: «الرصيف», «الأعمى», «مساعدة». No other text, no decoration."
+  },
+  "9998ba0e1c91565c": {
+    "file": "9998ba0e1c91565c.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A simple labelled home observation diagram shows a child beside a sidewalk and a pedestrian crossing, checking the safe walking route. Labelled in Arabic exactly as follows: «الرصيف», «العبور», «رجل المرور». No other text, no decoration."
+  },
+  "504dcb8d3cda0098": {
+    "file": "504dcb8d3cda0098.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: one half shows «الأذن» as the vision organ under a large red ✗; the other shows «العين» as the vision organ under a large green ✓. Labelled in Arabic exactly as follows: «الأذن», «العين». No other text, no decoration."
+  },
+  "da0a00d9e895e256": {
+    "file": "da0a00d9e895e256.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Flat vector educational illustration, clean textbook style. A teacher in a classroom covers his eyes with one hand beside a table while pupils watch; a teaching board inside the scene shows the day's key words. Labelled in Arabic exactly as follows: «العين», «أبصر», «الطاولة». No other text, no decoration."
+  },
+  "dcd9dfa681fc88ac": {
+    "file": "dcd9dfa681fc88ac.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil works at a chalkboard showing one simple face with eyes, nose, mouth and ears; the two eyes are circled as the worked example. Labelled in Arabic exactly as follows: «العين», «الأذن», «الفم», «الإبصار». No other text, no decoration."
+  },
+  "aef2d04eb8004e16": {
+    "file": "aef2d04eb8004e16.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil works in a notebook: a traffic light is colored red at top, yellow in middle, green at bottom, beside a large and small circle and three circles with one triangle; the correct choices are visibly marked. Labelled in Arabic exactly as follows: «أحمر», «أصفر», «أخضر», «المثلث». No other text, no decoration."
+  },
+  "4dd344263aa9dbdb": {
+    "file": "4dd344263aa9dbdb.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil completes an exit task on a notebook: a simple face has the eyes circled, with a short care action represented beside it. Labelled in Arabic exactly as follows: «العين», «أعتني», «الإبصار». No other text, no decoration."
+  },
+  "a1da7d2c35259936": {
+    "file": "a1da7d2c35259936.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Flat vector educational illustration, clean textbook style. Second-grade pupils clap together beside a classroom board while counting, with the day's key lesson example written plainly on the board. Labelled in Arabic exactly as follows: «العد», «الجمع», «١٨». No other text, no decoration."
+  },
+  "2e6d4d56e0558ef9": {
+    "file": "2e6d4d56e0558ef9.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A teacher works at a chalkboard showing one worked example of addition within ١٨ using the doubles strategy: ٩+٩=١٨. Labelled in Arabic exactly as follows: «مضاعف», «٩+٩», «١٨». No other text, no decoration."
+  },
+  "3f2aaf00cf53bd07": {
+    "file": "3f2aaf00cf53bd07.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A second-grade pupil works in a notebook on the actual practice exercise ٧+٩ and writes the correct answer ١٦, with a small number line showing the forward jumps. Labelled in Arabic exactly as follows: «٧+٩», «١٦», «خط الأعداد». No other text, no decoration."
+  },
+  "fd918593b8dfc91b": {
+    "file": "fd918593b8dfc91b.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil completes an exit ticket showing the two lesson tasks ٨+٩=١٧ and ٧+٧=١٤, with the answers visibly written. Labelled in Arabic exactly as follows: «بطاقة الخروج», «١٧», «١٤». No other text, no decoration."
+  },
+  "d3418b1e00e7d1dd": {
+    "file": "d3418b1e00e7d1dd.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: one half shows ب incorrectly with the dot above under a large red ✗; the other half shows ب correctly with the dot below under a large green ✓. Labelled in Arabic exactly as follows: «باء», «نون». No other text, no decoration."
+  },
+  "04e2f1d07752913d": {
+    "file": "04e2f1d07752913d.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A teacher's chalkboard works through one real lesson example: «بَيْت» with one dot below ب, alongside ي with two dots below. Labelled in Arabic exactly as follows: «بيت», «باء», «ياء». No other text, no decoration."
+  },
+  "ce5e0df5147fe438": {
+    "file": "ce5e0df5147fe438.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil's notebook shows the actual exercise «بـ ... ـت» completed correctly as «بَيْت», with the inserted letter ي visible. Labelled in Arabic exactly as follows: «بيت», «ياء», «كراسة». No other text, no decoration."
+  },
+  "5d84f5e9b4c2902d": {
+    "file": "5d84f5e9b4c2902d.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: one half shows the lesson's real plant example done WRONG, with roots labelled above the soil under a large red ✗; the other half shows the CORRECT version, with roots below the soil and stem above it under a large green ✓. Labelled in Arabic exactly as follows: «الجذور», «الساق». No other text, no decoration."
+  },
+  "a306491136e45475": {
+    "file": "a306491136e45475.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في فصل دراسي ينظرون إلى نبات حقيقي صغير وكوب فول مزروع، يتعلمون أجزاء النبات وكيف ينمو."
+  },
+  "05777b40c12f3dd8": {
+    "file": "05777b40c12f3dd8.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي واضح لنبات يوضح الجذور والساق والأوراق والزهرة والثمرة، مع كل جزء labelled in Arabic: الجذور، الساق، الأوراق، الزهرة، الثمرة."
+  },
+  "8cb590003a760445": {
+    "file": "8cb590003a760445.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "مخطط يوضح مراحل نمو نبات الفول: البذرة في التربة، الجذور تنمو، الساق يعلو وتظهر الأوراق، الأزهار والثمار، مع تسميات عربية للمرحلة ١ والمرحلة ٢ والمرحلة ٣ والمرحلة ٤"
+  },
+  "9fc2ae2c4f604362": {
+    "file": "9fc2ae2c4f604362.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil's worksheet on a classroom desk shows the four real bean-growth stages ordered ١، ٢، ٣، ٤ and the plant needs الماء، الضوء، التربة، الهواء. Labelled in Arabic exactly as follows: «مراحل النمو», «الماء», «الضوء», «التربة». No other text, no decoration."
+  },
+  "c2e7007bccb834b1": {
+    "file": "c2e7007bccb834b1.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil's notebook shows one transparent cup containing a bean planted in soil, with a small amount of water beside it and a simple drawing of the plant for daily observation. Labelled in Arabic exactly as follows: «فول», «ماء», «تربة». No other text, no decoration."
+  },
+  "777cffe589d05c2f": {
+    "file": "777cffe589d05c2f.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: one half shows the wrong confusion between mouth and nose under a large red ✗; the other half shows the correct distinction under a large green ✓. Labelled in Arabic exactly as follows: «المضمضة», «الاستنشاق», «الفم», «الأنف». No other text, no decoration."
+  },
+  "bac222c567fb0468": {
+    "file": "bac222c567fb0468.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil works at a desk arranging numbered wudu cards in the correct order, with the completed sequence visible. Labelled in Arabic exactly as follows: «النية», «المضمضة», «الوجه», «الرجلان». No other text, no decoration."
+  },
+  "00f60253cca45bfb": {
+    "file": "00f60253cca45bfb.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil completes an exit ticket on a notebook page, correctly ordering the lesson's three real steps: intention, rinsing the mouth, washing the face. Labelled in Arabic exactly as follows: «النية», «المضمضة», «غسل الوجه». No other text, no decoration."
+  },
+  "3a5d3c0359c945fc": {
+    "file": "3a5d3c0359c945fc.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A child practices wudu beside a small water pitcher at home while a parent observes, with the physical task of following the numbered wudu sequence shown simply. Labelled in Arabic exactly as follows: «إبريق ماء», «الوضوء», «النية». No other text, no decoration."
+  },
+  "5c3cf0590d101660": {
+    "file": "5c3cf0590d101660.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A classroom chalkboard shows one worked example from the lesson: Ahmad's father works from morning to evening to provide food, clothing and housing, and visits his parents at night. Labelled in Arabic exactly as follows: «أحمد», «والده», «والديه». The board also shows the short line «حب الوالدين». No other text, no decoration."
+  },
+  "8fb1df356c64add9": {
+    "file": "8fb1df356c64add9.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: one half shows the lesson's real example done WRONG, ٢ ÷ ١٢, under a large red ✗; the other half shows the CORRECT version, ١٢ ÷ ٢, under a large green ✓. Labelled in Arabic exactly as follows: «المقسوم», «المقسوم عليه». No other text, no decoration."
+  },
+  "83d1fecae4089f69": {
+    "file": "83d1fecae4089f69.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A classroom chalkboard shows one worked example: ١٥ - ٥ = ١٠, ١٠ - ٥ = ٥, ٥ - ٥ = ٠, leading to ١٥ ÷ ٥ = ٣. Labelled in Arabic exactly as follows: «المقسوم», «الخمسات», «الناتج». No other text, no decoration."
+  },
+  "a1795c94e563b3cb": {
+    "file": "a1795c94e563b3cb.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil's notebook shows a worked division exercise from page ٧٩: ١٢ ÷ ٣ = ٤, with three equal groups represented by counting objects. Labelled in Arabic exactly as follows: «القسمة», «المجموعات», «الناتج». No other text, no decoration."
+  },
+  "ab38f27af4726d7c": {
+    "file": "ab38f27af4726d7c.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil's desk shows ١٦ small stones arranged into ٤ equal groups and the exit-task equation ١٦ ÷ ٤ = ٤ written on a notebook. Labelled in Arabic exactly as follows: «حصى», «مجموعات», «بطاقة الخروج». No other text, no decoration."
+  },
+  "376f02d0d291bf80": {
+    "file": "376f02d0d291bf80.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A simple labelled notebook diagram shows ١٢ buttons arranged into ٣ equal groups of ٤ for the home division task. Labelled in Arabic exactly as follows: «أزرار», «مجموعات», «القسمة». No other text, no decoration."
+  },
+  "23b10c34430ea63d": {
+    "file": "23b10c34430ea63d.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: one half shows water flowing above the ground under a large red ✗ but labelled incorrectly as «مياه جوفية»; the other half shows water seeping beneath soil under a large green ✓ and labelled «مياه جوفية». Labelled in Arabic exactly as follows: «مياه جارية», «مياه جوفية». No other text, no decoration."
+  },
+  "1136113e4b1918ee": {
+    "file": "1136113e4b1918ee.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في صف دراسي يشاهدون المعلم وهو يضع كوب ماء ساخن على الطاولة ويغطيه بصحن أو غطاء زجاجي بارد لملاحظة قطرات الماء على الغطاء."
+  },
+  "c7e4352c3e5c405b": {
+    "file": "c7e4352c3e5c405b.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "مخطط تعليمي لدورة الماء في الطبيعة يوضح انتقال الماء من البحار إلى الجو ثم إلى الأرض وعودته مرة أخرى، مع مراحل التبخر، التكاثف، هطول المطر، المياه الجارية والمياه الجوفية، مع كل جزء مُسمّى باللغة العربية."
+  },
+  "c85c989291003408": {
+    "file": "c85c989291003408.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil's notebook shows the actual exercise completed with the correct sequence «تبخر ← تكاثف ← هطول المطر ← المياه الجارية», with the first step caused by «أشعة الشمس». Labelled in Arabic exactly as follows: «تبخر», «تكاثف», «هطول المطر», «مياه جارية». No other text, no decoration."
+  },
+  "37388e509f296f6a": {
+    "file": "37388e509f296f6a.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil performs the exit task on a small classroom card, arranging the three real lesson terms in the correct order: «تبخر ← تكاثف ← هطول المطر». Labelled in Arabic exactly as follows: «تبخر», «تكاثف», «هطول المطر». No other text, no decoration."
+  },
+  "2f31f299cb759102": {
+    "file": "2f31f299cb759102.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: one half shows a child facing east but incorrectly labels west as front and east behind under a large red ✗; the other half shows the child facing east with east in front and west behind under a large green ✓. Labelled in Arabic exactly as follows: «الشرق», «الغرب», «الشمال», «الجنوب». No other text, no decoration."
+  },
+  "5f13044e948f8c80": {
+    "file": "5f13044e948f8c80.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "مخطط تعليمي لطفل واقف مواجهًا الشرق مع أسهم واضحة تشير إلى الشرق، الغرب، الشمال، الجنوب، مع كل جزء مُسمّى باللغة العربية وبالعبارات: الشرق، الغرب، الشمال، الجنوب."
+  },
+  "cad99f263236b092": {
+    "file": "cad99f263236b092.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: the left half shows «بدأ» incorrectly treated as a long-mad alif under a large red ✗; the right half shows «بدا» with the long alif under a large green ✓. Labelled in Arabic exactly as follows: «بدأ», «بدا». No other text, no decoration."
+  },
+  "82f94ba4a92a3da2": {
+    "file": "82f94ba4a92a3da2.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Flat vector educational illustration, clean textbook style. A simple classroom scene with a dog picture beside a chalkboard showing the lesson title and the key question about whether an animal can be loyal. Labelled in Arabic exactly as follows: «الكلب الوفي», «الوفاء», «الكلب». No other text, no decoration."
+  },
+  "9675d8da0ac950c3": {
+    "file": "9675d8da0ac950c3.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A chalkboard presents one worked example from the lesson: «كيف عاد الكلب؟» followed by «عاد الكلب مسرعا». Labelled in Arabic exactly as follows: «كيف», «عاد», «مسرعا». No other text, no decoration."
+  },
+  "950ac22235cb8742": {
+    "file": "950ac22235cb8742.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil performs the exit task in a notebook: the question «لماذا هو وفي؟» with the answer «حرس دكان صاحبه». Labelled in Arabic exactly as follows: «وفي», «حرس», «صاحبه». No other text, no decoration."
+  },
+  "ed913473bdb706ff": {
+    "file": "ed913473bdb706ff.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "One wide chalkboard split in two halves by a vertical line: one half shows «اعتنق» confused with «تعصب» under a large red ✗; the other half shows «اعتنق» and «تعصب» correctly distinguished under a large green ✓. Labelled in Arabic exactly as follows: «اعتنق», «تعصب». No other text, no decoration."
+  },
+  "1708ab5ba2809610": {
+    "file": "1708ab5ba2809610.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "أطفال يمنيون في صف دراسي يتعلمون قصة أصحاب الأخدود، مع المعلم والكتاب المدرسي، ويظهر على السبورة عنوان قِصَّةُ أَصْحَابِ الأُخْدُودِ وصفحة 35"
+  },
+  "143b3f95bc11ea8c": {
+    "file": "143b3f95bc11ea8c.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "بطاقات مفردات تعليمية للكلمات: الأخدود، جبار، اعتنق، تعصّب، مع صورة أو رمز بسيط بجانب كل كلمة، وكل الكلمات والملصقات داخل الصورة مكتوبة بالعربية."
+  },
+  "ddbc5a07e0380448": {
+    "file": "ddbc5a07e0380448.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: one half shows two straight segments of different lengths wrongly treated as different kinds of lines under a large red ✗; the other half shows both straight segments correctly identified under a large green ✓. Labelled in Arabic exactly as follows: «طويلة», «قصيرة», «مستقيمة». No other text, no decoration."
+  },
+  "c151dcd568504074": {
+    "file": "c151dcd568504074.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A classroom chalkboard shows one worked example: four points connected by four straight segments to form a closed quadrilateral, beside two identical paper shapes stacked exactly and simple cube and cone objects. Labelled in Arabic exactly as follows: «شكل رباعي», «تطابق», «مكعب», «مخروط». No other text, no decoration."
+  },
+  "8bbeda61b79c2bff": {
+    "file": "8bbeda61b79c2bff.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil's notebook shows four points connected with a ruler into a closed quadrilateral, with a matching pair of equal shapes and a cube and cone classification; the worked answers are visible. Labelled in Arabic exactly as follows: «أربع أضلاع», «متطابق», «مكعب», «مخروط». No other text, no decoration."
+  },
+  "3c8e7bbc3e47511a": {
+    "file": "3c8e7bbc3e47511a.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil's exit ticket shows one straight segment marked with a check and two solid shapes, a cube marked with a check and a cone marked with X. Labelled in Arabic exactly as follows: «مستقيم», «مكعب», «مخروط». No other text, no decoration."
+  },
+  "594cf98d0b2cff8c": {
+    "file": "594cf98d0b2cff8c.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: one half shows the ear labelled as the vision organ under a large red ✗; the other shows the eye as the vision organ under a large green ✓. Labelled in Arabic exactly as follows: «الأذن», «العين». No other text, no decoration."
+  },
+  "739d8f6495afa3a2": {
+    "file": "739d8f6495afa3a2.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "Flat vector educational illustration, clean textbook style. A first-grade teacher covers the eyes with a hand beside a classroom table, while a Yemen flag is displayed on a board with the day's key visual colors. Labelled in Arabic exactly as follows: «العين», «أحمر», «أبيض», «أسود». No other text, no decoration."
+  },
+  "805ad6bd9b2ff948": {
+    "file": "805ad6bd9b2ff948.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A classroom chalkboard shows one worked example: a simple face with the two eyes circled, beside a traffic light ordered red, yellow, green. Labelled in Arabic exactly as follows: «العين», «أحمر», «أصفر», «أخضر». No other text, no decoration."
+  },
+  "158ad98295331145": {
+    "file": "158ad98295331145.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil performs the exit task beside a notebook showing an eye circled as the vision organ and a simple eye-care action represented by clean water. Labelled in Arabic exactly as follows: «العين», «ماء نظيف». No other text, no decoration."
+  },
+  "46d4de93efaadb81": {
+    "file": "46d4de93efaadb81.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil's notebook shows the actual exercise solved: the eye circled among eye, ear and mouth; traffic light colored red, yellow, green from top to bottom; the large circle underlined; the triangle circled as the different shape. Labelled in Arabic exactly as follows: «العين», «أخضر», «كبير», «مختلف». No other text, no decoration."
+  },
+  "f1c8d6ff13f64903": {
+    "file": "f1c8d6ff13f64903.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. One wide chalkboard split in two halves by a vertical line: one half shows the lesson's real plant example done WRONG under a large red ✗, confusing the stem with the roots; the other half shows the CORRECT version under a large green ✓, with roots below the soil and stem above it. Labelled in Arabic exactly as follows: «الجذور», «الساق». No other text, no decoration."
+  },
+  "4d4eb4be88f18804": {
+    "file": "4d4eb4be88f18804.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A teacher works at a classroom chalkboard showing one worked example of a complete plant with roots below soil, stem above soil, and leaves above. The board connects each visible part to its function. Labelled in Arabic exactly as follows: «الجذور», «الساق», «الأوراق», «الغذاء». No other text, no decoration."
+  },
+  "b840ad0ae30a010e": {
+    "file": "b840ad0ae30a010e.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil solves the actual plant-growth exercise in a notebook, arranging four stages in the correct order: seed in soil, roots grow, stem and leaves appear, flowers and fruits form. The visible answer is «١ ٢ ٣ ٤». Labelled in Arabic exactly as follows: «بذرة», «جذور», «أوراق», «ثمار». No other text, no decoration."
+  },
+  "3e06aa7373a835b2": {
+    "file": "3e06aa7373a835b2.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil performs the exit task beside a real plant, pointing to the roots while a notebook shows the answer «الجذور» and two growth needs. Labelled in Arabic exactly as follows: «الجذور», «الماء», «الضوء». No other text, no decoration."
+  },
+  "1c270cc38911813f": {
+    "file": "1c270cc38911813f.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A classroom chalkboard showing one worked example: father works from morning to evening and leaves at night to check on his parents and reassure them. Labelled in Arabic exactly as follows: «والد أحمد», «يتفقد», «أبويه». No other text, no decoration."
+  },
+  "213971f65b16d339": {
+    "file": "213971f65b16d339.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil's notebook shows the real practice question and a correct written answer: «ماذا قال أحمد لصديقه علي؟» followed by «إنني أحب والدي وأحترمه». Labelled in Arabic exactly as follows: «أحمد», «علي», «والدي». No other text, no decoration."
+  },
+  "135d8a846e14f64f": {
+    "file": "135d8a846e14f64f.jpg",
+    "mime": "image/jpeg",
+    "model": "nano-banana-2-lite",
+    "concept": "scene",
+    "prompt": "تلاميذ يمنيون في الصف الثالث الأساسي يشاهدون المعلم وهو يضع كوب ماء ساخن على الطاولة ويغطيه بصحن أو غطاء زجاجي بارد، وينظرون إلى قطرات الماء الصغيرة المتكونة على الغطاء من الداخل."
+  },
+  "0f3424bc6a086b89": {
+    "file": "0f3424bc6a086b89.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "مخطط تعليمي يوضح دورة الماء في الطبيعة: البحار والأنهار، صعود الماء إلى السماء بالتبخر، تكوّن الغيوم بالتكاثف، هطول المطر، المياه الجارية والمياه الجوفية، وعودة الماء إلى مصادره. كل جزء في المخطط مُسمّى باللغة العربية وبالعبارات: التبخر، التكاثف، هطول المطر، مياه جارية، مياه جوفية."
+  },
+  "d5b950602a9fbfe5": {
+    "file": "d5b950602a9fbfe5.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "رسم توضيحي لدورة الماء في الطبيعة يوضح تبخر الماء وتكاثف الغيوم وهطول المطر والمياه الجارية والمياه الجوفية، مع كل جزء مُسمّى باللغة العربية."
+  },
+  "810955ede1a80d0b": {
+    "file": "810955ede1a80d0b.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "رسم تعليمي لطفل واقف ووجهه باتجاه الشرق، مع توضيح الشمال في جهة اليد اليسرى، والجنوب في جهة اليد اليمنى، والغرب خلف الظهر، والشرق أمام الوجه، مع كل الأجزاء والاتجاهات labelled in Arabic: الشرق، الغرب، الشمال، الجنوب، أمام الوجه، خلف الظهر، اليد اليمنى، اليد اليسرى."
+  },
+  "41e9e18ad9c2497b": {
+    "file": "41e9e18ad9c2497b.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "مخطط تعليمي للجهات الأصلية الأربع حول طفل واقف مواجهًا الشرق، يوضح الشرق والغرب والشمال والجنوب، مع كل تسمية مكتوبة بالعربية."
+  },
+  "8b84981655fd034f": {
+    "file": "8b84981655fd034f.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "طفل واقف ووجهه نحو الشرق، مع إظهار الجهات الأصلية الأربع حوله بالأسهم والكتابة: الشرق، الغرب، الشمال، الجنوب، وشرح العلاقة بين اتجاه وجه الطفل والجهات. جميع الكلمات داخل الصورة باللغة العربية."
+  },
+  "9fdee4f64f668448": {
+    "file": "9fdee4f64f668448.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A teacher's chalkboard works through one real lesson example from the story: «كيف عاد الكلب؟» followed by «عاد مسرعا». Labelled in Arabic exactly as follows: «كيف», «عاد مسرعا», «النباح». No other text, no decoration."
+  },
+  "a61ca3b17fdb4c4a": {
+    "file": "a61ca3b17fdb4c4a.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil performs the exit task in a notebook, answering why the dog is described as loyal with the real lesson answer: «حرس دكان صاحبه». Labelled in Arabic exactly as follows: «وفي», «حرس», «صاحبه». No other text, no decoration."
+  },
+  "7d139ced92700e18": {
+    "file": "7d139ced92700e18.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. Classroom chalkboard. One worked example matching a father picture to the word «أبي». Labelled in Arabic exactly as follows: «أبي», «اب», «اسرة». No other text, no decoration."
+  },
+  "15ae4eeb1cfec15e": {
+    "file": "15ae4eeb1cfec15e.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil's notebook shows two separated points connected by one straight segment with a ruler beside it, plus one small cube-like box and one cone-like funnel found at home. Labelled in Arabic exactly as follows: «مسطرة», «مكعب», «مخروط». No other text, no decoration."
+  },
+  "7740aa2462383aca": {
+    "file": "7740aa2462383aca.png",
+    "mime": "image/png",
+    "model": "nano-banana-2",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A classroom chalkboard showing one worked example comparing the words «أبي» and «أمي» with letters highlighted. Labelled in Arabic exactly as follows: «أبي», «أمي», «حرف». No other text, no decoration."
+  },
+  "2b334b8f80c10f9f": {
+    "file": "2b334b8f80c10f9f.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil notebook showing the exercise of matching family pictures with the correct words, with the solved example visible. Labelled in Arabic exactly as follows: «رجل», «امرأة», «أحمد». No other text, no decoration."
+  },
+  "643ec2efcdfd0cd3": {
+    "file": "643ec2efcdfd0cd3.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A pupil pointing to the correct exit card between «أحمد» and «سبأ» on a classroom board. Labelled in Arabic exactly as follows: «أحمد», «سبأ». No other text, no decoration."
+  },
+  "d0765555ca8072ea": {
+    "file": "d0765555ca8072ea.png",
+    "mime": "image/png",
+    "model": "gpt-image-2-text-to-image",
+    "concept": "diagram",
+    "prompt": "Flat vector educational illustration, clean textbook style. A simple notebook page showing a child writing a family member name with a pencil. Labelled in Arabic exactly as follows: «اسم», «قلم». No other text, no decoration."
+  }
 }

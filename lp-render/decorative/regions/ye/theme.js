@@ -122,6 +122,11 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-errors .s-title{color:#c0392b}
 .section.sec-errors .panel{border:2px solid var(--c-red);border-color:var(--c-red) !important;background:#fff}
 .section.sec-errors .d-qc{border-width:1.5px;border-radius:10px}
+/* code-composed twin board: full width below the qa twins, RTL order (✗ right) */
+.section.sec-errors .panel.has-twin-board{display:flex;flex-direction:column;gap:6px}
+.section.sec-errors .panel.has-twin-board .ii-body{display:block;width:100%}
+.section.sec-errors .d-twin-board{max-width:470px;margin:2px auto 4px;flex-direction:row-reverse}
+.section.sec-errors .d-twin-board .tb-half img{height:170px}
 /* Illustrated errors strip (pilot): the خطأ/صواب twin-board figure spans the card
    width BELOW the twins instead of squeezing them into a side column. */
 .section.sec-errors .panel.has-inline-img{display:flex;flex-direction:column}
