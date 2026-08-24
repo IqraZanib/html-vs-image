@@ -1,5 +1,5 @@
 'use strict';
-// Map a FULL lesson content JSON onto the "daily guide" template — the
+// Condense a FULL lesson content JSON into the "daily guide" template — the
 // region design sets' teacher-facing format (12 role sections, see
 // decorative/regions/<region>/DESIGN.md). Same provider/key as the structurer.
 // It condenses ONLY from the source (never invents facts), keeps the lesson's
@@ -11,7 +11,7 @@ const { fixGuide } = require('./text/arabic-hygiene');
 
 const CHAT_URL = 'https://api.kie.ai/gpt-5-2/v1/chat/completions';
 
-const SYSTEM = `You map a FULL lesson-plan JSON onto a "daily teacher guide" JSON for the same renderer.
+const SYSTEM = `You condense a FULL lesson-plan JSON into a compact "daily teacher guide" JSON for the same renderer.
 
 Output ONLY the JSON object — no markdown, no prose, no code fences.
 
@@ -574,7 +574,7 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
     out.images = [];
   }
   if (out.meta) delete out.meta.banner;
-  log(`Mapped onto the guide template: ${out.sections.length} sections, ${out.images.length} reused image(s).`);
+  log(`Condensed to the guide template: ${out.sections.length} sections, ${out.images.length} reused image(s).`);
   return out;
 }
 
