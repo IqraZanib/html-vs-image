@@ -658,10 +658,15 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 
 `;
 
-// MAX_PAGES is the pack's page contract: this design set is a two-page daily guide,
-// so a render that overruns is a fault to fix (by drawing the figures smaller), not a
-// longer document to accept. Packs without it are unconstrained.
+// NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then
+// re-condensed the lesson tighter and shrank the figures until the render fitted it.
+// That made the page count the thing being satisfied and the teacher's words the thing
+// being sacrificed. The raw lesson is the source of truth: pagination now follows the
+// content, and a lesson that needs three pages gets three pages. The composer numbers
+// «الصفحة ن من م» from the real page count, so nothing downstream assumes two.
+// A pack MAY still declare MAX_PAGES if its design genuinely requires one — the
+// mechanism in pipeline.js is intact, this design just no longer uses it.
 // CHARACTER_CAST: false — this design set has no slot for decorative characters. The
 // legacy fallback (add a cast when a lesson has no content images) was injecting one
-// into the homework card and pushing zero-artwork lessons onto a third page.
-module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom', MAX_PAGES: 2, CHARACTER_CAST: false };
+// into the homework card.
+module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom', CHARACTER_CAST: false };

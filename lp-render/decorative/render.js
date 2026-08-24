@@ -690,10 +690,11 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
   let prevHeading = '';
   const rot = { n: 0, t: 0, seed: seedOf(`${meta.id || ''}|${meta.subject || ''}|${meta.title || ''}`) };
   const used = new Set(); // no character repeats within one lesson
-  // How many step sets may take the card's full width. Each spanning stacked block
-  // costs roughly 200px, so a lesson that gives every stage one cannot hold two pages
-  // however terse its text. The first two span; the rest ride the figure column.
-  const SPANNING_STEP_BUDGET = 2;
+  // How many step sets may take the card's full width. This was two because a spanning
+  // block costs ~200px and more than two could not hold a two-page contract. With no
+  // page contract the limit is legibility, not height: a spanning set reads better, so
+  // let every step set that wants the width have it.
+  const SPANNING_STEP_BUDGET = Infinity;
   const spanningSteps = new Set();
   {
     let n = 0;
