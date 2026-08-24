@@ -74,7 +74,7 @@ function handler(req, res) {
       try {
         const parsedBody = JSON.parse(body);
         const { content, region } = parsedBody;
-        // Default ON — clients that predate the checkbox get the 2-page guide too.
+        // Default ON — clients that predate the checkbox get the guide structure too.
         const guide2p = parsedBody.guide2p !== false;
         let parsed = null; let structured = null;
         // First, try to read the paste as a ready content JSON.
@@ -95,15 +95,16 @@ function handler(req, res) {
         // declares), 'default' = force the default theme, '<code>' = that design pack.
         if (region === 'default') { parsed.meta = { ...(parsed.meta || {}) }; delete parsed.meta.region; log('Region: forced default theme (picker).'); }
         else if (region) { parsed.meta = { ...(parsed.meta || {}), region }; log(`Region: "${region}" design pack (picker).`); }
-        // 2-page guide (default ON): condense the full lesson into the design sets'
-        // teacher-facing 12-role template before rendering. Content already in the
-        // guide shape passes through untouched.
+        // GUIDE STRUCTURE (default ON): map the full lesson onto the design set's
+        // teacher-facing 12-role template before rendering. This is a structural
+        // mapping, not a length target — it does not exist to hit a page count.
+        // Content already in the guide shape passes through untouched.
         const srcForValidation = parsed; // the structured lesson, before condensing
         let figureReport = null;
         const looksLikeGuide = Array.isArray(parsed.sections) && parsed.sections.some((x) => x && x.id === 'stage-tamhid');
         if (guide2p && !looksLikeGuide) {
-          if (!process.env.KIE_API_KEY) throw new Error('The 2-page guide needs a kie.ai key for the condense step.');
-          log('Condensing the full lesson into the 2-page guide template…');
+          if (!process.env.KIE_API_KEY) throw new Error('The guide structure needs a kie.ai key for the condense step.');
+          log('Mapping the full lesson onto the guide template…');
           const keepRegion = parsed.meta && parsed.meta.region;
           parsed = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log });
           if (keepRegion) parsed.meta = { ...(parsed.meta || {}), region: keepRegion };
@@ -128,18 +129,14 @@ function handler(req, res) {
           figureReport = validateFigures(parsed, { source: srcForValidation, log });
           structured = JSON.stringify(parsed, null, 2);
         }
-        let { png, pdf, stats, contentId, locale, maxPages, stripHeight, pageBudget } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)
-        // The region pack states its page contract (Yemen: two pages). Fall back to the
-        // 2-page checkbox when a pack does not declare one.
-        const pageLimit = maxPages || (guide2p ? 2 : null);
-        // Fit loop: the guide promises 2 pages — if the condensed lesson still paginates
-        // longer, re-condense with escalating tightness (up to two retries: dense
-        // lessons at large type sizes routinely survive a single pass).
+        let { png, pdf, stats, contentId, locale, maxPages } = await renderLessonImage(parsed, { log, pdf: true }); // PNG preview + PDF download (final product)
+        // PAGE COUNT FOLLOWS THE CONTENT. A pack may still declare MAX_PAGES, but the
+        // guide checkbox no longer implies one: it selects the 12-role guide STRUCTURE,
+        // not a length. Nothing below re-condenses or shrinks anything to hit a page
+        // target — the raw lesson is the source of truth and the document is as long as
+        // the lesson needs.
+        const pageLimit = maxPages || null;
         const pageCount = (buf) => ((buf || '').toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
-        const TIGHTEN = [
-          'The previous attempt was TOO LONG. Cut every word budget by a third; keep only the most essential sentence in each stage body. KEEP EVERY FIGURE — each stage that had an "image" or "codeFigure" must still have one; cut WORDS, never visuals.',
-          'STILL TOO LONG. Halve every word budget: stage bodies ≤ 14 words (one imperative sentence), goal ≤ 14, errors sides ≤ 12, solutions items ≤ 12, homework ≤ 20, glossary values ≤ 5, multigrade lines ≤ 8. KEEP EVERY FIGURE — the figures carry the lesson, so never drop an "image" or "codeFigure" to save space; cut words only.',
-        ];
         // A tightening pass rewrites the guide, and it has been observed dropping
         // every stage figure despite being told not to. Snapshot the figures and put
         // back whatever a pass loses: the loop is for cutting words, not visuals.
@@ -175,31 +172,9 @@ function handler(req, res) {
           if (restored) log(`  ↺ restored ${restored} figure(s) the tightening pass dropped — the fit loop cuts words, not visuals`);
           return g;
         };
-        const figSnapshot = snapshotFigures(parsed);
-        // DENSITY FIRST: a guide that overruns because its figures are large is fixed
-        // by drawing them a little smaller, which costs nothing and keeps every figure.
-        // Only when that is not enough do we start cutting the teacher's words.
-        if (pageLimit && pdf && pageCount(pdf) > pageLimit) {
-          // Step down until it fits, then step back UP to the midpoint of the last
-          // failure — a coarse ladder overshoots and leaves the figures smaller than
-          // the page actually requires (88% fitted with 189px still spare).
-          let lastFail = 1;
-          for (const scale of [0.94, 0.86, 0.78, 0.7, 0.62]) {
-            const attempt = await renderLessonImage(parsed, { log, pdf: true, figureScale: scale });
-            if (pageCount(attempt.pdf) > pageLimit) { lastFail = scale; continue; }
-            let best = { attempt, scale };
-            const mid = Math.round(((scale + lastFail) / 2) * 100) / 100;
-            if (mid > scale + 0.02) {
-              const up = await renderLessonImage(parsed, { log, pdf: true, figureScale: mid });
-              if (up.pdf && pageCount(up.pdf) <= pageLimit) best = { attempt: up, scale: mid };
-            }
-            // stripHeight MUST come along: the page-filling pass below reads it, and
-            // leaving it stale meant that pass never ran.
-            ({ png, pdf, stats, contentId, locale, stripHeight } = best.attempt);
-            log(`  ✓ fits ${pageLimit} page(s) at ${Math.round(best.scale * 100)}% figure density — no text was cut`);
-            break;
-          }
-        }
+        // (The figure-shrinking ladder that used to run here is gone with the page
+        // contract: figures were being drawn down to 62% to buy a page that no longer
+        // needs buying. They now render at their designed size.)
         // Everything from here on is an OPTIMISATION of a render we already have. A
         // flaky model call must not cost us the lesson: keep the last good state and
         // fall back to it. (A corpus run lost a whole lesson to one bad response.)
@@ -209,17 +184,12 @@ function handler(req, res) {
           log(`  ⚠ ${why} — keeping the last good render instead of failing the lesson`);
           ({ parsed, structured, png, pdf, stats, contentId, locale } = best);
         };
-        for (let pass = 0; guide2p && pdf && pageCount(pdf) > 2 && !looksLikeGuide && pass < TIGHTEN.length; pass++) {
-          log(`Guide came out ${pageCount(pdf)} pages — re-condensing tighter (pass ${pass + 1})…`);
-          const keepRegion2 = parsed.meta && parsed.meta.region;
-          try {
-            parsed = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log, extra: TIGHTEN[pass] });
-            if (keepRegion2) parsed.meta = { ...(parsed.meta || {}), region: keepRegion2 };
-            parsed = restoreFigures(parsed, figSnapshot);
-            structured = JSON.stringify(parsed, null, 2);
-            ({ png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }));
-            keepBest();
-          } catch (e) { revert(`tightening pass ${pass + 1} failed (${e.message})`); break; }
+        if (pdf) log(`Guide rendered at ${pageCount(pdf)} page(s) — length follows the lesson, nothing was cut to fit.`);
+        // A pack may still declare a page contract. It is now REPORTED, not enforced:
+        // the operator learns the design's expectation without the lesson being
+        // rewritten or the figures shrunk behind their back.
+        if (pageLimit && pdf && pageCount(pdf) > pageLimit) {
+          log(`  ℹ this design pack declares MAX_PAGES=${pageLimit}; the lesson rendered ${pageCount(pdf)} page(s). Reported only — no text was cut and no figure was shrunk.`);
         }
         // Whatever the rolls did, no stage ships as bare prose: a narrow text-only
         // figure pass fills the gaps from the guide's own words, then we re-render.
@@ -237,20 +207,8 @@ function handler(req, res) {
             if (bareCount() < before) {
               structured = JSON.stringify(parsed, null, 2);
               ({ png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }));
-              // The figures we just added are what must survive the next tightening, so
-              // snapshot AFTER the figure pass — snapshotting the tightened guide would
-              // restore nothing.
-              const snapAfterPass = snapshotFigures(parsed);
-              // the added visuals can push the page count, so tighten once more if needed
-              for (let pass = 0; pdf && pageCount(pdf) > 2 && pass < TIGHTEN.length; pass++) {
-                log(`Guide is ${pageCount(pdf)} pages after the figure pass — tightening (pass ${pass + 1})…`);
-                const keepR = parsed.meta && parsed.meta.region;
-                parsed = await condenseToGuide(parsed, { apiKey: process.env.KIE_API_KEY, log, extra: TIGHTEN[pass] });
-                if (keepR) parsed.meta = { ...(parsed.meta || {}), region: keepR };
-                parsed = restoreFigures(parsed, snapAfterPass);
-                structured = JSON.stringify(parsed, null, 2);
-                ({ png, pdf, stats, contentId, locale } = await renderLessonImage(parsed, { log, pdf: true }));
-              }
+              // Figures added here simply make the document longer if they need to;
+              // there is no tightening pass to claw the space back.
             }
             } catch (e) { revert(`the figure pass failed (${e.message})`); }
           }
@@ -274,23 +232,9 @@ function handler(req, res) {
             } catch (e) { revert(`the artwork retry failed (${e.message})`); }
           }
         }
-        // FILL THE PAGE. Density has only ever shrunk figures; a lesson that lands with
-        // hundreds of pixels spare reads as unfinished, and the figures are exactly what
-        // should have been bigger. Grow them while the page contract still holds.
-        if (pageLimit && pdf && pageCount(pdf) <= pageLimit && stripHeight && pageBudget) {
-          const slack = pageBudget - stripHeight;
-          if (slack > 150) {
-            log(`Page has ${slack}px spare — trying larger figures…`);
-            for (const scale of [1.3, 1.15]) {
-              const attempt = await renderLessonImage(parsed, { log, pdf: true, figureScale: scale });
-              if (attempt.pdf && pageCount(attempt.pdf) <= pageLimit) {
-                ({ png, pdf, stats, contentId, locale, stripHeight } = attempt);
-                log(`  ✓ figures drawn at ${Math.round(scale * 100)}% — the page is fuller`);
-                break;
-              }
-            }
-          }
-        }
+        // (The page-filling upscale that used to run here is gone too: it grew figures
+        // to consume leftover space inside a fixed budget. With no budget there is no
+        // leftover to fill.)
         // Keep every rendered lesson in the repo (pdf + png + the content JSON used).
         try {
           const dir = path.join(ROOT, 'assets/generated/lessons');

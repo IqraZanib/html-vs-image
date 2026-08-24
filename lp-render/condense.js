@@ -1,5 +1,5 @@
 'use strict';
-// Condense a FULL lesson content JSON into the 2-page "daily guide" template — the
+// Map a FULL lesson content JSON onto the "daily guide" template — the
 // region design sets' teacher-facing format (12 role sections, see
 // decorative/regions/<region>/DESIGN.md). Same provider/key as the structurer.
 // It condenses ONLY from the source (never invents facts), keeps the lesson's
@@ -11,7 +11,7 @@ const { fixGuide } = require('./text/arabic-hygiene');
 
 const CHAT_URL = 'https://api.kie.ai/gpt-5-2/v1/chat/completions';
 
-const SYSTEM = `You condense a FULL lesson-plan JSON into a compact 2-page "daily teacher guide" JSON for the same renderer.
+const SYSTEM = `You map a FULL lesson-plan JSON onto a "daily teacher guide" JSON for the same renderer.
 
 Output ONLY the JSON object — no markdown, no prose, no code fences.
 
@@ -52,7 +52,7 @@ __IMAGES_BLOCK__
 HARD RULES:
 - Everything condensed FROM THE SOURCE ONLY — never invent facts, names, numbers or answers.
 - Keep the lesson's language for ALL reader-visible text. No English scaffolding labels inside a non-English lesson.
-- The total body text must fit 2 A4 pages: respect every word budget; prefer dropping detail over exceeding budgets.`;
+- Respect every word budget: the text is a terse sidebar next to the figures. There is NO page target — the guide is as long as the lesson needs, so never drop teaching detail to save space.`;
 
 // Figure policy is part of a REGION'S DESIGN SET, not global editorial policy.
 // Regions whose approved design is figure-rich (every card teaches inside the
@@ -99,7 +99,7 @@ const IMAGES_RICH_HYBRID = `IMAGES — HYBRID FIGURES: the image model draws TEX
 
 WHAT EACH SECTION CARRIES:
 - stage-tamhid, stage-arad, stage-tatbiq, stage-taqwim: each carries EITHER an authored textless image ("image": "<id>") OR a CODE-DRAWN figure ("codeFigure"). *** PREFER codeFigure whenever the teaching point is a direction, a comparison, a count, a part-of-a-whole, a fraction, or a key expression — the renderer draws those exactly and legibly. Use a generated image only for real-world scenes, people and objects (supporting artwork). ***
-  AT LEAST ONE PICTURE, AT MOST ONE WIDE DIAGRAM: give at least ONE stage a textless illustration ("image") so the page has a real picture on it — a scene of children or objects, no words in it. And use at most ONE wide code visual per lesson (a "process", a "labeled-parts" diagram, or a "steps" set of 4+ cards): those span the whole card, and two of them will not fit two pages. A "steps" set of 2 or 3 cards is NOT wide — prefer that shape, and use it as often as it helps.
+  AT LEAST ONE PICTURE, AT MOST ONE WIDE DIAGRAM: give at least ONE stage a textless illustration ("image") so the page has a real picture on it — a scene of children or objects, no words in it. Wide code visuals (a "process", a "labeled-parts" diagram, or a "steps" set of 4+ cards) span the whole card: use them where the concept genuinely needs the width, and prefer a "steps" set of 2 or 3 cards otherwise because it reads well in the figure column. Length is not a constraint — do not drop a visual to save space.
   VISUAL DENSITY — READ THIS TWICE. A stage that is only a paragraph of instructions is a failure: teachers reported the pages as text-heavy. EVERY stage section must carry a figure — a textless illustration where the point is a real scene, a codeFigure everywhere else — and when a stage is mostly instructions, give it a "steps" card set built from the stage's own words. Keep each stage's prose SHORT (one or two sentences) and let the visual carry the rest. The "solutions" and "homework" sections may each carry a codeFigure too (e.g. "steps" for what to do at home). Never invent content for a figure: every label must be a word the lesson already uses.
   BALANCE: use a codeFigure wherever exactness matters and never the same figure twice; the other stages carry textless illustrations as supporting artwork. There is no fixed figure count — give a stage a figure when it earns one, and leave prose alone when a figure would only decorate. The errors board does not count towards the three.
   codeFigure kinds — pick the one that fits, all take optional "label" (big caption under the drawing, Eastern numerals) and "caption" (short Arabic line):
@@ -369,21 +369,19 @@ async function addFiguresToGuide(guide, { apiKey, fetchImpl = defaultFetch, log 
   return { guide: applyFigureBalance(guide), added };
 }
 
-// The figure-balance rules, applied to any guide: identical visuals are duplicates,
-// a stage may carry a code visual and up to two supporting sections may too, and only
-// one card-spanning visual fits two pages. Callable so the figure pass obeys them too.
+// The figure-balance rules, applied to any guide: identical visuals are duplicates, a
+// stage may carry a code visual and up to two supporting sections may too. There is no
+// longer a cap on card-spanning visuals — that cap existed to protect a two-page
+// contract, and deleting a teaching figure to save page height is exactly what the
+// raw lesson is not supposed to pay for. Callable so the figure pass obeys them too.
 function applyFigureBalance(out) {
 
   const sig = (cf) => JSON.stringify([cf.kind, cf.shape, cf.parts, cf.shaded, cf.total, cf.north, cf.east, cf.text,
     (cf.items || []).map((i) => i.label), (cf.stages || []).map((i) => i.label), (cf.parts || []).map ? (cf.parts || []).map((p) => p && p.label) : cf.parts]);
-  const seen = new Set(); let stageCount = 0, sideCount = 0, wideCount = 0;
+  const seen = new Set(); let stageCount = 0, sideCount = 0;
   const STAGES = new Set(['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim']);
-  // A figure that must span the card costs real page height, and two pages will
-  // not hold more than one of them.
-  // Only these always need the card's width. Whether a STEP SET spans is a layout
-  // call the renderer makes — it can see how many are on the page — and the condenser
-  // must never delete a teaching step to influence layout.
-  const spansCard = (cf) => cf.kind === 'process' || cf.kind === 'labeled-parts';
+  // Whether a STEP SET spans the card is a layout call the renderer makes, and the
+  // condenser must never delete a teaching step to influence layout.
   for (const s of out.sections) {
     if (!s || !s.codeFigure || s.codeFigure.kind === 'error-board') continue;
     const k = sig(s.codeFigure);
@@ -391,11 +389,6 @@ function applyFigureBalance(out) {
     // Duplicates never survive. Beyond that: every stage may carry a code visual,
     // and up to two supporting sections (solutions, homework, goal …) may too.
     if (seen.has(k) || (isStage ? stageCount >= 4 : sideCount >= 2)) { delete s.codeFigure; continue; }
-    // Two card-spanning visuals fit; a third costs a page, so it goes.
-    if (spansCard(s.codeFigure)) {
-      if (wideCount >= 2) { delete s.codeFigure; continue; }
-      wideCount++;
-    }
     seen.add(k); if (isStage) stageCount++; else sideCount++;
   }
   // The model's job is supporting pictures; the teaching visuals are code. Two
@@ -581,7 +574,7 @@ async function condenseToGuide(content, { apiKey, fetchImpl = defaultFetch, log 
     out.images = [];
   }
   if (out.meta) delete out.meta.banner;
-  log(`Condensed to the 2-page guide: ${out.sections.length} sections, ${out.images.length} reused image(s).`);
+  log(`Mapped onto the guide template: ${out.sections.length} sections, ${out.images.length} reused image(s).`);
   return out;
 }
 
