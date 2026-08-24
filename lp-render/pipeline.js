@@ -14,6 +14,15 @@ const { renderDecorativeLesson } = require('./decorative/render');
 const { htmlToPixelPdf } = require('./render/png-to-pdf');
 const { ensureCast } = require('./decorative/characters');
 const store = require('./store/assets');
+const { resolveRegion } = require('../imagegen/prompts/regions');
+const { fixGuide } = require('./text/arabic-hygiene');
+
+// An image the generator has already given up on must not be attempted again inside
+// the same run. The fit/density loop re-renders a lesson several times, and each
+// re-render was retrying every dropped image from scratch — including its culture
+// re-rolls — so one stubborn brief could cost a dozen generations and minutes of wall
+// clock. Remember the failure and make that decision once.
+const GAVE_UP = new Set();
 const { resolveSegmentImages } = require('../imagegen');
 const { chromium } = require('../node_modules/playwright-core');
 
@@ -64,13 +73,30 @@ async function renderLessonImage(content, opts = {}) {
   const meta = content.meta || {};
   const locale = meta.locale || 'en';
   const contentId = meta.id || 'lesson';
+  // A guide handed straight to the renderer (a re-render of something already
+  // reviewed) must get the same corrections as a freshly condensed one — otherwise the
+  // fixes only reach new content.
+  if (String(locale).startsWith('ar')) fixGuide(content, { log });
   const wanted = Array.isArray(content.images) ? content.images : [];
   const statsOut = { restored: 0, generated: 0, dropped: 0 };
 
   const imagesMap = {};
   const toGen = [];
+  // Cache identity = the brief + the region + that region's art-direction version.
+  // Keyed on the brief alone, changing how Yemeni teachers are dressed changed
+  // nothing: every lesson just restored the old picture.
+  const artRegion = String(meta.region || ({ sw: 'ke', ar: 'ye' })[locale] || 'pk').toLowerCase();
+  const artVersion = (resolveRegion(artRegion) || {}).version || 1;
+  const cacheKey = (prompt) => store.keyFor(`${prompt}|region:${artRegion}|art:v${artVersion}`);
   for (const im of wanted) {
-    const key = store.keyFor(im.prompt);
+    const key = cacheKey(im.prompt);
+    if (GAVE_UP.has(key)) { statsOut.dropped++; log(`  ⊘ image "${im.id}" skipped — already rejected earlier in this run`); continue; }
+    const priorReject = store.isRejected(key);
+    if (priorReject) {
+      statsOut.dropped++;
+      log(`  ⊘ image "${im.id}" skipped — rejected on an earlier run (${priorReject.reason}); set LP_RETRY_REJECTED=1 to try again`);
+      continue;
+    }
     if (!fresh) {
       const hit = store.get(key);
       if (hit) { imagesMap[im.id] = { dataUri: hit.dataUri, label: im.label, cover: im.concept !== 'diagram' }; statsOut.restored++; log(`  ⤿ image "${im.id}" restored from store (no credits)`); continue; }
@@ -109,16 +135,46 @@ async function renderLessonImage(content, opts = {}) {
         store.put(key, dataUri, { model: got.model, concept: im.concept, prompt: im.prompt });
         imagesMap[im.id] = { dataUri, label: im.label, cover: im.concept !== 'diagram' };
         statsOut.generated++; log(`  ✓ image "${im.id}" generated (${got.model}) → saved to store`);
-      } else { statsOut.dropped++; log(`  ✗ image "${im.id}" dropped — no model passed the quality gate`); }
+      } else {
+        statsOut.dropped++;
+        // Say WHY: a regional-fit rejection is a different problem from a generation
+        // failure, and the operator needs to know which one happened.
+        const why = (got && got.reason) || 'no model passed the quality gate';
+        log(`  ✗ image "${im.id}" dropped — ${why}`);
+        GAVE_UP.add(key); // do not pay for this again on the next re-render
+        // and remember it across runs: the gates will not change their mind by themselves
+        if (/culture_reject/.test(why)) store.markRejected(key, why);
+      }
     }
   } else if (wanted.length) {
     log('All content images restored from the store — no credits spent.');
   }
 
+  // Load the region design pack FIRST: it may switch off features that predate it
+  // (the character cast, below) and it carries the page contract.
+  let regionPack = null;
+  const themeRegion = String(meta.region || '').toLowerCase();
+  if (themeRegion) {
+    // Cache-busted so a long-running server (LP Studio) always serves the pack's
+    // CURRENT code — theme edits apply on the next render, no restart needed.
+    try {
+      const themePath = require.resolve(`./decorative/regions/${themeRegion}/theme`);
+      delete require.cache[themePath];
+      regionPack = require(themePath);
+    } catch (_) { /* no design pack for this region — default look */ }
+  }
   // Characters are a fallback: only build the (region-appropriate) cast when the
   // lesson has no content images. Region follows the language (ar→Yemen, sw→Kenya).
   const anyImage = Object.values(imagesMap).some((im) => im && im.dataUri);
-  const cast = anyImage ? {} : await ensureCast({ apiKey, gatePolicy, locale });
+  // A pack with its own approved design has no slot for decorative characters — and
+  // the cast is a generator, so letting it fire also spends credits and page height a
+  // fixed-format design cannot afford. Corpus runs showed it pushing zero-artwork
+  // lessons onto a third page.
+  const castAllowed = !(regionPack && regionPack.CHARACTER_CAST === false);
+  // Code-only mode spends nothing: the character cast is a generator too, so skip it.
+  const cast = (anyImage || !castAllowed || process.env.LP_NO_IMAGES === '1')
+    ? {} : await ensureCast({ apiKey, gatePolicy, locale });
+  if (!anyImage && !castAllowed) log('  (no illustration in this lesson; this design set does not use the character cast)');
   const { headerHtml, bodyHtml, headCss } = renderDecorativeLesson(content, imagesMap, cast);
   let html = buildShell({ headerHtml, bodyHtml, locale, title: meta.title || contentId });
   // Region DESIGN PACK: each region with an approved design set owns a folder
@@ -129,20 +185,25 @@ async function renderLessonImage(content, opts = {}) {
   // or changing one pack cannot affect another region's output.
   let regionCss = '';
   let regionPageStyle = '';
-  const themeRegion = String(meta.region || '').toLowerCase();
-  if (themeRegion) {
-    // Cache-busted so a long-running server (LP Studio) always serves the pack's
-    // CURRENT code — theme edits apply on the next render, no restart needed.
+  let regionMaxPages = null;
+  let overflowFindings = [];
+  if (regionPack) {
     try {
-      const themePath = require.resolve(`./decorative/regions/${themeRegion}/theme`);
-      delete require.cache[themePath];
-      const pack = require(themePath);
+      const pack = regionPack;
       regionCss = pack.THEME_OVERRIDE_CSS || '';
       regionPageStyle = pack.PAGE_NUMBER_STYLE || '';
+      regionMaxPages = Number(pack.MAX_PAGES) || null;
       log(`  ⛨ region design pack "${themeRegion}" applied`);
     } catch (_) { /* no design pack for this region — default look */ }
   }
   html = html.replace('</head>', `<style>${THEME_CSS}</style>${regionCss ? `<style>${regionCss}</style>` : ''}${headCss ? `<style>${headCss}</style>` : ''}</head>`);
+  // Figure density: a caller that has to fit a fixed number of pages can shrink
+  // every figure together rather than lose one. 1 (or absent) changes nothing.
+  const figureScale = Number(opts.figureScale);
+  if (figureScale > 0 && figureScale !== 1) {
+    html = html.replace('</head>', `<style>:root{--figscale:${figureScale}}</style></head>`);
+    log(`  ⤡ figure density ${Math.round(figureScale * 100)}% (fitting the page budget)`);
+  }
 
   // The PDF is a second full render; skip it when only the PNG is needed (e.g. the web
   // interface) to roughly halve the render step.
@@ -153,7 +214,16 @@ async function renderLessonImage(content, opts = {}) {
     // preview, no section leaking, real margins. Falls back to the Chromium vector PDF if
     // python3 + pillow + img2pdf are not available.
     try {
-      pdf = await htmlToPixelPdf(html, regionPageStyle ? { pageStyle: regionPageStyle, footerText: (content.meta && content.meta.footer) || '' } : {});
+      // No instructional text may leave its container: the composer measures the real
+      // laid-out DOM and reports before the PDF is built.
+      const onFindings = (list) => {
+        for (const f of (list || []).slice(0, 8)) log(`  ⚠ ${f.kind}: «${f.text}» does not fit inside its box`);
+        if ((list || []).length > 8) log(`  ⚠ …and ${list.length - 8} more overflow finding(s)`);
+        overflowFindings = list || [];
+      };
+      pdf = await htmlToPixelPdf(html, regionPageStyle
+        ? { pageStyle: regionPageStyle, footerText: (content.meta && content.meta.footer) || '', onFindings }
+        : { onFindings });
     } catch (e) {
       log(`  (pixel-perfect PDF unavailable — ${e.message}; using vector fallback)`);
       pdf = await htmlToPdf(html, { pageMode: 'paged', pdfOptions: { printBackground: true } });
@@ -161,7 +231,14 @@ async function renderLessonImage(content, opts = {}) {
     }
   }
   const png = await screenshot(html);
-  return { png, pdf, html, contentId, locale, stats: statsOut };
+  // Report how full the page is, so a caller with a page contract can not only shrink
+  // figures to fit but GROW them to fill: a lesson that lands with 450px spare reads
+  // as unfinished, and its figures were the thing that should have been bigger.
+  let stripHeight = null;
+  try { stripHeight = png && png.length > 24 ? Buffer.from(png).readUInt32BE(20) : null; } catch (_) { /* not a PNG buffer */ }
+  const usablePerPage = 1123 - 28 - (regionPageStyle === 'ar-bottom' ? 36 : 12);
+  const pageBudget = regionMaxPages ? regionMaxPages * usablePerPage : null;
+  return { png, pdf, html, contentId, locale, stats: statsOut, maxPages: regionMaxPages, stripHeight, pageBudget, overflow: overflowFindings };
 }
 
 module.exports = { renderLessonImage, ROOT };

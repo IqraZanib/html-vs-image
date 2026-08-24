@@ -4,7 +4,13 @@ const https = require('node:https');
 const BASE = 'https://api.kie.ai/api/v1';
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
-function defaultFetch(url, { method = 'GET', headers = {}, body } = {}) {
+// A stalled connection used to hang forever: no socket timeout meant the promise
+// never settled, so one bad request could freeze a render (and a batch of them)
+// indefinitely. Every call now fails loudly after a bounded wait — the callers all
+// have retry or fallback paths, but only if they get an answer.
+const FETCH_TIMEOUT_MS = Number(process.env.KIE_FETCH_TIMEOUT_MS || 180000);
+
+function defaultFetch(url, { method = 'GET', headers = {}, body, timeoutMs = FETCH_TIMEOUT_MS } = {}) {
   return new Promise((resolve, reject) => {
     const u = new URL(url);
     const req = https.request({ method, hostname: u.hostname, path: u.pathname + u.search, headers }, (r) => {
@@ -12,6 +18,7 @@ function defaultFetch(url, { method = 'GET', headers = {}, body } = {}) {
       r.on('data', (d) => c.push(d));
       r.on('end', () => resolve({ statusCode: r.statusCode, body: Buffer.concat(c).toString('utf8') }));
     });
+    req.setTimeout(timeoutMs, () => req.destroy(new Error(`request timed out after ${timeoutMs}ms`)));
     req.on('error', reject);
     if (body) req.write(body);
     req.end();

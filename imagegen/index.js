@@ -4,6 +4,7 @@ const { route } = require('./route');
 const { resolvePrompt } = require('./prompts/build');
 const { generateImage } = require('./kie/generate');
 const { checkImage } = require('./quality_gate');
+const { checkCulture, cultureRulesFor } = require('./culture_gate');
 const { cacheKey, MemoryAssetCache } = require('./cache');
 const { BudgetGuard } = require('./budget');
 
@@ -13,7 +14,7 @@ const { BudgetGuard } = require('./budget');
 async function resolveSegmentImages(segment = {}, opts = {}) {
   const {
     apiKey, region = segment.region || 'pk',
-    generateImpl = generateImage, gateImpl = checkImage,
+    generateImpl = generateImage, gateImpl = checkImage, cultureImpl = checkCulture,
     cache = new MemoryAssetCache(), budget = new BudgetGuard(),
   } = opts;
 
@@ -32,6 +33,7 @@ async function resolveSegmentImages(segment = {}, opts = {}) {
 
     let resolved = null;
     let lastRejected = null; // gate-soft: presence beats absence (owner decision 2026-08-18)
+    let culturallyRejected = null; // regional mismatch is NOT shipped, even soft
     for (const model of ladder) {
       const key = cacheKey(category, prompt, model);
       const cached = await cache.get(key);
@@ -48,6 +50,29 @@ async function resolveSegmentImages(segment = {}, opts = {}) {
       const gate = await gateImpl({ apiKey, imageUrl: gen.url, expectation, policy: opts.gatePolicy });
       report.push({ blockType: block.type, model, credits: gen.creditsConsumed, gate: gate.pass, reason: gate.reason });
       if (!gate.pass) lastRejected = { model, asset: { url: gen.url, model }, credits: gen.creditsConsumed, reason: 'gate_soft: shipped unverified (' + gate.reason + ')' };
+      // REGIONAL FIT: the prompt asks for the region's dress and setting; this checks
+      // the pixels and re-rolls when the model ignored it. A culturally wrong picture
+      // in a Yemeni classroom is worse than none, so we do not ship a failure.
+      if (gate.pass && cultureRulesFor(region)) {
+        const wantTextless = /no text|no letters|wordless/i.test(prompt) || process.env.LP_FIGURE_MODE === 'hybrid';
+        let fit = await cultureImpl({ apiKey, imageUrl: gen.url, region, textless: wantTextless });
+        let rolls = 0;
+        while (fit.checked && !fit.pass && rolls < 2) {
+          rolls++;
+          report.push({ blockType: block.type, model, event: 'culture_reroll', reason: fit.reason });
+          const re = await generateImpl({ apiKey, model, prompt });
+          if (!re.ok) break;
+          if (typeof re.creditsConsumed === 'number') budget.spend(re.creditsConsumed);
+          gen = re;
+          fit = await cultureImpl({ apiKey, imageUrl: gen.url, region, textless: wantTextless });
+        }
+        report.push({ blockType: block.type, model, event: 'culture', pass: fit.pass, checked: fit.checked, reason: fit.reason, rolls });
+        if (fit.checked && !fit.pass) {
+          // exhausted the re-rolls: leave the slot empty rather than ship a mismatch
+          culturallyRejected = { reason: `culture_reject after ${rolls} re-roll(s): ${fit.reason}` };
+          continue;
+        }
+      }
       if (gate.pass) {
         const asset = { url: gen.url, model };
         await cache.set(key, asset);
@@ -58,6 +83,11 @@ async function resolveSegmentImages(segment = {}, opts = {}) {
 
     // Gate-soft policy: a rejected-but-generated image beats an empty slot. The
     // reason string carries the gate verdict so logs show what shipped unverified.
+    // Gate-soft does NOT extend to a regional mismatch: a Western-looking teacher in a
+    // Yemeni lesson is a wrong picture, not an unverified one.
+    if (!resolved && culturallyRejected) {
+      return { blockType: block.type, category, needsImage: true, model: null, asset: null, reason: culturallyRejected.reason };
+    }
     if (!resolved && lastRejected) resolved = lastRejected;
     return resolved
       ? { blockType: block.type, category, needsImage: true, model: resolved.model, asset: resolved.asset, reason: resolved.reason, creditsConsumed: resolved.credits }

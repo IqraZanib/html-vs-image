@@ -229,7 +229,11 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
       figure-driven cards (تطبيق/تقويم) keep flow layout. */
 .section.sec-stage-tamhid .d-inline-img,.section.sec-stage-arad .d-inline-img{position:relative;align-self:stretch;min-height:230px}
 .section.sec-stage-tamhid .d-inline-img img,.section.sec-stage-arad .d-inline-img img{position:absolute;left:0;top:0;width:100%;height:calc(100% - 24px);object-fit:contain;max-height:none}
-.section.sec-stage-tamhid .d-inline-img .cap,.section.sec-stage-arad .d-inline-img .cap{position:absolute;bottom:0;left:0;right:0}
+/* This pins the caption to the bottom of a hero IMAGE, whose box is positioned. A
+   CODE figure's box is static, so an absolute caption escaped it and landed at the
+   foot of the page — two of them stacked on each other, 440px from their figures.
+   Restrict it to real images. */
+.section.sec-stage-tamhid .d-inline-img:not(.d-code-fig) .cap,.section.sec-stage-arad .d-inline-img:not(.d-code-fig) .cap{position:absolute;bottom:0;left:0;right:0}
 .section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:166px}
 /* 7) footer: stronger, pilot-proportioned band */
 .lp-footer{border-top:2px solid var(--navy);font-size:11.5px;padding:6px 4px 0;margin:8px 22px 0}
@@ -275,7 +279,7 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-homework .panel.has-inline-img{display:flex;gap:10px;align-items:center}
 .section.sec-homework .panel.has-inline-img .ii-body{display:block;flex:1;min-width:0}
 .section.sec-homework .panel.has-inline-img .d-inline-img{flex:0 0 31%;max-width:230px;position:static;align-self:auto}
-.section.sec-homework .panel.has-inline-img .d-inline-img img{max-height:124px;position:static;height:auto}
+.section.sec-homework .panel.has-inline-img .d-inline-img img{max-height:96px;position:static;height:auto}
 .section.sec-homework .panel.has-inline-img::before{display:none}
 .section.sec-homework .panel.has-inline-img{padding-left:14px}
 
@@ -402,6 +406,268 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-errors .d-inline-img .cap{display:block;background:#fff;border-top:1px solid var(--line);font-size:11.5px;padding:3px 8px;text-align:center}
 .section.sec-stage-tamhid .d-inline-img,.section.sec-stage-arad .d-inline-img{min-height:180px}
 
+
+/* ── ROUND: hybrid figures — code overlays on textless art + SVG math figures ── */
+.ov-wrap{position:relative;display:block}
+.ov{position:absolute;z-index:2;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic',sans-serif}
+.ov-chip{background:#fff;border:1.5px solid var(--navy);color:var(--navy);font-weight:700;font-size:13px;
+  padding:2px 10px;border-radius:9px;box-shadow:0 1px 4px rgba(20,30,60,.18);white-space:nowrap}
+.ov-fraction{background:#fff;border:2px solid var(--navy);border-radius:10px;padding:3px 10px;
+  display:flex;flex-direction:column;align-items:center;line-height:1.05;font-weight:800;color:var(--navy);font-size:15px}
+.ov-fraction .fr-b{display:block;width:16px;border-top:2.5px solid var(--navy);margin:2px 0}
+.ov-top-right{top:6px;right:6px}.ov-top-left{top:6px;left:6px}
+.ov-bottom-right{bottom:6px;right:6px}.ov-bottom-left{bottom:6px;left:6px}
+.ov-top{top:6px;left:50%;transform:translateX(-50%)}.ov-bottom{bottom:6px;left:50%;transform:translateX(-50%)}
+.d-code-fig{background:#fff;display:flex;flex-direction:column;align-items:center;padding:8px 6px 0}
+.d-code-fig .cf-svg{width:82%;max-height:170px}
+.d-code-fig .cf-label{font-weight:800;font-size:22px;color:var(--navy);margin:2px 0 0}
+.tb-label{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--line);
+  border-radius:8px;padding:1px 10px;font-weight:700;font-size:12.5px;color:var(--navy);white-space:nowrap}
+.d-twin-board .tb-half{padding-bottom:26px;background:#fff}
+
+
+/* hybrid fixes: ov-wrap fills the absolute-fill hero slots; compact code figures */
+.section.sec-stage-tamhid .d-inline-img .ov-wrap,.section.sec-stage-arad .d-inline-img .ov-wrap{position:absolute;left:0;right:0;top:0;bottom:24px}
+.section.sec-stage-tamhid .d-inline-img .ov-wrap img,.section.sec-stage-arad .d-inline-img .ov-wrap img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;max-height:none}
+.d-code-fig .cf-svg{max-height:132px}
+.d-code-fig .cf-label{font-size:20px}
+
+
+/* code figures are flow-laid-out even inside the hero slots (the absolute-fill
+   rules are for bitmaps only) — otherwise the SVG + fraction label get clipped */
+.section.sec-stage-tamhid .d-code-fig,.section.sec-stage-arad .d-code-fig{position:static;min-height:0;height:auto;align-self:center;padding:6px 6px 4px}
+.section.sec-stage-tamhid .d-code-fig .cf-svg,.section.sec-stage-arad .d-code-fig .cf-svg{position:static;width:78%;height:auto;max-height:126px}
+.d-code-fig .cf-label{margin-top:1px;line-height:1.1}
+/* on-image chips sit clear of the caption strip */
+.d-inline-img.has-ov .ov-bottom-right{bottom:8px;right:8px}
+
+
+/* ── code-rendered teaching visuals: expressions, and the code-drawn ✗/✓ board ── */
+.cf-expr{font:800 40px 'Noto Naskh Arabic','IBM Plex Sans Arabic',sans-serif;color:var(--navy);
+  padding:14px 6px 8px;text-align:center;line-height:1.1}
+.d-code-board{display:flex;flex-direction:row-reverse;align-items:stretch;gap:0;background:#fff;
+  border:1.5px solid var(--line);border-radius:12px;overflow:hidden;max-width:470px;margin:4px auto 2px}
+.d-code-board .cb-half{flex:1;position:relative;padding:6px 6px 4px;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-start;min-width:0}
+.d-code-board .cb-divider{width:2px;background:var(--line)}
+.d-code-board .cb-mark{position:absolute;top:4px;inset-inline-start:6px;font-size:19px;font-weight:800;line-height:1;
+  width:26px;height:26px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 1px 3px rgba(0,0,0,.22);z-index:1}
+.d-code-board .cb-wrong .cb-mark{color:#c0392b}
+.d-code-board .cb-correct .cb-mark{color:#1e8e4d}
+.d-code-board .cb-vis{width:100%;display:flex;justify-content:center}
+.d-code-board .cb-vis .cf-svg{max-height:104px;width:88%}
+.d-code-board .cb-vis .cf-expr{font-size:30px;padding:8px 4px 2px}
+.d-code-board .cb-label{margin-top:2px;background:#fff;border:1px solid var(--line);border-radius:8px;
+  padding:1px 10px;font-weight:700;font-size:12.5px;color:var(--navy);white-space:nowrap}
+.section.sec-errors .panel.has-twin-board .d-code-board{margin-top:6px}
+
+
+/* process / cycle figures: wider than tall, so let them use the full card width */
+.d-code-fig .cf-svg{max-height:150px}
+.section.sec-stage-tamhid .d-code-fig .cf-svg,.section.sec-stage-arad .d-code-fig .cf-svg{max-height:150px}
+.d-code-fig.cf-wide,.d-inline-img.cf-wide{width:100% !important;max-width:100% !important;flex:0 0 100% !important}
+
+
+/* a process/cycle figure takes the whole card, stacked under the text, so its
+   stage labels stay legible instead of shrinking into the figure column */
+/* the panel is a 3-column grid; span the figure across all of it (no :has()
+   dependency, which some renderers ignore) */
+.panel.has-inline-img .d-code-fig.cf-wide{grid-column:1 / -1;grid-row:auto}
+.panel.has-inline-img .d-code-fig.cf-wide{width:100%;max-width:100%;margin:4px auto 0;padding:2px;position:static;min-height:0}
+.panel.has-inline-img .d-code-fig.cf-wide .cf-svg{width:100%;max-height:112px;position:static}
+
+
+/* step cards and labelled diagrams span the card like a process does; each kind gets
+   the height its drawing actually needs, capped so the lesson still fits two pages */
+.panel.has-inline-img .d-code-fig.cf-k-steps .cf-svg{max-height:118px}
+.panel.has-inline-img .d-code-fig.cf-k-labeled-parts .cf-svg{max-height:192px}
+.section.sec-solutions .d-code-fig.cf-wide .cf-svg,.section.sec-homework .d-code-fig.cf-wide .cf-svg{max-height:96px}
+
+
+/* a stacked step set behaves like a hero figure: it fills the reserved figure
+   column instead of spanning the card, so it adds no page height */
+.panel.has-inline-img .d-code-fig.cf-k-steps:not(.cf-wide){position:static;width:100%;max-width:100%}
+.panel.has-inline-img .d-code-fig.cf-k-steps:not(.cf-wide) .cf-svg{position:static;width:100%;height:auto;max-height:168px}
+.panel.has-inline-img .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:112px}
+
+
+/* the last stage and the closing sections always land on page 2 in this design set,
+   so their figures run a little more compact — shaving page-1 residents instead only
+   moves the page boundary down and gains nothing */
+.section.sec-stage-taqwim .d-code-fig.cf-k-steps:not(.cf-wide) .cf-svg{max-height:126px}
+.section.sec-stage-taqwim .d-code-fig.cf-wide .cf-svg{max-height:100px}
+
+
+/* ───────────────────────────────────────────────────────────────────────────
+   RULE: a status icon never overlaps instructional text. It gets its own slot
+   in the layout, so the text cannot be covered at any size and nothing depends
+   on the icon happening to be small.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* code-drawn ✗/✓ board: each half becomes a two-column grid — a fixed icon column
+   at the RTL start (the right), then the content. The icon spans both content rows,
+   so it stays beside the drawing AND its caption instead of floating over either. */
+.d-code-board .cb-half{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;
+  column-gap:8px;align-items:start;justify-items:center;padding:7px 8px 6px}
+.d-code-board .cb-mark{position:static;grid-column:1;grid-row:1 / span 2;align-self:start;
+  width:23px;height:23px;min-width:23px;font-size:15.5px;box-shadow:none;
+  border:1.6px solid currentColor;background:#fff}
+.d-code-board .cb-vis{grid-column:2;grid-row:1}
+/* the caption may now wrap inside its column rather than run under the icon */
+.d-code-board .cb-label{grid-column:2;grid-row:2;white-space:normal;text-align:center;max-width:100%}
+
+/* twin IMAGE board: the badge moves off the picture into its own row above it, so it
+   can never cover the image's code-rendered label chip. */
+/* with no mini-visuals the board used to collapse to its content, leaving each
+   caption barely 85px and wrapping short labels; hold the full width so a 2-3 word
+   caption stays on one line (and the board stays the height it was) */
+.d-code-board{width:100%}
+
+.d-twin-board .tb-half{display:flex;flex-direction:column;align-items:stretch}
+.d-twin-board .tb-mark{position:static;align-self:flex-start;margin:4px 7px 3px;box-shadow:none;
+  border:1.6px solid currentColor;background:#fff;width:23px;height:23px;font-size:15.5px;
+  display:flex;align-items:center;justify-content:center;border-radius:50%;line-height:1}
+
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Teacher-notes strip: the box is ::after and its ملاحظات tab is ::before on the
+   same section, so neither can measure the other. Their heights were hard-coded
+   separately and drifted — a later round trimmed the box to 66px while the tab
+   stayed at 72px, so the tab stood 8px above the box's top and floated 2px above
+   its bottom. ONE variable now drives both, and the tab is derived from it, so
+   changing the strip's height can never leave the tab behind again.
+   ─────────────────────────────────────────────────────────────────────────── */
+.section.sec-stage-taqwim{--notes-h:66px;--notes-bw:2px}
+/* border-box so --notes-h IS the outer height; padding and the dotted rules are
+   unchanged, so the strip renders exactly as before */
+.section.sec-stage-taqwim::after{box-sizing:border-box;height:var(--notes-h);border-width:var(--notes-bw)}
+/* the tab fills the box's inner height and sits flush in its bottom-inline-start
+   corner, framed by the navy border on three sides instead of overhanging it */
+.section.sec-stage-taqwim::before{height:calc(var(--notes-h) - var(--notes-bw) * 2);
+  bottom:var(--notes-bw);right:var(--notes-bw);background-position:center 7px;padding-bottom:7px;
+  border-radius:0 10px 10px 0}
+
+
+/* ───────────────────────────────────────────────────────────────────────────
+   BIGGER FIGURES. Two things were holding them small:
+   (1) the shared theme caps every inline figure at max-width:240px, so a figure
+       sat in 240px of the 394px column this design set reserves for it;
+   (2) figures scale to CONTAIN, so with the width freed the binding dimension
+       becomes the height cap — raising the cap is what actually enlarges them.
+   Page 1 ends 15px short of its limit, so تمهيد/عرض can only take a little;
+   page 2 had ~114px spare, which goes to تطبيق/تقويم.
+   ─────────────────────────────────────────────────────────────────────────── */
+.panel.has-inline-img .d-inline-img{max-width:100%}
+.panel.has-inline-img .d-code-fig{max-width:100%}
+/* On a card whose figure spans the full width, the text row still used only the
+   narrow first column while the 394px figure column sat empty beside it — so the
+   prose ran 8 lines deep and ate the height the figure wanted. Let the text span
+   both columns on that row; the تحقق sidebar keeps the third. */
+.panel.has-inline-img:has(.cf-wide) .d-step:first-child{grid-column:1 / 3}
+
+/* the figure column, used in full */
+.section.sec-stage-tamhid .d-inline-img,.section.sec-stage-arad .d-inline-img{min-height:196px}
+.section.sec-stage-tatbiq .d-inline-img img,.section.sec-stage-taqwim .d-inline-img img{max-height:196px}
+.section.sec-stage-tatbiq .d-code-fig .cf-svg{max-height:166px;width:100%}
+.section.sec-stage-taqwim .d-code-fig.cf-k-steps:not(.cf-wide) .cf-svg{max-height:170px}
+.section.sec-stage-taqwim .d-code-fig.cf-wide .cf-svg{max-height:140px}
+/* the wide labelled diagram gets the same treatment within what page 1 allows */
+.panel.has-inline-img .d-code-fig.cf-k-labeled-parts .cf-svg{max-height:206px}
+
+
+/* ───────────────────────────────────────────────────────────────────────────
+   FIGURES ARE THE POINT OF THE PAGE — size them generously.
+   On a wide-figure card the تحقق sidebar sat in the text row only, so a 145px
+   sidebar beside 60px of text forced 85px of empty height, and the figure had to
+   fit in what was left. Let the sidebar span BOTH rows: the wasted height goes to
+   the figure instead. Roughly 100px per wide-figure card.
+   ─────────────────────────────────────────────────────────────────────────── */
+.panel.has-inline-img:has(.cf-wide){grid-template-rows:auto auto;align-items:start}
+.panel.has-inline-img:has(.cf-wide) .d-step:first-child{grid-column:1 / 3;grid-row:1}
+.panel.has-inline-img:has(.cf-wide) .d-step:last-child{grid-column:3;grid-row:1 / span 2;align-self:stretch}
+.panel.has-inline-img:has(.cf-wide) .d-code-fig.cf-wide{grid-column:1 / 3;grid-row:2}
+
+
+/* a step ROW spanning the card: tall enough that the numerals and labels read at a
+   glance, which is the whole point of the visual */
+.panel.has-inline-img .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:150px}
+.section.sec-stage-taqwim .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:150px}
+/* a stacked PAIR fills its column instead of sitting small inside it */
+.panel.has-inline-img .d-code-fig.cf-k-steps:not(.cf-wide) .cf-svg{max-height:200px}
+/* the illustration: fill the figure column instead of leaving white space beside a
+   small picture — the box now follows the picture's own 4:3 shape */
+.section.sec-stage-tamhid .d-inline-img,.section.sec-stage-arad .d-inline-img{min-height:242px}
+
+
+/* a spanning STACKED step set: full card width, cards tall enough to read at arm's
+   length — this is the shape that replaced a small figure lost in its column */
+.panel.has-inline-img .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:176px;width:100%}
+.section.sec-stage-taqwim .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:158px}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   FIGURE DENSITY (--figscale, 1 by default so nothing changes at rest).
+   Scaling max-height caps turned out to be useless: a figure is usually smaller
+   than its cap, so lowering the cap moves nothing. What actually governs height
+   is the figure's WIDTH (an SVG keeps its aspect) and the hero floor. Those are
+   what scale here.
+
+   And the hero floor now applies only to a real illustration: a stage carrying a
+   small code figure was paying 242px of empty height for a 120px drawing.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root{--figscale:1}
+/* SHRINK by width (an SVG keeps its aspect, so width governs height) but never grow
+   past the column, or the drawing spills out of its card. */
+.panel.has-inline-img .d-code-fig .cf-svg{width:min(100%, calc(100% * var(--figscale)))}
+.panel.has-inline-img .d-inline-img:not(.d-code-fig) img{max-width:min(100%, calc(100% * var(--figscale)))}
+.d-code-board .cb-vis .cf-svg{width:min(88%, calc(88% * var(--figscale)))}
+/* GROW by cap: when a figure is already as wide as its column, only a taller cap lets
+   it get bigger — which is what fills a page that came out sparse. */
+.section.sec-stage-tamhid .d-inline-img.d-code-fig,.section.sec-stage-arad .d-inline-img.d-code-fig{min-height:0}
+.section.sec-stage-tamhid .d-inline-img:not(.d-code-fig),.section.sec-stage-arad .d-inline-img:not(.d-code-fig){min-height:calc(242px * var(--figscale))}
+.panel.has-inline-img .d-code-fig.cf-k-steps:not(.cf-wide) .cf-svg{max-height:calc(200px * var(--figscale))}
+.section.sec-stage-taqwim .d-code-fig.cf-k-steps:not(.cf-wide) .cf-svg{max-height:calc(170px * var(--figscale))}
+.section.sec-stage-tatbiq .d-code-fig .cf-svg{max-height:calc(166px * var(--figscale))}
+.panel.has-inline-img .d-code-fig.cf-wide .cf-svg{max-height:calc(112px * var(--figscale))}
+/* kind-specific caps must come AFTER the generic cf-wide cap: same specificity, so
+   source order decides, and the generic 112px was silently flattening the labelled
+   diagram to a fifth of the height it was given. */
+.panel.has-inline-img .d-code-fig.cf-k-labeled-parts .cf-svg{max-height:calc(258px * var(--figscale))}
+.panel.has-inline-img .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:calc(176px * var(--figscale))}
+.section.sec-stage-taqwim .d-code-fig.cf-k-steps.cf-wide .cf-svg{max-height:calc(158px * var(--figscale))}
+.section.sec-stage-taqwim .d-code-fig.cf-wide .cf-svg{max-height:calc(140px * var(--figscale))}
+.section.sec-solutions .d-code-fig.cf-wide .cf-svg,.section.sec-homework .d-code-fig.cf-wide .cf-svg{max-height:calc(96px * var(--figscale))}
+.section.sec-errors .d-twin-board .tb-half img{height:calc(170px * var(--figscale))}
+.d-twin-board .tb-half img{height:calc(150px * var(--figscale))}
+.section.sec-errors .d-inline-img img{height:calc(204px * var(--figscale))}
+
+
+/* MATHS IS NOT PROSE. An arithmetic run inside RTL Arabic is laid out mirrored — the
+   digits are strong Arabic-Number characters but the operators between them are
+   neutral and take the paragraph direction, so «١٥ ÷ ٥ = ٣» renders as «٣ = ٥ ÷ ١٥».
+   Every arithmetic run is wrapped in .ltr-math and forced left-to-right. */
+/* isolate is NOT enough: Arabic-Indic digits carry an intrinsic Arabic-Number class,
+   so even inside an LTR isolate the number sequence still resolves right-to-left.
+   isolate-override forces every character to the container's direction, which is the
+   only thing that actually puts «١٥ ÷ ٥ = ٣» in the order the lesson means. */
+.ltr-math{direction:ltr !important;unicode-bidi:isolate-override !important;display:inline-block}
+/* NB: no blanket rule on .cf-expr — an expression figure often holds an Arabic
+   phrase, and forcing LTR on that renders the words backwards. The renderer adds
+   .ltr-math only when the content is digits and operators. */
+
+/* A process/cycle diagram is the MAIN visual of its stage, so it gets real size rather
+   than sitting small inside a wide card — roughly 1.6x what it had. Density still
+   scales it to fit, so this is a ceiling and not a fixed height. */
+.panel.has-inline-img .d-code-fig.cf-k-process .cf-svg{max-height:calc(240px * var(--figscale))}
+.section.sec-stage-taqwim .d-code-fig.cf-k-process .cf-svg{max-height:calc(210px * var(--figscale))}
+.panel.has-inline-img .d-code-fig.cf-k-process{width:100%}
+
 `;
 
-module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom' };
+// MAX_PAGES is the pack's page contract: this design set is a two-page daily guide,
+// so a render that overruns is a fault to fix (by drawing the figures smaller), not a
+// longer document to accept. Packs without it are unconstrained.
+// CHARACTER_CAST: false — this design set has no slot for decorative characters. The
+// legacy fallback (add a cast when a lesson has no content images) was injecting one
+// into the homework card and pushing zero-artwork lessons onto a third page.
+module.exports = { THEME_OVERRIDE_CSS, REGION_NAME: 'Yemen', PAGE_NUMBER_STYLE: 'ar-bottom', MAX_PAGES: 2, CHARACTER_CAST: false };

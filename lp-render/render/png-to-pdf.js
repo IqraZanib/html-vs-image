@@ -45,6 +45,10 @@ async function htmlToPixelPdf(html, opts = {}) {
         // be cut THROUGH the figure: inner boundaries are legal only BELOW the
         // figure's bottom edge. Cards without figures offer all inner boundaries.
         const fig = sec.querySelector('.d-inline-img, .char-fig');
+        // A card holding a CODE-drawn figure is atomic: its figure is followed by a
+        // value label and caption, so a cut 'below the figure' would slice the card
+        // and orphan that text. Only the card's own bottom is a legal boundary.
+        if (sec.querySelector('.d-code-fig, .d-code-board')) return;
         const figBottom = fig ? y(fig, 'bottom') : -Infinity;
         sec.querySelectorAll(
           '.d-bullets > li, .d-steps > .d-step, .d-rubric > .rrow, .d-imgrow, .d-qa, ' +
@@ -53,10 +57,69 @@ async function htmlToPixelPdf(html, opts = {}) {
       });
       const footer = document.querySelector('.lp-footer');
       if (footer) { cuts.push(y(footer, 'top')); cuts.push(y(footer, 'bottom')); }
-      return { cuts, height: document.documentElement.scrollHeight, width: document.documentElement.scrollWidth,
+      // OVERFLOW GUARD: no instructional text may leave its container. Checked here
+      // because this is the one place the real laid-out DOM exists, before the PDF is
+      // sliced. Each code-drawn card is a <g class="cf-card"> whose first child is its
+      // rect, so a label can be measured against the box it belongs to.
+      const overflow = [];
+      const outside = (inner, outer, pad) => inner.left < outer.left - pad || inner.right > outer.right + pad
+        || inner.top < outer.top - pad || inner.bottom > outer.bottom + pad;
+      document.querySelectorAll('g.cf-card').forEach((card) => {
+        const rect = card.querySelector('rect');
+        if (!rect) return;
+        const rb = rect.getBoundingClientRect();
+        card.querySelectorAll('text').forEach((t) => {
+          const tb = t.getBoundingClientRect();
+          if (tb.width && outside(tb, rb, 1.5)) {
+            overflow.push({ kind: 'text_outside_card', text: (t.textContent || '').trim().slice(0, 28) });
+          }
+        });
+      });
+      document.querySelectorAll('svg.cf-svg').forEach((svg) => {
+        const sb = svg.getBoundingClientRect();
+        svg.querySelectorAll('text').forEach((t) => {
+          const tb = t.getBoundingClientRect();
+          if (tb.width && outside(tb, sb, 1)) {
+            overflow.push({ kind: 'text_outside_figure', text: (t.textContent || '').trim().slice(0, 28) });
+          }
+        });
+      });
+      // MATH DIRECTION: an arithmetic run must read left-to-right on the page. Measure
+      // the first and last character of each run: if the first sits to the RIGHT of the
+      // last, the equation is mirrored and disagrees with the lesson.
+      const MATH_RE = /[\u0660-\u06690-9]+(?:\s*[+\-\u00d7\u00f7*/]\s*[\u0660-\u06690-9]+)*\s*=\s*[\u0660-\u06690-9]+/;
+      {
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        let node;
+        while ((node = walker.nextNode())) {
+          const s = node.nodeValue || '';
+          const m = s.match(MATH_RE);
+          if (!m) continue;
+          const i = s.indexOf(m[0]);
+          const r1 = document.createRange(); r1.setStart(node, i); r1.setEnd(node, i + 1);
+          const r2 = document.createRange(); r2.setStart(node, i + m[0].length - 1); r2.setEnd(node, i + m[0].length);
+          const a = r1.getBoundingClientRect(); const z = r2.getBoundingClientRect();
+          if (!a.width || !z.width) continue;
+          if (a.left > z.left) overflow.push({ kind: 'math_reversed', text: m[0] });
+        }
+      }
+      // and HTML text spilling out of its panel
+      document.querySelectorAll('.panel').forEach((panel) => {
+        const pb = panel.getBoundingClientRect();
+        panel.querySelectorAll('.cf-label, .cap, .cb-label, .tb-label').forEach((el) => {
+          const eb = el.getBoundingClientRect();
+          if (eb.width && outside(eb, pb, 2)) {
+            overflow.push({ kind: 'caption_outside_card', text: (el.textContent || '').trim().slice(0, 28) });
+          }
+        });
+      });
+      return { cuts, overflow, height: document.documentElement.scrollHeight, width: document.documentElement.scrollWidth,
         bg: getComputedStyle(document.body).backgroundColor || '#ffffff' };
     });
     shot = await page.screenshot({ fullPage: true });
+    // Hand the overflow findings to the caller BEFORE the PDF exists, so a page that
+    // clips a label is reported rather than quietly shipped.
+    if (typeof opts.onFindings === 'function' && geom && Array.isArray(geom.overflow)) opts.onFindings(geom.overflow);
   } finally { await browser.close(); }
 
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'lppdf-'));
@@ -90,7 +153,12 @@ async function composeWithChromium(shotBuf, geom, opts = {}) {
     const limit = start + usable;
     const within = cuts.filter((c) => c > start + 40 && c <= limit);
     let end = within.length ? within[within.length - 1] : Math.min(limit, height);
-    if (height - end < 48) end = height; // absorb trailing padding — no phantom page
+    // Absorb a small trailing remainder so a few px of padding does not earn its own
+    // page — but ONLY when the page still fits. The clip is a fixed `usable` box with
+    // overflow:hidden, so extending it past that silently CUT the content off (a
+    // homework card lost half its instructions this way, while the render still
+    // reported two pages, which is also why the fit loop never noticed).
+    if (height - end < 48 && height - start <= usable) end = height;
     pages.push([start, Math.min(end, height)]);
     start = end;
   }

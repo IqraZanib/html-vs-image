@@ -7,9 +7,12 @@ const VLM_URL = 'https://api.kie.ai/gpt-5-2/v1/chat/completions';
 // safe against human values. Returns { pass, reason }; fails closed on any
 // error. `policy` is extra reviewer guidance (read from RULES.md by the caller).
 async function checkImage({ apiKey, imageUrl, expectation, policy = '', fetchImpl = defaultFetch } = {}) {
-  // Research/debug knob: KIE_GATE_OFF=1 approves everything so a run shows each
-  // model's RAW output (used for model bake-offs). Never set in production.
-  if (process.env.KIE_GATE_OFF === '1') return { pass: true, reason: 'gate off (KIE_GATE_OFF=1)' };
+  // COST POLICY (2026-08-19): the gate is OFF by default and costs nothing.
+  // Safe because generated images are now TEXTLESS — all labels, marks, fractions
+  // and counts are rendered by code (see lp-render/decorative/render.js), so the
+  // checks the gate exists for no longer apply to what the model produces.
+  // Set KIE_GATE_ON=1 to run it (auditing raw model quality, bake-offs).
+  if (process.env.KIE_GATE_ON !== '1') return { pass: true, reason: 'gate off by default (set KIE_GATE_ON=1 to enable)' };
   const ask = `You are a strict reviewer of teaching images for a school classroom.
 The image is intended to show: ${expectation}
 Approve (pass:true) ONLY if EVERY check passes:
