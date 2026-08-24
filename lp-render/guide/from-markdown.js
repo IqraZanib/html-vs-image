@@ -229,6 +229,23 @@ function buildGuideFromMarkdown(md, { region = '', locale = 'ar', subject = '', 
     byRole.get(role).push(b);
   }
 
+  // Some template roles are not their own HEADING in these lessons — they live as a
+  // bold label inside a stage: «**الواجب المنزلي (Homework):**», «**Scaffolding (للطلاب
+  // المتعثرين):**», «**Extension Activity (للطلاب المتقدمين):**», «**Watch out:**».
+  // Measured against the approved design, four required cards were missing from the
+  // raw-text render; three of them were sitting in the source under these labels, so
+  // they are lifted to their proper role instead of being buried mid-stage.
+  const LIFT = [
+    ['homework', /الواجب المنزلي|homework|إعادة التعليم|ركن المعلم/i],
+    ['multigrade', /scaffolding|المتعثرين|extension|المتقدمين|تكييف/i],
+    ['errors-caption', /watch out|تنبيه|احذر/i],
+  ];
+  const lifted = new Map();
+  const liftRole = (label) => {
+    for (const [role, re] of LIFT) if (re.test(label)) return role;
+    return null;
+  };
+
   const sections = [];
   const push = (s) => { if (s) sections.push(s); };
 
@@ -265,6 +282,12 @@ function buildGuideFromMarkdown(md, { region = '', locale = 'ar', subject = '', 
       const head = found.length > 1 ? b.title.replace(/\s*—.*$/, '').trim() : '';
       const parts = labelledParts(b.body);
       parts.forEach((p, i) => {
+        const role = p.label ? liftRole(p.label) : null;
+        if (role) {
+          if (!lifted.has(role)) lifted.set(role, []);
+          lifted.get(role).push({ label: p.label, body: p.body });
+          return;   // it belongs to its own card, not to this stage
+        }
         const label = [i === 0 ? head : '', p.label].filter(Boolean).join(' · ');
         items.push({ text: label ? `**${label}:** ${p.body}` : p.body });
       });
@@ -279,6 +302,23 @@ function buildGuideFromMarkdown(md, { region = '', locale = 'ar', subject = '', 
     const fig = figureFor(raw);
     if (fig) sec.codeFigure = fig;
     push(sec);
+  }
+
+  // the roles lifted out of the stages
+  const mgLift = lifted.get('multigrade');
+  if (mgLift && mgLift.length && !byRole.get('multigrade')) {
+    push({ id: 'multigrade', heading: HEADINGS_AR.multigrade, type: 'bullets', marker: 'num',
+      items: mgLift.map((x) => ({ text: `**${x.label}:** ${x.body}` })) });
+  }
+  const hwLift = lifted.get('homework');
+  if (hwLift && hwLift.length && !byRole.get('homework')) {
+    push({ id: 'homework', heading: HEADINGS_AR.homework, type: 'note',
+      body: hwLift.map((x) => `**${x.label}:** ${x.body}`).join(' ') });
+  }
+  const ecLift = lifted.get('errors-caption');
+  if (ecLift && ecLift.length) {
+    push({ id: 'errors-caption', heading: 'ملاحظة', type: 'text',
+      body: ecLift.map((x) => `**${x.label}:** ${x.body}`).join(' ') });
   }
 
   const sol = byRole.get('solutions');
