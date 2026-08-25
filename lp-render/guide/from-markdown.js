@@ -489,10 +489,16 @@ function buildGuideFromMarkdown(md, { region = '', locale = 'ar', subject = '', 
 
   // Give page 1 something to look at: the lesson's own vocabulary as a card set, on the
   // first stage card that has no figure of its own.
+  // Reserve a card for the illustration FIRST. render.js renders a section's codeFigure
+  // and never reaches the image branch when both are set, so a card holding both shows
+  // only the drawing — which is how the generated artwork went missing from page 1 while
+  // the log said it had been generated.
+  const artCard = sections.find((x) => String(x.id).startsWith('stage-') && !x.codeFigure);
   const vocab = byRole.get('glossary');
   if (vocab) {
     const wc = wordCardsFigure(tableRows(vocab.map((b) => b.body).join('\n')));
-    const target = sections.find((x) => String(x.id).startsWith('stage-') && !x.codeFigure);
+    const target = sections.find((x) => String(x.id).startsWith('stage-')
+      && !x.codeFigure && x !== artCard);
     if (wc && target) target.codeFigure = wc;
   }
 
@@ -512,17 +518,22 @@ function buildGuideFromMarkdown(md, { region = '', locale = 'ar', subject = '', 
   // renders. Authoring it anyway means the artwork appears on a top-up with no code
   // change. Region art direction (dress, teacher, setting) comes from the ye pack.
   const images = [];
-  const warmup = sections.find((x) => x.id === 'stage-tamhid');
-  if (warmup && topic) {
+  const warmup = artCard || sections.find((x) => x.id === 'stage-tamhid');
+  if (warmup && topic && !warmup.codeFigure) {
     images.push({
       id: 'lesson-scene',
       concept: 'scene',
       label: topic.slice(0, 40),
+      // Naming boards, pages and walls as "empty surfaces" is what produced a row of blank
+      // framed panels: the model draws what the brief names, so a brief that names an empty
+      // board gets an empty board. Describe the PEOPLE and the ACTION instead, and ask for
+      // the absence of text without naming a surface to leave blank.
       prompt: 'Flat vector educational illustration, clean children\'s textbook style, soft '
-        + 'colours. A primary-school classroom scene for a lesson about ' + topic + '. '
-        + 'The image contains ABSOLUTELY NO text, no letters, no numbers, no symbols, and no '
-        + 'blank cards, frames or placeholders; boards, pages and walls are completely empty '
-        + 'surfaces with nothing drawn on them.',
+        + 'colours, warm daylight. Young primary-school children and their teacher together '
+        + 'in a simple classroom, engaged in an activity about ' + topic + '. Show faces, '
+        + 'gestures and posture; fill the frame with the people and a few simple objects. '
+        + 'Absolutely no writing of any kind anywhere in the picture: no letters, numerals, '
+        + 'signs or labels. No empty boards, blank cards, picture frames or vacant panels.',
     });
     warmup.image = 'lesson-scene';
   }
