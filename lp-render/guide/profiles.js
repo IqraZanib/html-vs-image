@@ -94,6 +94,9 @@ const YE = {
   // content to fill a gap is not an option.
   emitEmptyStages: true,
   leadIntoFirstPart: true,
+  oneCardPerStage: true,
+  tabbedBlocks: ['homework'],
+  badgeBlocks: { goal: 'target' },
   // The assessment activity must not be a second copy of the practice widget — the
   // reviewer asked for it to read differently inside the same design family.
   assessmentStage: 'stage-taqwim',
@@ -152,6 +155,9 @@ const YE = {
   errLeadRe: /^(?:بعض|كثير من) الطلاب\s*/,
   confusionPairRe: /يخلطون\s+بين\s+("?[^"،.]{1,12}"?)\s*و\s*("?[^"،.]{1,12}"?)/,
   // «الخلط بين كلمتي "أبي" و"أمي"» — the two words a pupil confuses, for the ✗/✓ board.
+  // The clause that says what the TEACHER does about the confusion. Arabic writes it
+  // after a semicolon («؛»); the panel gives it its own strip beneath the two halves.
+  correctionSplitRe: /\s*[؛;]\s*/,
   confusedPairRe: /الخلط\s+بين\s+(?:كلمتي|كلمتين)?\s*("[^"]{1,14}"|[^\s"،.]{1,14})\s*و\s*("[^"]{1,14}"|[^\s"،.]{1,14})/,
   chrome: {
     when: (locale, region) => String(locale).startsWith('ar') && region === 'ye',

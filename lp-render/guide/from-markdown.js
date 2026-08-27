@@ -793,6 +793,20 @@ function buildGuideFromMarkdown(md, opts = {}) {
       if (body) {
         const sec = { id: 'errors', heading: T.errors, type: 'misconception', body };
         const pair = profile.confusedPairRe ? body.match(profile.confusedPairRe) : null;
+        // THE CORRECTION IS NOT THE MISCONCEPTION. The source states both in one
+        // sentence — «الخلط بين كلمتي "أبي" و"أمي" لتشابه الحروف؛ يصححه المعلم بالتركيز
+        // على نطق ومخرج حرفي "الباء" و"الميم".» — the confusion before the separator and
+        // what the teacher does about it after. The approved design gives the second one
+        // its own quiet strip beneath the panel, so they are split here rather than being
+        // printed as one paragraph wedged beside the boxes. Not a word is changed.
+        if (profile.correctionSplitRe) {
+          const cut = body.search(profile.correctionSplitRe);
+          if (cut > 20) {
+            const m = body.slice(cut).match(profile.correctionSplitRe);
+            sec.body = body.slice(0, cut).trim();
+            sec.fix = body.slice(cut + m[0].length).trim();
+          }
+        }
         if (pair) {
           // «✕ خطأ» / «✓ صواب» — the two words the design puts on this panel.
           sec.codeFigure = { kind: 'error-board',
@@ -1162,6 +1176,51 @@ function buildGuideFromMarkdown(md, opts = {}) {
         + 'handling.',
     });
     warmup.image = 'lesson-scene';
+  }
+  // ONE STAGE, ONE CARD. The approved pages compose each stage as a single large teaching
+  // card: the stage's name on its tab, its teaching text, then every activity it contains
+  // one after another inside the same border, and the checkpoint last. Emitting a card per
+  // labelled part produced two cards both tabbed «التطبيق», and it pushed the numbered
+  // exercise label into the tab — where a 44-character heading shoved the duration and mode
+  // pills clean outside the card. The label belongs inside the card, above its activity.
+  // A block the design gives a labelled tab to. The tab text is the last segment of the
+  // section's own heading — «الواجب المنزلي · ركن المعلم» tabs as «ركن المعلم» — so it is
+  // the source's own words, short enough for the tab, and no second label is invented.
+  for (const sec of sections) {
+    if ((profile.badgeBlocks || {})[sec.id]) sec.badge = profile.badgeBlocks[sec.id];
+    if ((profile.tabbedBlocks || []).includes(sec.id)) {
+      const parts = String(sec.heading || '').split(/\s*·\s*/).filter(Boolean);
+      if (parts.length) sec.tab = parts[parts.length - 1];
+    }
+  }
+  if (profile.oneCardPerStage) {
+    const stageIds = new Set(profile.stages || []);
+    const merged = [];
+    for (const sec of sections) {
+      const prev = merged[merged.length - 1];
+      const isStage = sec.type === 'stage' && stageIds.has(sec.id);
+      const asActivity = (x) => ({
+        label: String(x.heading || '').split(/\s+[—·]\s+/).slice(1).join(' — '),
+        body: x.body || '', codeFigure: x.codeFigure || null,
+      });
+      if (isStage && prev && prev.id === sec.id && prev.type === 'stage') {
+        prev.activities.push(asActivity(sec));
+        if (sec.check) prev.checks.push(sec.check);
+        if (sec.callouts) prev.callouts = (prev.callouts || []).concat(sec.callouts);
+        if (sec.lead && !prev.lead) prev.lead = sec.lead;
+        continue;
+      }
+      if (isStage) {
+        const base = { ...sec, heading: T[sec.id] || sec.heading,
+          activities: [asActivity(sec)], checks: sec.check ? [sec.check] : [] };
+        delete base.body; delete base.codeFigure; delete base.check;
+        merged.push(base);
+        continue;
+      }
+      merged.push(sec);
+    }
+    sections.length = 0;
+    sections.push(...merged);
   }
   return { meta, images, sections, sourceProfile: { id: profile.id, name: profile.name, mode: doc.mode } };
 }

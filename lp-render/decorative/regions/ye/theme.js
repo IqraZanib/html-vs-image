@@ -1171,6 +1171,388 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.yl-miscsec .yl-mnote{order:-1}
 .yl-mboard{direction:ltr}
 .yl-mboard .yl-half{direction:rtl}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   APPROVED-ARTIFACT COMPOSITION
+   Read off the approved Yemen pages in the reviewer's reference artifact (lesson 01
+   أسرتي, both pages) rather than inferred from the earlier BLN pilot, which is a
+   different design set. What the approved pages actually do:
+
+     · header      a rounded navy CARD, centred, title over one subtitle line
+     · objective   a SOLID dark band, full width, icon + label at the RTL start
+     · errors      ✕ خطأ at the start, ✓ صواب beside it, the teacher's correction as
+                   one quiet strip BENEATH both — not a third column
+     · stage       tab + duration pill at the start and mode pill at the far end, all
+                   ABOVE the card's border; then a white bordered card holding
+                   text | visual, the asides, and the checkpoint strip last
+     · visuals     a COMPACT visual sits beside the text; a WIDE activity (matching,
+                   assessment) spans the full card beneath it. Not one fixed grid.
+     · bottom      exit ticket + answers share a row; teacher's corner runs full width
+                   with its labelled tab at the end
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+/* ── YemenHeader ──────────────────────────────────────────────────────────────────── */
+/* The container is .lp-header — .head matched nothing and the whole block was inert. */
+.lp-header{background:none !important;border:0 !important;border-bottom:0 !important;
+  border-radius:0 !important;padding:0 0 9px !important;min-height:0 !important;
+  box-shadow:none !important;display:block !important;overflow:visible !important;
+  text-align:center !important}
+.lp-header .hb,.lp-header .deco,.lp-header .h-bg,.lp-header svg.h-bg{display:none !important}
+.lp-header{background:#1f2937 !important;border-radius:15px !important;
+  padding:12px 22px 11px !important;margin:0 0 9px}
+.lp-header h1{background:none;color:#fff;margin:0;padding:0;text-align:center;
+  font-size:26px;line-height:1.25;font-weight:700;-webkit-text-stroke:0;position:static}
+.lp-header .sub{background:none;color:#dfe6f2;margin:3px 0 0;padding:0;
+  text-align:center;font-size:14px;font-weight:600;line-height:1.4;position:static;
+  width:auto;max-width:none}
+.lp-header .meta{display:none}
+
+/* ── ObjectiveMaterialsRow ────────────────────────────────────────────────────────── */
+.section.yl-block.sec-goal{grid-column:1 / 13;background:#1d6b5f !important;
+  border:0 !important;border-radius:13px;overflow:hidden}
+.section.yl-block.sec-goal .yl-bhead{display:none}
+.section.yl-block.sec-goal .yl-bbody{padding:11px 15px;padding-inline-start:52px;
+  position:relative;display:block}
+.section.yl-block.sec-goal .d-note{background:none !important;border:0 !important;
+  padding:0 !important;color:#fff !important;font-size:15.5px;line-height:1.5;
+  font-weight:700;text-align:start}
+.section.yl-block.sec-goal .d-note b{color:#ffd98a !important;font-size:16px;
+  -webkit-text-stroke:0}
+/* the label and its dart live at the RTL start, inside the band */
+.section.yl-block.sec-goal .yl-bbody::before{content:"";position:absolute;
+  inset-inline-start:14px;top:50%;transform:translateY(-50%);width:26px;height:26px;
+  inset-inline-end:auto;
+  background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='34' r='23' fill='none' stroke='%23ffffff' stroke-width='5'/><circle cx='32' cy='34' r='11' fill='none' stroke='%23ffffff' stroke-width='5'/><circle cx='32' cy='34' r='3' fill='%23ffffff'/><path d='M32 34 L54 12' stroke='%23ffd98a' stroke-width='5' stroke-linecap='round'/></svg>") no-repeat center/contain}
+.section.yl-block.sec-materials{grid-column:1 / 13}
+.section.yl-block.sec-materials .yl-bhead{padding:5px 13px 3px}
+.section.yl-block.sec-materials .yl-bbody{padding:6px 13px 8px}
+
+/* ── MisconceptionPanel ──────────────────────────────────────────────────────────── */
+.section.yl-miscsec{grid-column:1 / 13;border:1.6px solid #d8dee9 !important;
+  border-radius:13px;overflow:hidden;background:#fff}
+.section.yl-miscsec .yl-stage-head,.section.yl-miscsec .yl-shead{display:none}
+.section.yl-miscsec .yl-misc{display:block !important;padding:0;grid-template-columns:none}
+.section.yl-miscsec .yl-mrow{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.section.yl-miscsec .yl-mrow .yl-half{padding:9px 13px 10px;min-width:0;border:0;border-radius:0;
+  display:block;text-align:start;position:static}
+.section.yl-miscsec .yl-mrow .yl-wrong{background:#fdeaea;border-inline-end:1.6px solid #e9d2d2}
+.section.yl-miscsec .yl-mrow .yl-correct{background:#e8f5ea}
+.section.yl-miscsec .yl-mhead{display:flex;align-items:center;gap:7px;margin:0 0 5px}
+.section.yl-miscsec .yl-mhead .yl-mark{position:static;font-size:17px;font-weight:800;line-height:1}
+.section.yl-miscsec .yl-mhead .yl-mlbl{font-size:18px;font-weight:700;border:0;background:none;padding:0;
+  border-radius:0;-webkit-text-stroke:.3px currentColor}
+.section.yl-miscsec .yl-wrong .yl-mhead{color:#b3261e !important}
+.section.yl-miscsec .yl-correct .yl-mhead{color:#1f6b3a !important}
+.section.yl-miscsec .yl-mbody{font-size:14px;line-height:1.55;font-weight:600;color:var(--ink)}
+/* the pair, with the one letter that separates the two words marked */
+.section.yl-miscsec .yl-pair{display:flex;align-items:center;justify-content:center;gap:14px;
+  padding:3px 0 1px;flex-wrap:wrap}
+.yl-pword{font-size:26px;font-weight:800;letter-spacing:1px;color:#1f2937;
+  background:#fff;border:1.5px solid #bcd9c4;border-radius:10px;padding:2px 15px}
+.section.yl-miscsec .yl-dchips{display:flex;align-items:center;justify-content:center;
+  gap:8px;padding:2px 0 0}
+.section.yl-miscsec .yl-dchip{font-size:17px;font-weight:800;color:#fff;background:#2f7d4a;
+  border-radius:8px;min-width:30px;text-align:center;padding:1px 7px}
+.section.yl-miscsec .yl-dvs{color:#6b8f78;font-weight:800;font-size:14px}
+.yl-vs{width:15px;height:0;border-top:2px dotted #8fb79c}
+/* the teacher's correction: one quiet strip beneath both halves */
+.section.yl-miscsec .yl-mfix{background:#eef1f5;border-top:1.5px solid #dde3ec;padding:7px 14px;
+  font-size:13.5px;line-height:1.5;font-weight:600;color:#42506a;text-align:start}
+
+/* ── StageCard ───────────────────────────────────────────────────────────────────── */
+.section.yl-stage{background:none !important;border:0 !important;padding:0 !important;
+  border-radius:0 !important;overflow:visible;display:block;margin:0 0 8px}
+.yl-shead{display:flex;align-items:center;gap:7px;padding:0 2px 5px;flex-wrap:nowrap;
+  min-width:0}
+.yl-tab{color:#fff;font-size:16.5px;font-weight:700;border-radius:9px;
+  padding:3px 15px 4px;white-space:nowrap;-webkit-text-stroke:.3px currentColor;
+  flex:0 0 auto}
+.yl-shead .yl-pill{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;
+  font-weight:700;border-radius:99px;padding:2px 11px;white-space:nowrap;flex:0 0 auto}
+.yl-shead .yl-dur{color:#fff}
+.yl-shead .yl-dur .yl-clock{width:13px;height:13px;flex:0 0 auto}
+.yl-shead .yl-mode{background:#fff;border:1.5px solid #cfd7e4;color:#2f3e63;
+  margin-inline-start:auto}
+.yl-shead .yl-mode .yl-dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.yl-scard{background:#fff;border:1.7px solid;border-radius:13px;overflow:hidden}
+.yl-sbody{padding:10px 13px}
+.yl-sbody.yl-split{display:grid;grid-template-columns:1fr 1fr;gap:12px;
+  align-items:stretch}
+.yl-sbody.yl-stacked{display:grid;grid-template-columns:1fr;gap:9px}
+.yl-sbody.yl-solo{display:block}
+.yl-ttext{min-width:0}
+.yl-ttext p{margin:0 0 7px;font-size:14.5px;line-height:1.62;font-weight:700;
+  color:var(--ink)}
+.yl-ttext p:last-child{margin-bottom:0}
+.yl-tvis{min-width:0;display:flex;flex-direction:column;justify-content:center}
+
+/* the visual sits in a white card of its own, as it does on the approved pages */
+.yl-tvis > *{width:100%;box-sizing:border-box;margin:0}
+.yl-tvis .yl-illus{border:1.5px solid #e1e6ef;border-radius:11px;padding:5px;
+  background:#fff;box-shadow:none}
+.yl-tvis .yl-illus img{max-height:none;width:100%;height:auto;object-fit:contain;
+  border-radius:8px;position:static}
+.yl-tvis .yl-illus figcaption{background:#f1f3f7;color:#4a5568;border-radius:0 0 8px 8px;
+  margin:5px -5px -5px;padding:4px 9px;font-size:11.5px;font-weight:700;
+  text-align:center;border-top:1px solid #e4e8f0}
+.yl-tvis .yl-match,.yl-tvis .yl-assess,.yl-tvis .yl-cf{background:#fff;
+  border:1.5px solid #e1e6ef;border-radius:11px;padding:9px 10px}
+
+/* ── SupportChallengeRow ─────────────────────────────────────────────────────────── */
+.yl-srows{display:block;padding:0 13px 9px}
+.yl-srow{display:flex;align-items:flex-start;gap:8px;background:#f5f7fa;
+  border:1px solid #e3e8f0;border-radius:9px;padding:5px 10px;margin:0 0 5px;
+  font-size:13px;line-height:1.5;font-weight:600;color:#3c4a63}
+.yl-srow:last-child{margin-bottom:0}
+.yl-srow .yl-cl{flex:0 0 auto;font-size:11.5px;font-weight:800;color:#fff;
+  border-radius:99px;padding:1px 9px;margin-top:1px}
+.yl-srow.yl-support .yl-cl{background:#4b8a3f}
+.yl-srow.yl-challenge .yl-cl{background:#7c5aa6}
+.yl-srow .yl-cb{min-width:0}
+
+/* ── CheckpointStrip ─────────────────────────────────────────────────────────────── */
+.section.yl-stage .yl-check{display:flex;align-items:flex-start;gap:7px;
+  border-top:1.5px solid;border-radius:0;margin:0;padding:6px 13px 7px;
+  font-size:13.5px;line-height:1.5;font-weight:700}
+.section.yl-stage .yl-check .yl-cmark{flex:0 0 auto;font-weight:800}
+.section.yl-stage .yl-check .yl-ctext{min-width:0}
+
+/* per-stage colour: the tab, the duration pill, the card border and the strip */
+.sec-stage-tamhid  .yl-tab,.sec-stage-tamhid  .yl-dur{background:#c8862a}
+.sec-stage-tamhid  .yl-scard{border-color:#e8c07a}
+.sec-stage-tamhid  .yl-check{background:#fdf4e3;border-top-color:#efd9ad;color:#7a5410}
+.sec-stage-tamhid  .yl-mode .yl-dot{background:#c8862a}
+.sec-stage-arad    .yl-tab,.sec-stage-arad    .yl-dur{background:#2f5a88}
+.sec-stage-arad    .yl-scard{border-color:#9dbbde}
+.sec-stage-arad    .yl-check{background:#eaf1f9;border-top-color:#c2d5ea;color:#26456a}
+.sec-stage-arad    .yl-mode .yl-dot{background:#2f5a88}
+.sec-stage-tatbiq  .yl-tab,.sec-stage-tatbiq  .yl-dur{background:#2f7d4a}
+.sec-stage-tatbiq  .yl-scard{border-color:#a3cc93}
+.sec-stage-tatbiq  .yl-check{background:#eaf4ec;border-top-color:#c3e0c8;color:#25511d}
+.sec-stage-tatbiq  .yl-mode .yl-dot{background:#2f7d4a}
+.sec-stage-taqwim  .yl-tab,.sec-stage-taqwim  .yl-dur{background:#2f5a88}
+.sec-stage-taqwim  .yl-scard{border-color:#9dbbde}
+.sec-stage-taqwim  .yl-check{background:#eaf1f9;border-top-color:#c2d5ea;color:#26456a}
+.sec-stage-taqwim  .yl-mode .yl-dot{background:#2f5a88}
+
+/* ── an empty stage COLLAPSES to its label ───────────────────────────────────────── */
+.section.yl-stage.yl-empty{grid-column:1 / 13;margin-bottom:8px}
+.section.yl-stage.yl-empty .yl-shead{padding:0 2px;background:none}
+
+/* ── TeacherNotes · ExitAnswerRow · TeacherCorner · Footer ───────────────────────── */
+.section.yl-block{background:#fff;border:1.6px solid #dbe1ea;border-radius:13px;
+  overflow:hidden;margin:0 0 8px}
+.section.yl-block .yl-bhead{padding:5px 13px 4px;background:#f6f8fb;
+  border-bottom:1px solid #e6eaf2}
+.section.yl-block .yl-title{font-size:14.5px;font-weight:700}
+.section.yl-block .yl-bbody{padding:8px 13px}
+.section.yl-block.sec-exit-ticket{grid-column:1 / 7}
+.section.yl-block.sec-solutions{grid-column:7 / 13}
+.section.yl-block.sec-exit-ticket .yl-bbody .d-note,
+.section.yl-block.sec-solutions .yl-bbody .d-text{background:#fff !important;
+  border:1.4px solid #e6dcc0 !important;border-radius:9px;padding:7px 11px;
+  font-size:14.5px;font-weight:700}
+.section.yl-block.sec-solutions .yl-bbody .d-text{border-color:#c9e2d3 !important}
+/* teacher's corner: full width, its labelled tab at the far end, as in the approved set */
+.section.yl-block.sec-homework{grid-column:1 / 13;background:#fdf6e6;
+  border-color:#e8cf95 !important;position:relative}
+.section.yl-block.sec-homework .yl-bhead{display:none}
+.section.yl-block.sec-homework .yl-bbody{padding:10px 15px;padding-inline-end:96px}
+.section.yl-block.sec-homework .yl-bbody::before{content:"";position:absolute;
+  inset-inline-end:0;top:0;bottom:0;width:84px;background:#d9a13b;
+  border-radius:0 12px 12px 0}
+.section.yl-block.sec-homework .yl-bbody::after{content:"ركن المعلم";position:absolute;
+  inset-inline-end:0;top:50%;transform:translateY(-50%);width:84px;text-align:center;
+  color:#fff;font-size:13px;font-weight:800;line-height:1.3;padding:0 6px}
+.section.yl-block.sec-homework .d-note{background:#fff !important;
+  border:1.4px solid #ecd9a0 !important;border-radius:9px;padding:7px 11px;
+  font-size:14.5px;font-weight:700}
+
+/* ── page density ────────────────────────────────────────────────────────────────────
+   The approved cards breathe: the illustration is the largest object on page 1 and the
+   text sits beside it in a narrower column. The intro card gets the page's spare height
+   because it is the card whose visual carries the lesson. */
+.section.sec-stage-tamhid .yl-sbody.yl-split{grid-template-columns:.78fr 1.22fr}
+.section.sec-stage-tamhid .yl-tvis .yl-illus img{max-height:none}
+.yl-sbody{padding:11px 13px 12px}
+.yl-ttext p{font-size:15px;line-height:1.68}
+
+/* ── ActivityLabel + activity blocks ─────────────────────────────────────────────────
+   The numbered exercise label is a line INSIDE the card above its activity, never text
+   in the tab: a 44-character label in the tab pushed the duration and mode pills 203px
+   outside the card. The tab carries the stage's name and nothing else. */
+.yl-tab{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.yl-shead{flex-wrap:nowrap}
+.yl-act{padding:0}
+.yl-act + .yl-act{border-top:1px dashed #e2e7f0;margin-top:2px}
+.yl-alabel{padding:8px 13px 0;font-size:14px;font-weight:800;color:#2f3e63}
+.yl-alabel + .yl-sbody{padding-top:6px}
+.yl-ttext.yl-lead{padding:11px 13px 0}
+.yl-ttext.yl-lead + .yl-act .yl-alabel{padding-top:7px}
+.yl-ttext.yl-lead p{margin-bottom:0}
+.section.yl-stage .yl-check + .yl-check{border-top-style:dashed}
+
+/* two activities of the same kind: one row, two explicit columns */
+.yl-actgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;padding:0 13px 10px}
+.yl-actgrid .yl-act{min-width:0;padding:0}
+.yl-actgrid .yl-act + .yl-act{border-top:0;margin-top:0}
+.yl-actgrid .yl-alabel{padding:8px 0 0;font-size:13.5px;line-height:1.45}
+.yl-actgrid .yl-sbody{padding:6px 0 0}
+
+/* The intro illustration is the page's largest object but it must not eat the page: an
+   unbounded height took the intro card to 559px and cost the LP a third page. */
+.section.sec-stage-tamhid .yl-tvis .yl-illus img{max-height:290px !important}
+.section.sec-stage-tamhid .yl-sbody.yl-split{grid-template-columns:1fr 1.12fr}
+
+/* 81px decided the second page. Taken from the asides and the card padding — never from
+   the teaching text, whose size the reviewer set, and never from the activities. */
+.yl-srows{padding:0 13px 8px}
+.yl-srow{padding:4px 9px;margin-bottom:4px;font-size:12.5px;line-height:1.45}
+.yl-srow .yl-cl{font-size:11px;padding:1px 8px}
+.yl-sbody{padding:9px 13px 10px}
+.yl-alabel{padding:7px 13px 0}
+.section.yl-stage .yl-check{padding:5px 13px 6px;font-size:13px}
+.section.yl-block .yl-bbody{padding:7px 13px}
+.section.yl-block .yl-bhead{padding:4px 13px 3px}
+
+/* the last 35px */
+.section.sec-stage-tamhid .yl-tvis .yl-illus img{max-height:262px !important}
+.section.yl-block.sec-exit-ticket .yl-bbody .d-note,
+.section.yl-block.sec-solutions .yl-bbody .d-text{padding:5px 10px}
+.section.yl-block.sec-homework .yl-bbody{padding:8px 15px}
+.section.yl-block.sec-homework .d-note{padding:5px 10px}
+
+/* SupportChallengeRow — ONE row, two cells, at the foot of the stage it belongs to. As two
+   stacked rows this pair cost ~28px per stage and the LP a third page; as a row it is the
+   component the reviewer named, and neither cell is a floating side box. */
+.yl-srows{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.yl-srow{margin:0}
+.yl-srow:last-child{margin:0}
+
+/* The last 23px, taken only from PAGE-2 residents — the activities' own frames, not the
+   teaching text and not the page-1 cards, because shaving a page-1 card moves the page
+   boundary up by the same amount and gains nothing. */
+.section.sec-stage-tatbiq .yl-tvis .yl-match,
+.section.sec-stage-taqwim .yl-tvis .yl-assess{padding:6px 8px}
+.section.sec-stage-tatbiq .yl-match{gap:4px}
+.section.sec-stage-tatbiq .yl-check,.section.sec-stage-taqwim .yl-check{padding:4px 13px 5px}
+.yl-actgrid .yl-alabel{padding:6px 0 0}
+.section.yl-block.sec-exit-ticket .yl-bhead,
+.section.yl-block.sec-solutions .yl-bhead,
+.section.yl-block.sec-homework .yl-bhead{padding:3px 13px 2px}
+
+/* Page 2 landed exactly 1px over its own limit, which the composer will not absorb. A few
+   px of real margin, taken from the bottom blocks' frames. */
+.section.yl-block.sec-homework .yl-bbody{padding:6px 15px}
+.section.yl-block.sec-exit-ticket .yl-bbody,
+.section.yl-block.sec-solutions .yl-bbody{padding:6px 13px}
+.body > .section{margin-bottom:7px}
+
+/* ONE STAGE, ONE FULL-WIDTH CARD. An earlier rule made the practice card half-width when
+   it carried a matching activity — and with grid-auto-flow:row dense the الإجابات block
+   backfilled the empty half, so the answers printed beside the practice stage on page 1
+   and the practice card was cut across the page break. A stage card is never half a row. */
+.body > .section.yl-stage{grid-column:1 / 13 !important}
+
+/* ── the space goes to the teaching visuals ──────────────────────────────────────────
+   With every stage card now a full row the document came back 226px under its two-page
+   capacity. The approved pages spend that on the visuals, not on padding: the intro
+   illustration is the largest object on page 1, and the matching and assessment
+   activities are big enough for a six-year-old to read across the room. */
+.section.sec-stage-tamhid .yl-tvis .yl-illus img{max-height:372px !important}
+.section.sec-stage-tatbiq .yl-tvis .yl-match{padding:9px 11px}
+.section.sec-stage-tatbiq .yl-match{gap:7px}
+.section.sec-stage-tatbiq .yl-card{font-size:15px;padding:6px 9px}
+.section.sec-stage-tatbiq .yl-card.yl-target{font-size:13.5px}
+.section.sec-stage-tatbiq .yl-fig{width:27px;height:30px}
+.section.sec-stage-taqwim .yl-tvis .yl-assess{padding:9px 11px}
+.section.sec-stage-taqwim .yl-assess{gap:7px 16px}
+
+/* The illustration is WIDTH-bound inside its column, so a taller cap alone moves nothing —
+   the column has to be wider. The intro text is two lines; the picture is what a six-year-
+   old reads first, and on the approved page it is the biggest thing on the sheet. */
+.section.sec-stage-tamhid .yl-sbody.yl-split{grid-template-columns:1fr 1.62fr}
+.section.sec-stage-tamhid .yl-tvis .yl-illus img{max-height:400px !important}
+.section.sec-stage-tatbiq .yl-card{font-size:15.5px;padding:7px 10px}
+.section.sec-stage-tatbiq .yl-match{gap:8px}
+.section.sec-stage-taqwim .yl-assess{gap:9px 16px}
+.section.sec-stage-taqwim .yl-card{font-size:15px;padding:6px 10px}
+
+/* ── TeacherCorner ─────────────────────────────────────────────────────────────────── */
+.section.yl-block.yl-tabbed{position:relative;display:flex;align-items:stretch}
+.section.yl-block.yl-tabbed .yl-bbody{flex:1;min-width:0;padding:8px 14px}
+.yl-btab{flex:0 0 82px;background:#d9a13b;color:#fff;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;padding:7px 5px;text-align:center}
+.yl-btab .yl-bubble{width:19px;height:19px}
+.yl-btab .yl-btl{font-size:12.5px;font-weight:800;line-height:1.25}
+/* the pseudo-element tab this replaces, off */
+.section.yl-block.sec-homework .yl-bbody::before,
+.section.yl-block.sec-homework .yl-bbody::after{display:none !important;content:none !important}
+.section.yl-block.sec-homework .yl-bbody{padding-inline-end:14px !important;
+  padding-inline-start:14px !important}
+
+/* the tab belongs at the card's END, as the approved page has it (RTL: the left edge) */
+.yl-btab{order:2;border-radius:0 12px 12px 0}
+.section.yl-block.yl-tabbed .yl-bbody{order:1}
+
+/* ── the stage is an OUTER tinted card holding a WHITE inner card ────────────────────
+   Read off the approved pages: the stage's colour is a block, not a line. The outer card
+   carries the tint, the header row, the asides and the checkpoint; the inner white card
+   carries the teaching content. */
+.section.yl-stage{border:1.6px solid !important;border-radius:14px !important;
+  padding:8px 9px 9px !important;overflow:hidden}
+.yl-shead{padding:0 3px 7px}
+.yl-scard{border-width:1.3px}
+.section.yl-stage .yl-check{border-top:0;border-radius:8px;margin:7px 0 0;
+  padding:5px 11px 6px;background:none !important}
+.yl-srows{padding:7px 0 0}
+.section.yl-stage .yl-check + .yl-check{margin-top:5px}
+.section.sec-stage-tamhid{background:#fdf4e3;border-color:#e8c07a !important}
+.section.sec-stage-arad{background:#eaf1f9;border-color:#9dbbde !important}
+.section.sec-stage-tatbiq{background:#eaf4ec;border-color:#a3cc93 !important}
+.section.sec-stage-taqwim{background:#eaf1f9;border-color:#9dbbde !important}
+.section.sec-stage-tamhid .yl-check{border:1px solid #e3c78f;color:#7a5410}
+.section.sec-stage-arad .yl-check,.section.sec-stage-taqwim .yl-check{
+  border:1px solid #bcd0e8;color:#26456a}
+.section.sec-stage-tatbiq .yl-check{border:1px solid #bcd8c2;color:#25511d}
+.section.yl-stage.yl-empty{background:#eaf1f9;border-color:#9dbbde !important;
+  padding:7px 9px !important}
+.section.yl-stage.yl-empty .yl-shead{padding:0 3px}
+/* the asides read as part of the stage, on its own tint */
+.yl-srow{background:#fff;border-color:#e0e6ef}
+
+/* ── YemenHeader: a centred card, not a full-width band ─────────────────────────────── */
+.lp-header{max-width:66% !important;margin:0 auto 9px !important}
+
+/* ── the objective's label is white in the approved band ────────────────────────────── */
+.section.yl-block.sec-goal .d-note b{color:#fff !important}
+
+/* ── the panel's ✕/✓ labels carry the approved weight ───────────────────────────────── */
+.section.yl-miscsec .yl-mhead .yl-mlbl{font-size:20px;font-weight:800;
+  -webkit-text-stroke:.4px currentColor}
+.section.yl-miscsec .yl-mhead .yl-mark{font-size:19px}
+
+/* the outer stage cards added 9px past page 2's limit; taken back from the activity frames */
+.section.sec-stage-tatbiq .yl-match{gap:6px}
+.section.sec-stage-tatbiq .yl-card{padding:6px 10px}
+.section.sec-stage-taqwim .yl-assess{gap:7px 16px}
+
+/* «خطأ» and «صواب» were rendering WHITE on their tints — all but invisible. The colour has
+   to be set on the label itself: this pack's inherited title colour is white (the same trap
+   that made «المواد» and «بطاقة الخروج» disappear), so setting it on the row does nothing. */
+.section.yl-miscsec .yl-wrong .yl-mlbl{color:#b3261e !important}
+.section.yl-miscsec .yl-correct .yl-mlbl{color:#1f6b3a !important}
+
+/* the approved footer rule is gold, not navy */
+.lp-footer{border-top-color:#e0a83c !important}
+
+/* ── ObjectiveMaterialsRow: the badge is a flex child, so no gutter can drift ────────── */
+.section.yl-block.sec-goal .yl-bbody{display:flex !important;align-items:center;gap:11px;
+  padding:11px 15px !important}
+.section.yl-block.sec-goal .yl-bbody::before{display:none !important;content:none !important}
+.yl-badge{flex:0 0 auto;display:flex;color:#fff}
+.yl-badge .yl-tg{width:27px;height:27px}
+.section.yl-block.sec-goal .d-note{flex:1;min-width:0}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

@@ -892,22 +892,77 @@ function ylAssessment(items) {
   return '<div class="yl-assess">' + rows + '</div>';
 }
 
-// MisconceptionPanel — two columns, ✕ خطأ against ✓ صواب, with the source's explanation.
+const TARGET_SVG = '<svg class="yl-tg" viewBox="0 0 64 64" aria-hidden="true">'
+  + '<circle cx="30" cy="34" r="23" fill="none" stroke="currentColor" stroke-width="5"/>'
+  + '<circle cx="30" cy="34" r="11" fill="none" stroke="currentColor" stroke-width="5"/>'
+  + '<circle cx="30" cy="34" r="3.5" fill="currentColor"/>'
+  + '<path d="M30 34 L55 11" stroke="#ffd98a" stroke-width="5" stroke-linecap="round"/>'
+  + '<path d="M55 11 l-2 10 M55 11 l-10 2" stroke="#ffd98a" stroke-width="4.4"'
+  + ' stroke-linecap="round"/></svg>';
+
+const BUBBLE_SVG = '<svg class="yl-bubble" viewBox="0 0 24 24" aria-hidden="true">'
+  + '<path d="M4 5.5h16v10.5H12.5L8 19.5V16H4z" fill="none" stroke="currentColor"'
+  + ' stroke-width="1.9" stroke-linejoin="round"/>'
+  + '<path d="M8 9.5h8M8 12.5h5" stroke="currentColor" stroke-width="1.7"'
+  + ' stroke-linecap="round"/></svg>';
+
+const CLOCK_SVG = '<svg class="yl-clock" viewBox="0 0 24 24" aria-hidden="true">'
+  + '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/>'
+  + '<path d="M12 7v5.5l3.5 2" fill="none" stroke="currentColor" stroke-width="2"'
+  + ' stroke-linecap="round"/></svg>';
+
+// MisconceptionPanel, composed the way the approved pages compose it: ONE component, not
+// three columns of unrelated text. The ✕ خطأ half at the RTL start states the confusion,
+// the ✓ صواب half beside it shows the two words with the letter that separates them marked,
+// and the teacher's correction runs as one quiet strip beneath both — which is where the
+// approved design puts the supporting line. Previously the explanation sat as a third
+// column wedged next to the boxes.
+//
+// Every character comes from the source: the pair is the pair the lesson names, and the
+// marked letter is found by comparing the two words, not chosen.
+function ylLetterPair(a, b) {
+  const A = [...String(a)]; const B = [...String(b)];
+  let at = -1;
+  if (A.length === B.length) {
+    const diff = A.reduce((acc, ch, i) => (ch === B[i] ? acc : acc.concat(i)), []);
+    if (diff.length === 1) at = diff[0];
+  }
+  // NEVER PUT MARKUP INSIDE AN ARABIC WORD. Wrapping the single differing letter in a
+  // <b> was the obvious way to mark it and it is wrong: shaping does not cross element
+  // boundaries, so «أبي» would lose the ب–ي join and print in disjointed letter forms.
+  // Nothing in the verbatim check would notice — the characters are all still there.
+  // The letters are shown as their own chips beneath the two words instead, which is how
+  // a letter contrast is taught anyway, and a letter standing alone is correctly isolated.
+  const word = (t) => '<span class="yl-pword">' + esc(t) + '</span>';
+  const chips = at >= 0
+    ? '<div class="yl-dchips"><span class="yl-dchip">' + esc(A[at]) + '</span>'
+      + '<span class="yl-dvs">/</span><span class="yl-dchip">' + esc(B[at]) + '</span></div>'
+    : '';
+  return '<div class="yl-pair">' + word(a) + '<span class="yl-vs"></span>' + word(b)
+    + '</div>' + chips;
+}
+
 function ylMisconception(section, engine) {
   const cf = section.codeFigure || {};
   const wrong = (cf.wrong && cf.wrong.text) || '';
   const correct = (cf.correct && cf.correct.text) || '';
-  const half = (cls, mark, lbl, word) =>
-    '<div class="yl-half ' + cls + '"><div class="yl-mark">' + mark + '</div>'
-    + '<div class="yl-mword">' + esc(cleanHeading(word)) + '</div>'
-    + '<div class="yl-mlbl">' + esc(cleanHeading(lbl)) + '</div></div>';
-  const board = (wrong && correct)
-    ? '<div class="yl-mboard">' + half('yl-wrong', '✕', cf.labelWrong || '', wrong)
-      + half('yl-correct', '✓', cf.labelCorrect || '', correct) + '</div>'
-    : '';
-  const note = section.body
-    ? '<div class="yl-mnote">' + richText(section.body, { engine }) + '</div>' : '';
-  return '<div class="yl-misc">' + board + note + '</div>';
+  const half = (cls, mark, lbl, inner) =>
+    '<div class="yl-half ' + cls + '">'
+    + '<div class="yl-mhead"><span class="yl-mark">' + mark + '</span>'
+    + '<span class="yl-mlbl">' + esc(cleanHeading(lbl)) + '</span></div>'
+    + '<div class="yl-mbody">' + inner + '</div></div>';
+  const said = section.body ? richText(section.body, { engine }) : '';
+  const pair = (wrong && correct) ? ylLetterPair(wrong, correct)
+    : (wrong || correct ? '<div class="yl-pair"><span class="yl-pword">'
+      + esc(wrong || correct) + '</span></div>' : '');
+  const row = '<div class="yl-mrow">'
+    + half('yl-wrong', '✕', cf.labelWrong || '', said)
+    + half('yl-correct', '✓', cf.labelCorrect || '', pair)
+    + '</div>';
+  // The correction the source states, beneath both halves, full width.
+  const fix = section.fix
+    ? '<div class="yl-mfix">' + richText(section.fix, { engine }) + '</div>' : '';
+  return '<div class="yl-misc">' + row + fix + '</div>';
 }
 
 // The visual slot of a stage: the model illustration, or a code activity, or nothing.
@@ -942,8 +997,24 @@ function ylBlock(section, accent, images, idCls, body) {
     ? '<div class="yl-bhead"><span class="yl-ic">' + ic + '</span>'
       + '<span class="yl-title">' + esc(title) + '</span></div>'
     : '';
-  return '<section class="section yl-block' + idCls + '">' + head
-    + '<div class="yl-bbody">' + body + '</div></section>';
+  // TeacherCorner — a labelled tab down the card's inline end, as the approved page has it.
+  // REAL MARKUP, not a pseudo-element: two generations of ::before rules for this card were
+  // fighting each other (an old messenger icon with its own transform against a new tab),
+  // and the result was a 15px amber stub floating above the card with no label on it. A
+  // pseudo-element cannot be measured by the geometry test either.
+  const tab = section.tab
+    ? '<div class="yl-btab">' + BUBBLE_SVG
+      + '<span class="yl-btl">' + esc(cleanHeading(section.tab)) + '</span></div>'
+    : '';
+  // A BADGE IS REAL MARKUP, NOT A PSEUDO-ELEMENT. The objective band's dart was an
+  // absolutely-positioned ::before with a padding gutter reserved for it, and a later
+  // generic `.yl-block .yl-bbody{padding:…}` rule of equal specificity kept resetting that
+  // gutter — the icon drifted back onto the text every time the block padding was touched.
+  // As a flex child it cannot overlap anything, and the geometry test can measure it.
+  const badge = section.badge === 'target'
+    ? '<span class="yl-badge">' + TARGET_SVG + '</span>' : '';
+  return '<section class="section yl-block' + (tab ? ' yl-tabbed' : '') + idCls + '">'
+    + head + tab + '<div class="yl-bbody">' + badge + body + '</div></section>';
 }
 
 // StageCard — one designed teaching unit with fixed slots:
@@ -951,46 +1022,80 @@ function ylBlock(section, accent, images, idCls, body) {
 //   body:   teaching text | visual            (explicit grid, 1fr / 1.3fr)
 //   check:  checkpoint strip, full width
 //   diff:   دعم | تحد, two equal columns, full width
+// StageCard — ONE stage, ONE card, with named slots, the way the approved pages compose it:
+//
+//   StageHeader        tab · duration pill ......................... mode pill   (above the card)
+//   ┌─ card ────────────────────────────────────────────────────────────────────┐
+//   │ TeachingTextColumn (lead)                                                 │
+//   │ ActivityLabel                                                             │
+//   │ TeachingTextColumn | TeachingVisualColumn      (or the visual full width)  │
+//   │ ActivityLabel                                                             │
+//   │ … one block per activity the stage contains …                             │
+//   │ SupportChallengeRow                                                       │
+//   │ CheckpointStrip                                                           │
+//   └───────────────────────────────────────────────────────────────────────────┘
 function ylStage(section, accent, images, idCls) {
   const engine = section.engine;
   const title = cleanHeading(section.heading);
-  const ic = section.icon && hasIcon(section.icon) ? icon(section.icon, 20) : '';
-  const head = '<div class="yl-stage-head">'
-    + '<span class="yl-ic">' + ic + '</span>'
-    + '<span class="yl-title">' + esc(title) + '</span>'
-    + (section.time ? '<span class="yl-pill yl-dur">' + esc(cleanHeading(section.time)) + '</span>' : '')
-    + (section.mode ? '<span class="yl-pill yl-mode">' + esc(cleanHeading(section.mode)) + '</span>' : '')
+  const head = '<div class="yl-shead">'
+    + '<span class="yl-tab">' + esc(title) + '</span>'
+    + (section.time ? '<span class="yl-pill yl-dur">' + CLOCK_SVG
+      + esc(cleanHeading(section.time)) + '</span>' : '')
+    + (section.mode ? '<span class="yl-pill yl-mode"><i class="yl-dot"></i>'
+      + esc(cleanHeading(section.mode)) + '</span>' : '')
     + '</div>';
-  const visual = ylVisual(section, images, engine);
-  // THE INSTRUCTION SLOT: the sentence that introduces the activity spans the full card
-  // above both columns, so it reads as one instruction rather than as a column of prose
-  // competing with the visual beside it.
-  const lead = section.lead
-    ? '<div class="yl-lead">' + richText(section.lead, { engine }) + '</div>' : '';
-  const text = section.body
-    ? '<div class="yl-text">' + richText(section.body, { engine }) + '</div>' : '';
-  // no text → the visual takes the whole width; no visual → the text does. This is what
-  // stops a card being tall while its content is small.
-  const bodyCls = 'yl-stage-body' + (text && visual ? '' : ' yl-solo');
-  const body = (text || visual)
-    ? '<div class="' + bodyCls + '">' + text + (visual ? '<div class="yl-visual">' + visual + '</div>' : '') + '</div>'
-    : '';
-  const check = section.check
-    ? '<div class="yl-check"><span class="yl-cmark">✓</span><span class="yl-ctext">'
-      + richText(section.check, { engine }) + '</span></div>' : '';
+  const para = (t) => '<p>' + richText(t, { engine }) + '</p>';
+  const lead = section.lead ? '<div class="yl-ttext yl-lead">' + para(section.lead) + '</div>' : '';
+  // Each activity is its own block inside the same card. WIDE ACTIVITIES STACK, COMPACT
+  // VISUALS SIT BESIDE THE TEXT — the rule the approved pages follow. A five-row matching
+  // grid squeezed into half a card is unreadable; an illustration beside two lines of
+  // teacher text is exactly the composition of the approved intro card.
+  const acts = Array.isArray(section.activities) && section.activities.length
+    ? section.activities
+    : [{ label: '', body: section.body || '', codeFigure: section.codeFigure || null }];
+  const blocks = acts.map((a) => {
+    const visual = ylVisual({ ...a, image: a.image || section.image }, images, engine);
+    const text = a.body ? '<div class="yl-ttext">' + para(a.body) + '</div>' : '';
+    const label = a.label
+      ? '<div class="yl-alabel">' + esc(cleanHeading(a.label)) + '</div>' : '';
+    const wide = !!(a.codeFigure
+      && (a.codeFigure.kind === 'match-pairs' || a.codeFigure.kind === 'assessment'));
+    const vis = visual ? '<div class="yl-tvis">' + visual + '</div>' : '';
+    const layout = !text || !visual ? ' yl-solo' : (wide ? ' yl-stacked' : ' yl-split');
+    const body = (text || vis)
+      ? '<div class="yl-sbody' + layout + '">' + text + vis + '</div>' : '';
+    return (label || body) ? '<div class="yl-act">' + label + body + '</div>' : '';
+  }).join('');
+  // TWO ACTIVITIES OF THE SAME KIND SIT SIDE BY SIDE, as the approved card does with the
+  // two halves of its exercise. Stacked, this lesson's two five-row matching grids made
+  // the card 500px tall on their own and pushed the LP onto a third page; in two columns
+  // they are the same size on the page and read as one exercise with two parts.
+  const wideActs = acts.filter((a) => a.codeFigure
+    && (a.codeFigure.kind === 'match-pairs' || a.codeFigure.kind === 'assessment')).length;
+  const grid = acts.length > 1 && wideActs === acts.length;
   const diff = (Array.isArray(section.callouts) && section.callouts.length)
-    ? '<div class="yl-diff">' + section.callouts.map((c, k) =>
-      '<div class="yl-cal ' + (k === 0 ? 'yl-support' : 'yl-challenge') + '">'
+    ? '<div class="yl-srows">' + section.callouts.map((c, k) =>
+      '<div class="yl-srow ' + (k === 0 ? 'yl-support' : 'yl-challenge') + '">'
       + '<span class="yl-cl">' + esc(cleanHeading(c.label || '')) + '</span>'
       + '<span class="yl-cb">' + richText(c.body || '', { engine }) + '</span></div>').join('')
       + '</div>' : '';
-  // A HEADING THE SOURCE LEFT EMPTY becomes ruled space for the teacher to fill, not a
-  // stray box with a title and nothing under it. «العرض — أنا أفعل (١٠ دقائق)» has no text
-  // in this lesson; the section is still part of the plan, so it is kept and made usable.
-  const empty = !body && !check && !diff ? ' yl-empty' : '';
-  const rules = empty ? '<div class="yl-rules"><i></i><i></i><i></i></div>' : '';
-  return '<section class="section yl-stage' + idCls + empty + '">'
-    + head + lead + body + rules + check + diff + '</section>';
+  const checks = (Array.isArray(section.checks) && section.checks.length ? section.checks
+    : (section.check ? [section.check] : []))
+    .map((c) => '<div class="yl-check"><span class="yl-cmark">✓</span>'
+      + '<span class="yl-ctext">' + richText(c, { engine }) + '</span></div>').join('');
+  // A HEADING THE SOURCE LEFT EMPTY COLLAPSES to its label. «العرض — أنا أفعل (١٠ دقائق)»
+  // carries no text in this lesson: inventing content is not an option, and neither is a
+  // large blank card. The stage keeps its tab and its pills, and nothing else.
+  if (!lead && !blocks && !checks && !diff) {
+    return '<section class="section yl-stage yl-empty' + idCls + '">' + head + '</section>';
+  }
+  const inner = grid ? '<div class="yl-actgrid">' + blocks + '</div>' : blocks;
+  // The approved stage is TWO cards: an outer one carrying the stage's own tint, which
+  // holds the header row, the asides and the checkpoint strip; and a white inner card
+  // holding the teaching content. That outer block of colour is what makes a stage read
+  // as one designed unit instead of a header floating above a white box.
+  return '<section class="section yl-stage' + idCls + '">' + head
+    + '<div class="yl-scard">' + lead + inner + '</div>' + diff + checks + '</section>';
 }
 
 function renderDecorativeLesson(content, images = {}, cast = {}) {

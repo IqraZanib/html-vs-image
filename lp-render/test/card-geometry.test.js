@@ -85,30 +85,22 @@ async function measure(page) {
         if (dx > 1 && dy > 1) out.overlap.push({ a: s.className, b: secs[j].className });
       }
     });
-    // The pinned icons: each is a ::before on the card body, so its box is read from the
-    // pseudo-element's own geometry rather than from an element we can query.
-    for (const sel of ['.sec-goal .yl-bbody', '.sec-homework .yl-bbody']) {
-      const box = document.querySelector(sel);
-      if (!box) continue;
-      const cs = getComputedStyle(box, '::before');
-      const w = parseFloat(cs.width) || 0;
-      if (!w) continue;
-      const br = R(box);
-      const startInset = parseFloat(cs.insetInlineStart);
-      const rtl = getComputedStyle(document.documentElement).direction === 'rtl';
-      // inline-start is the RIGHT edge in RTL.
-      const icon = Number.isFinite(startInset)
-        ? (rtl ? { left: br.right - startInset - w, right: br.right - startInset }
-          : { left: br.left + startInset, right: br.left + startInset + w })
-        : (() => {
-          const endInset = parseFloat(cs.insetInlineEnd) || 0;
-          return rtl ? { left: br.left + endInset, right: br.left + endInset + w }
-            : { left: br.right - endInset - w, right: br.right - endInset };
-        })();
-      for (const t of box.querySelectorAll('.d-note,.d-text')) {
-        const tr = R(t);
-        const hit = Math.min(icon.right, tr.right) - Math.max(icon.left, tr.left);
-        if (hit > 1) out.iconHits.push({ sel, overlapPx: +hit.toFixed(1) });
+    // THE ICONS ARE REAL ELEMENTS NOW. Both were absolutely-positioned pseudo-elements
+    // with a padding gutter reserved for them, and a later block rule of equal specificity
+    // kept resetting that gutter — the dart drifted back onto «الأسرة» whenever the block
+    // padding was touched, and the teacher's-corner tab ended up a 15px stub floating above
+    // its card. As flex children they cannot overlap their text, and they can be measured.
+    for (const sel of ['.yl-badge', '.yl-btab']) {
+      for (const ic of document.querySelectorAll(sel)) {
+        const ir = R(ic);
+        const card = ic.closest('.section');
+        if (!card) continue;
+        for (const t of card.querySelectorAll('.d-note,.d-text,.yl-title')) {
+          const tr = R(t);
+          const hit = Math.min(ir.right, tr.right) - Math.max(ir.left, tr.left);
+          const vhit = Math.min(ir.bottom, tr.bottom) - Math.max(ir.top, tr.top);
+          if (hit > 1 && vhit > 1) out.iconHits.push({ sel, overlapPx: +hit.toFixed(1) });
+        }
       }
     }
     return out;
@@ -142,23 +134,32 @@ test('no card overflows, overlaps, clips its text, or lets an icon sit on it', a
   }
 });
 
-test('a stage instruction line rides on its first exercise, not a card of its own', () => {
+test('a stage is ONE card, and its instruction leads the activity it introduces', () => {
   const guide = buildGuideFromMarkdown(RAW, { region: 'ye' });
   const tatbiq = guide.sections.filter((s) => s.id === 'stage-tatbiq');
-  // Two exercises in the source → two cards, not three.
-  assert.strictEqual(tatbiq.length, 2, 'the instruction line became its own card again');
+  // The approved pages compose a stage as one large teaching card holding its activities.
+  assert.strictEqual(tatbiq.length, 1, 'one stage, one card');
+  assert.strictEqual(tatbiq[0].heading, 'التطبيق',
+    'the tab carries the stage name only — a 44-character exercise label in the tab pushed '
+    + 'the duration and mode pills outside the card');
+  assert.strictEqual(tatbiq[0].activities.length, 2, 'both exercises are activities in it');
+  assert.match(tatbiq[0].activities[0].label, /١\)/);
+  assert.match(tatbiq[0].activities[1].label, /٢\)/);
   assert.match(tatbiq[0].lead || '', /يفتح التلاميذ الكتاب صفحة/,
-    'the instruction must lead the card that carries the exercise it describes');
-  assert.ok(!tatbiq.some((s) => /^\s*يفتح التلاميذ/.test(s.body || '')),
-    'the instruction must not also be duplicated into a body');
+    'the instruction leads the card that carries the exercises it describes');
+  assert.ok(!tatbiq[0].activities.some((a) => /^\s*يفتح التلاميذ/.test(a.body || '')),
+    'and it is not duplicated into an activity body');
 });
 
-test('a heading the source left empty is kept as writing space, not dropped', () => {
+test('a heading the source left empty collapses to its label', () => {
   const guide = buildGuideFromMarkdown(RAW, { region: 'ye' });
   const arad = guide.sections.find((s) => s.id === 'stage-arad');
   assert.ok(arad, 'العرض is in the source and must stay in the plan');
-  assert.ok(!arad.body, 'the source has no text under it, so nothing may be invented');
+  const hasText = (arad.activities || []).some((a) => a.body) || arad.body;
+  assert.ok(!hasText, 'the source has no text under it, so nothing may be invented');
   const { bodyHtml } = renderDecorativeLesson(guide, {}, {});
-  assert.match(bodyHtml, /yl-empty/, 'an empty stage must be marked so the pack can rule it');
-  assert.match(bodyHtml, /yl-rules/, 'an empty stage must render writing space');
+  assert.match(bodyHtml, /yl-stage yl-empty/,
+    'an empty stage collapses: its tab and pills, no card, no blank region');
+  assert.ok(!/yl-empty[^>]*>\s*<div class="yl-shead">[\s\S]{0,400}yl-scard/.test(bodyHtml),
+    'a collapsed stage must not render a content card at all');
 });
