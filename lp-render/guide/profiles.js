@@ -26,14 +26,32 @@ const YE = {
   id: 'ye',
   name: 'Yemen — دليل الدرس اليومي',
   locale: 'ar',
+  // These patterns were built from the artifact lessons, whose headings are English 5E
+  // names with an Arabic parenthetical («#### Engage (الإحماء والتشويق) — 8-10 دقائق»).
+  // A lesson written with plain Arabic headings missed five of them, because Arabic
+  // inflects and the patterns were exact:
+  //   «الهدف» ≠ «الأهداف»            (singular against plural)
+  //   «الأخطاء الشائعة» ≠ «أخطاء شائعة»  (the definite article on both words)
+  //   «التقويم» ≠ «التقييم»            (a different word for assessment, and the one
+  //                                     this pack has always PRINTED on the card)
+  //   «المواد» and «بطاقة الخروج»       (no role existed for either)
+  // Measured: 5 of 13 headings recognised, and التقويم's whole 279-character block was
+  // being absorbed into التطبيق.
   roles: [
-    ['goal', /الأهداف|معايير النجاح|objectives?|goals?/i],
+    // NOT \b AFTER AN ARABIC LETTER. JavaScript's \b is defined on ASCII word
+    // characters, and Arabic letters are not among them, so /الهدف\b/ can never match:
+    // at the end of «الهدف» both sides of the position are non-word. Measured — it
+    // silently matched nothing at all. A negative lookahead for another Arabic letter
+    // is the boundary that works, and it still refuses «الهدفان».
+    ['goal', /الأهداف|الهدف(?![؀-ۿ])|معايير النجاح|objectives?|goals?/i],
     ['glossary', /المفردات|glossary|vocabulary/i],
-    ['errors', /أخطاء شائعة|خطأ شائع|سوء فهم|misconception|common error/i],
+    ['materials', /^\s*(?:ال)?مواد(?![؀-ۿ])|^\s*الوسائل|^\s*الأدوات|teaching aids|materials/i],
+    ['errors', /أخطاء\s+(?:ال)?شائعة|(?:ال)?أخطاء\s+(?:ال)?شائعة|خطأ شائع|سوء فهم|misconception|common error/i],
     ['stage-tamhid', /\bengage\b|الإحماء|التشويق|التمهيد|warm[- ]?up/i],
     ['stage-arad', /\bexplore\b|الاستكشاف|\bexplain\b|الشرح|العرض|presentation/i],
     ['stage-tatbiq', /\bpractice\b|التطبيق|guided practice/i],
-    ['stage-taqwim', /\bassess\b|التقييم|الختام|closing|wrap[- ]?up/i],
+    ['stage-taqwim', /\bassess\b|التقييم|التقويم|الختام|closing|wrap[- ]?up/i],
+    ['exit-ticket', /بطاقة الخروج|تذكرة الخروج|exit ticket/i],
     ['solutions', /answer key|الإجابة|الإجابات|الحل|نموذج الإجابة/i],
     ['multigrade', /متعدد الصفوف|multigrade|تكييف|differentiat/i],
     ['homework', /الواجب|واجب منزلي|homework|ركن المعلم/i],
@@ -57,7 +75,12 @@ const YE = {
     glossary: 'مصطلحات',
     multigrade: 'تكييف متعدد الصفوف',
     homework: 'الواجب المنزلي · ركن المعلم',
+    materials: 'المواد والوسائل',
+    'exit-ticket': 'بطاقة الخروج',
   },
+  // the two roles with no hand-written treatment: a materials list is a row of chips,
+  // an exit ticket is a single question on a note card
+  types: { materials: 'chips', 'exit-ticket': 'note' },
   // the gradual-release pill the pack expects on a stage
   grr: {
     'stage-tamhid': 'أنا أفعل',
@@ -66,8 +89,9 @@ const YE = {
     'stage-taqwim': 'أنت تفعل',
   },
   stages: ['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim'],
-  order: ['lesson-line', 'goal', 'errors', 'errors-caption', 'stage-tamhid', 'stage-arad',
-    'stage-tatbiq', 'stage-taqwim', 'solutions', 'glossary', 'multigrade', 'homework'],
+  order: ['lesson-line', 'goal', 'materials', 'errors', 'errors-caption', 'stage-tamhid',
+    'stage-arad', 'stage-tatbiq', 'stage-taqwim', 'exit-ticket', 'solutions', 'glossary',
+    'multigrade', 'homework'],
   // small labels the mapper writes around the source's own words
   goalLead: 'هدف اليوم:',
   labelWrong: 'خطأ',
@@ -86,7 +110,12 @@ const YE = {
   chipEllipsis: false,
   gradeRe: /الصف\s+\S+/,
   titleStrip: /^خطة الدرس:\s*/,
-  checkMarks: /(?=(?:\*{0,2})\s*(?:MODEL ANSWER|الحل الصحيح|الحل:|الإجابة الصحيحة|الإجابة:))/i,
+  checkMarks: /(?=(?:\*{0,2})\s*(?:MODEL ANSWER|الحل الصحيح|الحل:|الإجابة الصحيحة|الإجابة:|نقطة التحقق))/i,
+  // A label the mapper must NOT split a card at, because it belongs in the card's own
+  // تحقق sidebar — the signature of this design set. «نقطة التحقق: ٤ من كل ٥ تلاميذ…» is
+  // the criterion the teacher checks against, so it fills the amber strip beside the
+  // activity rather than becoming a separate card after it.
+  checkLabelRe: /^\s*نقطة التحقق\s*$/,
   // the lesson's own «Watch out» wording, for the drawn ✗/✓ board
   warnRe: /watch out|تنبيه|احذر/i,
   fixRe: /(?:التصحيح|الصواب|الصحيح)\s*[:،]?\s*([^.!؟\n]{6,60})/,
@@ -95,6 +124,8 @@ const YE = {
   errLongRe: /((?:بعض الطلاب|كثير من الطلاب)[^.!؟]{6,140})/,
   errLeadRe: /^(?:بعض|كثير من) الطلاب\s*/,
   confusionPairRe: /يخلطون\s+بين\s+("?[^"،.]{1,12}"?)\s*و\s*("?[^"،.]{1,12}"?)/,
+  // «الخلط بين كلمتي "أبي" و"أمي"» — the two words a pupil confuses, for the ✗/✓ board.
+  confusedPairRe: /الخلط\s+بين\s+(?:كلمتي|كلمتين)?\s*("[^"]{1,14}"|[^\s"،.]{1,14})\s*و\s*("[^"]{1,14}"|[^\s"،.]{1,14})/,
   chrome: {
     when: (locale, region) => String(locale).startsWith('ar') && region === 'ye',
     title: 'دليل الدرس اليومي',

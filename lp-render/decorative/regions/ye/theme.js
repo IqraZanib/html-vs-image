@@ -137,6 +137,21 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-errors-caption .s-head{display:none}
 .section.sec-errors-caption .panel{background:transparent;border:0;box-shadow:none;padding:0 6px}
 .section.sec-errors-caption .d-text{font-size:12px;color:var(--muted);text-align:center;font-weight:600}
+/* Two roles this pack gained when a lesson written with plain Arabic headings arrived:
+   «المواد» and «بطاقة الخروج». Both were previously unrecognised, so the materials list
+   was dropped from every LP and the exit ticket had nowhere to go. Titles in this pack are
+   coloured TEXT rather than filled tabs, so a role with no colour of its own renders its
+   title invisibly — which is exactly what happened on the first render. */
+.section.sec-materials .s-title{color:var(--c-teal-ink)}
+.section.sec-materials .panel{background:#f4faf9;border-color:#a8d4d0 !important}
+.section.sec-materials .d-chip{background:#fff !important;border:1.5px solid #a8d4d0;
+  color:var(--c-teal-ink) !important;font-weight:700;font-size:13px;padding:5px 12px}
+.section.sec-materials .d-bullets li{font-size:13.5px}
+/* the exit ticket is the last thing a pupil answers, so it reads as a question card */
+.section.sec-exit-ticket .s-title{color:#8a6d1d}
+.section.sec-exit-ticket .panel{background:var(--cream);border-color:#dbb95e !important}
+.section.sec-exit-ticket .d-note{background:#fff !important;font-size:15px;font-weight:700}
+
 .section.sec-stage-tamhid .s-title{color:#b23a48}
 .section.sec-stage-tamhid .panel{background:#fcd8d8;border-color:#e79a9a !important}
 .section.sec-stage-arad .s-title{color:var(--c-blue-ink)}
@@ -149,6 +164,14 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-stage-taqwim .s-title{color:#8a6d1d}
 .section.sec-stage-taqwim .panel{background:var(--cream);border-color:#dbb95e !important}
 .section.sec-stage-taqwim .d-step:last-child{background:#fff;border-color:var(--cream-line)}
+/* ONE STRIP, NOT ONE PER CARD. This chrome hangs off .sec-stage-taqwim, which was safe
+   while a guide had exactly one التقويم card. A lesson whose التقويم has several labelled
+   parts (دعم, تحد …) gets one card each — and printed the teacher-notes strip three times,
+   which also cost the LP a third page. :has() hides it on every taqwim card that is
+   immediately followed by another one, so only the last card in the run carries it. */
+.section.sec-stage-taqwim:has(+ .section.sec-stage-taqwim)::after,
+.section.sec-stage-taqwim:has(+ .section.sec-stage-taqwim)::before{display:none}
+
 /* pilot chrome: teacher-notes strip after التقويم — dotted ruled lines and the
    dark ملاحظات tab; pure theme chrome, identical for every lesson */
 .section.sec-stage-taqwim{position:relative}

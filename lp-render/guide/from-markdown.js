@@ -130,18 +130,28 @@ function blocks(md, profile) {
 // reading «Hatua za Somo (Dakika 20)» matched nothing while the pattern only allowed
 // number-then-unit, and the stage lost its time pill. No language in play writes
 // "min 20", so trying both orders cannot fire spuriously.
+// A DIGIT MAY BE ARABIC-INDIC. «التمهيد (٥ دقائق)» matched nothing while the pattern was
+// ASCII-only \d, so every stage of a lesson written with ٥ ١٠ ١٥ lost its time pill — the
+// artifact lessons happened to write their minutes in ASCII digits, which is why this went
+// unnoticed. Matched in either script and normalised to ASCII before being re-rendered in
+// the profile's own numerals.
+const D = '[\\d\u0660-\u0669\u06F0-\u06F9]';
+const toAscii = (s) => String(s)
+  .replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+  .replace(/[\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) - 0x06F0));
+
 function minutesOf(title, profile) {
   const unit = (profile.minutesWords || ['min']).join('|');
   const pats = [
-    new RegExp(`(\\d+)\\s*[-–]\\s*(\\d+)\\s*(?:${unit})`, 'i'),
-    new RegExp(`(\\d+)\\s*(?:${unit})`, 'i'),
-    new RegExp(`(?:${unit})\\s*(\\d+)\\s*[-–]\\s*(\\d+)`, 'i'),
-    new RegExp(`(?:${unit})\\s*(\\d+)`, 'i'),
+    new RegExp(`(${D}+)\\s*[-–]\\s*(${D}+)\\s*(?:${unit})`, 'i'),
+    new RegExp(`(${D}+)\\s*(?:${unit})`, 'i'),
+    new RegExp(`(?:${unit})\\s*(${D}+)\\s*[-–]\\s*(${D}+)`, 'i'),
+    new RegExp(`(?:${unit})\\s*(${D}+)`, 'i'),
   ];
   for (const re of pats) {
     const m = title.match(re);
     if (!m) continue;
-    const n = num(profile, m[2] || m[1]);
+    const n = num(profile, toAscii(m[2] || m[1]));
     const label = profile.minutesLabel || 'min';
     return profile.minutesUnitFirst ? `${label} ${n}` : `${n} ${label}`;
   }
@@ -315,7 +325,7 @@ function stepsFigure(items, profile) {
 // into one giant card — so a source that does use bold marks splits exactly as before.
 const BOLD_MARK = /\*\*([^*\n]{2,80}?):\*\*/g;
 const BARE_MARK = /^[ \t]*([^\n:.!?؟*|]{2,60}):[ \t]*/gm;
-function labelledParts(body) {
+function labelledParts(body, profile = {}) {
   const src = stripTables(String(body));   // fences kept: figureFor reads them
   const collect = (re) => {
     const marks = []; let m;
@@ -336,6 +346,10 @@ function labelledParts(body) {
     const openS = (t) => (t.match(/‘/g) || []).length - (t.match(/’/g) || []).length;
     const bare = collect(BARE_MARK).filter((mk) => {
       if (/^[“”‘’"']/.test(mk.label)) return false;
+      // A check-point label belongs in the card's own تحقق sidebar, so the card must not
+      // be split at it — splitting turned «نقطة التحقق: ٤ من كل ٥ تلاميذ…» into a card of
+      // its own and left the pilot's amber strip empty on every stage.
+      if (profile.checkLabelRe && profile.checkLabelRe.test(mk.label)) return false;
       const before = src.slice(0, mk.at);
       return openQ(before) <= 0 && openS(before) <= 0;
     });
@@ -387,7 +401,18 @@ function pairsFigure(body) {
     .map((m) => ({ label: m[1].trim(), caption: m[2].trim() }));
   const seen = new Set();
   const uniq = pairs.filter((p) => !seen.has(p.label) && seen.add(p.label));
-  return uniq.length >= 2 ? { kind: 'steps', items: uniq.slice(0, 6) } : null;
+  if (uniq.length >= 2) return { kind: 'steps', items: uniq.slice(0, 6) };
+  // The SAME exercise without the brackets — «أبي ← صورة الأب», «سبأ ← سبأ» — which is how
+  // a hand-written lesson lists it. Read as a generic bulleted list it produced cards
+  // labelled «أبي ← صورة» (the first three words of each line, arrow included); read as
+  // pairs, each card carries the prompt and the answer it matches. The lesson's own
+  // instruction is «أصل بين الصورة والكلمة الدالة عليها» — matching is the content.
+  const bare = [...String(body).matchAll(/^[\s•▪●◦*-]*([^\s←→،.:]{1,18})\s*[←→]\s*([^←→،.:\n]{1,24})$/gm)]
+    .map((m) => ({ label: m[1].trim(), caption: m[2].trim() }))
+    .filter((x) => x.label && x.caption);
+  const seen2 = new Set();
+  const uniq2 = bare.filter((p) => !seen2.has(p.label + p.caption) && seen2.add(p.label + p.caption));
+  return uniq2.length >= 2 ? { kind: 'steps', items: uniq2.slice(0, 6) } : null;
 }
 
 // «Hujambo?-Sijambo, Hamjambo?-Hatujambo, Habari?-Nzuri» — a greeting paired with its
@@ -542,10 +567,19 @@ function shapeSection(id, heading, raw, hint, opts = {}) {
     const rb = rubricItems(raw);
     if (rb.length >= 2) return { id, heading, type: 'rubric', items: rb };
   }
+  // A CHIP HOLDS A PHRASE, NOT A SENTENCE. Lesson 01's materials list runs to entries like
+  // «بطاقات كلمات مكتوبة بخط واضح وكبير (يمكن كتابتها يدوياً على ورق مقوى أو كراتين قديمة):
+  // أبي، أمي، أحمد، سبأ، إيمان.» — 120 characters, which as a pill is a paragraph with
+  // rounded corners. Long entries render as a list instead; short ones stay chips.
   if (want === 'chips' && items.length) {
-    return { id, heading, type: 'chips', items: items.map((t) => t.replace(/\*\*/g, '')) };
+    const clean = items.map((t) => t.replace(/\*\*/g, ''));
+    if (!clean.some((t) => t.length > 48)) return { id, heading, type: 'chips', items: clean };
   }
-  if (want === 'chips' && body) {
+  // …and only when there is no list to work from. Skipping the chips path because the
+  // items are long must fall through to BULLETS, not to this one — splitting the whole
+  // prose on Arabic commas turned lesson 01's materials into «كتاب الطالب صفحة 32. بطاقات
+  // كلمات مكتوبة…» followed by a chip reading «أمي».
+  if (want === 'chips' && !items.length && body) {
     // Split on the SEPARATOR THE SOURCE CHOSE. Splitting on commas as well as semicolons
     // broke a single resource — «Chart, Model of the breathing system» — into two.
     const sep = /;/.test(body) ? /\s*;\s*/ : /\s*[,،·]\s*/;
@@ -618,8 +652,8 @@ function buildGuideFromMarkdown(md, opts = {}) {
   const titleSrc = h1 ? h1.title : (doc.preamble.split('\n').map((l) => l.trim())
     .filter(Boolean).find((l) => l.length < 120) || '');
   const pageWords = (profile.pageWords || ['page']).join('|');
-  const pageRe = new RegExp(`\\(?\\s*(?:${pageWords})\\.?\\s*(\\d+)\\s*\\)?`, 'i');
-  const pageRef = (titleSrc.match(pageRe) || [])[1] || '';
+  const pageRe = new RegExp(`\\(?\\s*(?:${pageWords})\\.?\\s*(${D}+)\\s*\\)?`, 'i');
+  const pageRef = toAscii((titleSrc.match(pageRe) || [])[1] || '');
   const gradeText = (titleSrc.match(profile.gradeRe) || [])[0] || grade || '';
   const trimSep = (s) => s.replace(/^[\s·|,;:\-–—]+|[\s·|,;:\-–—]+$/g, '').trim();
   let topic = trimSep(titleSrc.replace(profile.titleStrip || /$^/, '').replace(/\s*—.*$/, '')
@@ -688,7 +722,9 @@ function buildGuideFromMarkdown(md, opts = {}) {
   const lessonLine = [subj, grade_, topic,
     pageRef ? `${profile.pageLabel} ${num(profile, pageRef)}` : '']
     .filter(Boolean).join(' · ');
-  if (profile.lessonLineCard !== false) {
+  // …and only if there is something to say. A lesson with no title line above its first
+  // heading produced an empty «درس» card: a coloured tab over a blank panel.
+  if (profile.lessonLineCard !== false && lessonLine) {
     push({ id: 'lesson-line', heading: T['lesson-line'], type: 'text', body: lessonLine });
   }
 
@@ -698,13 +734,32 @@ function buildGuideFromMarkdown(md, opts = {}) {
     if (body) push({ id: 'goal', heading: T.goal, type: 'note', body: `**${profile.goalLead}** ${body}` });
   }
 
-  // Misconceptions only if the lesson has them. No invention.
+  // Misconceptions only if the lesson has them. No invention — but no LOSS either: the
+  // twin ✗/✓ card needs two list items, and a lesson that states its misconception as one
+  // sentence («الأخطاء الشائعة: الخلط بين كلمتي "أبي" و"أمي" … يصححه المعلم بالتركيز على
+  // نطق ومخرج حرفي "الباء" و"الميم"») used to produce NO card at all, which dropped the
+  // content from the page. Prose falls back to a note card, and the confusion the sentence
+  // names is drawn as the pilot's split board.
   if (T.errors && byRole.get('errors')) {
-    const items = listItems(rawOf('errors'));
+    const raw = rawOf('errors');
+    const items = listItems(raw);
     if (items.length >= 2) {
       push({ id: 'errors', heading: T.errors, type: 'qa',
         items: [{ q: `✗ ${profile.labelWrong}`, a: items[0] },
           { q: `✓ ${profile.labelCorrect}`, a: items[1] }] });
+    } else {
+      const body = plain(raw);
+      if (body) {
+        const sec = { id: 'errors', heading: T.errors, type: 'note', body };
+        const pair = profile.confusedPairRe ? body.match(profile.confusedPairRe) : null;
+        if (pair) {
+          sec.codeFigure = { kind: 'error-board',
+            wrong: { kind: 'expression', text: pair[1].replace(/["»«]/g, '').trim() },
+            correct: { kind: 'expression', text: pair[2].replace(/["»«]/g, '').trim() },
+            labelWrong: profile.boardWrong, labelCorrect: profile.labelCorrect };
+        }
+        push(sec);
+      }
     }
   }
 
@@ -728,7 +783,7 @@ function buildGuideFromMarkdown(md, opts = {}) {
       // pill, and a heading that only repeats the role name adds nothing.
       let blockHead = b.title.replace(/\s*—.*$/, '').replace(tailMin, '').trim();
       if (T[id] && bare(blockHead).startsWith(bare(T[id]))) blockHead = '';
-      for (const part of labelledParts(b.body)) {
+      for (const part of labelledParts(b.body, profile)) {
         const role = part.label ? liftRole(part.label) : null;
         if (role) {
           if (!lifted.has(role)) lifted.set(role, []);
@@ -925,11 +980,21 @@ function buildGuideFromMarkdown(md, opts = {}) {
   // grounded in a Yemeni classroom or a Kenyan one without being written differently.
   const images = [];
   const warmup = artCard || sections.find((x) => x.id === profile.stages[0]);
-  if (warmup && topic && !warmup.codeFigure) {
+  // A lesson with no title line has no topic to brief an illustration from — this one had
+  // none, so no artwork was authored at all. Its GOAL states what the lesson is about
+  // («أستطيع التعرف على كلمات أفراد الأسرة وقراءتها والمطابقة بينها»), which is the
+  // lesson's own description of itself and the right thing to draw. The brief is a prompt
+  // to the image model, never reader-visible text.
+  const goalSec = sections.find((x) => x.id === 'goal');
+  const artTopic = topic || (goalSec
+    ? String(goalSec.body || '').replace(/\*\*[^*]*\*\*/g, '').replace(/[.؟!]+\s*$/, '')
+      .trim().slice(0, 90)
+    : '');
+  if (warmup && artTopic && !warmup.codeFigure) {
     images.push({
       id: 'lesson-scene',
       concept: 'scene',
-      label: topic.slice(0, 40),
+      label: (topic || artTopic).slice(0, 40),
       // Naming boards, pages and walls as "empty surfaces" is what produced a row of blank
       // framed panels: the model draws what the brief names, so a brief that names an empty
       // board gets an empty board. Describe the PEOPLE and the ACTION instead.
