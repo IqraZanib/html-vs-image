@@ -1150,6 +1150,27 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
    border and padding were added ON TOP of that width and the widget stood 3px outside its
    card at narrow measurements. Border-box makes that 100% include them. */
 .yl-visual > *,.yl-match,.yl-assess,.yl-match .yl-row,.yl-card{box-sizing:border-box}
+
+/* ── SIDES, CHECKED AGAINST THE APPROVED PAGES ─────────────────────────────────────
+   Reserving each icon's gutter logically stopped it covering text, but it left both
+   icons on the side the markup happened to name — and that is not the side the approved
+   design puts them on. Read off the pilot: the dart sits at the goal card's RTL START
+   (right) with the sentence beginning after it, and the messenger icon sits at the
+   teacher's-corner card's far END (left) with the word beside it. Gutter and inset move
+   together, both logical, so the pair can never drift apart again. */
+.section.yl-block.sec-goal .yl-bbody{padding:9px 14px;padding-inline-start:58px}
+.section.yl-block.sec-goal .yl-bbody::before{inset-inline-start:8px;inset-inline-end:auto}
+.section.yl-block.sec-homework .yl-bbody{padding:9px 13px;padding-inline-end:58px}
+.section.yl-block.sec-homework .yl-bbody::before{inset-inline-end:9px;inset-inline-start:auto}
+
+/* The pilot's common-errors strip reads TEXT → صواب → خطأ from the RTL start: the
+   teacher meets the explanation first and the correct form before the error. Ours was
+   mirrored — error, correction, then the explanation last. This was logged as an open
+   judgment call for months; the approved pages settle it. */
+.section.yl-miscsec .yl-misc{grid-template-columns:.9fr 1.25fr}
+.section.yl-miscsec .yl-mnote{order:-1}
+.yl-mboard{direction:ltr}
+.yl-mboard .yl-half{direction:rtl}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then
