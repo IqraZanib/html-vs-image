@@ -1183,6 +1183,17 @@ function buildGuideFromMarkdown(md, opts = {}) {
   // labelled part produced two cards both tabbed «التطبيق», and it pushed the numbered
   // exercise label into the tab — where a 44-character heading shoved the duration and mode
   // pills clean outside the card. The label belongs inside the card, above its activity.
+  // The teacher's after-lesson notes belong to the design, not to the lesson text: every
+  // plan gets them, in the same place. Declared by the profile so a region that does not
+  // want them simply omits the key.
+  if (profile.notes && profile.notes.after) {
+    const at = sections.findIndex((x) => x.id === profile.notes.after);
+    if (at >= 0) {
+      sections.splice(at + 1, 0, { id: 'notes', type: 'notes', label: profile.notes.label,
+        tab: profile.notes.tab, lines: profile.notes.lines || 2 });
+    }
+  }
+
   // A block the design gives a labelled tab to. The tab text is the last segment of the
   // section's own heading — «الواجب المنزلي · ركن المعلم» tabs as «ركن المعلم» — so it is
   // the source's own words, short enough for the tab, and no second label is invented.

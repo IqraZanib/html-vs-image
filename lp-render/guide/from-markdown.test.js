@@ -48,8 +48,15 @@ const LESSON = `# خطة الدرس: أسرتي (صفحة 32) — الصف ال�
 test('a raw markdown lesson becomes a guide with no model call', () => {
   const g = buildGuideFromMarkdown(LESSON, { region: 'ye', locale: 'ar', subject: 'اللغة العربية' });
   const ids = g.sections.map((s) => s.id);
+  // 'notes' is supplied by the DESIGN, not by the lesson text: the pack declares that every
+  // plan carries the teacher's after-lesson notes, and where. It used to be drawn as
+  // pseudo-element chrome hanging off the assessment stage, which is why it was invisible
+  // to this contract — and why its badge ended up outside its own box.
   assert.deepStrictEqual(ids, ['lesson-line', 'goal', 'stage-tamhid', 'stage-arad',
-    'stage-tatbiq', 'stage-taqwim', 'solutions', 'glossary']);
+    'stage-tatbiq', 'stage-taqwim', 'notes', 'solutions', 'glossary']);
+  const notes = g.sections.find((x) => x.id === 'notes');
+  assert.strictEqual(notes.type, 'notes');
+  assert.ok(!notes.body, 'it carries no lesson text — it is writing space');
   assert.strictEqual(g.meta.region, 'ye');
   assert.match(g.meta.title, /دليل الدرس اليومي/);
 });

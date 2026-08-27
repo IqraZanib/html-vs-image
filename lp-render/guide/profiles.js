@@ -97,6 +97,7 @@ const YE = {
   oneCardPerStage: true,
   tabbedBlocks: ['homework'],
   badgeBlocks: { goal: 'target' },
+  notes: { after: 'stage-taqwim', label: 'ملاحظات المعلّم بعد الدرس', tab: 'ملاحظات', lines: 2 },
   // The assessment activity must not be a second copy of the practice widget — the
   // reviewer asked for it to read differently inside the same design family.
   assessmentStage: 'stage-taqwim',

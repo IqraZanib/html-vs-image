@@ -1553,6 +1553,52 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .yl-badge{flex:0 0 auto;display:flex;color:#fff}
 .yl-badge .yl-tg{width:27px;height:27px}
 .section.yl-block.sec-goal .d-note{flex:1;min-width:0}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   TEACHER NOTES AS A COMPONENT, AND COLOUR ALL THE WAY DOWN THE PAGE
+   Two reviewer notes: the notes badge was printing outside its box, and the page went
+   plain after the first few cards. The first was pseudo-element chrome positioned against
+   the assessment stage's rectangle — it is a real section now, so the old chrome goes off.
+   The second is a fill: every block gets a gentle pastel ground so the sheet reads as one
+   designed LP rather than colourful at the top and white below.
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+/* the old chrome, off — box AND tab */
+.section.sec-stage-taqwim::after,.section.sec-stage-taqwim::before{
+  content:none !important;display:none !important}
+
+/* ── TeacherNotes ─────────────────────────────────────────────────────────────────── */
+.section.yl-notes{display:flex;align-items:stretch;background:#eef3fb;
+  border:1.6px solid #c3d3e9;border-radius:13px;overflow:hidden;grid-column:1 / 13;
+  margin:0 0 7px}
+.section.yl-notes .yl-nbody{flex:1;min-width:0;padding:8px 13px 9px}
+.section.yl-notes .yl-nlabel{font-size:13.5px;font-weight:800;color:#2f4a72;
+  margin:0 0 6px;text-align:start}
+.section.yl-notes .yl-nrules{display:flex;flex-direction:column;gap:11px;padding:2px 0 3px}
+.section.yl-notes .yl-nrules i{display:block;height:0;border-bottom:1.5px dashed #b9c9e2}
+.yl-ntab{flex:0 0 74px;background:#2f4a72;color:#fff;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;padding:6px 5px;text-align:center}
+.yl-ntab .yl-bubble{width:18px;height:18px}
+.yl-ntab .yl-ntl{font-size:12px;font-weight:800;line-height:1.25}
+
+/* ── pastel grounds for every block, so the page does not go white below the fold ──── */
+.section.yl-block.sec-materials{background:#eef7ef;border-color:#c3ddc6 !important}
+.section.yl-block.sec-materials .yl-bhead{background:#e2f0e4;border-bottom-color:#cbe2ce}
+.section.yl-block.sec-materials .yl-title{color:#2f6b3a}
+.section.yl-block.sec-exit-ticket{background:#fdf6e6;border-color:#e8cf95 !important}
+.section.yl-block.sec-exit-ticket .yl-bhead{background:#f8ecd2;border-bottom-color:#e5d3a6}
+.section.yl-block.sec-exit-ticket .yl-title{color:#8a6d1d}
+.section.yl-block.sec-solutions{background:#eaf5f0;border-color:#b6d9c8 !important}
+.section.yl-block.sec-solutions .yl-bhead{background:#dcefe6;border-bottom-color:#c3e0d1}
+.section.yl-block.sec-solutions .yl-title{color:#1f6b52}
+/* the inner answer boxes stay white so they read as the thing to be filled or read */
+.section.yl-block .yl-bbody .d-note,.section.yl-block .yl-bbody .d-text{background:#fff}
+/* the misconception panel's frame picks up its own soft ground behind the two halves */
+.section.yl-miscsec{background:#fbfcfe}
+.section.yl-miscsec .yl-mfix{background:#eef1f5}
+/* the material chips read as chips on the tint */
+.section.yl-block.sec-materials .d-chip{background:#fff !important;border:1.4px solid #bcd8c1;
+  color:#2f6b3a !important}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

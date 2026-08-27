@@ -1022,6 +1022,26 @@ function ylBlock(section, accent, images, idCls, body) {
 //   body:   teaching text | visual            (explicit grid, 1fr / 1.3fr)
 //   check:  checkpoint strip, full width
 //   diff:   دعم | تحد, two equal columns, full width
+// TeacherNotes — a real section, not chrome hanging off another card.
+//
+// This was a ::after box with a ::before tab, both positioned against the ASSESSMENT
+// STAGE's box. That worked while the stage was one flat panel. Once the stage became an
+// outer tinted card with its own padding, the tab was being positioned against the wrong
+// rectangle and printed outside the notes box — and because a pseudo-element is not an
+// element, the geometry test could not see it. As its own component it cannot drift, and
+// it is measured like everything else.
+function ylNotes(section) {
+  const lines = Math.max(2, Math.min(6, Number(section.lines) || 2));
+  const rules = new Array(lines).fill('<i></i>').join('');
+  return '<section class="section yl-notes' + (section.id ? ' sec-' + section.id : '') + '">'
+    + '<div class="yl-nbody">'
+    + '<div class="yl-nlabel">' + esc(cleanHeading(section.label || '')) + '</div>'
+    + '<div class="yl-nrules">' + rules + '</div></div>'
+    + (section.tab ? '<div class="yl-ntab">' + BUBBLE_SVG
+      + '<span class="yl-ntl">' + esc(cleanHeading(section.tab)) + '</span></div>' : '')
+    + '</section>';
+}
+
 // StageCard — ONE stage, ONE card, with named slots, the way the approved pages compose it:
 //
 //   StageHeader        tab · duration pill ......................... mode pill   (above the card)
@@ -1163,6 +1183,7 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     }
     // AN EXPLICIT COMPONENT, NOT A GENERIC PANEL. A stage carries known slots and is laid
     // out by grid; nothing inside it chooses its own position.
+    if (section.type === 'notes') return ylNotes(section);
     if (section.type === 'stage') return ylStage(section, accent, images, idCls);
     if (section.component === 'block' && body !== '') {
       return ylBlock(section, accent, images, idCls, body);

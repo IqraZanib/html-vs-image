@@ -90,12 +90,12 @@ async function measure(page) {
     // kept resetting that gutter — the dart drifted back onto «الأسرة» whenever the block
     // padding was touched, and the teacher's-corner tab ended up a 15px stub floating above
     // its card. As flex children they cannot overlap their text, and they can be measured.
-    for (const sel of ['.yl-badge', '.yl-btab']) {
+    for (const sel of ['.yl-badge', '.yl-btab', '.yl-ntab']) {
       for (const ic of document.querySelectorAll(sel)) {
         const ir = R(ic);
         const card = ic.closest('.section');
         if (!card) continue;
-        for (const t of card.querySelectorAll('.d-note,.d-text,.yl-title')) {
+        for (const t of card.querySelectorAll('.d-note,.d-text,.yl-title,.yl-nlabel,.yl-nrules')) {
           const tr = R(t);
           const hit = Math.min(ir.right, tr.right) - Math.max(ir.left, tr.left);
           const vhit = Math.min(ir.bottom, tr.bottom) - Math.max(ir.top, tr.top);
@@ -132,6 +132,24 @@ test('no card overflows, overlaps, clips its text, or lets an icon sit on it', a
     await browser.close();
     fs.unlinkSync(file);
   }
+});
+
+test('the teacher-notes badge stays inside its own card', () => {
+  // It was a ::after box with a ::before tab, both positioned against the ASSESSMENT
+  // STAGE's rectangle. That held while the stage was one flat panel; once the stage became
+  // an outer tinted card with its own padding the tab was measured against the wrong box
+  // and printed outside the notes strip — and a pseudo-element cannot be measured by the
+  // geometry check above, so nothing caught it but the reviewer's eye.
+  const guide = buildGuideFromMarkdown(RAW, { region: 'ye' });
+  const notes = guide.sections.find((s) => s.type === 'notes');
+  assert.ok(notes, 'the design supplies the notes section for every lesson');
+  assert.match(notes.label, /ملاحظات/);
+  const { bodyHtml } = renderDecorativeLesson(guide, {}, {});
+  assert.match(bodyHtml, /class="section yl-notes/, 'it is a real section');
+  assert.match(bodyHtml, /yl-ntab/, 'with its badge as a real element inside it');
+  const css = require('../decorative/regions/ye/theme').THEME_OVERRIDE_CSS;
+  assert.match(css, /\.section\.sec-stage-taqwim::after[^}]*content:none/,
+    'and the pseudo-element chrome it replaces must be switched off, or both draw');
 });
 
 test('a stage is ONE card, and its instruction leads the activity it introduces', () => {
