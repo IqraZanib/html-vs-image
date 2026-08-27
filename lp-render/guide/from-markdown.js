@@ -20,7 +20,7 @@
 // Everything region-specific now lives in ./profiles.js, and this file reads a profile:
 // which headings name which role, what each card is called, what order they come in,
 // and the document's own chrome. Adding a region means adding a profile.
-const { profileFor, detectRegion, GUIDE_SECTION_IDS } = require('./profiles');
+const { profileFor, resolveProfile, detectRegion, GUIDE_SECTION_IDS } = require('./profiles');
 
 const AR_DIGITS = '٠١٢٣٤٥٦٧٨٩';
 const toArabicDigits = (s) => String(s).replace(/\d/g, (d) => AR_DIGITS[+d]);
@@ -107,14 +107,27 @@ function blocks(md, profile) {
   return parseDocument(md, asProfile(profile)).blocks;
 }
 
-// «— 8-10 دقائق» / «(5 minutes)» in a stage heading, in the profile's own vocabulary.
+// «— 8-10 دقائق» / «(5 minutes)» / «(Dakika 20)» in a stage heading, in the profile's own
+// vocabulary — and in its own word ORDER. Kiswahili puts the unit first, so a heading
+// reading «Hatua za Somo (Dakika 20)» matched nothing while the pattern only allowed
+// number-then-unit, and the stage lost its time pill. No language in play writes
+// "min 20", so trying both orders cannot fire spuriously.
 function minutesOf(title, profile) {
   const unit = (profile.minutesWords || ['min']).join('|');
-  const re2 = new RegExp(`(\\d+)\\s*[-–]\\s*(\\d+)\\s*(?:${unit})`, 'i');
-  const re1 = new RegExp(`(\\d+)\\s*(?:${unit})`, 'i');
-  const m = title.match(re2) || title.match(re1);
-  if (!m) return '';
-  return `${num(profile, m[2] || m[1])} ${profile.minutesLabel || 'min'}`;
+  const pats = [
+    new RegExp(`(\\d+)\\s*[-–]\\s*(\\d+)\\s*(?:${unit})`, 'i'),
+    new RegExp(`(\\d+)\\s*(?:${unit})`, 'i'),
+    new RegExp(`(?:${unit})\\s*(\\d+)\\s*[-–]\\s*(\\d+)`, 'i'),
+    new RegExp(`(?:${unit})\\s*(\\d+)`, 'i'),
+  ];
+  for (const re of pats) {
+    const m = title.match(re);
+    if (!m) continue;
+    const n = num(profile, m[2] || m[1]);
+    const label = profile.minutesLabel || 'min';
+    return profile.minutesUnitFirst ? `${label} ${n}` : `${n} ${label}`;
+  }
+  return '';
 }
 
 // Markdown prose → plain reader text, keeping every word. Bold survives as **…**
@@ -428,8 +441,11 @@ function buildGuideFromMarkdown(md, opts = {}) {
   // wins — detection is for a paste that arrives with nothing attached.
   const declared = opts.region || '';
   const detected = declared ? '' : detectRegion(md);
-  const profile = opts.profile || profileFor(declared || detected);
   const region = declared || detected || '';
+  // resolveProfile also picks the LANGUAGE the source is written in, where a region has
+  // more than one (Kenya's CBC form exists in English and in Kiswahili with identical
+  // roles). The region says which curriculum; the text says which language of it.
+  const profile = opts.profile || resolveProfile(region, md);
   const locale = opts.locale || profile.locale;
   const T = profile.titles;
 

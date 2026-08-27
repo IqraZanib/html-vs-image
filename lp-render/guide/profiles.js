@@ -203,6 +203,90 @@ const KE = {
     subtitle: 'Republic of Kenya · Competency-Based Curriculum',
     footer: 'Competency-Based Curriculum · lesson plan',
   },
+  // ── KISWAHILI ─────────────────────────────────────────────────────────────────────
+  // The same CBC form, written in Kiswahili. This is a LANGUAGE VARIANT of the Kenya
+  // profile, not a separate region: the roles, their order and the design pack are
+  // identical — only the words the source uses to name them, and the words we print
+  // back, differ. The variant is chosen by the TEXT (see resolveProfile): whichever
+  // language's headings the document actually uses wins, and both pattern sets stay
+  // active afterwards, because a Kenyan Kiswahili plan routinely leaves a heading or
+  // two in English.
+  //
+  // Vocabulary sources, so this is not guesswork: the CBC lesson-plan form's own
+  // Kiswahili wording, plus the Kiswahili already attested in this repo —
+  // assets/content/lesson-kiswahili-demo.sw.json (Malengo ya Somo, Utangulizi, Hatua za
+  // Somo, Shughuli ya Wanafunzi, Tathmini, Darasa la 1, Dakika 40) and the Kiswahili
+  // Grade 1 guide under assets/generated/lessons (Somo, Lengo, Makosa ya kawaida,
+  // Utangulizi, Ukuzaji wa Somo, Mazoezi, Hitimisho, Majibu, Maneno muhimu, Kazi ya
+  // Nyumbani).
+  langs: {
+    sw: {
+      name: 'Kenya — CBC lesson plan (Kiswahili)',
+      locale: 'sw',
+      // ORDER MATTERS — first match wins, and Kiswahili headings overlap more than the
+      // English ones do. «Shughuli za Ziada» must be read as the extension task before
+      // the development pattern claims it for its «Shughuli» / «Hatua» activities, and
+      // «Tathmini ya Mwalimu» is the teacher's reflection, not the pupils' assessment.
+      // Each of those was actually mis-routed before this order was pinned down.
+      roles: [
+        ['strand', /^\s*mada\s+kuu|^\s*mada\b(?!\s+ndogo)/i],
+        ['sub-strand', /mada\s+ndogo|kipengele/i],
+        ['outcomes', /matokeo\s+ya\s+kujifunza|malengo\s+ya\s+somo|malengo\s+mahsusi|matokeo\s+yanayotarajiwa|^\s*malengo\b/i],
+        ['inquiry', /maswali?\s+muhimu|udadisi|kudadisi/i],
+        ['resources', /nyenzo|vifaa\s+vya\s+kujifunz|zana\s+za\s+kujifunz/i],
+        ['extended', /shughuli\s+za\s+ziada|kazi\s+ya\s+ziada|kazi\s+ya\s+nyumbani/i],
+        ['rubric', /rubriki|kigezo\s+cha\s+tathmini|viwango\s+vya\s+tathmini|vigezo\s+vya\s+tathmini/i],
+        ['reflection', /^\s*tafakari\b|maoni\s+ya\s+mwalimu|tathmini\s+ya\s+mwalimu/i],
+        ['introduction', /^\s*utangulizi\b|kuanzisha\s+somo/i],
+        ['conclusion', /^\s*hitimisho\b|^\s*tamati\b|kumalizia|kufunga\s+somo/i],
+        ['development', /ukuzaji\s+wa\s+somo|hatua\s+za\s+somo|maendeleo\s+ya\s+somo|^\s*hatua\b|^\s*shughuli\b|mazoezi/i],
+        ['assessment', /^\s*tathmini\b|maswali\s+ya\s+tathmini/i],
+      ],
+      titles: {
+        'lesson-line': 'Somo',
+        admin: 'Maelezo ya Somo',
+        strand: 'Mada Kuu',
+        'sub-strand': 'Mada Ndogo',
+        outcomes: 'Matokeo ya Kujifunza',
+        inquiry: 'Maswali Muhimu ya Udadisi',
+        resources: 'Nyenzo za Kujifunza',
+        introduction: 'Utangulizi',
+        development: 'Ukuzaji wa Somo',
+        conclusion: 'Hitimisho',
+        extended: 'Shughuli za Ziada',
+        assessment: 'Tathmini',
+        rubric: 'Rubriki ya Tathmini',
+        reflection: 'Tafakari',
+      },
+      merge: [{ id: 'admin', title: 'Maelezo ya Somo', type: 'fields',
+        roles: ['strand', 'sub-strand'] }],
+      headerChips: [['Somo', 'subject'], ['Darasa', 'grade']],
+      goalLead: 'Matokeo ya kujifunza:',
+      labelWrong: 'Kosa',
+      labelCorrect: 'Sahihi',
+      boardWrong: 'Kosa la kawaida',
+      boardCorrect: 'Sahihi',
+      checkLabel: 'Hakiki',
+      solutionLabel: 'Jibu',
+      teacherSaysLabel: 'Mwalimu anasema',
+      pageLabel: 'ukurasa',
+      pageWords: ['ukurasa', 'uk\\.?', 'page'],
+      minutesWords: ['dakika', 'min'],
+      minutesLabel: 'Dakika',
+      minutesUnitFirst: true,          // Kiswahili writes «Dakika 20», not «20 dakika»
+      gradeRe: /\bdarasa\s+(?:la\s+)?\d+\b/i,
+      titleStrip: /^(?:andalio\s+la\s+somo|mpango\s+wa\s+somo|somo)\s*[:—–-]\s*/i,
+      checkMarks: /(?=(?:\*{0,2})\s*(?:Jibu sahihi|Jibu:|Majibu:|Jibu linalotarajiwa))/i,
+      warnRe: /angalia|tahadhari|kosa la kawaida/i,
+      fixRe: /(?:sahihi|marekebisho)\s*[:—–]?\s*([^.!\n]{6,60})/i,
+      errRe: /(?:wanafunzi\s+wengi|wanafunzi\s+wanaweza|baadhi\s+ya\s+wanafunzi)\s*[:—–]?\s*([^.!\n]{6,60})/i,
+      chrome: {
+        title: '',
+        subtitle: 'Jamhuri ya Kenya · Mtaala Unaozingatia Umahiri (CBC)',
+        footer: 'Mtaala Unaozingatia Umahiri · andalio la somo',
+      },
+    },
+  },
 };
 
 // ── Fallback: enough English structure to be useful, no curriculum assumed ─────────
@@ -231,17 +315,59 @@ function profileFor(region) {
   return PROFILES[key] || GENERIC;
 }
 
-// Which profile does this text look like? Counts how many of each profile's role
-// patterns appear as a line of their own. Used only when no region was declared: an
-// explicit picker choice always wins.
-function detectRegion(text) {
+// How many of a role set does this text actually name? A heading leads with its own
+// name, so the pattern must match in the opening of a short line — the same rule the
+// converter's bare-heading detector uses, and the reason a sentence containing the word
+// "tathmini" halfway along is not mistaken for the Tathmini heading.
+function countRoles(text, roles) {
   const lines = String(text).split('\n')
-    .map((l) => l.replace(/^#+\s*/, '').replace(/^\*{0,2}/, '').trim())
-    .filter(Boolean);
+    .map((l) => l.replace(/^#+\s*/, '').replace(/[*_]/g, '').trim())
+    .filter((l) => l && l.length < 120);
+  const found = new Set();
+  for (const [role, re] of roles) {
+    if (lines.some((l) => re.test(l.slice(0, 44)))) found.add(role);
+  }
+  return found.size;
+}
+
+const variantsOf = (p) => Object.values(p.langs || {});
+
+// The region says WHICH curriculum; the text says which LANGUAGE of it. A Kenyan CBC
+// plan exists in English and in Kiswahili with the same roles in the same order and the
+// same design pack — only the words naming them differ. So a language variant is chosen
+// by counting which language's headings the document actually uses, and BOTH pattern
+// sets stay active afterwards: a Kenyan Kiswahili plan routinely leaves a heading or two
+// in English, and that heading should still find its role.
+//
+// Card titles then come from the chosen language even for a heading matched by the other
+// one — a card title is document chrome, not source text, and a Kiswahili plan should
+// not sprout one English card title. (The Yemen pack has always worked this way: Arabic
+// card titles over English 5E headings.)
+function resolveProfile(region, text) {
+  const base = profileFor(region);
+  const variants = variantsOf(base);
+  if (!variants.length || !text) return base;
+  let best = null;
+  let bestScore = countRoles(text, base.roles);
+  for (const v of variants) {
+    const score = countRoles(text, v.roles);
+    if (score > bestScore) { best = v; bestScore = score; }
+  }
+  if (!best) return base;
+  const merged = { ...base, ...best, id: base.id,
+    roles: [...best.roles, ...base.roles] };
+  delete merged.langs;
+  return merged;
+}
+
+// Which profile does this text look like? The score is the best any of a profile's
+// languages manages, so a Kiswahili Kenyan lesson is recognised as Kenyan. Used only
+// when no region was declared: an explicit picker choice always wins.
+function detectRegion(text) {
   let best = { id: '', score: 0 };
   for (const p of [YE, KE]) {
-    let score = 0;
-    for (const [, re] of p.roles) if (lines.some((l) => l.length < 80 && re.test(l))) score++;
+    const score = Math.max(countRoles(text, p.roles),
+      ...variantsOf(p).map((v) => countRoles(text, v.roles)));
     if (score > best.score) best = { id: p.id, score };
   }
   return best.score >= 3 ? best.id : '';
@@ -252,4 +378,5 @@ function detectRegion(text) {
 // guide was never recognised as one and got sent back through the structurer.
 const GUIDE_SECTION_IDS = new Set(Object.values(PROFILES).flatMap((p) => p.order));
 
-module.exports = { profileFor, detectRegion, PROFILES, GUIDE_SECTION_IDS };
+module.exports = { profileFor, resolveProfile, detectRegion, countRoles, PROFILES,
+  GUIDE_SECTION_IDS };

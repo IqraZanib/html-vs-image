@@ -7,6 +7,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const { buildGuideFromMarkdown, roleOf, tableRows, listItems,
   rubricItems } = require('./from-markdown');
+const { resolveProfile } = require('./profiles');
 const { checkVerbatim } = require('../text/verbatim');
 
 const LESSON = `# خطة الدرس: أسرتي (صفحة 32) — الصف الأول
@@ -248,6 +249,104 @@ test('the region can be detected from the text when the picker says nothing', ()
   assert.strictEqual(buildGuideFromMarkdown(LESSON, {}).sourceProfile.id, 'ye');
   // and a declared region always wins over detection
   assert.strictEqual(buildGuideFromMarkdown(CBC, { region: 'ke' }).sourceProfile.id, 'ke');
+});
+
+// ── Kenya, in Kiswahili ──────────────────────────────────────────────────────────────
+// The CBC form exists in Kiswahili with the same roles in the same order. That is a
+// LANGUAGE VARIANT of the Kenya profile, not another region, and the variant is chosen by
+// the text. Fixture below: the repo's own Kiswahili demo lesson
+// (assets/content/lesson-kiswahili-demo.sw.json) reflowed as a raw paste, so the words
+// are the repo's, not invented for the test.
+
+const CBC_SW = `Darasa la 1 · Hisabati
+
+Mada Ndogo: Kuhesabu 1 hadi 10
+
+Malengo ya Somo
+a) Kuhesabu vitu kutoka 1 hadi 10.
+b) Kuandika namba 1 hadi 10.
+
+Utangulizi (Dakika 5)
+Mwalimu anaonyesha mawe na wanafunzi wanahesabu pamoja kwa sauti.
+
+Hatua za Somo (Dakika 20)
+Hatua ya 1: Hesabu mawe kwa sauti pamoja na wanafunzi.
+Hatua ya 2: Andika namba ubaoni na wanafunzi waandike madaftarini.
+
+Hitimisho (Dakika 5)
+Wanafunzi wanahesabu kwa sauti kutoka 1 hadi 10 pamoja.
+
+Tathmini
+a) Hesabu mawe matano.
+b) Andika namba tatu.
+
+Shughuli za Ziada
+Wanafunzi wahesabu vitu vitano nyumbani.
+
+Tafakari
+`;
+
+test('every Kiswahili CBC heading routes to its role', () => {
+  const p = resolveProfile('ke', CBC_SW);
+  const expected = [
+    ['Mada Kuu', 'strand'],
+    ['Mada Ndogo', 'sub-strand'],
+    ['Matokeo ya Kujifunza', 'outcomes'],
+    ['Malengo ya Somo', 'outcomes'],
+    ['Maswali Muhimu ya Udadisi', 'inquiry'],
+    ['Nyenzo za Kujifunza', 'resources'],
+    ['Utangulizi', 'introduction'],
+    ['Ukuzaji wa Somo', 'development'],
+    ['Hatua za Somo', 'development'],
+    ['Hitimisho', 'conclusion'],
+    ['Shughuli za Ziada', 'extended'],
+    ['Tathmini', 'assessment'],
+    ['Rubriki ya Tathmini', 'rubric'],
+    ['Tafakari', 'reflection'],
+  ];
+  for (const [heading, role] of expected) {
+    assert.strictEqual(roleOf(heading, p), role, `«${heading}» should be ${role}`);
+  }
+  // and the English headings still work, because a Kiswahili plan often leaves one or
+  // two of them in English
+  assert.strictEqual(roleOf('Assessment Rubric', p), 'rubric');
+  assert.strictEqual(roleOf('Learning Resources', p), 'resources');
+});
+
+test('a Kiswahili CBC lesson renders as Kiswahili, in the Kenya region', () => {
+  const g = buildGuideFromMarkdown(CBC_SW, { region: 'ke' });
+  assert.match(g.sourceProfile.name, /Kiswahili/);
+  assert.strictEqual(g.meta.locale, 'sw', 'the locale follows the language of the source');
+  assert.strictEqual(g.meta.region, 'ke');
+  assert.strictEqual(g.meta.title, 'Kuhesabu 1 hadi 10');
+  assert.strictEqual(g.meta.grade, 'Darasa la 1');
+  assert.match(g.meta.subtitle, /Jamhuri ya Kenya/);
+  const headings = g.sections.map((s) => s.heading).join(' | ');
+  assert.match(headings, /Matokeo ya Kujifunza/);
+  assert.match(headings, /Ukuzaji wa Somo/);
+  assert.match(headings, /Hitimisho/);
+  assert.match(headings, /Tathmini/);
+  // no English card titles leak into a Kiswahili document
+  for (const english of ['Lesson Learning Outcomes', 'Lesson Development', 'Conclusion',
+    'Assessment', 'Extended Activities', 'Reflection']) {
+    assert.ok(!headings.includes(english), `English card title «${english}» leaked`);
+  }
+  assert.ok(!/[\u0600-\u06FF]/.test(JSON.stringify(g)), 'no Arabic in a Kenyan guide');
+  const dev = g.sections.filter((s) => s.id === 'development');
+  assert.ok(dev.length >= 2, 'the source\'s own Hatua become their own cards');
+  assert.match(dev[0].time, /Dakika 20/, 'minutes read and printed the Kiswahili way round');
+  const r = checkVerbatim(g, { text: CBC_SW }, {});
+  assert.strictEqual(r.deviations.length, 0,
+    'deviations: ' + JSON.stringify(r.deviations.map((d) => d.missing)));
+});
+
+test('adding Kiswahili did not turn English CBC lessons Kiswahili', () => {
+  const g = buildGuideFromMarkdown(CBC, { region: 'ke' });
+  assert.strictEqual(g.meta.locale, 'en');
+  assert.ok(!/Kiswahili/.test(g.sourceProfile.name));
+  const headings = g.sections.map((s) => s.heading).join(' | ');
+  assert.match(headings, /Lesson Learning Outcomes/);
+  assert.ok(!headings.includes('Matokeo ya Kujifunza'));
 });
 
 test('a rubric keeps the source level names and reads levels in order', () => {
