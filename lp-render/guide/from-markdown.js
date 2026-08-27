@@ -1152,8 +1152,12 @@ function buildGuideFromMarkdown(md, opts = {}) {
       // "any adult is Kenyan — dark brown skin and African features" clause. The prompt
       // then no longer asked for the very thing the culture gate checks. Describe the
       // people and the action; let the scaffold and the pack do their own jobs.
+      // artTopic, NOT topic. The fallback above exists because some sources carry no
+      // title line at all — this lesson's very first line is a heading — and the caption
+      // already used it while the brief still used the raw variable. The composed brief
+      // read «engaged in an activity about .» and the model was left to guess the subject.
       prompt: 'Young primary-school children and their teacher together in a simple '
-        + 'classroom, engaged in an activity about ' + topic + '. Show faces, gestures '
+        + 'classroom, engaged in an activity about ' + artTopic + '. Show faces, gestures '
         + 'and posture; fill the frame with the people and a few simple objects they are '
         + 'handling.',
     });
