@@ -125,6 +125,12 @@ const KE = {
     ['rubric', /assessment rubric|rubric|marking guide|levels? of achievement/i],
     ['assessment', /assessment|assessment questions?/i],
     ['reflection', /^\s*reflection\b|teacher(?:'s)? reflection|self[-\s]?reflection/i],
+    // The Taleemabad LP template wraps the CBC form in three more blocks: a
+    // 30-second summary at the top, the fill-in admin/TSC form, and remediation
+    // notes near the end. Additive — the plain CBC lesson has none of them.
+    ['summary', /\b30[-\s]?second summary\b|lesson at a glance/i],
+    ['admin-form', /^\s*school\b/i],
+    ['remediation', /remediation|correction notes/i],
   ],
   lift: [],
   titles: {
@@ -141,6 +147,9 @@ const KE = {
     assessment: 'Assessment',
     rubric: 'Assessment Rubric',
     reflection: 'Reflection',
+    summary: '30-Second Summary',
+    'admin-form': 'Lesson Details',
+    remediation: 'Remediation Notes',
   },
   grr: {},
   // A CBC plan names its topic in the Sub-Strand row ("Sub-Strand: The Breathing
@@ -149,14 +158,16 @@ const KE = {
   // CBC lesson development is one role, not four named stages: the source's own Step 1,
   // Step 2 … become the cards inside it rather than being forced into Engage/Explore.
   stages: ['introduction', 'development', 'conclusion'],
-  order: ['lesson-line', 'admin', 'strand', 'sub-strand', 'outcomes', 'inquiry',
-    'resources', 'introduction', 'development', 'conclusion', 'assessment', 'rubric',
-    'extended', 'reflection'],
+  order: ['lesson-line', 'summary', 'admin', 'admin-form', 'strand', 'sub-strand',
+    'lesson-topic', 'outcomes', 'inquiry', 'resources', 'introduction', 'development',
+    'conclusion', 'assessment', 'rubric', 'extended', 'remediation', 'reflection'],
   // The CBC form states the learning area and grade in its header row, and the page
   // header already carries the topic — so a separate lesson-line CARD repeated all of it
   // a second time. These become header chips instead.
   lessonLineCard: false,
   headerChips: [['Learning Area', 'subject'], ['Grade', 'grade']],
+  gradeField: /^\s*grade\b|^\s*class\b/i,
+  subjectField: /^\s*learning\s+area|^\s*subject\b/i,
   // Roles that belong together on ONE card. A CBC plan's identifying rows are a table
   // on the form, not four separate panels — rendering Strand and Sub-Strand as
   // full-width cards of their own spent a third of page 1 on two short phrases.
@@ -173,6 +184,9 @@ const KE = {
     rubric: 'rubric',
     extended: 'note',
     reflection: 'note',
+    summary: 'summary',
+    'admin-form': 'fields',
+    remediation: 'bullets',
   },
   goalLead: 'Learning outcomes:',
   labelWrong: 'Common error',
@@ -223,43 +237,82 @@ const KE = {
     sw: {
       name: 'Kenya — CBC lesson plan (Kiswahili)',
       locale: 'sw',
-      // ORDER MATTERS — first match wins, and Kiswahili headings overlap more than the
-      // English ones do. «Shughuli za Ziada» must be read as the extension task before
-      // the development pattern claims it for its «Shughuli» / «Hatua» activities, and
-      // «Tathmini ya Mwalimu» is the teacher's reflection, not the pupils' assessment.
-      // Each of those was actually mis-routed before this order was pinned down.
+      // ORDER MATTERS — first match wins, and Kiswahili headings overlap far more than
+      // the English ones do. Every ordering below was forced by a real mis-routing:
+      //   · «Shughuli za Ziada» went to Lesson Development, because the development
+      //     pattern claims «Shughuli»/«Hatua» and sat earlier;
+      //   · «Tathmini ya Mwalimu» went to the pupils' assessment rather than the
+      //     teacher's reflection;
+      //   · «Mada Ndogo» went to sub-strand and «Mada» to strand, which is one level
+      //     out — a Kenyan Kiswahili plan carries THREE levels (Suala 1.0 → Mada 1.1 →
+      //     Mada Ndogo 1.1.1) and the innermost one names the lesson.
       roles: [
-        ['strand', /^\s*mada\s+kuu|^\s*mada\b(?!\s+ndogo)/i],
-        ['sub-strand', /mada\s+ndogo|kipengele/i],
+        // three-level hierarchy, innermost first so the more specific name wins
+        ['lesson-topic', /^\s*mada\s+ndogo/i],
+        ['strand', /^\s*suala\b|^\s*mada\s+kuu/i],
+        ['sub-strand', /^\s*mada\b|kipengele/i],
+        ['summary', /muhtasari/i],
+        ['admin-form', /^\s*shule\b/i],
         ['outcomes', /matokeo\s+ya\s+kujifunza|malengo\s+ya\s+somo|malengo\s+mahsusi|matokeo\s+yanayotarajiwa|^\s*malengo\b/i],
-        ['inquiry', /maswali?\s+muhimu|udadisi|kudadisi/i],
+        ['inquiry', /maswali?\s+muhimu|udadisi|kudadisi|uchunguzi/i],
         ['resources', /nyenzo|vifaa\s+vya\s+kujifunz|zana\s+za\s+kujifunz/i],
         ['extended', /shughuli\s+za\s+ziada|kazi\s+ya\s+ziada|kazi\s+ya\s+nyumbani/i],
         ['rubric', /rubriki|kigezo\s+cha\s+tathmini|viwango\s+vya\s+tathmini|vigezo\s+vya\s+tathmini/i],
         ['reflection', /^\s*tafakari\b|maoni\s+ya\s+mwalimu|tathmini\s+ya\s+mwalimu/i],
+        ['remediation', /maelezo\s+ya\s+kurekebisha|kurekebisha|marekebisho/i],
         ['introduction', /^\s*utangulizi\b|kuanzisha\s+somo/i],
         ['conclusion', /^\s*hitimisho\b|^\s*tamati\b|kumalizia|kufunga\s+somo/i],
-        ['development', /ukuzaji\s+wa\s+somo|hatua\s+za\s+somo|maendeleo\s+ya\s+somo|^\s*hatua\b|^\s*shughuli\b|mazoezi/i],
+        // «Ukuaji wa Somo» and «Ukuzaji wa Somo» are both in use — the first is what the
+        // reviewer's own Grade 1 lesson says, and it matched nothing until now.
+        ['development', /ukuz?aji\s+wa\s+somo|hatua\s+za\s+somo|maendeleo\s+ya\s+somo|^\s*hatua\b|^\s*shughuli\b|mazoezi/i],
         ['assessment', /^\s*tathmini\b|maswali\s+ya\s+tathmini/i],
       ],
       titles: {
         'lesson-line': 'Somo',
         admin: 'Maelezo ya Somo',
-        strand: 'Mada Kuu',
-        'sub-strand': 'Mada Ndogo',
-        outcomes: 'Matokeo ya Kujifunza',
-        inquiry: 'Maswali Muhimu ya Udadisi',
+        summary: 'Muhtasari wa Sekunde 30',
+        'admin-form': 'Maelezo ya Somo',
+        strand: 'Suala',
+        'sub-strand': 'Mada',
+        'lesson-topic': 'Mada Ndogo',
+        outcomes: 'Matokeo ya Kujifunza ya Somo',
+        inquiry: 'Swali Muhimu la Uchunguzi',
         resources: 'Nyenzo za Kujifunza',
         introduction: 'Utangulizi',
-        development: 'Ukuzaji wa Somo',
+        development: 'Ukuaji wa Somo',
         conclusion: 'Hitimisho',
         extended: 'Shughuli za Ziada',
         assessment: 'Tathmini',
-        rubric: 'Rubriki ya Tathmini',
+        rubric: 'Vigezo vya Tathmini',
+        remediation: 'Maelezo ya Kurekebisha',
         reflection: 'Tafakari',
       },
+      // ONE identifying card, as on the form: the fill-in rows (SHULE, TAREHE, IDADI,
+      // Nambari ya TSC …) expand into fields, and the three curriculum levels join them
+      // as three more rows. Six separate full-width cards for six short phrases is what
+      // this avoids.
       merge: [{ id: 'admin', title: 'Maelezo ya Somo', type: 'fields',
-        roles: ['strand', 'sub-strand'] }],
+        expand: ['admin-form'], roles: ['strand', 'sub-strand', 'lesson-topic'] }],
+      // the lesson is named by the innermost level
+      topicRole: 'lesson-topic',
+      // …and the grade and learning area are rows of the fill-in form, not a title line
+      gradeField: /^\s*darasa\b/i,
+      subjectField: /^\s*eneo\s+la\s+kujifunza|^\s*somo\b/i,
+      types: {
+        summary: 'summary',
+        'admin-form': 'fields',
+        outcomes: 'bullets',
+        inquiry: 'note',
+        resources: 'chips',
+        assessment: 'bullets',
+        rubric: 'rubric',
+        extended: 'note',
+        remediation: 'bullets',
+        reflection: 'note',
+      },
+      order: ['lesson-line', 'summary', 'admin', 'admin-form', 'strand', 'sub-strand',
+        'lesson-topic', 'outcomes', 'inquiry', 'resources', 'introduction', 'development',
+        'conclusion', 'assessment', 'rubric', 'extended', 'remediation', 'reflection'],
       headerChips: [['Somo', 'subject'], ['Darasa', 'grade']],
       goalLead: 'Matokeo ya kujifunza:',
       labelWrong: 'Kosa',

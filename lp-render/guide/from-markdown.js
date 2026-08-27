@@ -50,20 +50,38 @@ function roleOf(title, profile) {
 // Question(s)". Markdown mode is tried first and kept whenever it already recognises
 // the document's structure, so text that does use '#' behaves exactly as before.
 
+// How far into a heading may the role name start? A heading LEADS with its own name, but
+// not always at character zero: «Swali/Maswali Muhimu ya Uchunguzi» reaches "Maswali" at
+// index 6, and «Lesson Learning Outcomes» reaches "Learning Outcomes" at index 7.
+//
+// This bound is what separates a heading from a sentence, and 44 was far too loose.
+// Measured on a real Kiswahili lesson, a 44-character window turned two ordinary prose
+// lines into headings, because Kiswahili role names are ordinary words:
+//   «darasa zima linafanya mazoezi ya kuoanisha maamkizi…» → "mazoezi" at 21 → development
+//   «Maswali ya mdomo ya kufunga somo:»                    → "kufunga somo" at 20 → conclusion
+// The first split a sentence in half mid-activity; the second tore the closing questions
+// out of Hitimisho into a card of their own.
+const ROLE_START_MAX = 12;
+function roleAtStart(title, profile) {
+  for (const [role, re] of profile.roles) {
+    const m = String(title).match(re);
+    if (m && m.index <= ROLE_START_MAX) return role;
+  }
+  return null;
+}
+
 function bareHeading(line, profile) {
   const raw = String(line).trim();
   if (!raw || raw.length > 120) return null;
   const m = raw.match(/^#{0,6}\s*\*{0,2}_{0,2}([^:*_\n]{2,80}?)_{0,2}\*{0,2}\s*:\s*(.*)$/)
     || raw.match(/^#{0,6}\s*\*{0,2}_{0,2}([^:*_\n]{2,80}?)_{0,2}\*{0,2}\s*$/);
   if (!m) return null;
-  const title = m[1].trim();
-  if (/[.!?؟]$/.test(title)) return null;           // a sentence, not a heading
-  if (title.split(/\s+/).length > 16) return null;  // headings are short
-  // A HEADING LEADS WITH ITS OWN NAME. Requiring the role match inside the opening of
-  // the line is what lets a real CBC heading through — «Assessment Questions (to be
-  // captured in the teacher's notes) (5 minutes)» is 11 words — while still refusing an
-  // ordinary sentence that happens to contain the word "assessment" halfway along.
-  if (!roleOf(title.slice(0, 44), profile)) return null;
+  // The source's own bullet is list punctuation, never part of a heading's name, so it
+  // comes off before the role is looked up and before the title is used.
+  const title = m[1].replace(/^[•▪●◦*\-–—]\s*/, '').trim();
+  if (!title || /[.!?؟]$/.test(title)) return null;   // a sentence, not a heading
+  if (title.split(/\s+/).length > 16) return null;    // headings are short
+  if (!roleAtStart(title, profile)) return null;       // and they lead with their own name
   return { title, rest: (m[2] || '').trim() };
 }
 
@@ -173,11 +191,74 @@ function tableRows(body) {
 // «b) …» — which is how a CBC plan writes its learning outcomes and its assessment
 // questions; without it those lines read as one run-on paragraph.
 function listItems(body) {
-  return String(body).split('\n')
-    .map((l) => l.match(/^\s*(?:[-*+•]|\d+[.)]|[a-z][.)])\s+(.*)$/i))
-    .filter(Boolean)
-    .map((m) => m[1].trim())
-    .filter((x) => x.length > 1);
+  // A CONTINUATION LINE BELONGS TO ITS ITEM. These sources routinely write the label on
+  // the bullet line and the substance underneath:
+  //     • Wanafunzi waliofikia lengo kikamilifu:
+  //     nyumbani, waamkue mwanafamilia kwa maamkizi mapya…
+  // Taking only the marked lines dropped every second line of Shughuli za Ziada and of
+  // Maelezo ya Kurekebisha — silent content loss, on a page whose whole promise is that
+  // nothing is cut. A line with no marker now continues the item above it.
+  // A BULLET THAT ENDS IN A COLON IS A LABEL, and the lines under it are its content:
+  //     • Wanafunzi waliofikia lengo kikamilifu:
+  //     nyumbani, waamkue mwanafamilia kwa maamkizi mapya…
+  // Taking only the marked lines dropped every second line of Shughuli za Ziada and of
+  // Maelezo ya Kurekebisha — silent loss, on a page whose whole promise is that nothing
+  // is cut.
+  //
+  // The colon is what makes this safe. Folding EVERY line under a bullet also swallowed
+  // things that are not continuations at all: the Yemen answer key puts a bold
+  // sub-heading between two bullets («**القسم الثاني (5 علامات):**»), and three
+  // previously byte-stable Yemen sections changed. Absorbing stops at a blank line, at
+  // the next marker, and at a bold line.
+  const MARK = /^\s*(?:[-*+•▪●◦]|\d+[.)]|[a-z][.)])\s+(.*)$/i;
+  const out = [];
+  let open = false;
+  for (const line of String(body).split('\n')) {
+    const t = line.trim();
+    const m = line.match(MARK);
+    if (m) { out.push(m[1].trim()); open = /:$/.test(m[1].trim()); continue; }
+    if (!t || /^\*\*/.test(t)) { open = false; continue; }
+    if (open) out[out.length - 1] += ` ${t}`;
+  }
+  return out.map((x) => x.trim()).filter((x) => x.length > 1);
+}
+
+// A run of «LABEL: value» lines → [{label, value}]. This is what the identifying block
+// of a CBC plan looks like when pasted — SHULE, ENEO LA KUJIFUNZA, DARASA, TAREHE, MUDA,
+// IDADI, Jina la Mwalimu, Nambari ya TSC, Jinsia — and it is also the shape of a labelled
+// summary («Muda wote / Muda wa maandalizi:» on one line, its value on the next).
+//
+// Two source habits both have to work: the value may sit AFTER the colon on the same
+// line, or on the following line(s). A line with no colon therefore continues the field
+// above it, joined with a separator rather than a space, so «IDADI:» followed by
+// «WAVULANA ___», «WASICHANA ___», «JUMLA ___» stays readable as one row of the form.
+// Blank values (a row of underscores) are kept exactly as the source wrote them — they
+// are the spaces the teacher fills in, not missing data.
+function fieldLines(raw, seedLabel) {
+  const out = [];
+  // The heading that opened this block may itself be the first field's label: «SHULE:
+  // ______» is read as a heading («SHULE») whose content is the blank, so without the
+  // seed the first row of the form lost its name and rendered as a bare row of
+  // underscores.
+  if (seedLabel) {
+    const first = String(raw).split('\n').map((l) => l.trim()).find(Boolean) || '';
+    if (first && !/:/.test(first)) out.push({ label: String(seedLabel).trim(), value: first });
+  }
+  let skipFirst = out.length === 1;
+  for (const line of String(raw).split('\n')) {
+    const t = line.trim();
+    if (!t) continue;
+    if (skipFirst) { skipFirst = false; continue; }   // already taken by the seed
+    const m = t.match(/^([^:]{1,48}):\s*(.*)$/);
+    if (m) out.push({ label: m[1].trim(), value: m[2].trim() });
+    else if (out.length) {
+      // Join with a SPACE, which is what plain() does everywhere else and what the
+      // verbatim checker normalises newlines to. Joining with ' · ' built a string that
+      // appears nowhere in the source and the checker rightly flagged it.
+      out[out.length - 1].value = [out[out.length - 1].value, t].filter(Boolean).join(' ');
+    } else out.push({ label: '', value: t });
+  }
+  return out.filter((f) => f.label || f.value);
 }
 
 // An assessment rubric → [{level, desc}]. A CBC rubric is written either as a table
@@ -187,6 +268,11 @@ function listItems(body) {
 function rubricItems(body) {
   const rows = tableRows(body);
   if (rows.length >= 2) return rows.map((r) => ({ level: r.label, desc: r.value }));
+  // «Kuzidi Matarajio:» on its own line, the descriptor on the next — the commonest
+  // pasted form, and the one the reviewer's own Kiswahili lesson uses. Without this the
+  // rubric fell through to a plain text card and lost its whole ramp.
+  const fl = fieldLines(body).filter((f) => f.label && f.value);
+  if (fl.length >= 2) return fl.map((f) => ({ level: f.label, desc: f.value }));
   const items = listItems(body).concat(
     String(body).split('\n').map((l) => l.trim()).filter((l) => l && !/^[-*+\d|]/.test(l)),
   );
@@ -239,9 +325,26 @@ function labelledParts(body) {
   };
   let marks = collect(BOLD_MARK);
   if (!marks.length) {
-    const bare = collect(BARE_MARK);
+    // A LABEL CANNOT BEGIN INSIDE A QUOTATION. Teacher speech in these lessons runs over
+    // several lines and contains colons of its own:
+    //     “Fikiria - unapokutana na mwenzako asubuhi, unamsalimu vipi?
+    //     Tuseme pamoja: ‘Hujambo?’”
+    // Read as labels, «Tuseme pamoja» and «“Sikiliza» tore the teacher's own words into
+    // three cards, one of them titled with an opening quote mark. A candidate is rejected
+    // if the quotes before it are unbalanced, or if it starts with a quote glyph.
+    const openQ = (t) => (t.match(/[“„]/g) || []).length - (t.match(/[”]/g) || []).length;
+    const openS = (t) => (t.match(/‘/g) || []).length - (t.match(/’/g) || []).length;
+    const bare = collect(BARE_MARK).filter((mk) => {
+      if (/^[“”‘’"']/.test(mk.label)) return false;
+      const before = src.slice(0, mk.at);
+      return openQ(before) <= 0 && openS(before) <= 0;
+    });
     if (bare.length >= 2) marks = bare;
   }
+  // A bare label often begins with the source's own bullet — «• Mazoezi ya pamoja:»,
+  // «▪ Wanafunzi walio chini ya lengo:». The bullet is list punctuation, not part of the
+  // card's title, so it comes off the LABEL only; the body keeps every character.
+  marks = marks.map((mk) => ({ ...mk, label: mk.label.replace(/^[•▪●◦*\-–—]\s*/, '').trim() }));
   if (!marks.length) {
     const t = plain(body);
     return t ? [{ label: '', body: t, raw: String(body) }] : [];
@@ -412,6 +515,19 @@ function shapeSection(id, heading, raw, hint, opts = {}) {
     if (parts.length >= 2) return { id, heading, type: 'chips', items: parts.slice(0, 14) };
   }
   if (rows.length) return { id, heading, type: 'fields', items: rows };
+  // The 30-second summary is the design's own cream card: an icon, a bold label and the
+  // line it introduces. Its three labelled parts map straight onto that.
+  if (want === 'summary') {
+    const fl = fieldLines(raw);
+    if (fl.length >= 2) {
+      return { id, heading, type: 'summary',
+        items: fl.map((f) => ({ label: f.label, body: f.value })) };
+    }
+  }
+  if (want === 'fields') {
+    const fl = fieldLines(raw);
+    if (fl.length >= 2) return { id, heading, type: 'fields', items: fl };
+  }
   if (items.length) {
     // The prose ABOVE a list belongs to the list: «By the end of the lesson, the learner
     // should be able to:» is the sentence the outcomes complete, and dropping it lost a
@@ -491,6 +607,22 @@ function buildGuideFromMarkdown(md, opts = {}) {
   // topic from that section is structural, not a guess at which preamble line matters —
   // and it is what stops a Kenyan lesson being titled "Grade 5" or "Strand".
   let subj = subject;
+  let gradeFromForm = '';
+  // A CBC plan states its grade and learning area as ROWS OF THE FORM — «DARASA: 1»,
+  // «ENEO LA KUJIFUNZA: Kiswahili» — not in a title line, so the header came out with no
+  // grade and no subject at all until these were read.
+  const formRole = (profile.roles || []).some(([r]) => r === 'admin-form') ? 'admin-form' : '';
+  if (formRole && byRole.get(formRole)) {
+    const formBlocks = byRole.get(formRole);
+    for (const f of fieldLines(rawOf(formRole), formBlocks[0] && formBlocks[0].title)) {
+      const val = String(f.value || '').replace(/[_.\s]*$/, '').trim();
+      if (!val) continue;
+      if (profile.gradeField && profile.gradeField.test(f.label) && !gradeFromForm) {
+        gradeFromForm = val;       // the chip supplies the word "Darasa" / "Grade"
+      }
+      if (profile.subjectField && profile.subjectField.test(f.label) && !subj) subj = val;
+    }
+  }
   if (profile.topicRole && byRole.get(profile.topicRole)) {
     const t = plain(rawOf(profile.topicRole));
     if (t && t.length <= 90) {
@@ -514,7 +646,8 @@ function buildGuideFromMarkdown(md, opts = {}) {
   const sections = [];
   const push = (s) => { if (s) sections.push(s); };
 
-  const lessonLine = [subj, gradeText, topic,
+  const grade_ = gradeText || gradeFromForm;
+  const lessonLine = [subj, grade_, topic,
     pageRef ? `${profile.pageLabel} ${num(profile, pageRef)}` : '']
     .filter(Boolean).join(' · ');
   if (profile.lessonLineCard !== false) {
@@ -674,9 +807,18 @@ function buildGuideFromMarkdown(md, opts = {}) {
   // ── roles the profile groups onto one card ───────────────────────────────────────
   const merged = new Set();
   for (const rule of (profile.merge || [])) {
-    const items = rule.roles.filter((r) => byRole.get(r))
+    // An EXPAND role contributes its own «LABEL: value» rows (the fill-in form); a plain
+    // role contributes one row, its card title against its text.
+    const items = [];
+    for (const r of (rule.expand || [])) {
+      const bs_ = byRole.get(r);
+      if (!bs_) continue;
+      items.push(...fieldLines(rawOf(r), bs_[0] && bs_[0].title));
+      merged.add(r);
+    }
+    items.push(...rule.roles.filter((r) => byRole.get(r))
       .map((r) => ({ label: T[r] || r, value: plain(rawOf(r)) }))
-      .filter((x) => x.value);
+      .filter((x) => x.value));
     if (items.length) {
       push({ id: rule.id, heading: rule.title, type: rule.type || 'fields', items });
       rule.roles.forEach((r) => merged.add(r));
@@ -714,10 +856,10 @@ function buildGuideFromMarkdown(md, opts = {}) {
   };
   sections.sort((a, b) => rank(a.id) - rank(b.id));
 
-  const meta = { id: 'lesson-guide', locale, region, subject: subj, grade: gradeText, chips: [] };
+  const meta = { id: 'lesson-guide', locale, region, subject: subj, grade: grade_, chips: [] };
   // A profile may put the identifying details in the page header instead of in a card.
   for (const [label, key] of (profile.headerChips || [])) {
-    const value = key === 'subject' ? subj : key === 'grade' ? gradeText : '';
+    const value = key === 'subject' ? subj : key === 'grade' ? grade_ : '';
     if (!value) continue;
     // The source often writes the label into the value — «Grade 5» under a chip already
     // labelled "Grade" printed «Grade  Grade 5». The value wins; the label drops.

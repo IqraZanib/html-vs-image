@@ -288,9 +288,22 @@ Tafakari
 
 test('every Kiswahili CBC heading routes to its role', () => {
   const p = resolveProfile('ke', CBC_SW);
+  // A Kenyan Kiswahili plan carries THREE curriculum levels — Suala 1.0 → Mada 1.1 →
+  // Mada Ndogo 1.1.1 — and the innermost one names the lesson. The first version of this
+  // test pinned «Mada Ndogo» to sub-strand, which is one level out: it made the document
+  // title the sub-strand ("Kusikiliza na Kuzungumza") instead of the lesson
+  // ("Maamkizi na Maagano").
   const expected = [
+    ['Suala', 'strand'],
     ['Mada Kuu', 'strand'],
-    ['Mada Ndogo', 'sub-strand'],
+    ['Mada', 'sub-strand'],
+    ['Mada Ndogo', 'lesson-topic'],
+    ['Muhtasari wa Sekunde 30', 'summary'],
+    ['SHULE:', 'admin-form'],
+    ['Maelezo ya Kurekebisha', 'remediation'],
+    ['Ukuaji wa Somo', 'development'],
+    ['Ukuzaji wa Somo', 'development'],
+    ['Swali/Maswali Muhimu ya Uchunguzi', 'inquiry'],
     ['Matokeo ya Kujifunza', 'outcomes'],
     ['Malengo ya Somo', 'outcomes'],
     ['Maswali Muhimu ya Udadisi', 'inquiry'],
@@ -323,12 +336,13 @@ test('a Kiswahili CBC lesson renders as Kiswahili, in the Kenya region', () => {
   assert.match(g.meta.subtitle, /Jamhuri ya Kenya/);
   const headings = g.sections.map((s) => s.heading).join(' | ');
   assert.match(headings, /Matokeo ya Kujifunza/);
-  assert.match(headings, /Ukuzaji wa Somo/);
+  assert.match(headings, /Ukuz?aji wa Somo/);
   assert.match(headings, /Hitimisho/);
   assert.match(headings, /Tathmini/);
   // no English card titles leak into a Kiswahili document
   for (const english of ['Lesson Learning Outcomes', 'Lesson Development', 'Conclusion',
-    'Assessment', 'Extended Activities', 'Reflection']) {
+    'Assessment', 'Extended Activities', 'Reflection', '30-Second Summary',
+    'Remediation Notes']) {
     assert.ok(!headings.includes(english), `English card title «${english}» leaked`);
   }
   assert.ok(!/[\u0600-\u06FF]/.test(JSON.stringify(g)), 'no Arabic in a Kenyan guide');
