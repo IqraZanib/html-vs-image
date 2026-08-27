@@ -911,6 +911,152 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-exit-ticket .d-note{border:1.5px solid #dbb95e !important}
 .section.sec-solutions .panel{background:#f2faf7}
 
+/* ══════════════════════════════════════════════════════════════════════════════════════
+   APPROVED-DESIGN COMPONENT LAYER
+   Explicit components on explicit grids. Everything above styles the generic panel the
+   renderer used to wrap every section in; a stage no longer uses it. The reason is
+   structural, not cosmetic: a generic card sized itself to whatever it contained and each
+   figure inside kept its own aspect ratio, so a small activity sat centred in a large
+   empty box and a stage never read as one unit. These components have named slots, the
+   grid decides the proportions, and HTML text reflows to fill them.
+   ══════════════════════════════════════════════════════════════════════════════════════ */
+
+.section.yl-stage{margin:0 0 9px;border:2px solid #ccd2dc;border-radius:14px;overflow:hidden;
+  background:#fff;break-inside:avoid;page-break-inside:avoid}
+
+/* StageHeader: icon + title on the reading side, duration and teaching mode on the other */
+.yl-stage-head{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;
+  gap:8px;padding:7px 13px;background:rgba(255,255,255,.55);border-bottom:1.5px solid #e3e7ef}
+.yl-stage-head .yl-ic{display:flex;align-items:center}
+.yl-stage-head .yl-ic svg{width:19px;height:19px}
+.yl-title{font-size:15.5px;font-weight:700;letter-spacing:-.1px}
+.yl-pill{font-size:11.5px;font-weight:700;white-space:nowrap;border-radius:99px;
+  padding:3px 11px;background:#fff;border:1px solid #d7dce6;color:#44506a}
+.yl-pill.yl-mode{background:var(--navy);border-color:var(--navy);color:#fff}
+
+/* StageCard body: teaching text | visual. One explicit grid, one known proportion. */
+.yl-stage-body{display:grid;grid-template-columns:1fr 1.3fr;gap:12px;align-items:center;
+  padding:10px 13px}
+.yl-stage-body.yl-solo{grid-template-columns:1fr}
+.yl-text{font-size:14.5px;line-height:1.6;font-weight:500;color:var(--ink)}
+.yl-visual{min-width:0}
+.yl-visual > *{width:100%}
+
+/* IllustrationPanel */
+.yl-illus{margin:0;background:#fff;border:1px solid #e1e6ef;border-radius:11px;padding:5px;
+  display:flex;flex-direction:column;gap:3px}
+.yl-illus img{width:100%;height:auto;max-height:215px;object-fit:contain;border-radius:8px}
+.yl-illus figcaption{font-size:11.5px;font-weight:700;color:#44506a;text-align:center}
+
+/* CheckpointStrip — full width, at the bottom of the stage it belongs to */
+.yl-check{display:flex;gap:8px;align-items:baseline;margin:0 13px 9px;padding:7px 11px;
+  background:#fdf3dc;border:1px solid #e3c579;border-radius:9px}
+.yl-check .yl-cmark{flex:none;color:#8a6410;font-weight:800;font-size:13px}
+.yl-check .yl-ctext{font-size:13.5px;line-height:1.45;font-weight:700;color:#5f4708}
+
+/* SupportStrip | ChallengeStrip — two equal columns, aligned, never floating side boxes */
+.yl-diff{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 13px 10px}
+.yl-cal{display:flex;gap:7px;align-items:flex-start;border-radius:9px;padding:6px 9px;
+  border:1px solid transparent}
+.yl-cal .yl-cl{flex:none;font-size:10.5px;font-weight:800;color:#fff;border-radius:99px;
+  padding:2px 9px;line-height:1.55}
+.yl-cal .yl-cb{font-size:12.5px;line-height:1.45;font-weight:600;color:var(--ink)}
+.yl-support{background:#eaf4e6;border-color:#b6d6a8}
+.yl-support .yl-cl{background:#4a8a2e}
+.yl-challenge{background:#f1ecf8;border-color:#c9b9de}
+.yl-challenge .yl-cl{background:#6b4a86}
+
+/* An empty stage: the source gives العرض no body, so the card is its header alone. */
+.section.yl-stage.yl-empty{border-style:dashed;background:#eef3fa}
+.section.yl-stage.yl-empty .yl-stage-head{border-bottom:0;background:transparent}
+
+/* MatchingActivity / WordMatchingActivity — rows that FILL the slot they are given.
+   [word card] · dotted connector · [figure + its exact label] */
+.yl-match{display:grid;gap:5px}
+.yl-match .yl-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(34px,.55fr) minmax(0,1.15fr);
+  align-items:center;gap:4px}
+/* Row rhythm: 15px Arabic in a full-width card reads as well as 16px and takes ~42px a row
+   instead of ~48px. Across three five-row activities that is ~240px — the difference between
+   a page that ends with the assessment and one that pushes it over. The cards stay full
+   width; what is tightened is the vertical rhythm, not the scale of the type. */
+.yl-card{border-radius:9px;padding:5px 9px;font-weight:800;font-size:15px;text-align:center;
+  background:#fff;border:1.7px solid #2f3e63;color:#0a1220;min-width:0}
+.yl-card.yl-word-b{background:#f7f9fc;border-color:#4479ad}
+.yl-card.yl-target{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:7px;
+  background:#f7f9fc;border-color:#4479ad;font-size:14px;text-align:start;padding:5px 9px}
+.yl-figwrap{display:flex;align-items:center}
+.yl-fig{width:30px;height:33px;display:block}
+.yl-tlabel{font-weight:700;min-width:0}
+.yl-conn{position:relative;display:flex;align-items:center;height:100%}
+.yl-conn .yl-link{width:100%;height:10px;display:block}
+.yl-conn .yl-dot{position:absolute;top:50%;width:5px;height:5px;border-radius:50%;
+  background:#2f3e63;transform:translateY(-50%)}
+.yl-conn .yl-dot-a{inset-inline-start:0}
+.yl-conn .yl-dot-b{inset-inline-end:0}
+.yl-wordmatch .yl-row{grid-template-columns:minmax(0,1fr) minmax(34px,.5fr) minmax(0,1fr)}
+
+/* AssessmentActivity — the word in a shape, then the row it is looked for in, underlined */
+/* The assessment rows go two-up for the same reason the matching rows did: five rows of one
+   pair left a 90px orphan on a third page. Three rows close the lesson on page 2. */
+.yl-assess{display:grid;grid-template-columns:1fr 1fr;gap:5px 16px}
+.yl-arow{display:grid;grid-template-columns:minmax(0,.62fr) minmax(0,1fr);gap:9px;align-items:center}
+.yl-shape{border:2px dashed #8a6d1d;border-radius:10px;background:#fffaf0;padding:5px 9px;
+  font-weight:800;font-size:15px;text-align:center}
+.yl-optrow{border-bottom:1.6px solid #d7dce6;padding:4px 8px 6px;display:flex;gap:12px;
+  justify-content:flex-start}
+.yl-opt{font-weight:800;font-size:15px}
+.yl-opt-pick{text-decoration:underline;text-decoration-thickness:2.5px;
+  text-underline-offset:4px;text-decoration-color:#4a8a2e}
+
+/* MisconceptionPanel — two columns, ✕ against ✓, explanation beside them */
+.section.yl-miscsec{border:2px solid #e0553a;border-radius:14px;overflow:hidden;
+  background:#fff8f7;margin:0 0 9px;break-inside:avoid}
+.section.yl-miscsec .yl-stage-head{border-bottom:1.5px solid #f3cdc6}
+.section.yl-miscsec .yl-title{color:#c0392b}
+.section.yl-miscsec .yl-misc{display:grid;grid-template-columns:1.25fr .9fr;gap:10px;
+  align-items:center;padding:9px 13px}
+.yl-mboard{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.yl-half{border-radius:11px;padding:7px 9px 6px;text-align:center;border:1.8px solid;
+  position:relative}
+.yl-half .yl-mark{position:absolute;top:5px;inset-inline-end:8px;font-size:13px;font-weight:800}
+.yl-half .yl-mword{font-size:21px;font-weight:800;line-height:1.5}
+.yl-half .yl-mlbl{font-size:11.5px;font-weight:800;border-radius:99px;padding:1px 9px;
+  display:inline-block;color:#fff}
+.yl-wrong{background:#fdecea;border-color:#e0553a}
+.yl-wrong .yl-mark{color:#c0392b}
+.yl-wrong .yl-mlbl{background:#c0392b}
+.yl-correct{background:#eaf6ec;border-color:#4a8a2e}
+.yl-correct .yl-mark{color:#1e8e4d}
+.yl-correct .yl-mlbl{background:#1e8e4d}
+.yl-mnote{font-size:13.5px;line-height:1.55;font-weight:600;color:var(--ink);
+  background:#fff;border:1px solid #f0c9c2;border-radius:10px;padding:8px 10px}
+
+/* TWO RELATED EXERCISES SHARE A ROW. «أصل بين الصورة والكلمة» and «أصل بين كل كلمتين
+   متماثلتين» are the two halves of one التطبيق, and stacked full-width they were 709px —
+   which is why the assessment could not fit the page and a third page appeared holding
+   62% of nothing. Side by side they are ~330px and the whole lesson closes on page 2. The
+   pilot does the same thing with its two stages. Each keeps its own header, checkpoint and
+   دعم/تحد strips, so it is still one designed unit. */
+.section.yl-stage.sec-stage-tatbiq:has(.yl-match){grid-column:span 6}
+.section.yl-stage:has(.yl-match) .yl-diff{grid-template-columns:1fr}
+.section.yl-stage:has(.yl-match) .yl-card{font-size:14px;padding:5px 7px}
+.section.yl-stage:has(.yl-match) .yl-card.yl-target{font-size:12.5px;gap:5px}
+.section.yl-stage:has(.yl-match) .yl-fig{width:24px;height:27px}
+.section.yl-stage:has(.yl-match) .yl-match .yl-row{grid-template-columns:minmax(0,1fr) minmax(26px,.42fr) minmax(0,1.1fr)}
+
+/* Stage role colours — one fill per stage, headers tinted to match */
+.section.yl-stage.sec-stage-tamhid{background:#fdeedd;border-color:#e8bb86}
+.section.yl-stage.sec-stage-tamhid .yl-title{color:#a85a12}
+.section.yl-stage.sec-stage-arad{background:#e7eef8;border-color:#9dbbde}
+.section.yl-stage.sec-stage-arad .yl-title{color:#1c4f7c}
+.section.yl-stage.sec-stage-tatbiq{background:#e9f2e5;border-color:#a3cc93}
+.section.yl-stage.sec-stage-tatbiq .yl-title{color:#3f7027}
+.section.yl-stage.sec-stage-taqwim{background:var(--cream);border-color:#dbb95e}
+.section.yl-stage.sec-stage-taqwim .yl-title{color:#8a6d1d}
+/* the activity itself sits on white so the word cards read cleanly */
+.yl-visual .yl-match,.yl-visual .yl-assess{background:#fff;border:1px solid #dfe4ee;
+  border-radius:11px;padding:8px}
+
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

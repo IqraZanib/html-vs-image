@@ -77,8 +77,10 @@ test('a role the lesson does not provide is left out, not invented', () => {
 test('stage times and gradual-release pills come from the source headings', () => {
   const g = buildGuideFromMarkdown(LESSON, { region: 'ye', locale: 'ar' });
   const tamhid = g.sections.find((s) => s.id === 'stage-tamhid');
+  // duration and teaching mode are SEPARATE slots now: the stage component renders them as
+  // two pills (DurationPill, TeachingModePill), so they are no longer one joined string.
   assert.match(tamhid.time, /١٠ دقيقة/, 'minutes parsed from «8-10 دقائق» in Arabic-Indic digits');
-  assert.match(tamhid.time, /أنا أفعل/);
+  assert.match(tamhid.mode, /أنا أفعل/);
 });
 
 test('Explore and Explain both reach العرض as their own cards', () => {
@@ -102,12 +104,15 @@ test('each labelled part becomes its own design-shaped card', () => {
   const g = buildGuideFromMarkdown(withParts, { region: 'ye', locale: 'ar' });
   const cards = g.sections.filter((s) => s.id === 'stage-tamhid');
   assert.ok(cards.length >= 2, 'one card per labelled part');
-  assert.ok(cards.every((c) => c.type === 'text'), 'a part card is a text card');
+  assert.ok(cards.every((c) => c.type === 'stage'),
+    'a stage part is an explicit stage component, with named slots for text, visual, '
+    + 'checkpoint and differentiation');
   assert.match(cards[0].heading, /التمهيد/, 'every card names its stage');
   assert.match(cards[0].heading, /نشاط الافتتاح/);
   assert.match(cards[1].heading, /السؤال الجوهري/);
-  assert.match(cards[0].time, /أنا أفعل/, 'the first card of a stage carries the time pill');
-  assert.ok(!cards[1].time, 'and later cards do not repeat it');
+  assert.match(cards[0].time, /١٠ دقيقة/, 'the first card of a stage carries the duration pill');
+  assert.match(cards[0].mode, /أنا أفعل/, '…and the teaching-mode pill');
+  assert.ok(!cards[1].time && !cards[1].mode, 'and later cards do not repeat them');
 });
 
 test('every stage that can carry a visual gets one', () => {

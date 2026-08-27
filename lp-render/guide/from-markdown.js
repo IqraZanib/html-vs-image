@@ -781,7 +781,7 @@ function buildGuideFromMarkdown(md, opts = {}) {
     } else {
       const body = plain(raw);
       if (body) {
-        const sec = { id: 'errors', heading: T.errors, type: 'note', body };
+        const sec = { id: 'errors', heading: T.errors, type: 'misconception', body };
         const pair = profile.confusedPairRe ? body.match(profile.confusedPairRe) : null;
         if (pair) {
           // «✕ خطأ» / «✓ صواب» — the two words the design puts on this panel.
@@ -806,9 +806,9 @@ function buildGuideFromMarkdown(md, opts = {}) {
     // the pack draws it as a slim empty stage.
     if (profile.emitEmptyStages && !found.some((b) => plain(b.body))) {
       const mins = found.map((x) => minutesOf(x.title, profile)).find(Boolean) || '';
-      const pill = [mins, (profile.grr || {})[id]].filter(Boolean).join(' · ');
-      const sec = { id, heading: T[id], type: 'text', body: '' };
-      if (pill) sec.time = pill;
+      const sec = { id, heading: T[id], type: 'stage', body: '' };
+      if (mins) sec.time = mins;
+      if ((profile.grr || {})[id]) sec.mode = profile.grr[id];
       push(sec);
       continue;
     }
@@ -905,17 +905,25 @@ function buildGuideFromMarkdown(md, opts = {}) {
             && partBody.search(profile.checkMarks) === 0 && partBody.length <= 160) {
           sp = { body: '', check: partBody.trim() };
         }
-        const sec = sp.check
-          ? { id, heading: title, type: 'steps',
-              items: [{ label: '', body: sp.body }, { label: profile.checkLabel, body: sp.check }] }
-          : { id, heading: title, type: 'text', body: sp.longCheck ? sp.body : partBody };
+        // AN EXPLICIT STAGE COMPONENT WITH NAMED SLOTS — text, visual, checkpoint,
+        // support, challenge — rather than a generic card whose contents arrange
+        // themselves. The renderer lays these out on a fixed grid (see ylStage).
+        const sec = { id, heading: title, type: 'stage',
+          body: sp.longCheck ? sp.body : (sp.check ? sp.body : partBody) };
+        if (sp.check) sec.check = sp.check;
         if (first) {
-          const mins = found.map((x) => minutesOf(x.title, profile)).find(Boolean) || '';
-          const pill = [mins, (profile.grr || {})[id]].filter(Boolean).join(' · ');
-          if (pill) sec.time = pill;
+          sec.time = found.map((x) => minutesOf(x.title, profile)).find(Boolean) || '';
+          sec.mode = (profile.grr || {})[id] || '';
+          if (!sec.time) delete sec.time;
+          if (!sec.mode) delete sec.mode;
           first = false;
         }
-        if (fig) sec.codeFigure = fig;
+        if (fig) {
+          // the same pairs, a different component: «أضع خطاً تحت الكلمة المماثلة» is an
+          // exercise to complete, not a matching demonstration to read
+          sec.codeFigure = (fig.kind === 'match-pairs' && id === profile.assessmentStage)
+            ? { ...fig, kind: 'assessment' } : fig;
+        }
         push(sec);
         lastCard = sec;
         // A long model answer is its own card — same stage colour — rather than being

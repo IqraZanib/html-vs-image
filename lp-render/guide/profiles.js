@@ -93,6 +93,9 @@ const YE = {
   // title and pills. The four-stage rhythm is what a teacher reads by, and fabricating
   // content to fill a gap is not an option.
   emitEmptyStages: true,
+  // The assessment activity must not be a second copy of the practice widget — the
+  // reviewer asked for it to read differently inside the same design family.
+  assessmentStage: 'stage-taqwim',
   order: ['lesson-line', 'goal', 'materials', 'errors', 'errors-caption', 'stage-tamhid',
     'stage-arad', 'stage-tatbiq', 'stage-taqwim', 'exit-ticket', 'solutions', 'glossary',
     'multigrade', 'homework'],

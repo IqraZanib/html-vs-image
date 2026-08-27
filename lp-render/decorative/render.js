@@ -803,6 +803,171 @@ function fractionGridSvg({ shape, parts, shaded }) {
   return `<svg class="cf-svg" viewBox="0 0 ${W} ${H}">${rects}</svg>`;
 }
 
+// ══ APPROVED-DESIGN COMPONENTS ═══════════════════════════════════════════════════════
+// Explicit components with known slots, laid out by CSS Grid. The renderer used to hand a
+// section to a generic panel and let each figure decide its own size inside it: an SVG with
+// a fixed viewBox in a flexible card is exactly how a small widget ends up centred in a
+// large empty box, and how a stage stopped reading as one designed unit.
+//
+// So Arabic text is HTML and geometry is SVG or CSS. HTML text reflows, which means a
+// component FILLS the slot it is given instead of preserving an aspect ratio — that is the
+// structural fix for the empty space, not a padding change. It also gives the Arabic proper
+// font and RTL handling, which text drawn inside an SVG never had.
+//
+// Component names match the design vocabulary: yl-stage (StageCard), yl-stage-head
+// (StageHeader), yl-dur (DurationPill), yl-mode (TeachingModePill), yl-text, yl-visual
+// (IllustrationPanel), yl-check (CheckpointStrip), yl-support / yl-challenge
+// (SupportStrip / ChallengeStrip), yl-match (MatchingActivity), yl-wordmatch
+// (WordMatchingActivity), yl-assess (AssessmentActivity), yl-misc (MisconceptionPanel).
+
+// Wordless person figures, drawn in code — never generated, never labelled by the model.
+const YL_PEOPLE = {
+  man: '<svg viewBox="0 0 40 44" class="yl-fig"><circle cx="20" cy="11" r="7.5" fill="#e8b98f"/>'
+    + '<path d="M12 10.5q8-6 16 0" fill="none" stroke="#2f3e63" stroke-width="2"/>'
+    + '<path d="M11 43l2-22h14l2 22z" fill="#f2f4f8" stroke="#2f3e63" stroke-width="1.4"/></svg>',
+  woman: '<svg viewBox="0 0 40 44" class="yl-fig"><circle cx="20" cy="11" r="7.5" fill="#e8b98f"/>'
+    + '<path d="M11 11a9 9 0 0118 0v9h-4v-5H15v5h-4z" fill="#3b4a72"/>'
+    + '<path d="M10 43l3-24h14l3 24z" fill="#3b4a72"/></svg>',
+  boy: '<svg viewBox="0 0 40 44" class="yl-fig"><circle cx="20" cy="11" r="7.5" fill="#e8b98f"/>'
+    + '<path d="M12.5 6.5q7.5-5 15 0" fill="#3a2b1c"/>'
+    + '<path d="M12 43l2-22h12l2 22z" fill="#cfe0ef" stroke="#2f3e63" stroke-width="1.3"/></svg>',
+  girl: '<svg viewBox="0 0 40 44" class="yl-fig"><circle cx="20" cy="11" r="7.5" fill="#e8b98f"/>'
+    + '<path d="M11 11a9 9 0 0118 0v8h-3.5v-4.5H14.5V19H11z" fill="#7f9cc4"/>'
+    + '<path d="M11 43l3-24h12l3 24z" fill="#7f9cc4"/></svg>',
+};
+const YL_PERSON_FOR = [
+  [/الولد|الابن|boy/i, 'boy'],
+  [/البنت|الابنة|girl/i, 'girl'],
+  [/الأب(?![\u0600-\u06FF])|father/i, 'man'],
+  [/الأم(?![\u0600-\u06FF])|mother/i, 'woman'],
+];
+const ylPerson = (t) => {
+  const hit = YL_PERSON_FOR.find(([re]) => re.test(String(t)));
+  return hit ? YL_PEOPLE[hit[1]] : '';
+};
+
+// A dotted connector with a dot at each end — SVG geometry, stretched by the grid.
+const YL_LINK = '<svg class="yl-link" viewBox="0 0 100 10" preserveAspectRatio="none">'
+  + '<line x1="4" y1="5" x2="96" y2="5" stroke="#2f3e63" stroke-width="1.4" stroke-dasharray="4 4" opacity=".55"/>'
+  + '</svg><span class="yl-dot yl-dot-a"></span><span class="yl-dot yl-dot-b"></span>';
+
+// MatchingActivity — «أصل بين الصورة والكلمة الدالة عليها». Word card, connector, then the
+// thing it names: a code-drawn figure plus its exact label from the source.
+function ylMatching(items) {
+  const rows = (items || []).map((it) => {
+    const word = esc(cleanHeading(it.label || ''));
+    const target = String(it.caption || '').trim();
+    const fig = ylPerson(target);
+    return '<div class="yl-row">'
+      + '<div class="yl-card yl-word">' + word + '</div>'
+      + '<div class="yl-conn">' + YL_LINK + '</div>'
+      + '<div class="yl-card yl-target">' + (fig ? '<span class="yl-figwrap">' + fig + '</span>' : '')
+      + '<span class="yl-tlabel">' + esc(cleanHeading(target)) + '</span></div>'
+      + '</div>';
+  }).join('');
+  return '<div class="yl-match">' + rows + '</div>';
+}
+
+// WordMatchingActivity — «أصل بين كل كلمتين متماثلتين». Two balanced columns of word cards.
+function ylWordMatch(items) {
+  const rows = (items || []).map((it) =>
+    '<div class="yl-row">'
+    + '<div class="yl-card yl-word">' + esc(cleanHeading(it.label || '')) + '</div>'
+    + '<div class="yl-conn">' + YL_LINK + '</div>'
+    + '<div class="yl-card yl-word yl-word-b">' + esc(cleanHeading(it.caption || '')) + '</div>'
+    + '</div>').join('');
+  return '<div class="yl-match yl-wordmatch">' + rows + '</div>';
+}
+
+// AssessmentActivity — «ألاحظ الكلمة التي في الشكل، ثم أضع خطاً تحت الكلمة المماثلة لها في
+// السطر». Deliberately a DIFFERENT shape from the practice activity: the word in a shape on
+// the reading side, then the row it is looked for in, with the match underlined.
+function ylAssessment(items) {
+  const rows = (items || []).map((it) =>
+    '<div class="yl-arow">'
+    + '<div class="yl-shape">' + esc(cleanHeading(it.label || '')) + '</div>'
+    + '<div class="yl-optrow"><span class="yl-opt yl-opt-pick">'
+    + esc(cleanHeading(it.caption || '')) + '</span></div>'
+    + '</div>').join('');
+  return '<div class="yl-assess">' + rows + '</div>';
+}
+
+// MisconceptionPanel — two columns, ✕ خطأ against ✓ صواب, with the source's explanation.
+function ylMisconception(section, engine) {
+  const cf = section.codeFigure || {};
+  const wrong = (cf.wrong && cf.wrong.text) || '';
+  const correct = (cf.correct && cf.correct.text) || '';
+  const half = (cls, mark, lbl, word) =>
+    '<div class="yl-half ' + cls + '"><div class="yl-mark">' + mark + '</div>'
+    + '<div class="yl-mword">' + esc(cleanHeading(word)) + '</div>'
+    + '<div class="yl-mlbl">' + esc(cleanHeading(lbl)) + '</div></div>';
+  const board = (wrong && correct)
+    ? '<div class="yl-mboard">' + half('yl-wrong', '✕', cf.labelWrong || '', wrong)
+      + half('yl-correct', '✓', cf.labelCorrect || '', correct) + '</div>'
+    : '';
+  const note = section.body
+    ? '<div class="yl-mnote">' + richText(section.body, { engine }) + '</div>' : '';
+  return '<div class="yl-misc">' + board + note + '</div>';
+}
+
+// The visual slot of a stage: the model illustration, or a code activity, or nothing.
+function ylVisual(section, images, engine) {
+  const cf = section.codeFigure;
+  if (cf) {
+    if (cf.kind === 'match-pairs') {
+      const named = (cf.items || []).some((it) => /صورة|picture|image/i.test(String(it.caption || '')));
+      return named ? ylMatching(cf.items) : ylWordMatch(cf.items);
+    }
+    if (cf.kind === 'assessment') return ylAssessment(cf.items);
+    if (CF_KINDS.has(cf.kind)) return '<div class="yl-cf">' + cfMini(cf) + '</div>';
+  }
+  const im = section.image && images[section.image];
+  if (im && im.dataUri) {
+    return '<figure class="yl-illus"><img src="' + im.dataUri + '" alt="'
+      + esc(cleanHeading(im.label || '')) + '">'
+      + (im.label ? '<figcaption>' + esc(cleanHeading(im.label)) + '</figcaption>' : '')
+      + '</figure>';
+  }
+  return '';
+}
+
+// StageCard — one designed teaching unit with fixed slots:
+//   head:   title · duration pill · teaching-mode pill
+//   body:   teaching text | visual            (explicit grid, 1fr / 1.3fr)
+//   check:  checkpoint strip, full width
+//   diff:   دعم | تحد, two equal columns, full width
+function ylStage(section, accent, images, idCls) {
+  const engine = section.engine;
+  const title = cleanHeading(section.heading);
+  const ic = section.icon && hasIcon(section.icon) ? icon(section.icon, 20) : '';
+  const head = '<div class="yl-stage-head">'
+    + '<span class="yl-ic">' + ic + '</span>'
+    + '<span class="yl-title">' + esc(title) + '</span>'
+    + (section.time ? '<span class="yl-pill yl-dur">' + esc(cleanHeading(section.time)) + '</span>' : '')
+    + (section.mode ? '<span class="yl-pill yl-mode">' + esc(cleanHeading(section.mode)) + '</span>' : '')
+    + '</div>';
+  const visual = ylVisual(section, images, engine);
+  const text = section.body
+    ? '<div class="yl-text">' + richText(section.body, { engine }) + '</div>' : '';
+  // no text → the visual takes the whole width; no visual → the text does. This is what
+  // stops a card being tall while its content is small.
+  const bodyCls = 'yl-stage-body' + (text && visual ? '' : ' yl-solo');
+  const body = (text || visual)
+    ? '<div class="' + bodyCls + '">' + text + (visual ? '<div class="yl-visual">' + visual + '</div>' : '') + '</div>'
+    : '';
+  const check = section.check
+    ? '<div class="yl-check"><span class="yl-cmark">✓</span><span class="yl-ctext">'
+      + richText(section.check, { engine }) + '</span></div>' : '';
+  const diff = (Array.isArray(section.callouts) && section.callouts.length)
+    ? '<div class="yl-diff">' + section.callouts.map((c, k) =>
+      '<div class="yl-cal ' + (k === 0 ? 'yl-support' : 'yl-challenge') + '">'
+      + '<span class="yl-cl">' + esc(cleanHeading(c.label || '')) + '</span>'
+      + '<span class="yl-cb">' + richText(c.body || '', { engine }) + '</span></div>').join('')
+      + '</div>' : '';
+  const empty = !body && !check && !diff ? ' yl-empty' : '';
+  return '<section class="section yl-stage' + idCls + empty + '">' + head + body + check + diff + '</section>';
+}
+
 function renderDecorativeLesson(content, images = {}, cast = {}) {
   const meta = content.meta || {};
   CF_DIR = cfDirFor(meta.locale);   // drawn labels read the way this document reads
@@ -865,6 +1030,20 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     if (mg && section.image && images[section.image] && images[section.image].dataUri) {
       referenced.add(section.image);
       body += inlineImage(section.image, images);
+    }
+    // AN EXPLICIT COMPONENT, NOT A GENERIC PANEL. A stage carries known slots and is laid
+    // out by grid; nothing inside it chooses its own position.
+    if (section.type === 'stage') return ylStage(section, accent, images, idCls);
+    if (section.type === 'misconception') {
+      // Its OWN header row, not the generic one: this pack pulls a section head 32px into
+      // the card it labels, which works against a .panel and only against a .panel. On a
+      // component with no panel the header landed on top of the ✕ box.
+      const t = cleanHeading(section.heading);
+      const mic = section.icon && hasIcon(section.icon) ? icon(section.icon, 19) : '';
+      return '<section class="section' + idCls + ' yl-miscsec">'
+        + '<div class="yl-stage-head"><span class="yl-ic">' + mic + '</span>'
+        + '<span class="yl-title">' + esc(t) + '</span><span></span><span></span></div>'
+        + ylMisconception(section, section.engine) + '</section>';
     }
     if (body === '') return '';
     // A heading that repeats the previous one (e.g. a phase split across structuring
