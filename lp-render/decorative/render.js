@@ -99,11 +99,35 @@ function renderBody(section, accent, images) {
       return `<table class="d-gtable"${style}>${cap}${head}<tbody>${body}</tbody></table>`;
     }
     case 'rubric': {
-      const COL = { exceeding: '--c-teal', meeting: '--c-green', approaching: '--c-amber', below: '--c-red' };
-      const SYM = { exceeding: '★', meeting: '✓', approaching: '▲', below: '✕' };
-      const rows = (section.items || []).map((it) => {
-        const key = String(it.level || '').toLowerCase().replace(/[^a-z]/g, '');
-        const c = COL[key] || accent; const sym = SYM[key] || '•';
+      // THE SEVERITY RAMP IS POSITIONAL, NOT LEXICAL. It used to be a lookup on four
+      // English words (exceeding / meeting / approaching / below), so any other level
+      // name — "Exceeding Expectation", a numbered band, a Kiswahili level, a three-band
+      // rubric — fell through to one flat accent colour and a bullet on every row, and
+      // the ramp that carries the meaning disappeared. A rubric's rows already arrive in
+      // order, so the ramp comes from POSITION; the words are consulted only to work out
+      // which end is the top, and a source can say so outright with order:'worst-first'.
+      const items = section.items || [];
+      const n = items.length;
+      const RAMP = {
+        1: ['--c-teal'],
+        2: ['--c-green', '--c-red'],
+        3: ['--c-teal', '--c-amber', '--c-red'],
+        4: ['--c-teal', '--c-green', '--c-amber', '--c-red'],
+      };
+      const SYMS = { 1: ['★'], 2: ['✓', '✕'], 3: ['★', '▲', '✕'], 4: ['★', '✓', '▲', '✕'] };
+      const spread = (a) => items.map((_, i) => a[Math.min(3, Math.floor((i * 4) / Math.max(1, n)))]);
+      const cols = RAMP[n] || spread(RAMP[4]);
+      const syms = SYMS[n] || spread(SYMS[4]);
+      const TOP = /exceed|excellent|advanced|distinction|outstanding|above|ممتاز/i;
+      const BOTTOM = /below|beginning|emerging|needs|weak|poor|ضعيف/i;
+      const first = String((items[0] || {}).level || '');
+      const last = String((items[n - 1] || {}).level || '');
+      const worstFirst = section.order === 'worst-first'
+        || (n > 1 && !TOP.test(first) && !BOTTOM.test(last)
+            && (BOTTOM.test(first) || TOP.test(last)));
+      const rank = (i) => (worstFirst ? n - 1 - i : i);
+      const rows = items.map((it, i) => {
+        const c = cols[rank(i)] || accent; const sym = syms[rank(i)] || '•';
         const lvl = cleanHeading(it.level || '').replace(/^[^\p{L}]+/u, ''); // drop any leading emoji/symbol (the badge already shows one)
         return `<div class="rrow"><div class="ric" style="background:var(${c})">${sym}</div>`
           + `<div><span class="rlevel">${esc(lvl)}:</span> `
