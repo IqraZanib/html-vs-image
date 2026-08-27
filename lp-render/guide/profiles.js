@@ -93,9 +93,15 @@ const YE = {
   // title and pills. The four-stage rhythm is what a teacher reads by, and fabricating
   // content to fill a gap is not an option.
   emitEmptyStages: true,
+  leadIntoFirstPart: true,
   // The assessment activity must not be a second copy of the practice widget — the
   // reviewer asked for it to read differently inside the same design family.
   assessmentStage: 'stage-taqwim',
+  // Roles that render as a titled BLOCK component — their own header row inside their
+  // own border. They were the last sections still using the generic panel, whose header
+  // is pulled 32px into the card; on those five it drew the title ON the border and
+  // clipped «أبي، أمي، أحمد، إيمان» outside the card.
+  blockComponents: ['goal', 'materials', 'exit-ticket', 'solutions', 'homework'],
   order: ['lesson-line', 'goal', 'materials', 'errors', 'errors-caption', 'stage-tamhid',
     'stage-arad', 'stage-tatbiq', 'stage-taqwim', 'exit-ticket', 'solutions', 'glossary',
     'multigrade', 'homework'],

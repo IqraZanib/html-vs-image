@@ -906,7 +906,6 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
       للفصول متعددة الصفوف). RTL: column 1 is the right edge, so the question sits right. */
 .section.sec-exit-ticket{grid-column:1 / 7}
 .section.sec-solutions{grid-column:7 / 13}
-.section.sec-exit-ticket .panel,.section.sec-solutions .panel{height:calc(100% - 34px)}
 
 .section.sec-exit-ticket .d-note{border:1.5px solid #dbb95e !important}
 .section.sec-solutions .panel{background:#f2faf7}
@@ -921,7 +920,17 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
    grid decides the proportions, and HTML text reflows to fill them.
    ══════════════════════════════════════════════════════════════════════════════════════ */
 
-.section.yl-stage{margin:0 0 9px;border:2px solid #ccd2dc;border-radius:14px;overflow:hidden;
+/* DEAD SPACE AFTER THE LAST CARD MADE A THIRD PAGE THAT HELD ONLY THE FOOTER. The document
+   ended 14px below its last card — the body's bottom padding plus that card's margin — and
+   the composer will not absorb an overflow it cannot fit without clipping, so it opened a
+   page for it. Nothing renders there but page chrome. */
+.body{padding-bottom:0 !important}
+.body > .section:last-child{margin-bottom:0}
+
+/* 17px decided a page: the document came to 1924px against a two-page capacity of 1907,
+   and the composer will not absorb an overflow it cannot fit without clipping. One pixel
+   off each card margin and the body padding covers it. */
+.section.yl-stage{margin:0 0 8px;border:2px solid #ccd2dc;border-radius:14px;overflow:hidden;
   background:#fff;break-inside:avoid;page-break-inside:avoid}
 
 /* StageHeader: icon + title on the reading side, duration and teaching mode on the other */
@@ -945,7 +954,7 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 /* IllustrationPanel */
 .yl-illus{margin:0;background:#fff;border:1px solid #e1e6ef;border-radius:11px;padding:5px;
   display:flex;flex-direction:column;gap:3px}
-.yl-illus img{width:100%;height:auto;max-height:215px;object-fit:contain;border-radius:8px}
+.yl-illus img{width:100%;height:auto;max-height:205px;object-fit:contain;border-radius:8px}
 .yl-illus figcaption{font-size:11.5px;font-weight:700;color:#44506a;text-align:center}
 
 /* CheckpointStrip — full width, at the bottom of the stage it belongs to */
@@ -1010,7 +1019,7 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 
 /* MisconceptionPanel — two columns, ✕ against ✓, explanation beside them */
 .section.yl-miscsec{border:2px solid #e0553a;border-radius:14px;overflow:hidden;
-  background:#fff8f7;margin:0 0 9px;break-inside:avoid}
+  background:#fff8f7;margin:0 0 8px;break-inside:avoid}
 .section.yl-miscsec .yl-stage-head{border-bottom:1.5px solid #f3cdc6}
 .section.yl-miscsec .yl-title{color:#c0392b}
 .section.yl-miscsec .yl-misc{display:grid;grid-template-columns:1.25fr .9fr;gap:10px;
@@ -1057,6 +1066,90 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .yl-visual .yl-match,.yl-visual .yl-assess{background:#fff;border:1px solid #dfe4ee;
   border-radius:11px;padding:8px}
 
+/* ── BLOCK COMPONENTS: objective, materials, exit ticket, answer key, teacher corner ──
+   Header row inside the card, content inside the card, nothing on the border. These were
+   the last sections on the generic panel — whose header is pulled 32px into it, which is
+   why «الإجابات» printed on the top border and its answer text was clipped below the
+   bottom one. A component owns its own header, so that cannot happen. */
+.section.yl-block{margin:0 0 8px;border:2px solid #ccd2dc;border-radius:14px;overflow:hidden;
+  background:#fff;break-inside:avoid;page-break-inside:avoid}
+.yl-bhead{display:flex;align-items:center;gap:8px;padding:6px 13px;
+  background:rgba(255,255,255,.55);border-bottom:1.5px solid #e3e7ef}
+.yl-bhead .yl-ic{display:flex}
+.yl-bhead .yl-ic svg{width:18px;height:18px}
+.yl-bbody{padding:8px 13px}
+.yl-bbody > *:last-child{margin-bottom:0}
+.yl-bbody .d-text,.yl-bbody .d-note{font-size:14px;line-height:1.55;font-weight:600;
+  background:none;border:0;padding:0;color:var(--ink)}
+.yl-bbody .d-chips{display:flex;flex-wrap:wrap;gap:6px}
+
+/* per-role skins */
+.section.yl-block.sec-goal{border-color:var(--c-teal);background:#f4fbfa}
+.section.yl-block.sec-goal .yl-bhead{display:none}
+/* The icon is pinned with a LOGICAL inset but the gutter was reserved with PHYSICAL padding,
+   so in RTL the space opened on the far side and the dart landed on top of «الأسرة».
+   Both must speak the same coordinate system. */
+.section.yl-block.sec-goal .yl-bbody{padding:9px 14px;padding-inline-end:58px;position:relative}
+.section.yl-block.sec-goal .yl-bbody::before{content:"";position:absolute;inset-inline-end:8px;
+  top:50%;transform:translateY(-50%);width:42px;height:42px;background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='34' r='24' fill='%23e0705a'/><circle cx='32' cy='34' r='17.5' fill='%23fff'/><circle cx='32' cy='34' r='11' fill='%23e0705a'/><circle cx='32' cy='34' r='5' fill='%23fff'/><path d='M32 34 L52 14' stroke='%23182448' stroke-width='4.5' stroke-linecap='round'/><path d='M52 14 l-1.5 9 M52 14 l-9 1.5' stroke='%23e3a23c' stroke-width='4' stroke-linecap='round'/></svg>") no-repeat center/contain}
+.section.yl-block.sec-goal .d-note b{color:var(--c-teal-ink)}
+.section.yl-block.sec-materials{border-color:#9ecfc9;background:#f3faf9}
+.section.yl-block.sec-materials .yl-title{color:var(--c-teal-ink)}
+.section.yl-block.sec-materials .d-chip{background:#fff !important;border:1.5px solid #9ecfc9;
+  color:#0f6b64 !important;font-weight:800;font-size:12.5px;padding:4px 11px}
+.section.yl-block.sec-exit-ticket{border-color:#dbb95e;background:var(--cream)}
+.section.yl-block.sec-exit-ticket .yl-title{color:#8a6d1d}
+.section.yl-block.sec-exit-ticket .yl-bbody .d-note{background:#fff;border:1.5px solid #e3d3a3;
+  border-radius:9px;padding:7px 10px;font-size:14.5px;font-weight:700}
+.section.yl-block.sec-solutions{border-color:#8fc9bf;background:#f2faf7}
+.section.yl-block.sec-solutions .yl-title{color:#0e7a7a}
+.section.yl-block.sec-solutions .yl-bbody .d-text{font-weight:800;font-size:15px}
+.section.yl-block.sec-homework{border-color:#dbb95e;background:#fdf6e6}
+.section.yl-block.sec-homework .yl-title{color:#8a6d1d}
+.section.yl-block.sec-homework .yl-bbody{padding:9px 13px;padding-inline-start:58px;position:relative}
+.section.yl-block.sec-homework .yl-bbody .d-note{background:#fff;border:1px solid #e3d3a3;
+  border-radius:9px;padding:7px 10px}
+.section.yl-block.sec-homework .yl-bbody::before{content:"";position:absolute;inset-inline-start:9px;
+  top:50%;transform:translateY(-50%);width:34px;height:34px;background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><circle cx='24' cy='24' r='22' fill='%2340c351'/><path d='M24 12c-6.6 0-12 5.1-12 11.4 0 2.3.75 4.5 2.05 6.3L12.6 35l5.5-1.4c1.75 1 3.8 1.6 5.9 1.6 6.6 0 12-5.1 12-11.4S30.6 12 24 12z' fill='%23fff'/></svg>") no-repeat center/contain}
+/* the objective and the materials keep their shared row */
+.section.yl-block.sec-goal{grid-column:1 / 7}
+.section.yl-block.sec-materials{grid-column:7 / 13}
+.section.yl-block.sec-exit-ticket{grid-column:1 / 7}
+.section.yl-block.sec-solutions{grid-column:7 / 13}
+
+
+/* ── INSTRUCTION SLOT + RULED SPACE ────────────────────────────────────────────────
+   The lead sentence spans the card above both columns; a source heading with no content
+   under it becomes writing space instead of an empty titled box. */
+.section.yl-stage .yl-lead{padding:7px 13px 0;font-size:14.5px;font-weight:700;
+  line-height:1.5;color:var(--ink)}
+.section.yl-stage .yl-lead + .yl-stage-body{padding-top:7px}
+.section.yl-stage.yl-empty{grid-column:1 / 13}
+.yl-rules{display:flex;flex-direction:column;gap:9px;padding:10px 14px 12px}
+.yl-rules i{display:block;height:0;border-bottom:1.5px dashed #c3cede}
+
+/* ── PAGE-1 DENSITY ────────────────────────────────────────────────────────────────
+   Page 1 was carrying 228px of blank paper below the last card while page 2 sat at its
+   limit: the next card is a matching activity that cannot be split, so it moved whole to
+   page 2 and left the gap behind. Shaving page 1 would only move the boundary up by the
+   same amount — the fix is to spend that space on page 1's own residents. The approved
+   design is figure-led, so it goes to the illustration and to the writing space. */
+/* The illustration is WIDTH-bound inside its column, so raising max-height alone moved
+   nothing — the column itself has to be wider. The intro text is two lines; the picture
+   is what a six-year-old reads first. */
+.section.sec-stage-tamhid .yl-stage-body{grid-template-columns:1fr 2fr}
+.section.sec-stage-tamhid .yl-illus img{max-height:420px}
+.section.sec-stage-tamhid.yl-stage .yl-stage-body{align-items:stretch}
+.section.yl-stage.yl-empty .yl-rules{gap:15px;padding:13px 14px 15px}
+.section.yl-stage.yl-empty .yl-rules i:nth-child(n+4){display:none}
+
+/* …and one pixel back from page 2, which sat exactly 1px over its own limit. */
+.section.yl-block.sec-homework .yl-bbody{padding-top:8px;padding-bottom:8px}
+
+/* The activity widgets are laid out with width:100% inside their column, so their own
+   border and padding were added ON TOP of that width and the widget stood 3px outside its
+   card at narrow measurements. Border-box makes that 100% include them. */
+.yl-visual > *,.yl-match,.yl-assess,.yl-match .yl-row,.yl-card{box-sizing:border-box}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

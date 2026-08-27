@@ -931,6 +931,21 @@ function ylVisual(section, images, engine) {
   return '';
 }
 
+// A titled BLOCK: header row, then its content, inside one border. The generic panel this
+// replaces relies on a header pulled 32px into it — fine while every card was a panel with
+// 33px of top padding, wrong the moment a rule changed that padding, and it put «الإجابات»
+// on the card's border with its answer text clipped outside the card.
+function ylBlock(section, accent, images, idCls, body) {
+  const title = cleanHeading(section.heading);
+  const ic = section.icon && hasIcon(section.icon) ? icon(section.icon, 19) : '';
+  const head = title
+    ? '<div class="yl-bhead"><span class="yl-ic">' + ic + '</span>'
+      + '<span class="yl-title">' + esc(title) + '</span></div>'
+    : '';
+  return '<section class="section yl-block' + idCls + '">' + head
+    + '<div class="yl-bbody">' + body + '</div></section>';
+}
+
 // StageCard — one designed teaching unit with fixed slots:
 //   head:   title · duration pill · teaching-mode pill
 //   body:   teaching text | visual            (explicit grid, 1fr / 1.3fr)
@@ -947,6 +962,11 @@ function ylStage(section, accent, images, idCls) {
     + (section.mode ? '<span class="yl-pill yl-mode">' + esc(cleanHeading(section.mode)) + '</span>' : '')
     + '</div>';
   const visual = ylVisual(section, images, engine);
+  // THE INSTRUCTION SLOT: the sentence that introduces the activity spans the full card
+  // above both columns, so it reads as one instruction rather than as a column of prose
+  // competing with the visual beside it.
+  const lead = section.lead
+    ? '<div class="yl-lead">' + richText(section.lead, { engine }) + '</div>' : '';
   const text = section.body
     ? '<div class="yl-text">' + richText(section.body, { engine }) + '</div>' : '';
   // no text → the visual takes the whole width; no visual → the text does. This is what
@@ -964,8 +984,13 @@ function ylStage(section, accent, images, idCls) {
       + '<span class="yl-cl">' + esc(cleanHeading(c.label || '')) + '</span>'
       + '<span class="yl-cb">' + richText(c.body || '', { engine }) + '</span></div>').join('')
       + '</div>' : '';
+  // A HEADING THE SOURCE LEFT EMPTY becomes ruled space for the teacher to fill, not a
+  // stray box with a title and nothing under it. «العرض — أنا أفعل (١٠ دقائق)» has no text
+  // in this lesson; the section is still part of the plan, so it is kept and made usable.
   const empty = !body && !check && !diff ? ' yl-empty' : '';
-  return '<section class="section yl-stage' + idCls + empty + '">' + head + body + check + diff + '</section>';
+  const rules = empty ? '<div class="yl-rules"><i></i><i></i><i></i></div>' : '';
+  return '<section class="section yl-stage' + idCls + empty + '">'
+    + head + lead + body + rules + check + diff + '</section>';
 }
 
 function renderDecorativeLesson(content, images = {}, cast = {}) {
@@ -1034,6 +1059,9 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     // AN EXPLICIT COMPONENT, NOT A GENERIC PANEL. A stage carries known slots and is laid
     // out by grid; nothing inside it chooses its own position.
     if (section.type === 'stage') return ylStage(section, accent, images, idCls);
+    if (section.component === 'block' && body !== '') {
+      return ylBlock(section, accent, images, idCls, body);
+    }
     if (section.type === 'misconception') {
       // Its OWN header row, not the generic one: this pack pulls a section head 32px into
       // the card it labels, which works against a .panel and only against a .panel. On a

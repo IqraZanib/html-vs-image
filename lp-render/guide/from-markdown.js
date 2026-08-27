@@ -399,6 +399,16 @@ function labelledParts(body, profile = {}) {
     const text = plain(raw);
     if (text) parts.push({ label: mk.label, body: text, raw });
   });
+  // AN INSTRUCTION LINE IS NOT AN ACTIVITY. «يفتح التلاميذ الكتاب صفحة ٣٢، ويحلون التمرين
+  // الأول والثاني جماعياً:» introduces the two exercises under it, and as a card of its own
+  // it became a thin text-only box — then the pagination put it on page 1 and its exercises
+  // on page 2, so the teacher read the instruction one page away from the work it describes.
+  // It rides on the first exercise as that card's lead line instead.
+  if (profile.leadIntoFirstPart && parts.length > 1 && !parts[0].label && parts[1].label) {
+    const [head, ...rest] = parts;
+    rest[0] = { ...rest[0], lead: head.body };
+    return rest;
+  }
   return parts;
 }
 
@@ -910,6 +920,7 @@ function buildGuideFromMarkdown(md, opts = {}) {
         // themselves. The renderer lays these out on a fixed grid (see ylStage).
         const sec = { id, heading: title, type: 'stage',
           body: sp.longCheck ? sp.body : (sp.check ? sp.body : partBody) };
+        if (part.lead) sec.lead = part.lead;
         if (sp.check) sec.check = sp.check;
         if (first) {
           sec.time = found.map((x) => minutesOf(x.title, profile)).find(Boolean) || '';
@@ -1059,6 +1070,11 @@ function buildGuideFromMarkdown(md, opts = {}) {
     const target = sections.find((x) => isStage(x) && !x.codeFigure && x !== artCard);
     if (wc && target) target.codeFigure = wc;
   }
+
+  // every block-component role carries the flag, so the renderer never falls back to the
+  // generic panel for them
+  const blocks_ = new Set(profile.blockComponents || []);
+  for (const sec of sections) if (blocks_.has(sec.id)) sec.component = 'block';
 
   const rank = (id) => {
     const i = profile.order.indexOf(id);
