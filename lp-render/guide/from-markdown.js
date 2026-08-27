@@ -752,14 +752,20 @@ function buildGuideFromMarkdown(md, opts = {}) {
       label: topic.slice(0, 40),
       // Naming boards, pages and walls as "empty surfaces" is what produced a row of blank
       // framed panels: the model draws what the brief names, so a brief that names an empty
-      // board gets an empty board. Describe the PEOPLE and the ACTION instead, and ask for
-      // the absence of text without naming a surface to leave blank.
+      // board gets an empty board. Describe the PEOPLE and the ACTION instead.
+      //
+      // AND DO NOT ARGUE WITH THE SCAFFOLD. imagegen/prompts appends its own textless
+      // rule — "every board, page, card and label area is blank and empty" — so my
+      // earlier "No empty boards, blank cards, picture frames or vacant panels" put two
+      // opposite instructions about the same object in one prompt. Read back from the
+      // composed prompt, not from either file alone. The positive form ("the composition
+      // is filled by the people") gets the same result without the contradiction, and
+      // the scaffold keeps sole ownership of the no-text rule.
       prompt: 'Flat vector educational illustration, clean children\'s textbook style, soft '
         + 'colours, warm daylight. Young primary-school children and their teacher together '
         + 'in a simple classroom, engaged in an activity about ' + topic + '. Show faces, '
-        + 'gestures and posture; fill the frame with the people and a few simple objects. '
-        + 'Absolutely no writing of any kind anywhere in the picture: no letters, numerals, '
-        + 'signs or labels. No empty boards, blank cards, picture frames or vacant panels.',
+        + 'gestures and posture. The composition is filled by the people themselves and a '
+        + 'few simple everyday objects they are handling.',
     });
     warmup.image = 'lesson-scene';
   }
