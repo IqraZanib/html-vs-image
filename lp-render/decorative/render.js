@@ -668,11 +668,16 @@ function cfLabeledParts({ object = 'plant', parts = [] }) {
 // A person figure is drawn instead of a word when the match NAMES a picture («صورة الأب»,
 // «صورة البنت»): code-drawn, wordless, modestly dressed. The exact label always comes from
 // the source and is always drawn as text by code, never generated.
+// NO \b AFTER AN ARABIC LETTER — the same trap as in the region profiles. JavaScript's \b
+// is defined on ASCII word characters, so /\bالأب\b/ matched nothing at all: «صورة الأب»
+// and «صورة الأم» drew no figure while «صورة الولد» and «صورة البنت» did, because those two
+// patterns happened to have no \b in them. Ordered longest-first so «الأب» is tested before
+// «أب» can match inside another word.
 const CF_PEOPLE = [
-  [/\bالأب\b|\bأب\b|father/i, 'man'],
-  [/\bالأم\b|\bأم\b|mother/i, 'woman'],
   [/الولد|الابن|boy/i, 'boy'],
   [/البنت|الابنة|girl/i, 'girl'],
+  [/الأب(?![\u0600-\u06FF])|father/i, 'man'],
+  [/الأم(?![\u0600-\u06FF])|mother/i, 'woman'],
 ];
 function cfPerson(kind, cx, cy, sc) {
   const S = (n) => n * sc;
@@ -699,39 +704,47 @@ function cfMatchPairs({ items = [], wide = false } = {}) {
     .map((it) => ({ a: String(it.label || '').trim(), b: String(it.caption || '').trim() }))
     .filter((x) => x.a && x.b);
   if (P.length < 2) return '';
-  // Drawn at a size a class can read: the activity gets the card's content width, so the
-  // viewBox is wide and the word cards are large. A row of small chips is what this
-  // component replaced.
-  const W = wide ? 460 : 250;
-  const rowH = wide ? 52 : 38;
-  const pad = 7;
-  const H = pad * 2 + P.length * rowH;
-  const cw = wide ? 168 : 92;          // card width
-  const fs = wide ? 19 : 13;
-  const gap = W - pad * 2 - cw * 2;
+
+  // TWO PAIRS PER ROW when the activity is wide and has four or more of them. One pair per
+  // row made a five-pair exercise ~200px tall before scaling; three of those, each inside
+  // an atomic card, left page 2 of the LP a third empty because no card could fit in what
+  // was left. Two-up halves the height, makes each card WIDER, and gives the compact
+  // block-of-cards composition the approved pilot uses for its number grid.
+  const twoUp = wide && P.length >= 4;
+  const cols = twoUp ? 2 : 1;
+  const rows = Math.ceil(P.length / cols);
+  const pad = 8;
+  const gapX = twoUp ? 22 : 0;
+  const W = wide ? 660 : 250;
+  const rowH = wide ? 46 : 38;
+  const H = pad * 2 + rows * rowH;
+  const colW = (W - pad * 2 - gapX * (cols - 1)) / cols;
+  const cw = Math.min(twoUp ? 132 : 250, colW * 0.42);   // one word card
+  const fs = wide ? (twoUp ? 17 : 21) : 13;
   let out = '';
   P.forEach((pr, i) => {
-    const y = pad + i * rowH;
+    const c = twoUp ? i % cols : 0;
+    const r = twoUp ? Math.floor(i / cols) : i;
+    // RTL: the first column of pairs sits on the RIGHT of the figure
+    const colX = pad + (cols - 1 - c) * (colW + gapX);
+    const y = pad + r * rowH;
     const cy = y + rowH / 2;
-    const rightX = W - pad - cw;       // reading start in RTL
-    const leftX = pad;
+    const rightX = colX + colW - cw;     // the prompt, at the reading start of its column
+    const leftX = colX;
     const person = CF_PEOPLE.find(([re]) => re.test(pr.b));
-    // the connector: a dotted line between the two cards, ending in small dots
-    out += '<line x1="' + (rightX - 4) + '" y1="' + cy + '" x2="' + (leftX + cw + 4) + '" y2="' + cy
-      + '" stroke="' + CF.stroke + '" stroke-width="1.6" stroke-dasharray="3 3" opacity=".55"/>'
-      + '<circle cx="' + (rightX - 4) + '" cy="' + cy + '" r="2.6" fill="' + CF.stroke + '"/>'
-      + '<circle cx="' + (leftX + cw + 4) + '" cy="' + cy + '" r="2.6" fill="' + CF.stroke + '"/>';
-    // prompt card (right)
-    out += '<rect x="' + rightX + '" y="' + (y + 3) + '" width="' + cw + '" height="' + (rowH - 8)
-      + '" rx="8" fill="#fff" stroke="' + CF.stroke + '" stroke-width="1.8"/>'
+    out += '<line x1="' + (rightX - 3) + '" y1="' + cy + '" x2="' + (leftX + cw + 3) + '" y2="' + cy
+      + '" stroke="' + CF.stroke + '" stroke-width="1.5" stroke-dasharray="3 3" opacity=".5"/>'
+      + '<circle cx="' + (rightX - 3) + '" cy="' + cy + '" r="2.4" fill="' + CF.stroke + '"/>'
+      + '<circle cx="' + (leftX + cw + 3) + '" cy="' + cy + '" r="2.4" fill="' + CF.stroke + '"/>';
+    out += '<rect x="' + rightX + '" y="' + (y + 4) + '" width="' + cw + '" height="' + (rowH - 9)
+      + '" rx="8" fill="#fff" stroke="' + CF.stroke + '" stroke-width="1.7"/>'
       + cfText(rightX + cw / 2, cy + fs * 0.36, pr.a, fs, 800, CF.ink);
-    // match card (left) — a person figure plus its exact label, or the word alone
-    out += '<rect x="' + leftX + '" y="' + (y + 3) + '" width="' + cw + '" height="' + (rowH - 8)
-      + '" rx="8" fill="#f7f9fc" stroke="' + CF.accent + '" stroke-width="1.6"/>';
-    if (person && wide) {
-      const sc = (rowH - 12) / 46;
-      out += cfPerson(person[1], leftX + 20, cy + 6, sc)
-        + cfText(leftX + cw / 2 + 14, cy + fs * 0.36, pr.b, fs - 2, 700, CF.ink);
+    out += '<rect x="' + leftX + '" y="' + (y + 4) + '" width="' + cw + '" height="' + (rowH - 9)
+      + '" rx="8" fill="#f7f9fc" stroke="' + CF.accent + '" stroke-width="1.5"/>';
+    if (person) {
+      const sc = (rowH - 14) / 46;
+      out += cfPerson(person[1], leftX + 16, cy + 5, sc)
+        + cfText(leftX + cw / 2 + 11, cy + fs * 0.36, pr.b, fs - 2, 700, CF.ink);
     } else {
       out += cfText(leftX + cw / 2, cy + fs * 0.36, pr.b, fs - 1, 700, CF.ink);
     }

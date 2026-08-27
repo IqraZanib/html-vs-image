@@ -123,15 +123,24 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-errors .panel{border:2px solid var(--c-red);border-color:var(--c-red) !important;background:#fff}
 .section.sec-errors .d-qc{border-width:1.5px;border-radius:10px}
 /* code-composed twin board: full width below the qa twins, RTL order (✗ right) */
-.section.sec-errors .panel.has-twin-board{display:flex;flex-direction:column;gap:6px}
-.section.sec-errors .panel.has-twin-board .ii-body{display:block;width:100%}
+/* The ✗/✓ board arrives as a TWIN BOARD, not an inline image, so the one-row rule has to
+   name that class too — naming only .has-inline-img left this card stacked and it stayed the
+   tallest non-activity block on the page. */
+.section.sec-errors .panel.has-twin-board{display:flex;flex-direction:row-reverse;
+  align-items:center;gap:10px}
+.section.sec-errors .panel.has-twin-board .ii-body{display:block;flex:0 0 38%;width:38%}
+.section.sec-errors .panel.has-twin-board .d-twin-board{flex:1 1 60%;margin:0}
 .section.sec-errors .d-twin-board{max-width:470px;margin:2px auto 4px;flex-direction:row-reverse}
 .section.sec-errors .d-twin-board .tb-half img{height:170px}
 /* Illustrated errors strip (pilot): the خطأ/صواب twin-board figure spans the card
    width BELOW the twins instead of squeezing them into a side column. */
-.section.sec-errors .panel.has-inline-img{display:flex;flex-direction:column}
-.section.sec-errors .panel.has-inline-img .ii-body{display:block;flex:none;width:100%}
-.section.sec-errors .d-inline-img{flex:none;width:100%;max-width:100%;display:flex;flex-direction:column;align-items:center;box-shadow:none;border:0;background:transparent}
+/* THE PILOT'S MISCONCEPTION STRIP IS ONE ROW: the explanation on the reading side, the
+   ✗/✓ boxes beside it — not stacked. Stacking made the tallest non-activity card on the
+   page out of two short pieces of content. */
+.section.sec-errors .panel.has-inline-img{display:flex;flex-direction:row-reverse;
+  align-items:center;gap:10px}
+.section.sec-errors .panel.has-inline-img .ii-body{display:block;flex:0 0 38%;width:38%}
+.section.sec-errors .d-inline-img{flex:1 1 60%;width:60%;max-width:62%;display:flex;flex-direction:column;align-items:center;box-shadow:none;border:0;background:transparent}
 .section.sec-errors .d-inline-img img{max-height:172px;width:auto;max-width:96%;border:1px solid var(--line);border-radius:10px}
 .section.sec-errors .d-inline-img .cap{border-top:0;background:transparent}
 .section.sec-errors-caption .s-head{display:none}
@@ -751,9 +760,20 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
       (body | figure | تحقق) and .ii-body is display:contents, so anything appended to the
       body becomes a GRID ITEM — the callout row landed in the narrow first column and
       wrapped to one word per line. It spans all columns, under the three of them. */
+/* …INSIDE THE TEXT COLUMN, as the approved pilot has them: two small tinted boxes stacked
+   under «ماذا يفعل المعلم», not a band across the card. Full width was better than separate
+   cards but still spent a whole row of the page on two short notes. */
 .section .panel.has-inline-img .d-callouts,
-.section .panel.has-twin-board .d-callouts{grid-column:1 / -1;width:100%}
-.section .panel .d-callouts{margin-top:10px}
+.section .panel.has-twin-board .d-callouts{grid-column:1;grid-template-columns:1fr;gap:4px}
+.section .panel .d-callouts{margin-top:8px}
+.d-callout{padding:5px 8px;border-radius:8px}
+.d-callout .co-l{font-size:10.5px;padding:1px 8px}
+.d-callout .co-b{font-size:12.5px;line-height:1.4}
+/* the pilot tints دعم green and تحد violet */
+.d-callouts .d-callout:nth-child(1){background:#eaf4e6;border-color:#b6d6a8}
+.d-callouts .d-callout:nth-child(1) .co-l{background:#4a8a2e}
+.d-callouts .d-callout:nth-child(2){background:#f1ecf8;border-color:#c9b9de}
+.d-callouts .d-callout:nth-child(2) .co-l{background:#6b4a86}
 
 /* 2 · THE MISCONCEPTION PANEL — a green/red split, clearly separated, code-drawn */
 .section.sec-errors .panel{background:#fff8f7}
@@ -781,8 +801,11 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
    matching exercises came out visibly different sizes. */
 .section .panel.has-inline-img:not(:has(.d-steps)) .d-code-fig.cf-wide{grid-column:1 / -1}
 .section .panel .d-text:empty{display:none}
-.section .d-code-fig.cf-wide{width:100%;max-width:100%;margin:8px auto 2px;background:#fff;
-  border:1.5px solid #dfe4ee;border-radius:12px;padding:8px 10px;box-shadow:none}
+/* Trimmed deliberately: at 8px margin and 8px padding the three activity cards came to
+   1,072px and page 2 could hold only two of them, wasting 435px. Five pixels each brings
+   the set under a page, so page 2 packs all three activities. */
+.section .d-code-fig.cf-wide{width:100%;max-width:100%;margin:3px auto 0;background:#fff;
+  border:1.5px solid #dfe4ee;border-radius:12px;padding:3px 7px;box-shadow:none}
 /* …and the SVG itself must be allowed to grow. Earlier rules cap .cf-svg at 170px, 132px
    and 126px for the stage figures — sensible for a small diagram beside prose, fatal for a
    full-width activity: the aspect ratio is preserved, so a height cap shrank the WIDTH too
@@ -819,7 +842,72 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.sec-materials .d-chip{background:#fff !important;border:1.5px solid #9ecfc9;
   color:#0f6b64 !important;font-weight:800;font-size:13.5px;padding:6px 14px}
 
-/* 7 · EXIT TICKET / ANSWERS — a question card and its answer, visually paired */
+/* 12 · NO TWO-COLUMN JUSTIFIED PROSE IN A NARROW CARD. The raw-text prominence block sets
+      column-count:2 with justified text on a figure-less stage card — fine across a full
+      page, but the التطبيق opening line now shares its row, and in a half-width card the
+      same rule produced «يفتح التلاميذ الكتاب صفحة ٣٢، جماعياً: ويحلون التمرين…» with
+      word-gaps wide enough to read as scrambled. One column, left-natural spacing. */
+.section.sec-stage-arad + .section.sec-stage-tatbiq .d-text,
+.section.sec-stage-arad + .section.sec-stage-tatbiq .panel .d-text{
+  column-count:1 !important;text-align:start !important;word-spacing:normal}
+
+/* 11 · FIFTY-TWO PIXELS BUY A WHOLE PAGE. Measured: page 1 ended at 883 of 1059 because
+      the first matching activity (228px) could not fit in the 176px left — so it went to
+      page 2, which pushed the closing components onto a third page holding 181px. Trimming
+      the page-1 residents by ~55px lets that activity onto page 1 and the whole lesson onto
+      TWO pages, with nothing removed from the content. The illustration keeps pilot scale;
+      what goes is padding. */
+/* Trim the BOTTOM, never the top: .s-head is pulled 32px into the card, so a panel needs
+   ~33px of top padding or the header lands on the first line of text. Cutting the top to
+   8px during the page-1 trim is exactly what made «التقويم والختام» overlap its own
+   opening sentence. */
+.section.sec-errors .panel{padding:33px 12px 7px}
+.section.sec-errors .d-note{padding:7px 10px}
+.section.sec-stage-tamhid .panel{padding:33px 12px 7px}
+.section.sec-stage-tamhid .d-inline-img{min-height:196px}
+.section.sec-goal .panel{padding:8px 62px 8px 15px}
+.section.sec-materials .panel{padding:6px 10px}
+
+/* 9 · THE OBJECTIVE AND THE MATERIALS SHARE A ROW. The pilot carries its materials as
+      chips on the lesson-information line, not as a band of their own; giving them a
+      full-width card of their own spent ~76px of page on five one-word chips. RTL: column 1
+      is the right edge, so the objective keeps the reading start. */
+/* The five material chips wrapped to a second line — «قلم» alone — which cost 24px and,
+   with it, a whole page: page 1 could then not fit the first activity, the tail slid onto a
+   third page and page 2 came out half empty. One more column of width fits them on one
+   line. The arithmetic, measured: 31px off page-1 residents lets the first activity onto
+   page 1 and brings the whole lesson to two pages, both ~100% dense. */
+.section.sec-goal{grid-column:1 / 7}
+.section.sec-materials{grid-column:7 / 13}
+.section.sec-materials .s-head{margin-bottom:4px}
+.section.sec-materials .panel{padding:7px 10px}
+.section.sec-materials .d-chip{font-size:12.5px;padding:4px 10px}
+.section.sec-goal .panel{margin-right:14px}
+
+/* 10 · The empty العرض strip sits beside the التطبيق opening line — two short blocks, one
+      row, which is how the pilot pairs its narrow stage with a wide one. */
+.section.sec-stage-arad{grid-column:1 / 6}
+.section.sec-stage-arad + .section.sec-stage-tatbiq{grid-column:6 / 13}
+
+/* 8 · THE CHECKPOINT COLUMN IS TOO NARROW ON AN ACTIVITY CARD. Measured: the التقويم card
+      is 546px tall and the tallest thing in it is not the activity — it is «٨٠٪ من التلاميذ
+      يضعون الخط تحت الكلمة الصحيحة» wrapping to seven lines in a ~95px column. The pilot's
+      تحقق column is much wider and runs three or four lines. Widening it on cards that
+      carry a spanning activity takes ~90px off each of them, and it matches the reference.
+      Cards with a small side figure keep the narrow column the pilot uses there. */
+.section .panel.has-inline-img:has(.d-code-fig.cf-wide){
+  grid-template-columns:minmax(0,1fr) minmax(0,50%) minmax(0,1.15fr);gap:8px}
+.section .panel.has-inline-img:has(.d-code-fig.cf-wide){padding:33px 12px 7px}
+.section .panel.has-inline-img:has(.d-code-fig.cf-wide) .d-steps > .d-step:last-child{
+  align-self:start}
+
+/* 7 · EXIT TICKET AND ANSWERS SHARE A ROW — a question and its answer belong together, and
+      the pilot pairs its two closing blocks the same way (مصطلحات رئيسية beside تكييف
+      للفصول متعددة الصفوف). RTL: column 1 is the right edge, so the question sits right. */
+.section.sec-exit-ticket{grid-column:1 / 7}
+.section.sec-solutions{grid-column:7 / 13}
+.section.sec-exit-ticket .panel,.section.sec-solutions .panel{height:calc(100% - 34px)}
+
 .section.sec-exit-ticket .d-note{border:1.5px solid #dbb95e !important}
 .section.sec-solutions .panel{background:#f2faf7}
 

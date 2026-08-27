@@ -857,8 +857,18 @@ function buildGuideFromMarkdown(md, opts = {}) {
         // Arabic-Indic digit run, right against «١», where it reads as «١٠». An isolate does
         // not help — the characters are in the wrong visual order either way. An em dash
         // cannot be mistaken for a zero, so a digit-initial label uses that instead.
-        const label = part.label || blockHead;
-        const sep = /^[\d٠-٩]/.test(String(label).trim()) ? ' — ' : ' · ';
+        // A SENTENCE IS NOT A CARD TITLE. The pack draws a stage title inside the card's top
+        // padding — .s-head is 32px tall with a -32px bottom margin — so a title that wraps
+        // to two lines overflows its box and collides with the card's own text, which is
+        // what «التقويم والختام · يحل التلاميذ التمرين الثالث بمفردهم في الكتاب» did. A long
+        // label is prepended to the BODY instead: the title stays as short as the pilot's,
+        // and not one word leaves the page. A numbered exercise heading always stays a
+        // title — that IS its role, and those are short.
+        const rawLabel = String(part.label || blockHead || '').trim();
+        const isExercise = /^[\d٠-٩]/.test(rawLabel);
+        const longLabel = !isExercise && rawLabel.length > 34;
+        const label = longLabel ? '' : rawLabel;
+        const sep = isExercise ? ' — ' : ' · ';
         const title = [T[id], label].filter(Boolean).join(sep);
         const fig = figureFor(part.raw || '', profile);
         // THE ACTIVITY IS THE VISUAL, NOT A PARAGRAPH TOO. When a matching figure carries
@@ -871,15 +881,18 @@ function buildGuideFromMarkdown(md, opts = {}) {
         // `steps` card whose text lives in items[0].body, not in .body, so stripping
         // afterwards wrote to a field the renderer ignores and silently dropped the
         // instruction «٣) ألاحظ الكلمة التي في الشكل…» off the page.
-        let partBody = part.body;
+        let partBody = longLabel && part.body
+          ? `${rawLabel}: ${part.body}`
+          : (longLabel ? rawLabel : part.body);
         if (fig && fig.kind === 'match-pairs') {
           // Strip at LINE level, from part.raw — part.body has already been flattened by
           // plain(), so a line filter applied to it matched nothing and the fallback regex
           // chewed the joined text into «… في السطر ← أحمد ← إيمان : ٨٠٪ …». Removing whole
           // source lines is exact: a pair line goes, everything else stays as written.
-          partBody = plain(String(part.raw || '').split('\n')
+          const kept = plain(String(part.raw || '').split('\n')
             .filter((l) => !/^[\s•▪●◦*-]*[^\s←→،.:]{1,18}\s*[←→]/.test(l.trim()))
             .join('\n'));
+          partBody = longLabel ? [rawLabel, kept].filter(Boolean).join(': ') : kept;
         }
         // Fill the pilot's two text slots from the part's own words when it carries a
         // model answer; otherwise a plain text card.
