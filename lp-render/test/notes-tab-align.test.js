@@ -79,6 +79,11 @@ test('the ملاحظات badge sits inside the notes card, never outside it', as
       // it must reach the card's edges, or it reads as floating — the original complaint
       assert.ok(g.tab.t - g.card.t <= 3 && g.card.b - g.tab.b <= 3,
         `at ${width}px the badge is inset from the card's top/bottom and reads as floating`);
+      // THE SIDE IS PART OF THE DESIGN. The reviewer's correct version puts the dark badge
+      // at the card's RIGHT edge with the label beside it; a flex order change once mirrored
+      // it to the far end and read as "flipped/inverted". RTL start = the right edge.
+      assert.ok(Math.abs(g.tab.r - g.card.r) <= 2,
+        `at ${width}px the badge is not at the card's right edge — it has been mirrored`);
       // and it must not sit on the notes text
       assert.ok(Math.min(g.tab.r, g.label.r) - Math.max(g.tab.l, g.label.l) <= 1,
         `at ${width}px the badge overlaps the notes label`);

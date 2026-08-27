@@ -1599,6 +1599,18 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 /* the material chips read as chips on the tint */
 .section.yl-block.sec-materials .d-chip{background:#fff !important;border:1.4px solid #bcd8c1;
   color:#2f6b3a !important}
+
+/* ── reviewer round: the objective's dart, and the notes badge on the RIGHT ──────────
+   Two asks. The dart in the objective band was too small. And the ملاحظات badge belongs at
+   the card's RIGHT edge — the side the earlier correct version had it on — with the label
+   beside it, not mirrored to the far end. The section clips its own corners, so the badge
+   needs no radius of its own; the flex order is the whole fix, and the badge stays a
+   flex child, which is what keeps it inside the card. */
+.yl-badge .yl-tg{width:34px;height:34px}
+.section.yl-block.sec-goal .yl-bbody{gap:13px}
+.yl-ntab{order:-1}
+.section.yl-block.yl-tabbed .yl-bbody{order:1}
+.section.yl-notes .yl-nbody{order:2}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then
