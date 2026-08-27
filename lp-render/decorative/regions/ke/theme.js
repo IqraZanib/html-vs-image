@@ -49,9 +49,31 @@ const THEME_OVERRIDE_CSS = `
 .section.sec-lesson-line .panel,.section.sec-admin .panel{
   background:#f4f6f9;border-color:#c3cfdc !important}
 .section.sec-lesson-line .d-text{font-weight:800;font-size:15px}
-.section.sec-admin .d-fields{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px}
-.section.sec-admin .d-field{background:transparent;border:0;padding:2px 0;font-size:14px}
-.section.sec-admin .d-field b{color:#4a6480;min-width:96px;display:inline-block}
+/* Twelve rows on the identifying card (the fill-in form plus the three curriculum
+   levels), so two columns and a fixed label gutter — otherwise the values ragged badly
+   against labels of very different lengths («MUDA» beside «ENEO LA KUJIFUNZA»). */
+.section.sec-admin .d-fields{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px}
+.section.sec-admin .d-field{background:transparent;border:0;padding:1px 0;font-size:13.5px;
+  display:grid;grid-template-columns:132px 1fr;gap:8px;align-items:baseline}
+.section.sec-admin .d-field b{color:#4a6480;font-size:11.5px;text-transform:uppercase;
+  letter-spacing:.3px;line-height:1.35}
+
+/* The 30-second summary opens the plan: what the pupils will be able to do, how long it
+   takes, and the one thing not to skip. The default theme already draws it as a cream
+   card with icon rows — this only anchors its colour and gives the rows room. */
+.section.sec-summary .s-tab{background:#8a6410 !important}
+.section.sec-summary .panel{background:var(--cream);border-color:#e3c579 !important}
+.section.sec-summary .d-summary{display:flex;flex-direction:column;gap:7px}
+.section.sec-summary .srow{display:grid;grid-template-columns:22px 1fr;gap:9px;align-items:start}
+.section.sec-summary .sic{width:20px;height:20px;border-radius:6px;background:#e3c579;
+  display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b4c08}
+.section.sec-summary .stext{font-size:14px;line-height:1.5}
+.section.sec-summary .stext b{color:#6b4c08}
+
+/* Remediation notes are what the teacher does when the check fails — corrective, so
+   amber, and deliberately not the same colour as the assessment it follows. */
+.section.sec-remediation .s-tab{background:#a8641a !important}
+.section.sec-remediation .panel{background:#fdf1e3;border-color:#e0b483 !important}
 
 /* Outcomes and the key inquiry question are what the lesson is judged against, so they
    sit directly under the header and carry the strongest colours. */
