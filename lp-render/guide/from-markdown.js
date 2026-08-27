@@ -761,11 +761,19 @@ function buildGuideFromMarkdown(md, opts = {}) {
       // composed prompt, not from either file alone. The positive form ("the composition
       // is filled by the people") gets the same result without the contradiction, and
       // the scaffold keeps sole ownership of the no-text rule.
-      prompt: 'Flat vector educational illustration, clean children\'s textbook style, soft '
-        + 'colours, warm daylight. Young primary-school children and their teacher together '
-        + 'in a simple classroom, engaged in an activity about ' + topic + '. Show faces, '
-        + 'gestures and posture. The composition is filled by the people themselves and a '
-        + 'few simple everyday objects they are handling.',
+      // KEEP IT SHORT, AND ONLY THE SCENE. imagegen's scaffold already supplies the
+      // style ("a warm, friendly flat-vector children's-book illustration…"), the
+      // colour note and the no-text rule, and the region pack supplies dress, teacher
+      // and setting. My first version restated the style itself, which pushed the
+      // COMPOSED prompt to 1,194 characters against z-image's 1,000-character limit —
+      // so the compactor trimmed the longest middle sentence, which was the region's
+      // "any adult is Kenyan — dark brown skin and African features" clause. The prompt
+      // then no longer asked for the very thing the culture gate checks. Describe the
+      // people and the action; let the scaffold and the pack do their own jobs.
+      prompt: 'Young primary-school children and their teacher together in a simple '
+        + 'classroom, engaged in an activity about ' + topic + '. Show faces, gestures '
+        + 'and posture; fill the frame with the people and a few simple objects they are '
+        + 'handling.',
     });
     warmup.image = 'lesson-scene';
   }
