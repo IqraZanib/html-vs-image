@@ -655,8 +655,92 @@ function cfLabeledParts({ object = 'plant', parts = [] }) {
   return cfSvg(out, W, H);
 }
 
-const CF_WIDE = new Set(['process', 'labeled-parts']);
-const CF_KINDS = new Set(['fraction-grid', 'count-set', 'compass', 'compare', 'expression', 'process', 'steps', 'labeled-parts', 'error-board']);
+// ── MATCHING ACTIVITY ────────────────────────────────────────────────────────────────
+// «أصل بين الصورة والكلمة الدالة عليها» — join each word to the thing it names. This is
+// the CENTRAL teaching activity of a matching lesson, and rendering it as a row of small
+// chips (which is what a generic `steps` figure did) made it read as a widget embedded in
+// a paragraph. It is a full-width two-column activity: the prompt on the reading side, its
+// match on the other, joined by a dotted connector, at a size a class can see.
+//
+// RTL: the SOURCE's left-hand term is the prompt, so in an Arabic document it is drawn on
+// the RIGHT — the reading start — and its match on the left.
+//
+// A person figure is drawn instead of a word when the match NAMES a picture («صورة الأب»,
+// «صورة البنت»): code-drawn, wordless, modestly dressed. The exact label always comes from
+// the source and is always drawn as text by code, never generated.
+const CF_PEOPLE = [
+  [/\bالأب\b|\bأب\b|father/i, 'man'],
+  [/\bالأم\b|\bأم\b|mother/i, 'woman'],
+  [/الولد|الابن|boy/i, 'boy'],
+  [/البنت|الابنة|girl/i, 'girl'],
+];
+function cfPerson(kind, cx, cy, sc) {
+  const S = (n) => n * sc;
+  const skin = '#e8b98f', dark = '#2f3e63';
+  const head = '<circle cx="' + cx + '" cy="' + (cy - S(15)) + '" r="' + S(7.5) + '" fill="' + skin + '"/>';
+  if (kind === 'woman' || kind === 'girl') {
+    // headscarf and a long modest dress — the region pack's own dress code, drawn
+    const robe = kind === 'woman' ? '#3b4a72' : '#7f9cc4';
+    return head
+      + '<path d="M' + (cx - S(9)) + ' ' + (cy - S(15)) + ' a' + S(9) + ' ' + S(9) + ' 0 0 1 ' + S(18) + ' 0'
+      + ' l0 ' + S(9) + ' l-' + S(4) + ' 0 l0 -' + S(5) + ' l-' + S(10) + ' 0 l0 ' + S(5) + ' z" fill="' + robe + '"/>'
+      + '<path d="M' + (cx - S(10)) + ' ' + (cy + S(22)) + ' l' + S(3) + ' -' + S(24) + ' l' + S(14) + ' 0 l' + S(3) + ' ' + S(24) + ' z" fill="' + robe + '"/>';
+  }
+  const thobe = kind === 'man' ? '#f2f4f8' : '#cfe0ef';
+  return head
+    + '<path d="M' + (cx - S(9)) + ' ' + (cy + S(22)) + ' l' + S(2) + ' -' + S(24) + ' l' + S(14) + ' 0 l' + S(2) + ' ' + S(24) + ' z" fill="' + thobe + '" stroke="' + dark + '" stroke-width="' + S(0.9) + '"/>'
+    + (kind === 'man'
+      ? '<path d="M' + (cx - S(8)) + ' ' + (cy - S(21)) + ' q' + S(8) + ' -' + S(6) + ' ' + S(16) + ' 0" stroke="' + dark + '" stroke-width="' + S(1.6) + '" fill="none"/>'
+      : '');
+}
+
+function cfMatchPairs({ items = [], wide = false } = {}) {
+  const P = items.slice(0, 6)
+    .map((it) => ({ a: String(it.label || '').trim(), b: String(it.caption || '').trim() }))
+    .filter((x) => x.a && x.b);
+  if (P.length < 2) return '';
+  // Drawn at a size a class can read: the activity gets the card's content width, so the
+  // viewBox is wide and the word cards are large. A row of small chips is what this
+  // component replaced.
+  const W = wide ? 460 : 250;
+  const rowH = wide ? 52 : 38;
+  const pad = 7;
+  const H = pad * 2 + P.length * rowH;
+  const cw = wide ? 168 : 92;          // card width
+  const fs = wide ? 19 : 13;
+  const gap = W - pad * 2 - cw * 2;
+  let out = '';
+  P.forEach((pr, i) => {
+    const y = pad + i * rowH;
+    const cy = y + rowH / 2;
+    const rightX = W - pad - cw;       // reading start in RTL
+    const leftX = pad;
+    const person = CF_PEOPLE.find(([re]) => re.test(pr.b));
+    // the connector: a dotted line between the two cards, ending in small dots
+    out += '<line x1="' + (rightX - 4) + '" y1="' + cy + '" x2="' + (leftX + cw + 4) + '" y2="' + cy
+      + '" stroke="' + CF.stroke + '" stroke-width="1.6" stroke-dasharray="3 3" opacity=".55"/>'
+      + '<circle cx="' + (rightX - 4) + '" cy="' + cy + '" r="2.6" fill="' + CF.stroke + '"/>'
+      + '<circle cx="' + (leftX + cw + 4) + '" cy="' + cy + '" r="2.6" fill="' + CF.stroke + '"/>';
+    // prompt card (right)
+    out += '<rect x="' + rightX + '" y="' + (y + 3) + '" width="' + cw + '" height="' + (rowH - 8)
+      + '" rx="8" fill="#fff" stroke="' + CF.stroke + '" stroke-width="1.8"/>'
+      + cfText(rightX + cw / 2, cy + fs * 0.36, pr.a, fs, 800, CF.ink);
+    // match card (left) — a person figure plus its exact label, or the word alone
+    out += '<rect x="' + leftX + '" y="' + (y + 3) + '" width="' + cw + '" height="' + (rowH - 8)
+      + '" rx="8" fill="#f7f9fc" stroke="' + CF.accent + '" stroke-width="1.6"/>';
+    if (person && wide) {
+      const sc = (rowH - 12) / 46;
+      out += cfPerson(person[1], leftX + 20, cy + 6, sc)
+        + cfText(leftX + cw / 2 + 14, cy + fs * 0.36, pr.b, fs - 2, 700, CF.ink);
+    } else {
+      out += cfText(leftX + cw / 2, cy + fs * 0.36, pr.b, fs - 1, 700, CF.ink);
+    }
+  });
+  return cfSvg(out, W, H);
+}
+
+const CF_WIDE = new Set(['process', 'labeled-parts', 'match-pairs']);
+const CF_KINDS = new Set(['fraction-grid', 'count-set', 'compass', 'compare', 'expression', 'process', 'steps', 'labeled-parts', 'error-board', 'match-pairs']);
 function cfMini(spec) {
   if (!spec) return '';
   switch (spec.kind) {
@@ -665,6 +749,7 @@ function cfMini(spec) {
     case 'compass': return cfCompass(spec);
     case 'compare': return cfCompare(spec);
     case 'process': return cfProcess(spec);
+    case 'match-pairs': return cfMatchPairs({ ...spec, wide: true });
     case 'steps': return cfSteps(spec);
     case 'labeled-parts': return cfLabeledParts(spec);
     case 'expression': return cfExpression(spec);
@@ -750,6 +835,16 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
     // template roles order-independently. Additive: nothing targets these by default.
     const idCls = section.id ? ` sec-${String(section.id).toLowerCase().replace(/[^a-z0-9_-]/g, '')}` : '';
     let body = renderBody(section, accent, images);
+    // SUB-ELEMENTS OF THIS CARD, not cards of their own. «دعم» and «تحد» are the
+    // differentiation notes for the activity above them; as full-width cards they tripled
+    // the length of the LP and made every stage read as three identical boxes. A compact
+    // two-up row keeps them visually attached to the stage they belong to.
+    if (Array.isArray(section.callouts) && section.callouts.length) {
+      body += '<div class="d-callouts">' + section.callouts.map((c) =>
+        '<div class="d-callout"><span class="co-l">' + esc(cleanHeading(c.label || '')) + '</span>'
+        + '<span class="co-b">' + richText(c.body || '', { engine: section.engine }) + '</span></div>'
+      ).join('') + '</div>';
+    }
     // Inline image (R32, upstream): in MULTIGRADE guides an explanatory picture sits
     // under the point it explains. In all other lessons section.image renders as the
     // in-panel side figure (design packs like Yemen's — see below); the mg gate keeps

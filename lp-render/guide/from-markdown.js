@@ -28,6 +28,15 @@ const num = (profile, s) => (profile.digits === 'arabic' ? toArabicDigits(s) : S
 
 const asProfile = (p) => (typeof p === 'string' || !p ? profileFor(p) : p);
 
+// Truncate to whole words. Used wherever a shortened string becomes reader-visible.
+function cutWords(s, max) {
+  const t = String(s || '').trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max);
+  const sp = cut.lastIndexOf(' ');
+  return (sp > max * 0.5 ? cut.slice(0, sp) : cut).replace(/[\s،,;:—–-]+$/, '');
+}
+
 function roleOf(title, profile) {
   const p = asProfile(profile);
   for (const [role, re] of p.roles) if (re.test(title)) return role;
@@ -355,6 +364,24 @@ function labelledParts(body, profile = {}) {
     });
     if (bare.length >= 2) marks = bare;
   }
+  // …AND THEN the numbered exercises, on top of whatever was collected. Adding these
+  // BEFORE the bare-label pass made `marks` non-empty, which skipped that pass entirely —
+  // so «دعم» and «تحد» after an exercise were swallowed into the exercise's own text.
+  // A NUMBERED EXERCISE OPENS AN ACTIVITY. «١) أصل بين الصورة والكلمة الدالة عليها» has no
+  // colon, so the bare-label splitter never saw it and both matching exercises ran together
+  // inside one card as prose with one small merged figure. Each numbered line now starts its
+  // own part, which is what lets each exercise get its own full-size visual.
+  if (profile.exerciseRe) {
+    const ex = [];
+    const re = new RegExp(profile.exerciseRe.source, profile.exerciseRe.flags);
+    let m;
+    while ((m = re.exec(src))) {
+      if (/^[٠-٩0-9]/.test(m[1].trim())) {
+        ex.push({ label: m[1].trim(), at: m.index, end: m.index + m[0].length });
+      }
+    }
+    if (ex.length >= 1) marks = marks.concat(ex).sort((x, y) => x.at - y.at);
+  }
   // A bare label often begins with the source's own bullet — «• Mazoezi ya pamoja:»,
   // «▪ Wanafunzi walio chini ya lengo:». The bullet is list punctuation, not part of the
   // card's title, so it comes off the LABEL only; the body keeps every character.
@@ -412,7 +439,11 @@ function pairsFigure(body) {
     .filter((x) => x.label && x.caption);
   const seen2 = new Set();
   const uniq2 = bare.filter((p) => !seen2.has(p.label + p.caption) && seen2.add(p.label + p.caption));
-  return uniq2.length >= 2 ? { kind: 'steps', items: uniq2.slice(0, 6) } : null;
+  // A MATCHING EXERCISE IS A MATCHING VISUAL, not a row of chips. «أصل بين الصورة والكلمة
+  // الدالة عليها» is the central activity of the lesson; drawn as `steps` it was a small
+  // embedded widget, which is exactly what the reviewer rejected. `match-pairs` is a
+  // full-width two-column activity with a connector between each pair.
+  return uniq2.length >= 2 ? { kind: 'match-pairs', items: uniq2.slice(0, 6) } : null;
 }
 
 // «Hujambo?-Sijambo, Hamjambo?-Hatujambo, Habari?-Nzuri» — a greeting paired with its
@@ -753,10 +784,11 @@ function buildGuideFromMarkdown(md, opts = {}) {
         const sec = { id: 'errors', heading: T.errors, type: 'note', body };
         const pair = profile.confusedPairRe ? body.match(profile.confusedPairRe) : null;
         if (pair) {
+          // «✕ خطأ» / «✓ صواب» — the two words the design puts on this panel.
           sec.codeFigure = { kind: 'error-board',
             wrong: { kind: 'expression', text: pair[1].replace(/["»«]/g, '').trim() },
             correct: { kind: 'expression', text: pair[2].replace(/["»«]/g, '').trim() },
-            labelWrong: profile.boardWrong, labelCorrect: profile.labelCorrect };
+            labelWrong: profile.labelWrong, labelCorrect: profile.labelCorrect };
         }
         push(sec);
       }
@@ -767,6 +799,19 @@ function buildGuideFromMarkdown(md, opts = {}) {
   for (const id of profile.stages) {
     const found = byRole.get(id);
     if (!found) continue;
+    // A STAGE THE SOURCE LEAVES EMPTY. This lesson's «العرض — أنا أفعل (١٠ دقائق)» heading
+    // has no body under it. Dropping the stage silently breaks the four-stage rhythm a
+    // teacher reads by; inventing text to fill it would be worse. The heading, its time and
+    // its gradual-release pill are the source's own, so the card is emitted with no body and
+    // the pack draws it as a slim empty stage.
+    if (profile.emitEmptyStages && !found.some((b) => plain(b.body))) {
+      const mins = found.map((x) => minutesOf(x.title, profile)).find(Boolean) || '';
+      const pill = [mins, (profile.grr || {})[id]].filter(Boolean).join(' · ');
+      const sec = { id, heading: T[id], type: 'text', body: '' };
+      if (pill) sec.time = pill;
+      push(sec);
+      continue;
+    }
     // ONE CARD PER LABELLED PART, not one card per stage. Putting a whole stage's text
     // into a single card and hanging one figure underneath is what made the full LP read
     // as a text document: the pack's card anatomy is text-beside-figure, and it cannot
@@ -774,6 +819,11 @@ function buildGuideFromMarkdown(md, opts = {}) {
     // the size that anatomy was designed for — so each becomes its own card in the
     // stage's colour, carrying its own title, its own text and its own figure.
     let first = true;
+    let lastCard = null;      // sub-elements attach to the card they belong to
+    const subOf = (label) => {
+      for (const [, re, title] of (profile.subElements || [])) if (re.test(label)) return title;
+      return null;
+    };
     const unit = (profile.minutesWords || ['min']).join('|');
     const tailMin = new RegExp(`\\s*\\(?\\s*\\d+(?:\\s*[-–]\\s*\\d+)?\\s*(?:${unit})\\s*\\)?\\s*$`, 'i');
     const bare = (x) => String(x).toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
@@ -790,25 +840,71 @@ function buildGuideFromMarkdown(md, opts = {}) {
           lifted.get(role).push({ label: part.label, body: part.body });
           continue;
         }
+        // A SUB-ELEMENT BELONGS TO THE ACTIVITY ABOVE IT, not to a card of its own.
+        // «دعم» and «تحد» as full-width cards tripled the length of the LP and made every
+        // stage read as three identical boxes. They ride on the stage card as compact
+        // callouts, which is how the approved design carries them.
+        const sub = part.label ? subOf(part.label) : null;
+        if (sub && lastCard) {
+          if (!lastCard.callouts) lastCard.callouts = [];
+          lastCard.callouts.push({ label: sub, body: part.body });
+          continue;
+        }
         // Every card says which stage it belongs to: a teacher on page 3 should not have
         // to scroll back to find out they are still in العرض / still in Development.
-        const title = [T[id], part.label || blockHead].filter(Boolean).join(' · ');
+        // KEEP THE SEPARATOR AWAY FROM A DIGIT. «التطبيق · ١) أصل بين…» displayed as
+        // «التطبيق ١٠ ) أصل بين…»: bidi puts the neutral middle dot to the LEFT of the
+        // Arabic-Indic digit run, right against «١», where it reads as «١٠». An isolate does
+        // not help — the characters are in the wrong visual order either way. An em dash
+        // cannot be mistaken for a zero, so a digit-initial label uses that instead.
+        const label = part.label || blockHead;
+        const sep = /^[\d٠-٩]/.test(String(label).trim()) ? ' — ' : ' · ';
+        const title = [T[id], label].filter(Boolean).join(sep);
+        const fig = figureFor(part.raw || '', profile);
+        // THE ACTIVITY IS THE VISUAL, NOT A PARAGRAPH TOO. When a matching figure carries
+        // the pairs, printing «أبي ← صورة الأب أمي ← صورة الأم …» in the body as well is the
+        // "labels squeezed into running text" the reviewer rejected. Every one of those
+        // words still appears — drawn, in the activity — and the instruction line above them
+        // stays exactly as written.
+        //
+        // This has to happen BEFORE the card is built: a card carrying a check point is a
+        // `steps` card whose text lives in items[0].body, not in .body, so stripping
+        // afterwards wrote to a field the renderer ignores and silently dropped the
+        // instruction «٣) ألاحظ الكلمة التي في الشكل…» off the page.
+        let partBody = part.body;
+        if (fig && fig.kind === 'match-pairs') {
+          // Strip at LINE level, from part.raw — part.body has already been flattened by
+          // plain(), so a line filter applied to it matched nothing and the fallback regex
+          // chewed the joined text into «… في السطر ← أحمد ← إيمان : ٨٠٪ …». Removing whole
+          // source lines is exact: a pair line goes, everything else stays as written.
+          partBody = plain(String(part.raw || '').split('\n')
+            .filter((l) => !/^[\s•▪●◦*-]*[^\s←→،.:]{1,18}\s*[←→]/.test(l.trim()))
+            .join('\n'));
+        }
         // Fill the pilot's two text slots from the part's own words when it carries a
         // model answer; otherwise a plain text card.
-        const sp = splitCheck(part.body, profile);
+        let sp = splitCheck(partBody, profile);
+        // A CARD WHOSE ONLY TEXT IS ITS CHECK POINT still puts that text in the تحقق strip.
+        // splitCheck needs something before the marker to split at, so once the pair lines
+        // moved into the matching visual the check was left as the card's body — losing the
+        // amber strip on exactly the card whose activity most needs it.
+        if (!sp.check && !sp.longCheck && partBody
+            && partBody.search(profile.checkMarks) === 0 && partBody.length <= 160) {
+          sp = { body: '', check: partBody.trim() };
+        }
         const sec = sp.check
           ? { id, heading: title, type: 'steps',
               items: [{ label: '', body: sp.body }, { label: profile.checkLabel, body: sp.check }] }
-          : { id, heading: title, type: 'text', body: sp.longCheck ? sp.body : part.body };
+          : { id, heading: title, type: 'text', body: sp.longCheck ? sp.body : partBody };
         if (first) {
           const mins = found.map((x) => minutesOf(x.title, profile)).find(Boolean) || '';
           const pill = [mins, (profile.grr || {})[id]].filter(Boolean).join(' · ');
           if (pill) sec.time = pill;
           first = false;
         }
-        const fig = figureFor(part.raw || '', profile);
         if (fig) sec.codeFigure = fig;
         push(sec);
+        lastCard = sec;
         // A long model answer is its own card — same stage colour — rather than being
         // squeezed into a sidebar built for one line.
         if (sp.longCheck) {
@@ -994,7 +1090,11 @@ function buildGuideFromMarkdown(md, opts = {}) {
     images.push({
       id: 'lesson-scene',
       concept: 'scene',
-      label: (topic || artTopic).slice(0, 40),
+      // THE LABEL IS READER-VISIBLE — it prints as the figure's caption, so it must not be
+      // cut mid-word. A goal-derived topic sliced at 40 characters put «أستطيع التعرف على
+      // كلمات أفراد الأسرة وقر» under the picture, "وقر" being half of "وقراءتها". Cut back
+      // to the last whole word instead.
+      label: cutWords(topic || artTopic, 44),
       // Naming boards, pages and walls as "empty surfaces" is what produced a row of blank
       // framed panels: the model draws what the brief names, so a brief that names an empty
       // board gets an empty board. Describe the PEOPLE and the ACTION instead.

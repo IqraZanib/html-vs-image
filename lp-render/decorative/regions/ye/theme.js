@@ -730,6 +730,99 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section[class*="sec-stage-"]{margin:0 0 7px}
 .section[class*="sec-stage-"] .panel{padding:34px 16px 9px}
 
+/* ══ REVIEWER ROUND: bring the raw-text render back to the approved design language ══
+   Reported problems: large plain text boxes; checkpoint/support/challenge each becoming
+   another full-width card; matching activities squeezed into body text as a small embedded
+   widget; weak hierarchy; every section the same pale tint. Structure was fixed in the
+   mapper (sub-elements now ride on their stage card, each numbered exercise is its own
+   activity); these are the rules that make it LOOK like the approved family. ── */
+
+/* 1 · SUPPORT / CHALLENGE — compact two-up callouts inside their stage, never cards */
+.d-callouts{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+.d-callout{display:flex;gap:7px;align-items:flex-start;background:rgba(255,255,255,.72);
+  border:1px solid rgba(24,36,72,.14);border-radius:9px;padding:6px 9px}
+.d-callout .co-l{flex:none;font-size:11px;font-weight:800;color:#fff;background:var(--navy);
+  border-radius:99px;padding:2px 9px;line-height:1.5;white-space:nowrap}
+.d-callout .co-b{font-size:13px;line-height:1.45;font-weight:600;color:var(--ink)}
+/* a lone callout should not stretch across the whole card */
+.d-callouts:has(.d-callout:only-child){grid-template-columns:minmax(0,62%)}
+
+/* 1b · …AND THEY MUST SPAN THE CARD. The pilot stage card is a three-column grid
+      (body | figure | تحقق) and .ii-body is display:contents, so anything appended to the
+      body becomes a GRID ITEM — the callout row landed in the narrow first column and
+      wrapped to one word per line. It spans all columns, under the three of them. */
+.section .panel.has-inline-img .d-callouts,
+.section .panel.has-twin-board .d-callouts{grid-column:1 / -1;width:100%}
+.section .panel .d-callouts{margin-top:10px}
+
+/* 2 · THE MISCONCEPTION PANEL — a green/red split, clearly separated, code-drawn */
+.section.sec-errors .panel{background:#fff8f7}
+.section.sec-errors .d-note{background:#fff !important;border:1px solid #f0c9c2 !important;
+  border-radius:10px;font-size:14px;line-height:1.55}
+.section.sec-errors .d-code-fig{background:transparent;border:0;box-shadow:none;margin-top:4px}
+.section.sec-errors .d-code-fig svg{max-height:none;width:min(100%,470px)}
+
+/* 3 · MATCHING ACTIVITY — a main teaching visual, not an embedded widget. It spans the
+      card and is given real height; the two-column structure is drawn in SVG. */
+/* A SPANNING FIGURE MUST SPAN THE CARD, not its column. The stage card is a three-column
+   grid and .ii-body is display:contents, so a figure marked cf-wide is still just a grid
+   ITEM — it sat in the ~44%-wide figure column and the matching cards inside it scaled down
+   to about a third of their drawn size, which is what made a main activity look like a
+   widget. Spanning all columns is what gives it the page space the approved design gives a
+   teaching figure. */
+/* …BUT NOT OVER THE SIDEBAR. Spanning all three columns drew the activity across the
+   amber تحقق strip, which sits in the third column and spans both rows — the check text
+   disappeared behind the figure on two cards. Spanning the first two columns puts the
+   activity on its own row, full width of the content area, with the strip beside it. */
+.section .panel.has-inline-img .d-code-fig.cf-wide{grid-column:1 / span 2;width:100%}
+/* …and when the card has NO تحقق strip there is nothing to leave room for, so the activity
+   takes all three columns. Without this, an activity card with no check point drew its
+   figure two-thirds width while the identical card beside it drew full width — the two
+   matching exercises came out visibly different sizes. */
+.section .panel.has-inline-img:not(:has(.d-steps)) .d-code-fig.cf-wide{grid-column:1 / -1}
+.section .panel .d-text:empty{display:none}
+.section .d-code-fig.cf-wide{width:100%;max-width:100%;margin:8px auto 2px;background:#fff;
+  border:1.5px solid #dfe4ee;border-radius:12px;padding:8px 10px;box-shadow:none}
+/* …and the SVG itself must be allowed to grow. Earlier rules cap .cf-svg at 170px, 132px
+   and 126px for the stage figures — sensible for a small diagram beside prose, fatal for a
+   full-width activity: the aspect ratio is preserved, so a height cap shrank the WIDTH too
+   and the word cards came out about a third of their drawn size. These selectors are more
+   specific than all three. */
+.section .d-code-fig.cf-wide svg,
+.section .d-code-fig.cf-wide .cf-svg,
+.section.sec-stage-tamhid .d-code-fig.cf-wide .cf-svg,
+.section.sec-stage-arad .d-code-fig.cf-wide .cf-svg,
+.section.sec-stage-tatbiq .d-code-fig.cf-wide .cf-svg,
+.section.sec-stage-taqwim .d-code-fig.cf-wide .cf-svg{
+  position:static;width:100%;height:auto;max-height:none}
+.section .d-code-fig.cf-wide .cap{display:none}
+
+/* 4 · STAGE COLOURS — warm amber for التمهيد, blue for العرض, green for التطبيق, cream for
+      التقويم. The reviewer asked for a warm intro; the previous rose came from sampling the
+      pilot, so if rose was right this is the one line to put back. */
+.section.sec-stage-tamhid .s-title{color:#a85a12}
+.section.sec-stage-tamhid .panel{background:#fdeedd;border-color:#e8bb86 !important}
+
+/* 5 · AN EMPTY STAGE — the source gives العرض no body. Slim, quiet, honest: the heading and
+      its pills, and no invented text. */
+/* An empty stage needs REAL height, or its header collides with the next section's. At
+   min-height:0 the dashed strip collapsed to a few pixels and «العرض» sat on top of
+   «التطبيق». A slim block with its own space reads as "this stage is in the plan and the
+   plan says nothing about it" — which is the honest message. */
+.section.sec-stage-arad:has(.panel .d-text:empty){margin-bottom:16px}
+.section.sec-stage-arad .panel:has(.d-text:empty){
+  min-height:34px;padding:8px 14px;background:#eef3fa;border-style:dashed !important}
+
+/* 6 · MATERIALS chips a touch stronger, so the top of the page has three distinct blocks
+      (objective · materials · misconception) rather than three similar boxes */
+.section.sec-materials .panel{background:#f3faf9}
+.section.sec-materials .d-chip{background:#fff !important;border:1.5px solid #9ecfc9;
+  color:#0f6b64 !important;font-weight:800;font-size:13.5px;padding:6px 14px}
+
+/* 7 · EXIT TICKET / ANSWERS — a question card and its answer, visually paired */
+.section.sec-exit-ticket .d-note{border:1.5px solid #dbb95e !important}
+.section.sec-solutions .panel{background:#f2faf7}
+
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

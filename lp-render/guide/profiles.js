@@ -89,6 +89,10 @@ const YE = {
     'stage-taqwim': 'أنت تفعل',
   },
   stages: ['stage-tamhid', 'stage-arad', 'stage-tatbiq', 'stage-taqwim'],
+  // A stage heading the source leaves empty still appears, as a slim card carrying its own
+  // title and pills. The four-stage rhythm is what a teacher reads by, and fabricating
+  // content to fill a gap is not an option.
+  emitEmptyStages: true,
   order: ['lesson-line', 'goal', 'materials', 'errors', 'errors-caption', 'stage-tamhid',
     'stage-arad', 'stage-tatbiq', 'stage-taqwim', 'exit-ticket', 'solutions', 'glossary',
     'multigrade', 'homework'],
@@ -116,6 +120,20 @@ const YE = {
   // the criterion the teacher checks against, so it fills the amber strip beside the
   // activity rather than becoming a separate card after it.
   checkLabelRe: /^\s*نقطة التحقق\s*$/,
+  // SUB-ELEMENTS OF A STAGE, NOT CARDS OF THEIR OWN. «دعم» and «تحد» are the
+  // differentiation notes for the activity above them. Rendered as full-width cards they
+  // tripled the length of the LP and made every stage look like three identical boxes —
+  // the reviewer's first complaint about the render. They attach to the stage card they
+  // belong to and draw as a compact two-up callout row underneath it.
+  subElements: [
+    ['support', /^\s*دعم\s*$/, 'دعم'],
+    ['challenge', /^\s*تحد\s*$/, 'تحد'],
+  ],
+  // A numbered exercise «١) أصل بين الصورة والكلمة الدالة عليها» is the heading of a
+  // teaching ACTIVITY, so it opens its own card and gets its own visual. The bare-label
+  // splitter only fires on «label:» lines, so these ran together inside one card and the
+  // matching exercises ended up as one small merged widget.
+  exerciseRe: /^[ \t]*([٠-٩0-9]{1,2}\s*[).\u061F]?\s*[^\n]{4,70})$/gm,
   // the lesson's own «Watch out» wording, for the drawn ✗/✓ board
   warnRe: /watch out|تنبيه|احذر/i,
   fixRe: /(?:التصحيح|الصواب|الصحيح)\s*[:،]?\s*([^.!؟\n]{6,60})/,
