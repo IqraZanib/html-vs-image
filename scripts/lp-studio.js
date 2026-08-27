@@ -13,7 +13,7 @@ const { structureLesson } = require('../lp-render/structure');
 const { condenseToGuide, addFiguresToGuide } = require('../lp-render/condense');
 const { validateFigures } = require('../lp-render/figures/validate');
 const { checkVerbatim } = require('../lp-render/text/verbatim');
-const { buildGuideFromMarkdown } = require('../lp-render/guide/from-markdown');
+const { buildGuideFromMarkdown, GUIDE_SECTION_IDS } = require('../lp-render/guide/from-markdown');
 
 const ROOT = path.resolve(__dirname, '..');
 // Load the kie.ai key from the git-ignored .env-api if it isn't already in the env.
@@ -91,7 +91,19 @@ function handler(req, res) {
         // Raw lesson TEXT (markdown, as the lesson artifacts carry it) is mapped by code.
         if (!parsed && typeof content === 'string' && guideMode === 'code') {
           log('Raw lesson text → guide template, mapped in code (no model call, no credits).');
-          parsed = buildGuideFromMarkdown(content, { region: region || 'ye', locale: 'ar' });
+          // REGION-AWARE. This line used to read `{ region: region || 'ye', locale: 'ar' }`:
+          // every paste with no picker choice was treated as a Yemeni lesson and every
+          // lesson was declared Arabic, so a Kenyan CBC paste was read with Yemen's
+          // heading rules and titled with Arabic card names. The picker's choice is
+          // passed through as-is; with nothing chosen the profile is detected from the
+          // text, and the locale comes from that profile rather than being asserted here.
+          parsed = buildGuideFromMarkdown(content, {
+            region: region === 'default' ? '' : (region || ''),
+            locale: parsedBody.locale || '',
+          });
+          const sp = parsed.sourceProfile || {};
+          log(`  ✓ profile: ${sp.name} (${sp.id}) · headings read in ${sp.mode === 'bare'
+            ? 'bare-line mode — the paste carries no "#" markers' : 'markdown mode'}`);
           structured = JSON.stringify(parsed, null, 2);
           const chars = parsed.sections.reduce((a, x) => a + (x.body ? x.body.length
             : (x.items || []).reduce((b, i) => b + String(i.body || i.text || i.value || '').length, 0)), 0);
@@ -118,7 +130,12 @@ function handler(req, res) {
         // Content already in the guide shape passes through untouched.
         const srcForValidation = parsed; // the structured lesson, before condensing
         let figureReport = null; let verbatimReport = null;
-        const looksLikeGuide = Array.isArray(parsed.sections) && parsed.sections.some((x) => x && x.id === 'stage-tamhid');
+        // "Is this already in guide shape?" used to mean "does it contain stage-tamhid",
+        // i.e. does it look YEMENI — so a Kenyan guide was never recognised as a guide and
+        // got sent back through the structurer. Any section id any region profile can
+        // emit counts, and a stage id of any profile is the real signal.
+        const looksLikeGuide = Array.isArray(parsed.sections)
+          && parsed.sections.filter((x) => x && GUIDE_SECTION_IDS.has(x.id)).length >= 3;
         if (guide2p && !looksLikeGuide && guideMode === 'llm') {
           if (!process.env.KIE_API_KEY) throw new Error('The guide structure needs a kie.ai key for the condense step.');
           log('Mapping the full lesson onto the guide template (model path — guideMode=llm)…');
