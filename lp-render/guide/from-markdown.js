@@ -390,6 +390,38 @@ function pairsFigure(body) {
   return uniq.length >= 2 ? { kind: 'steps', items: uniq.slice(0, 6) } : null;
 }
 
+// «Hujambo?-Sijambo, Hamjambo?-Hatujambo, Habari?-Nzuri» — a greeting paired with its
+// answer. This IS the content of a Kiswahili greetings lesson: «kuoanisha maamkizi na
+// majibu yake sahihi» means matching greetings to their correct responses, and the source
+// writes the pairs as question–answer joined by a dash. Rendered as prose it is a run of
+// bracketed text; drawn, each pair is a card showing the prompt and the answer to check
+// against — which is what the lesson asks the class to practise.
+//
+// It exists because a real Kiswahili lesson produced ZERO code figures: every detector
+// here was written against Arabic and English sources and looked for «[x] ← y», Arabic
+// letter builds, «Teacher says:», markdown tables or fenced chants. None of those appear
+// in a Kiswahili plan.
+function askAnswerPairsFigure(body) {
+  const pairs = [...String(body).matchAll(/([\p{L}]{3,20}\s*\?)\s*[-–—]\s*([\p{L}]{2,20})/gu)]
+    .map((m) => ({ label: m[1].replace(/\s+/g, ''), caption: m[2].trim() }));
+  const seen = new Set();
+  const uniq = pairs.filter((x) => !seen.has(x.label) && seen.add(x.label));
+  return uniq.length >= 2 ? { kind: 'steps', items: uniq.slice(0, 6) } : null;
+}
+
+// A run of questions the teacher asks aloud — «Tunasemaje tunaposalimu mwalimu?
+// Tunasemaje tunaposalimu mwenzetu?». Two or more in one part are the card's real
+// content, so they become chips a teacher can glance at rather than a paragraph.
+function questionsFigure(body) {
+  const qs = String(body).replace(/\s+/g, ' ').split(/(?<=\?)\s+/)
+    .map((x) => x.trim()).filter((x) => /\?$/.test(x) && x.length > 12 && x.length < 90);
+  const seen = new Set();
+  const uniq = qs.filter((q) => !seen.has(q) && seen.add(q));
+  return uniq.length >= 2
+    ? { kind: 'steps', items: uniq.slice(0, 4).map((q) => ({ label: q, caption: '' })) }
+    : null;
+}
+
 // «Teacher says: "…"» — the classroom voice. Drawn as a large centred card it reads as
 // a callout a teacher can glance at, instead of disappearing into a paragraph.
 function quoteFigure(body, profile) {
@@ -455,6 +487,9 @@ function figureFor(rawBody, profile) {
   if (eb) return eb;
   const pf = pairsFigure(rawBody);
   if (pf) return pf;
+  // a greeting-and-answer list is the lesson's own matching exercise
+  const ap = askAnswerPairsFigure(rawBody);
+  if (ap) return ap;
   const bf = buildFigure(rawBody);
   if (bf) return bf;
   const qf = quoteFigure(rawBody, profile);
@@ -467,6 +502,9 @@ function figureFor(rawBody, profile) {
   if (ff) return ff;
   const eq = String(rawBody).match(/[٠-٩0-9]+\s*[+\-×÷]\s*[٠-٩0-9]+\s*=\s*[٠-٩0-9]+/);
   if (eq) return { kind: 'expression', text: eq[0] };
+  // last: a part that is mostly questions the teacher reads out
+  const qsf = questionsFigure(rawBody);
+  if (qsf) return qsf;
   return null;
 }
 

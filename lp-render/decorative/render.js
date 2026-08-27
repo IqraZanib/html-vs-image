@@ -250,10 +250,24 @@ function cfSvg(inner, w = 240, h = 200, cls = 'cf-svg') {
 // expression is written with its first operand on the right, so rtl is correct for
 // both prose and arithmetic; forcing ltr on digit-and-operator strings is what made
 // «١٦ ÷ ٤ = ٤» read backwards in figures. See lp-render/math/math.js.
-function cfText(x, y, s, size = 13, weight = 700, fill = CF.ink, anchor = 'middle') {
+// THE DOCUMENT'S OWN DIRECTION, not a fixed one. Removing the forced-LTR override that
+// mirrored Arabic arithmetic was right, but hard-coding 'rtl' in its place was only right
+// for Arabic: a Kiswahili label «Hujambo?» drew as «?Hujambo», because the question mark
+// is a neutral character and takes the paragraph direction. Measured on a Kenyan Kiswahili
+// render — the lesson's whole point is the greeting, and every greeting card showed its
+// question mark on the wrong side.
+//
+// Set once per render from meta.locale (see renderDecorativeLesson). The default stays
+// 'rtl' so the Arabic maths-direction tests, which call cfText directly, keep testing what
+// they were written to test.
+let CF_DIR = 'rtl';
+const RTL_LOCALES = /^(ar|he|fa|ur|ps|sd|ku|yi|dv)\b/i;
+function cfDirFor(locale) { return RTL_LOCALES.test(String(locale || '')) ? 'rtl' : 'ltr'; }
+
+function cfText(x, y, s, size = 13, weight = 700, fill = CF.ink, anchor = 'middle', dir = CF_DIR) {
   const txt = String(s || '');
   return '<text x="' + x + '" y="' + y + '" text-anchor="' + anchor + '" font-size="' + size
-    + '" font-weight="' + weight + '" fill="' + fill + '" direction="rtl">' + esc(txt) + '</text>';
+    + '" font-weight="' + weight + '" fill="' + fill + '" direction="' + dir + '">' + esc(txt) + '</text>';
 }
 
 // N parts of one shape, K shaded (square grid or circle pie) — exact fractions.
@@ -419,8 +433,15 @@ function cfProcess({ layout = 'cycle', stages = [] }) {
 
 
 const CF_TINT = ['#fcd8d8', '#e7eef8', '#e9f2e5', '#fcf0d8', '#f1e7f5', '#dcf2f2'];
+// THE DOCUMENT'S OWN NUMERALS. A step badge was always drawn in Arabic-Indic digits, so
+// a Kiswahili lesson's matching exercise came out numbered «١ ٢ ٣» — measured on a Kenyan
+// Grade 1 render. Same root cause as the hard-coded text direction above: a choice that is
+// right for Arabic, made once, in a component every region shares. Follows CF_DIR, which
+// renderDecorativeLesson sets from meta.locale.
 const CF_AR_DIGITS = '٠١٢٣٤٥٦٧٨٩';
-const cfArNum = (n) => String(n).replace(/\d/g, (d) => CF_AR_DIGITS[+d]);
+const cfArNum = (n) => (CF_DIR === 'rtl'
+  ? String(n).replace(/\d/g, (d) => CF_AR_DIGITS[+d])
+  : String(n));
 
 // SVG text does not wrap, so break an Arabic label into at most two or three lines on
 // word boundaries. Arabic glyphs run ~0.52em, so chars-per-line is derived from the
@@ -686,6 +707,7 @@ function fractionGridSvg({ shape, parts, shaded }) {
 
 function renderDecorativeLesson(content, images = {}, cast = {}) {
   const meta = content.meta || {};
+  CF_DIR = cfDirFor(meta.locale);   // drawn labels read the way this document reads
   const chips = (meta.chips || []).map((c) => `<span><b>${esc(cleanHeading(c.label))}</b>${esc(cleanHeading(c.value))}</span>`).join('');
   const htext =
     `<h1>${esc(cleanHeading(meta.title))}</h1>` +
@@ -840,4 +862,4 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
 
 // cfText is exported for lp-render/test/math-direction.test.js: the direction of a
 // figure label is a rule worth asserting directly, not only through a full render.
-module.exports = { renderDecorativeLesson, cfText };
+module.exports = { renderDecorativeLesson, cfText, cfDirFor };
