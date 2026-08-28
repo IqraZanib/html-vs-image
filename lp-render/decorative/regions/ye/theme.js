@@ -1833,6 +1833,39 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.yl-stage:has(.yl-actgrid) .yl-illus img{max-height:186px !important}
 .section.yl-stage:has(.yl-actgrid) .yl-sbody.yl-split{grid-template-columns:1fr 1fr;
   align-items:start}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   TEACHER CORNER — matched to the approved page, replacing the flush side tab.
+   The approved card is a full-width horizontal card: soft cream fill, thin rounded amber
+   border, the text CENTRED on that fill with no inner white box, and the title as a
+   ROUNDED AMBER PILL inset at the RTL start with its bubble icon. Mine had a
+   square-edged full-height tab clamped to the far end and the text in a white box, which
+   is what read as "a small side label attached awkwardly to the box".
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+.section.yl-block.sec-homework{background:#fdf4e4 !important;border:1.6px solid #e2b464 !important}
+.section.yl-block.yl-tabbed.sec-homework{display:flex;align-items:center;gap:12px;
+  padding:9px 12px}
+.section.yl-block.sec-homework .yl-bhead{display:none}
+.sec-homework .yl-btab{order:0;flex:0 0 auto;background:#d9a13b;color:#fff;
+  border-radius:11px;padding:7px 10px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;min-width:74px;align-self:center}
+.sec-homework .yl-btab .yl-bubble{width:18px;height:18px}
+.sec-homework .yl-btab .yl-btl{font-size:12.5px;font-weight:800;line-height:1.25}
+.section.yl-block.sec-homework .yl-bbody{order:1;flex:1;min-width:0;padding:0 4px !important}
+/* the text sits on the card's own fill, centred, with no box around it */
+.section.yl-block.sec-homework .yl-bbody .d-note{background:none !important;
+  border:0 !important;padding:2px 6px !important;margin:0;text-align:center;
+  font-size:14.5px;font-weight:700;line-height:1.55;color:#4a3608}
+
+/* ── SIDE-BY-SIDE CELLS SHARE A HEIGHT ──────────────────────────────────────────────
+   In an exercise row the cells were as tall as their own content, so their bottoms drifted
+   apart and the answer lines sat at different heights across the row. Each cell now
+   stretches to the row and pins its answer to the bottom, so the row reads as one band. */
+.yl-actgrid{align-items:stretch}
+.yl-actgrid > .yl-act{display:flex;flex-direction:column;height:100%}
+.yl-actgrid > .yl-act > .yl-sbody{flex:1 1 auto;display:flex;align-items:center}
+.yl-actgrid > .yl-act > .yl-sbody > .yl-tvis{width:100%}
+.yl-actgrid > .yl-act > .yl-answer{margin-top:auto}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then
