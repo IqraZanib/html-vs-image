@@ -1866,6 +1866,85 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .yl-actgrid > .yl-act > .yl-sbody{flex:1 1 auto;display:flex;align-items:center}
 .yl-actgrid > .yl-act > .yl-sbody > .yl-tvis{width:100%}
 .yl-actgrid > .yl-act > .yl-answer{margin-top:auto}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   DENSITY AND A DELIBERATE CLOSING STACK
+   The reviewer's two complaints pull against each other: cards must never be cut by a
+   page break, AND the page must not be left half empty. Both hold only if the cards are
+   SMALLER — so the density goes into the activity cells, which is where the slack was.
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+/* exercise cells: fill their column, no dead margin, figure centred in its own cell */
+.yl-actgrid{padding:0 12px 9px;gap:0 9px}
+.yl-actgrid > .yl-act{padding:0}
+.yl-actgrid .yl-alabel{padding:7px 0 0;font-size:12px;line-height:1.4}
+.yl-actgrid .yl-sbody{padding:5px 0 0 !important}
+.yl-actgrid .yl-tvis .geo-fig{padding:6px 7px;justify-content:center}
+.yl-actgrid .yl-answer{font-size:10.5px;padding:3px 7px;margin-top:auto}
+/* a two-up row has more room per cell, so its figures may be bigger — that is what stops
+   a 2-cell row looking like two small things floating in a wide card */
+.yl-actgrid.yl-cols-2 .geo-s,.yl-actgrid.yl-cols-2 .geo-w,
+.yl-actgrid.yl-cols-2 .geo-g{max-height:86px}
+.yl-actgrid.yl-cols-3 .geo-s,.yl-actgrid.yl-cols-3 .geo-w,
+.yl-actgrid.yl-cols-3 .geo-g{max-height:66px}
+.yl-actgrid.yl-cols-2 .geo-fig,.yl-actgrid.yl-cols-3 .geo-fig{padding:8px 9px}
+
+/* THE CLOSING STACK IS ONE DELIBERATE BLOCK: notes full width, the pair in one row, the
+   teacher's corner full width, with the SAME gap between all three. */
+.body > .section.yl-notes,
+.body > .section.yl-block.sec-exit-ticket,
+.body > .section.yl-block.sec-solutions,
+.body > .section.yl-block.sec-homework{margin-bottom:6px}
+.body > .section.yl-block.sec-homework{margin-bottom:0}
+/* and they all carry the same soft-fill / rounded-border language */
+.section.yl-notes,.section.yl-block.sec-exit-ticket,
+.section.yl-block.sec-solutions,.section.yl-block.sec-homework{border-radius:13px}
+
+/* A LONG TEACHER SPEECH NEEDS WIDTH, NOT HEIGHT. العرض's text ran 363px tall in a half-width
+   column beside a compact drawn board, making a 509px card that would not fit in the 448px
+   left on page 1 — so the page broke at 58% full. The board is a fixed three-row drawing and
+   reads fine narrower; the prose gets the width instead. */
+/* Measured: العرض was 34px too tall to fit page 1, and its text column was the tall part —
+   351px of prose in a 437px column beside a compact drawn board. Widening the prose column
+   is what shortens the card; it also evens out the "one side crowded" imbalance. */
+.section.yl-stage:has(.geo-board) .yl-sbody.yl-split{grid-template-columns:1.95fr 1fr}
+.section.yl-stage:has(.geo-board) .geo-s{max-height:48px}
+
+
+
+/* PAGE 1 BREAKS ON A THRESHOLD, NOT A GRADIENT. It ended at 611px of 1059 because the next
+   card (العرض, 497px) needed 49px more than the 448px left. Freeing those 49px from the cards
+   ABOVE it does not move the boundary up by 49 — it lets the whole card land on page 1 and
+   the boundary jumps to ~1058. That is the blank area the reviewer is pointing at, and this
+   is the only lever that closes it without cutting a card. */
+.section.sec-stage-tamhid .yl-tvis .geo-fig{padding:5px 7px}
+.section.sec-stage-tamhid .geo-s{max-height:104px}
+.section.yl-miscsec .yl-mrow .yl-half{padding:7px 12px 8px}
+.section.yl-miscsec .yl-mhead{margin-bottom:3px}
+.section.yl-miscsec .yl-mfix{padding:5px 13px}
+.section.yl-block.sec-materials .yl-bbody{padding:5px 13px 6px}
+
+/* MEASURED AGAIN, AND THE TEXT WAS NEVER THE CONSTRAINT: widening the prose column changed
+   the card's height by zero, because the row is as tall as the BOARD beside it — three rows
+   of shape + answer box + caption, 351px. Eleven pixels off each row is the 34px that lets
+   the whole card land on page 1, which is what closes the blank area. */
+.section.yl-stage:has(.geo-board) .geo-s{max-height:42px}
+.section.yl-stage:has(.geo-board) .geo-brow{padding-bottom:3px}
+.section.yl-stage:has(.geo-board) .geo-box{width:19px;height:19px;font-size:11.5px}
+.section.yl-stage:has(.geo-board) .geo-cap{font-size:9.5px}
+.section.yl-stage:has(.geo-board) .geo-board{gap:4px}
+.section.yl-stage:has(.geo-board) .geo-cell{gap:3px}
+
+/* Page 1 is now 98% full and page 2 99.5% — the tail on page 3 is 80px. 55px off the
+   exercise grids' own frames closes it, and both pages stay under their limit. */
+.yl-actgrid.yl-cols-4 .geo-s,.yl-actgrid.yl-cols-4 .geo-w,
+.yl-actgrid.yl-cols-4 .geo-g{max-height:44px}
+.yl-actgrid.yl-cols-4 .geo-fig{padding:4px 4px}
+.yl-actgrid.yl-cols-2 .geo-s,.yl-actgrid.yl-cols-2 .geo-w,
+.yl-actgrid.yl-cols-2 .geo-g{max-height:74px}
+.yl-actgrid .yl-alabel{padding:6px 0 0}
+.yl-actgrid .yl-answer{padding:2px 6px}
+.section.yl-stage .yl-check{padding:4px 12px}
+.yl-srow{padding:3px 8px}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

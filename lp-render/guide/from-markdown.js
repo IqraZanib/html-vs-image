@@ -1097,6 +1097,9 @@ function buildGuideFromMarkdown(md, opts = {}) {
         const label = longLabel ? '' : rawLabel;
         const sep = isExercise ? ' — ' : ' · ';
         const title = [T[id], label].filter(Boolean).join(sep);
+        // the stage's name as the source wrote it, minus its minutes and its mode
+        const ownName = String(b.title || '').split(/\s*[—–]\s*/)[0]
+          .replace(tailMin, '').replace(/[(（][^)）]*[)）]/g, '').trim();
         // THE LABEL IS THE EXERCISE. «١. ضع إشارة (✓) على القطعة المستقيمة.» carries all of
         // its meaning in the label and has no body at all, so a detector fed only the body
         // saw an empty string and drew nothing for seven exercises in a row.
@@ -1151,6 +1154,7 @@ function buildGuideFromMarkdown(md, opts = {}) {
         const sec = { id, heading: title, type: 'stage',
           body: sp.longCheck ? sp.body : (sp.check ? sp.body : partBody) };
         if (part.lead) sec.lead = part.lead;
+        if (ownName && ownName.length <= 24) sec.sourceName = ownName;
         if (partAnswer) sec.answer = partAnswer;
         if (sp.check) sec.check = sp.check;
         if (first) {
@@ -1294,7 +1298,12 @@ function buildGuideFromMarkdown(md, opts = {}) {
   // only the drawing — which is how the generated artwork went missing from page 1 while
   // the log said it had been generated.
   const isStage = (x) => profile.stages.includes(x.id);
-  const artCard = sections.find((x) => isStage(x) && !x.codeFigure);
+  // A STAGE, NOT A SECTION. At this point a stage is still several part-sections, and the
+  // one carrying the stage's instruction line has no figure of its own — so this picked
+  // التطبيق, a stage whose other parts draw seven exercises, and put a photograph beside a
+  // 25px line of text. Availability is a property of the whole stage.
+  const stageDraws = (id) => sections.some((x) => x.id === id && x.codeFigure);
+  const artCard = sections.find((x) => isStage(x) && !stageDraws(x.id));
   const vocabRole = byRole.get('glossary') ? 'glossary' : (byRole.get('resources') ? 'resources' : '');
   if (vocabRole) {
     const wc = wordCardsFigure(tableRows(rawOf(vocabRole)));
@@ -1353,7 +1362,19 @@ function buildGuideFromMarkdown(md, opts = {}) {
   // art-direction pack — imagegen/prompts/regions/<region>.js — so the same brief is
   // grounded in a Yemeni classroom or a Kenyan one without being written differently.
   const images = [];
-  const warmup = artCard || sections.find((x) => x.id === profile.stages[0]);
+  // THE ILLUSTRATION GOES WHERE THERE IS ROOM FOR IT. It was landing in whichever stage
+  // came first, which put a 228px picture beside a 25px instruction line in a card that
+  // already held seven drawn exercises: 200px of empty space on one side, a 723px card,
+  // and a page break that left the previous page 58% full. A stage that already draws its
+  // own activities does not need a photograph as well — its exercises ARE the visuals — so
+  // the brief goes to the first stage that has no drawn figure, and to none if every stage
+  // has one.
+  const stageCards = (profile.stages || []).map((id) => sections.find((x) => x.id === id))
+    .filter(Boolean);
+  const hasFigure = (sec) => !!(sec.codeFigure
+    || (sec.activities || []).some((a) => a.codeFigure));
+  const warmup = artCard || stageCards.find((x) => !hasFigure(x) && (x.body
+    || (x.activities || []).some((a) => a.body)));
   // A lesson with no title line has no topic to brief an illustration from — this one had
   // none, so no artwork was authored at all. Its GOAL states what the lesson is about
   // («أستطيع التعرف على كلمات أفراد الأسرة وقراءتها والمطابقة بينها»), which is the
@@ -1470,7 +1491,12 @@ function buildGuideFromMarkdown(md, opts = {}) {
         continue;
       }
       if (isStage) {
-        const base = { ...sec, heading: T[sec.id] || sec.heading,
+        // THE TAB SAYS WHAT THE SOURCE CALLED THE STAGE. The template's own name for the
+        // assessment role is «التقويم والختام» while this lesson calls it «التقويم» — so the
+        // tab printed 124px of text where its neighbours printed 72px, and the row read as
+        // an inconsistent heading. The source's own word is both shorter and more faithful.
+        const own = String(sec.sourceName || '').trim();
+        const base = { ...sec, heading: own || T[sec.id] || sec.heading,
           activities: [asActivity(sec)], checks: sec.check ? [sec.check] : [] };
         delete base.body; delete base.codeFigure; delete base.check;
         merged.push(base);
@@ -1480,6 +1506,24 @@ function buildGuideFromMarkdown(md, opts = {}) {
     }
     sections.length = 0;
     sections.push(...merged);
+  }
+  // ENFORCED AFTER THE MERGE, whatever chose the card earlier: a stage that draws its own
+  // activities does not also carry a photograph. It was putting a 228px picture beside a
+  // 25px instruction line in a card that already held seven drawn exercises — 200px of dead
+  // space on one side, a 723px card, and a page break that left the page before it 58%
+  // full. If no stage is free, the lesson simply has no photograph: its own drawn
+  // activities are the visuals.
+  for (const sec of sections) {
+    if (!sec.image) continue;
+    const draws = (sec.activities || []).some((a) => a.codeFigure) || sec.codeFigure;
+    if (!draws) continue;
+    const free = sections.find((x) => x.type === 'stage' && x !== sec && !x.codeFigure
+      && !(x.activities || []).some((a) => a.codeFigure)
+      && ((x.activities || []).some((a) => a.body) || x.body));
+    const id = sec.image;
+    delete sec.image;
+    if (free) free.image = id;
+    else images.length = 0;          // nothing to attach it to; drop the brief
   }
   return { meta, images, sections, sourceProfile: { id: profile.id, name: profile.name, mode: doc.mode } };
 }
