@@ -914,7 +914,8 @@ function buildGuideFromMarkdown(md, opts = {}) {
     } else {
       const body = plain(raw);
       if (body) {
-        const sec = { id: 'errors', heading: T.errors, type: 'misconception', body };
+        const sec = { id: 'errors', heading: T.errors, type: 'misconception', body,
+          labelWrong: profile.labelWrong, labelCorrect: profile.labelCorrect };
         const pair = profile.confusedPairRe ? body.match(profile.confusedPairRe) : null;
         // THE CORRECTION IS NOT THE MISCONCEPTION. The source states both in one
         // sentence — «الخلط بين كلمتي "أبي" و"أمي" لتشابه الحروف؛ يصححه المعلم بالتركيز

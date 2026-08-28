@@ -1057,23 +1057,30 @@ function ylMisconception(section, engine) {
   const cf = section.codeFigure || {};
   const wrong = (cf.wrong && cf.wrong.text) || '';
   const correct = (cf.correct && cf.correct.text) || '';
+  // THE LABELS ARE THE DESIGN'S, NOT THE FIGURE'S. They were read off the codeFigure, which
+  // only exists when the source names a confused PAIR — «الخلط بين كلمتي "أبي" و"أمي"». A
+  // lesson whose misconception is not a pair («خلط التلميذ بين الشكل الرباعي وأي شكل آخر»)
+  // built no figure, so the panel printed a ✓ with no «صواب» beside it and an empty green
+  // half. The labels come from the profile now, and they are always there.
+  const lw = cf.labelWrong || section.labelWrong || '';
+  const lc = cf.labelCorrect || section.labelCorrect || '';
   const half = (cls, mark, lbl, inner) =>
     '<div class="yl-half ' + cls + '">'
     + '<div class="yl-mhead"><span class="yl-mark">' + mark + '</span>'
     + '<span class="yl-mlbl">' + esc(cleanHeading(lbl)) + '</span></div>'
-    + '<div class="yl-mbody">' + inner + '</div></div>';
+    + (inner ? '<div class="yl-mbody">' + inner + '</div>' : '') + '</div>';
   const said = section.body ? richText(section.body, { engine }) : '';
-  const pair = (wrong && correct) ? ylLetterPair(wrong, correct)
-    : (wrong || correct ? '<div class="yl-pair"><span class="yl-pword">'
-      + esc(wrong || correct) + '</span></div>' : '');
+  const pair = (wrong && correct) ? ylLetterPair(wrong, correct) : '';
+  // AND THE ✓ HALF MUST SAY SOMETHING. With a pair, it shows the two words and the letter
+  // that separates them, and the teacher's correction runs beneath both. With no pair, the
+  // correction IS the right-hand side — which is what the source put there.
+  const fixText = section.fix ? richText(section.fix, { engine }) : '';
   const row = '<div class="yl-mrow">'
-    + half('yl-wrong', '✕', cf.labelWrong || '', said)
-    + half('yl-correct', '✓', cf.labelCorrect || '', pair)
+    + half('yl-wrong', '✕', lw, said)
+    + half('yl-correct', '✓', lc, pair || fixText)
     + '</div>';
-  // The correction the source states, beneath both halves, full width.
-  const fix = section.fix
-    ? '<div class="yl-mfix">' + richText(section.fix, { engine }) + '</div>' : '';
-  return '<div class="yl-misc">' + row + fix + '</div>';
+  const strip = (pair && fixText) ? '<div class="yl-mfix">' + fixText + '</div>' : '';
+  return '<div class="yl-misc">' + row + strip + '</div>';
 }
 
 // The visual slot of a stage: the model illustration, or a code activity, or nothing.
