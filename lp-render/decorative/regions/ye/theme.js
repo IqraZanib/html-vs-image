@@ -1967,6 +1967,17 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.yl-block.sec-solutions .yl-bbody{padding:4px 11px 5px !important}
 .section.yl-stage .yl-check{padding:3px 12px 4px}
 .section.yl-notes .yl-nbody{padding:6px 13px 7px}
+
+/* the illustration sitting in the exercise grid's spare slot: same frame as its neighbours,
+   so it reads as one of the row rather than a photograph dropped into a gap */
+.yl-actgrid > .yl-act.yl-artcell{display:flex;flex-direction:column;justify-content:flex-end;
+  padding-top:6px}
+.yl-artcell .yl-illus{margin:0;background:#fff;border:1.5px solid #e1e6ef;border-radius:11px;
+  padding:4px;overflow:hidden}
+.yl-artcell .yl-illus img{width:100%;height:auto;max-height:104px;object-fit:cover;
+  border-radius:8px;display:block}
+.yl-artcell .yl-illus figcaption{font-size:9.5px;font-weight:700;color:#44506a;
+  text-align:center;padding:3px 2px 0;line-height:1.3}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

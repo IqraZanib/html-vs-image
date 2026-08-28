@@ -1530,13 +1530,21 @@ function buildGuideFromMarkdown(md, opts = {}) {
     if (!sec.image) continue;
     const draws = (sec.activities || []).some((a) => a.codeFigure) || sec.codeFigure;
     if (!draws) continue;
+    // …AND IF ITS ACTIVITIES ARE A GRID, THE PICTURE BECOMES ONE OF THE CELLS. Dropping the
+    // artwork entirely was too blunt — a lesson whose every stage draws its own exercises
+    // ended up with no illustration at all. An exercise grid's last row is usually not full
+    // (seven exercises, four to a row, leaves one empty slot), and a picture in that slot
+    // costs no extra height, sits inside the section it belongs to, and fills the gap that
+    // would otherwise be blank.
+    const gridded = (sec.activities || []).filter((a) => a.codeFigure).length >= 3;
     const free = sections.find((x) => x.type === 'stage' && x !== sec && !x.codeFigure
       && !(x.activities || []).some((a) => a.codeFigure)
       && ((x.activities || []).some((a) => a.body) || x.body));
     const id = sec.image;
     delete sec.image;
     if (free) free.image = id;
-    else images.length = 0;          // nothing to attach it to; drop the brief
+    else if (gridded) sec.artCell = id;   // into the grid's spare slot
+    else images.length = 0;               // nowhere to put it; drop the brief
   }
   return { meta, images, sections, sourceProfile: { id: profile.id, name: profile.name, mode: doc.mode } };
 }
