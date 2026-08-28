@@ -1712,6 +1712,28 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 
 .section.yl-notes .yl-nlabel{margin-bottom:4px}
 .yl-ntab{padding:5px 5px}
+
+/* The same lesson pasted with its answer on the exit-ticket line instead of its own line
+   is a taller card, and it put the sheet 23px past page 2's last legal cut. Taken from the
+   closing blocks' frames, which is where the extra text sits. */
+.section.yl-block.sec-exit-ticket .yl-bbody,
+.section.yl-block.sec-solutions .yl-bbody{padding:4px 12px}
+.section.yl-block.sec-exit-ticket .yl-bbody .d-note,
+.section.yl-block.sec-solutions .yl-bbody .d-text{padding:4px 8px;line-height:1.5}
+.section.yl-notes .yl-nrules{gap:6px}
+.section.yl-notes .yl-nbody{padding:5px 13px 6px}
+
+/* the last card sat 9px past page 2's limit */
+.section.yl-block.sec-homework .yl-bbody{padding:4px 14px}
+.section.yl-block.sec-homework .d-note{padding:4px 9px;line-height:1.45}
+.yl-btab{padding:4px 4px}
+
+/* THE EXIT TICKET PAIRS WITH THE ANSWERS, OR IT SPANS THE ROW. Whether الإجابات becomes its
+   own card depends on how the source is written: on its own line it does, inline at the end
+   of the بطاقة الخروج sentence it does not. Without a partner the exit ticket was still
+   holding half a row with the other half empty — a wasted half-row AND a taller card,
+   because its text had half the width to wrap in. */
+.body:not(:has(.sec-solutions)) .section.yl-block.sec-exit-ticket{grid-column:1 / 13}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

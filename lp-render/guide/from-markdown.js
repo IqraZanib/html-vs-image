@@ -423,6 +423,18 @@ function labelledParts(body, profile = {}) {
       }
     }
     if (ex.length >= 1) marks = marks.concat(ex).sort((x, y) => x.at - y.at);
+    // MARKS MUST NOT OVERLAP. «١) أصل بين الصورة والكلمة الدالة عليها:» ends with a colon,
+    // so it matches the numbered-exercise pattern AND the bare-label pattern — two marks a
+    // few characters apart on one line, which became two cards: one empty, one with the
+    // exercise. Where two marks collide, the one that starts first and consumes more of the
+    // line wins; the other was a second reading of the same heading.
+    marks = marks.filter((mk, i) => {
+      for (let j = 0; j < i; j++) {
+        const prev = marks[j];
+        if (mk.at < prev.end && mk.end > prev.at) return mk.end > prev.end && mk.at >= prev.end;
+      }
+      return true;
+    });
   }
   // A bare label often begins with the source's own bullet — «• Mazoezi ya pamoja:»,
   // «▪ Wanafunzi walio chini ya lengo:». The bullet is list punctuation, not part of the
