@@ -1769,6 +1769,63 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .section.yl-block.sec-exit-ticket .yl-bbody,
 .section.yl-block.sec-solutions .yl-bbody{padding:3px 12px 4px}
 .section.yl-block.sec-homework .yl-bbody{padding:3px 14px}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   THE CLOSING PAIR — بطاقة الخروج and الإجابات, ONE authoritative definition.
+   Ten rounds of per-round padding tweaks had left these two cards with different
+   internal structures: one printed its text bare, the other wrapped it in a white box;
+   their header bands were different heights; and each stood 123px tall for a single line
+   of text. Side by side they read as two unrelated cards that happened to be adjacent,
+   which is exactly what the reviewer saw. Everything below supersedes those tweaks.
+
+   They are a PAIR: same header band, same white content box, same padding, equal height,
+   a clear gap between them. And being half the height they were, ركن المعلم now joins
+   them on the same page instead of being stranded on a page of its own — which is what
+   was leaving a 75px gap above the footer rule.
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+.body > .section.yl-block.sec-exit-ticket{grid-column:1 / 7}
+.body > .section.yl-block.sec-solutions{grid-column:7 / 13}
+/* the cards are grid items in one row: each stretches to the row's height and lays its
+   own header and body out in a column, so the two bottoms line up by construction */
+.section.yl-block.sec-exit-ticket,
+.section.yl-block.sec-solutions{display:flex;flex-direction:column;align-self:stretch;
+  margin-bottom:5px}
+.section.yl-block.sec-exit-ticket .yl-bhead,
+.section.yl-block.sec-solutions .yl-bhead{flex:0 0 auto;padding:4px 12px 3px;
+  min-height:0;align-items:center}
+.section.yl-block.sec-exit-ticket .yl-title,
+.section.yl-block.sec-solutions .yl-title{font-size:14px;font-weight:800;line-height:1.3}
+/* the body fills what is left and centres its box, so a one-line card and a two-line card
+   still align top and bottom */
+.section.yl-block.sec-exit-ticket .yl-bbody,
+.section.yl-block.sec-solutions .yl-bbody{flex:1 1 auto;display:flex;align-items:center;
+  padding:6px 12px 7px !important}
+/* ONE content box, identical on both sides */
+.section.yl-block.sec-exit-ticket .yl-bbody .d-note,
+.section.yl-block.sec-solutions .yl-bbody .d-note,
+.section.yl-block.sec-exit-ticket .yl-bbody .d-text,
+.section.yl-block.sec-solutions .yl-bbody .d-text{width:100%;box-sizing:border-box;
+  margin:0;background:#fff !important;border-radius:9px;padding:6px 10px !important;
+  font-size:14.5px;font-weight:700;line-height:1.5;text-align:start}
+.section.yl-block.sec-exit-ticket .yl-bbody .d-note{border:1.4px solid #e6dcc0 !important}
+.section.yl-block.sec-solutions .yl-bbody .d-text{border:1.4px solid #c9e2d3 !important}
+/* ركن المعلم keeps the full width beneath the pair, as the reviewer specified */
+.body > .section.yl-block.sec-homework{grid-column:1 / 13}
+
+/* The last 25px, so ركن المعلم sits with the pair instead of alone on a page of its own —
+   which is what left the gap above the footer rule. Taken from the asides' and the notes
+   card's own frames: no font size changes, no activity changes, no teaching text touched. */
+.yl-srow{padding:3px 8px;line-height:1.42}
+.yl-srow .yl-cl{margin-top:0}
+.section.yl-notes .yl-nlabel{font-size:13px;margin-bottom:2px}
+.section.yl-notes .yl-nbody{padding:4px 12px}
+.section.yl-notes .yl-nrules{gap:4px}
+
+/* «بطاقة الخروج» was a pale amber on cream beside «الإجابات» in strong teal, so the two
+   still did not read as a matched pair even once they were aligned. Same presence, each in
+   its own accent. */
+.section.yl-block.sec-exit-ticket .yl-title{color:#7a5910 !important}
+.section.yl-block.sec-solutions .yl-title{color:#155e46 !important}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then
