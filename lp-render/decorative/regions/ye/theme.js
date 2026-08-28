@@ -1734,6 +1734,41 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
    holding half a row with the other half empty — a wasted half-row AND a taller card,
    because its text had half the width to wrap in. */
 .body:not(:has(.sec-solutions)) .section.yl-block.sec-exit-ticket{grid-column:1 / 13}
+
+/* WHEN EVERY STAGE CARRIES CONTENT, THE ILLUSTRATION GIVES BACK ITS SLACK. A paste where
+   العرض is written out in full is a whole stage longer than one where it is empty; the
+   illustration is the only element that can shrink without touching a word of teaching
+   text or an activity. It is still the largest object on page 1. */
+.section.sec-stage-tamhid .yl-tvis .yl-illus img{max-height:312px !important}
+
+/* the cap did not bind — the picture is width-bound in its column, so the column is what
+   has to give. Text and picture share the intro card evenly. */
+.section.sec-stage-tamhid .yl-sbody.yl-split{grid-template-columns:1fr 1.04fr}
+
+/* the last 16px, spread evenly across the cards rather than taken out of one */
+.yl-sbody{padding:8px 13px 9px}
+.yl-alabel{padding:6px 13px 0}
+.yl-ttext.yl-lead{padding:9px 13px 0}
+
+/* 8px: one pixel off the top and bottom of each stage card's own frame */
+.section.yl-stage{padding:7px 9px 8px !important}
+
+/* The last 34px, taken from the activity ROW GAPS on page 2 — about three pixels a row
+   across ten rows, rather than a visible cut anywhere. */
+.section.sec-stage-tatbiq .yl-match{gap:4px}
+.section.sec-stage-taqwim .yl-assess{gap:4px 16px}
+.section.sec-stage-tatbiq .yl-card,.section.sec-stage-taqwim .yl-card{padding:5px 10px}
+
+/* A PAGE HOLDING ONE 47px CARD IS WORSE THAN A TIGHTER PAGE. ركن المعلم was being stranded
+   on a third page by 24px. Taken from the notes card's writing space and the closing row's
+   frames — chrome, not teaching content, and not the page-1 cards, since shaving those
+   moves the page boundary up by the same amount and gains nothing. */
+.section.yl-notes .yl-nrules{gap:5px;padding:0}
+.section.yl-notes .yl-nbody{padding:4px 13px 5px}
+.section.yl-notes .yl-nlabel{margin-bottom:3px}
+.section.yl-block.sec-exit-ticket .yl-bbody,
+.section.yl-block.sec-solutions .yl-bbody{padding:3px 12px 4px}
+.section.yl-block.sec-homework .yl-bbody{padding:3px 14px}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

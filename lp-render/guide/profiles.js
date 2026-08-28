@@ -157,6 +157,19 @@ const YE = {
   // the criterion the teacher checks against, so it fills the amber strip beside the
   // activity rather than becoming a separate card after it.
   checkLabelRe: /^\s*نقطة التحقق\s*$/,
+  // The exact phrases that open a slot when they appear INLINE in a paragraph, written as
+  // the sources actually write them. Explicit, because inferring them from the short labels
+  // meant guessing about the definite article — «تحقق» vs «نقطة التحقق» — and a guess that
+  // fixed one paste broke three others.
+  inlineLabels: ['نقطة التحقق', 'دعم', 'تحد'],
+  // THE SAME LESSON MUST RENDER THE SAME WHETHER ITS ANSWER IS ON ITS OWN LINE OR INSIDE
+  // THE SENTENCE. «بطاقة الخروج: أي كلمة…؟ الإجابة: أبي، أمي…» carries both in one line, so
+  // the answer stayed inside the exit-ticket card and the الإجابات card disappeared — the
+  // reviewer noticed exactly that difference between two pastes of one lesson. The answer
+  // is split out into its own card, which is also what the approved layout pairs with the
+  // exit ticket.
+  answerSplit: { from: 'exit-ticket', to: 'solutions',
+    re: /\s*(?:الإجابة|الحل)\s*[:：]\s*([\s\S]+)$/ },
   // SUB-ELEMENTS OF A STAGE, NOT CARDS OF THEIR OWN. «دعم» and «تحد» are the
   // differentiation notes for the activity above them. Rendered as full-width cards they
   // tripled the length of the LP and made every stage look like three identical boxes —

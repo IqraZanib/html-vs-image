@@ -37,9 +37,23 @@ function cutWords(s, max) {
   return (sp > max * 0.5 ? cut.slice(0, sp) : cut).replace(/[\s،,;:—–-]+$/, '');
 }
 
+// ARABIC DIACRITICS ARE NOT PART OF A NAME. A source may vocalise its own headings and
+// labels — «ركن المعلّم» with a shadda, «تحدٍّ» with tanwin and shadda, «أَصِلُ» fully
+// vocalised — and every pattern in every profile is written unvocalised. The consequences
+// are silent and severe: «ركن المعلّم» matched no role, so that card VANISHED from the LP,
+// and «تحدٍّ» matched no sub-element, so the challenge line was swallowed into the text
+// above it. This repo has been bitten by the same thing twice before while SEARCHING
+// Arabic; the rule is the same when matching it.
+//
+// Only the string being TESTED is stripped. Everything stored and printed keeps every
+// diacritic the teacher wrote.
+const HARAKAT_RE = /[\u064B-\u0652\u0670\u0640\u06D6-\u06ED]/g;
+function unvocalised(t) { return String(t).replace(HARAKAT_RE, ''); }
+
 function roleOf(title, profile) {
   const p = asProfile(profile);
-  for (const [role, re] of p.roles) if (re.test(title)) return role;
+  const t = unvocalised(title);
+  for (const [role, re] of p.roles) if (re.test(t)) return role;
   return null;
 }
 
@@ -73,7 +87,7 @@ function roleOf(title, profile) {
 const ROLE_START_MAX = 12;
 function roleAtStart(title, profile) {
   for (const [role, re] of profile.roles) {
-    const m = String(title).match(re);
+    const m = unvocalised(title).match(re);
     if (m && m.index <= ROLE_START_MAX) return role;
   }
   return null;
@@ -362,17 +376,32 @@ const BARE_MARK = /^[ \t]*([^\n:.!?؟*|]{2,60}):[ \t]*/gm;
 // preceded by sentence-ending punctuation, so an ordinary colon inside prose is untouched.
 // Everything is put back on its own line and the existing line-based splitters do the rest.
 function breakOutInlineLabels(text, profile) {
-  const names = [];
-  if (profile.checkLabel) names.push(profile.checkLabel);
-  for (const [, , label] of profile.subElements || []) if (label) names.push(label);
+  const names = (profile.inlineLabels || []).slice();
   if (!names.length) return text;
+  const HK = '[\\u064B-\\u0652\\u0670\\u0640]*';
+  // The label may be VOCALISED in the source — «تحدٍّ:» for «تحد» — so diacritics are
+  // allowed between its letters. Stripping them from the text instead would change the
+  // teacher's words, which is not on the table.
+  const flexible = (n) => n.split('').map((c) => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join(HK) + HK;
   let out = String(text);
   for (const n of names) {
-    const esc = n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    // preceded by . ؟ ! ” or ) and a space — i.e. a new sentence, not a mid-clause colon
-    out = out.replace(new RegExp(`([.!?؟”"'\\)])[ \t]+((?:نقطة\\s+)?${esc}\\s*:)`, 'g'),
+    // THE COLON IS THE GUARD, NOT THE PRECEDING PUNCTUATION. Requiring a sentence to end
+    // first missed «* أبي ← أبي نقطة التحقق: ٤ من كل ٥ تلاميذ…», where the label is glued
+    // straight onto the last item of a list, so that stage rendered with no checkpoint at
+    // all. A known label followed by a colon is a label wherever it appears.
+    // The name may carry the definite article — the profile's label is «تحقق» and the
+    // source writes «نقطة التحقق:». Without the article this missed every checkpoint that
+    // was glued to the end of a list item, and because that item is a pair line, the strip
+    // that moves pairs into the matching visual then deleted the checkpoint WITH the line.
+    out = out.replace(new RegExp(`([^\\n])[ \\t]+(${flexible(n)}\\s*:)`, 'g'),
       (mm, p1, p2) => `${p1}\n${p2}`);
   }
+  // A NUMBERED EXERCISE MAY ALSO BE GLUED INLINE. «…جماعياً: ١) أَصِلُ بين الصورة…» and
+  // «* صورة البنت ← إيمان ٢) أَصِلُ…» put the next exercise's heading at the end of the
+  // previous line, where nothing could see it. A digit followed by ')' after whitespace
+  // starts a new line; «٥ تلاميذ» and «صفحة ٣٢» are untouched because they have no bracket.
+  out = out.replace(/([^\n])[ \t]+([٠-٩0-9]{1,2}\s*\)\s*)/g, (mm, p1, p2) => `${p1}\n${p2}`);
   return out;
 }
 
@@ -400,7 +429,7 @@ function labelledParts(body, profile = {}) {
       // A check-point label belongs in the card's own تحقق sidebar, so the card must not
       // be split at it — splitting turned «نقطة التحقق: ٤ من كل ٥ تلاميذ…» into a card of
       // its own and left the pilot's amber strip empty on every stage.
-      if (profile.checkLabelRe && profile.checkLabelRe.test(mk.label)) return false;
+      if (profile.checkLabelRe && profile.checkLabelRe.test(unvocalised(mk.label))) return false;
       const before = src.slice(0, mk.at);
       return openQ(before) <= 0 && openS(before) <= 0;
     });
@@ -469,8 +498,9 @@ function labelledParts(body, profile = {}) {
   // into one of those took the text with it. A lesson written as a single paragraph
   // («…أم منحني؟ نقطة التحقق: … دعم: … تحد: …») lost the whole of its التمهيد body that way.
   const absorbed = (label) => {
-    for (const [, re] of (profile.subElements || [])) if (re.test(label)) return true;
-    for (const [, re] of (profile.lift || [])) if (re.test(label)) return true;
+    const b = unvocalised(label);
+    for (const [, re] of (profile.subElements || [])) if (re.test(b)) return true;
+    for (const [, re] of (profile.lift || [])) if (re.test(b)) return true;
     return false;
   };
   if (profile.leadIntoFirstPart && parts.length > 1 && !parts[0].label && parts[1].label
@@ -514,7 +544,12 @@ function pairsFigure(body) {
   // labelled «أبي ← صورة» (the first three words of each line, arrow included); read as
   // pairs, each card carries the prompt and the answer it matches. The lesson's own
   // instruction is «أصل بين الصورة والكلمة الدالة عليها» — matching is the content.
-  const bare = [...String(body).matchAll(/^[\s•▪●◦*-]*([^\s←→،.:]{1,18})\s*[←→]\s*([^←→،.:\n]{1,24})$/gm)]
+  // EITHER SIDE MAY BE A PHRASE. The left capture used to forbid spaces, which was fine
+  // while the lesson wrote «أبي ← صورة الأب» — one word, then the picture. The same exercise
+  // written the other way round, «صورة الأب ← أبي», put the two-word side on the left and
+  // matched nothing, so the exercise fell through to a generic bulleted list and drew a row
+  // of small step chips instead of the full-width matching activity.
+  const bare = [...String(body).matchAll(/^[\s•▪●◦*-]*([^\n←→]{1,24}?)\s*[←→]\s*([^\n←→]{1,24})$/gm)]
     .map((m) => ({ label: m[1].trim(), caption: m[2].trim() }))
     .filter((x) => x.label && x.caption);
   const seen2 = new Set();
@@ -759,7 +794,11 @@ function shapeSection(id, heading, raw, hint, opts = {}) {
     // Split on the SEPARATOR THE SOURCE CHOSE. Splitting on commas as well as semicolons
     // broke a single resource — «Chart, Model of the breathing system» — into two.
     const sep = /;/.test(body) ? /\s*;\s*/ : /\s*[,،·]\s*/;
-    const parts = body.split(sep).map((x) => x.trim()).filter((x) => x.length > 1);
+    // The full stop that ends the SENTENCE is not part of the last item's name. «المواد:
+    // السبورة، الطباشير، … قلم.» produced a chip reading «قلم.» — the punctuation of the
+    // list, like its commas and the source's bullets, and not something a teacher reads.
+    const parts = body.split(sep).map((x) => x.trim().replace(/\s*[.،؛]\s*$/, ''))
+      .filter((x) => x.length > 1);
     if (parts.length >= 2) return { id, heading, type: 'chips', items: parts.slice(0, 14) };
   }
   if (rows.length) return { id, heading, type: 'fields', items: rows };
@@ -798,7 +837,25 @@ function shapeSection(id, heading, raw, hint, opts = {}) {
   return { id, heading, type: want === 'note' ? 'note' : 'text', body };
 }
 
+// A SOURCE MAY CARRY LaTeX MARKUP FOR ITS ARROWS. A paste out of a maths-aware editor
+// writes «صورة الأب $\leftarrow$ أبي» instead of «صورة الأب ← أبي». The arrow is the
+// connector a matching activity DRAWS, exactly like the source's bullet — so the macro is
+// normalised to the arrow character before anything is parsed. Left as-is, the pair
+// detector saw no pairs and the exercise fell through to a geometry figure, because
+// «متماثلتين» and «الصورة» were the only signals left.
+const LATEX_ARROWS = [
+  [/\$\s*\\(?:leftarrow|gets)\s*\$|\\(?:leftarrow|gets)\b/g, '←'],
+  [/\$\s*\\(?:rightarrow|to)\s*\$|\\(?:rightarrow|to)\b/g, '→'],
+  [/\$\s*\\(?:leftrightarrow)\s*\$|\\leftrightarrow\b/g, '↔'],
+];
+function normalizeMarkup(md) {
+  let out = String(md);
+  for (const [re, ch] of LATEX_ARROWS) out = out.replace(re, ch);
+  return out;
+}
+
 function buildGuideFromMarkdown(md, opts = {}) {
+  md = normalizeMarkup(md);
   const { subject = '', grade = '' } = opts;
   // Region resolution, in this order: what the caller declared (the Studio picker), what
   // the text looks like, then the region-neutral fallback. A declared region always
@@ -887,7 +944,7 @@ function buildGuideFromMarkdown(md, opts = {}) {
   // being buried mid-stage. A profile with no such convention declares no lifts.
   const lifted = new Map();
   const liftRole = (label) => {
-    for (const [role, re] of (profile.lift || [])) if (re.test(label)) return role;
+    for (const [role, re] of (profile.lift || [])) if (re.test(unvocalised(label))) return role;
     return null;
   };
 
@@ -981,7 +1038,7 @@ function buildGuideFromMarkdown(md, opts = {}) {
     let first = true;
     let lastCard = null;      // sub-elements attach to the card they belong to
     const subOf = (label) => {
-      for (const [, re, title] of (profile.subElements || [])) if (re.test(label)) return title;
+      for (const [, re, title] of (profile.subElements || [])) if (re.test(unvocalised(label))) return title;
       return null;
     };
     const unit = (profile.minutesWords || ['min']).join('|');
@@ -1062,8 +1119,13 @@ function buildGuideFromMarkdown(md, opts = {}) {
           // plain(), so a line filter applied to it matched nothing and the fallback regex
           // chewed the joined text into «… في السطر ← أحمد ← إيمان : ٨٠٪ …». Removing whole
           // source lines is exact: a pair line goes, everything else stays as written.
+          // THE STRIP MUST MATCH WHAT THE DETECTOR MATCHED. This pattern still required a
+          // single-word left side, so «صورة الأب ← أبي» was drawn in the activity AND left
+          // in the card's text — the pairs printed as running prose above their own visual,
+          // which is exactly the "labels squeezed into running text" the reviewer rejected.
+          const PAIR_LINE = /^[\s•▪●◦*-]*[^\n←→]{1,24}?\s*[←→]\s*[^\n←→]{1,24}$/;
           const kept = plain(String(part.raw || '').split('\n')
-            .filter((l) => !/^[\s•▪●◦*-]*[^\s←→،.:]{1,18}\s*[←→]/.test(l.trim()))
+            .filter((l) => !PAIR_LINE.test(l.trim()))
             .join('\n'));
           partBody = longLabel ? [rawLabel, kept].filter(Boolean).join(': ') : kept;
         }
@@ -1357,6 +1419,21 @@ function buildGuideFromMarkdown(md, opts = {}) {
     if (at >= 0) {
       sections.splice(at + 1, 0, { id: 'notes', type: 'notes', label: profile.notes.label,
         tab: profile.notes.tab, lines: profile.notes.lines || 2 });
+    }
+  }
+
+  // Split an inline answer out of its host card into the design's own answers card, in the
+  // order the profile's `order` puts them.
+  const asp = profile.answerSplit;
+  if (asp && !sections.some((x) => x.id === asp.to)) {
+    const host = sections.find((x) => x.id === asp.from);
+    const body = host && String(host.body || '');
+    const m = body && body.match(asp.re);
+    if (m && m[1].trim().length > 1) {
+      host.body = body.slice(0, m.index).trim();
+      const at = sections.indexOf(host);
+      sections.splice(at + 1, 0, { id: asp.to, heading: T[asp.to] || asp.to,
+        type: 'text', body: m[1].trim() });
     }
   }
 
