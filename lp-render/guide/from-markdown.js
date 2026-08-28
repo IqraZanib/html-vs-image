@@ -169,7 +169,18 @@ function minutesOf(title, profile) {
     const m = title.match(re);
     if (!m) continue;
     const n = num(profile, toAscii(m[2] || m[1]));
-    const label = profile.minutesLabel || 'min';
+    // KEEP THE SOURCE'S OWN UNIT WORD. Arabic inflects it — «٥ دقائق» for five, «١٥ دقيقة»
+    // for fifteen — and printing the profile's single form turned «٥ دقائق» into «٥ دقيقة»
+    // on the pill. It was the last thing in these lessons that the page said differently
+    // from the source, and it is the teacher's own word, not the template's.
+    // …BUT CASE IS THE DESIGN'S, NOT THE SOURCE'S. Arabic inflects the word itself, so the
+    // source's «دقائق» must survive. Kiswahili writes «dakika 4» mid-sentence and the pack
+    // prints «Dakika 4» — the same word, capitalised because it starts a label. So the
+    // source's word wins only when it differs by more than case.
+    const own = (title.match(new RegExp(`(?:${unit})`, 'i')) || [])[0];
+    const pack = profile.minutesLabel || 'min';
+    const sameWord = own && own.toLowerCase() === String(pack).toLowerCase();
+    const label = (!own || sameWord) ? pack : own;
     return profile.minutesUnitFirst ? `${label} ${n}` : `${n} ${label}`;
   }
   return '';

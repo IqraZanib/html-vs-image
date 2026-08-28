@@ -86,7 +86,9 @@ test('stage times and gradual-release pills come from the source headings', () =
   const tamhid = g.sections.find((s) => s.id === 'stage-tamhid');
   // duration and teaching mode are SEPARATE slots now: the stage component renders them as
   // two pills (DurationPill, TeachingModePill), so they are no longer one joined string.
-  assert.match(tamhid.time, /١٠ دقيقة/, 'minutes parsed from «8-10 دقائق» in Arabic-Indic digits');
+  // THE SOURCE'S OWN UNIT WORD. Arabic inflects it — «٥ دقائق», «١٥ دقيقة» — and printing
+  // the profile's single form made the pill say «٥ دقيقة» where the lesson said «٥ دقائق».
+  assert.match(tamhid.time, /١٠ دقائق/, 'minutes parsed from «8-10 دقائق», in the source\'s own word');
   assert.match(tamhid.mode, /أنا أفعل/);
 });
 
@@ -122,7 +124,7 @@ test('each labelled part becomes an activity block inside its stage card', () =>
   assert.ok(card.activities.length >= 2, 'one activity per labelled part');
   assert.match(card.activities[0].label, /نشاط الافتتاح/);
   assert.match(card.activities[1].label, /السؤال الجوهري/);
-  assert.match(card.time, /١٠ دقيقة/, 'the card carries the duration pill');
+  assert.match(card.time, /١٠ دقائق/, 'the card carries the duration pill, in the source\'s word');
   assert.match(card.mode, /أنا أفعل/, '…and the teaching-mode pill');
   assert.ok(card.activities.every((a) => !a.time && !a.mode),
     'the pills belong to the stage, not to each activity');
