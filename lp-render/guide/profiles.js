@@ -105,7 +105,10 @@ const YE = {
   // own border. They were the last sections still using the generic panel, whose header
   // is pulled 32px into the card; on those five it drew the title ON the border and
   // clipped «أبي، أمي، أحمد، إيمان» outside the card.
-  blockComponents: ['goal', 'materials', 'exit-ticket', 'solutions', 'homework'],
+  // '*' = every section that is not a stage, a misconception panel or the notes card gets
+  // the block component. Naming roles individually only covers the roles of the lesson you
+  // tested with; glossary, multigrade and the lesson line were missed that way.
+  blockComponents: ['*'],
   order: ['lesson-line', 'goal', 'materials', 'errors', 'errors-caption', 'stage-tamhid',
     'stage-arad', 'stage-tatbiq', 'stage-taqwim', 'exit-ticket', 'solutions', 'glossary',
     'multigrade', 'homework'],

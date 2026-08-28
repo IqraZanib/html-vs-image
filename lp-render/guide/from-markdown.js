@@ -1087,8 +1087,18 @@ function buildGuideFromMarkdown(md, opts = {}) {
 
   // every block-component role carries the flag, so the renderer never falls back to the
   // generic panel for them
+  // '*' MEANS EVERY NON-STAGE SECTION, and it is there because an enumerated list only
+  // covers the roles the lesson you happened to test actually had. أسرتي has no lesson
+  // title line, no glossary and no multigrade block, so those three roles kept falling
+  // through to the generic panel — whose header tab overhangs its card by 4px — and
+  // nothing caught it until four other Yemen lessons were rendered through the same code.
+  // A design pack should not have to predict which roles a lesson will bring.
   const blocks_ = new Set(profile.blockComponents || []);
-  for (const sec of sections) if (blocks_.has(sec.id)) sec.component = 'block';
+  const allBlocks = blocks_.has('*');
+  const notBlock = new Set(['stage', 'misconception', 'notes']);
+  for (const sec of sections) {
+    if (blocks_.has(sec.id) || (allBlocks && !notBlock.has(sec.type))) sec.component = 'block';
+  }
 
   const rank = (id) => {
     const i = profile.order.indexOf(id);
