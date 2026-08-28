@@ -1992,6 +1992,33 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .yl-sbody.yl-split > .yl-tvis > .yl-illus img{flex:1 1 auto;min-height:120px;height:auto;
   max-height:none;object-fit:cover;object-position:center}
 .yl-sbody.yl-split > .yl-tvis > .yl-illus figcaption{flex:0 0 auto}
+
+/* ── A SPANNING ILLUSTRATION, THE APPROVED ANATOMY ──────────────────────────────────
+   The picture holds one column for the whole card while the teacher's text, the دعم/تحد
+   row and the checkpoint stack in the other. Whichever side would have been shorter is
+   now filled with the section's own content instead of white. The picture is nested two
+   levels down, so the wrappers become display:contents and the grid places the real
+   elements — the same trick the pilot's تحقق sidebar used. */
+.yl-scard.yl-artspan{display:grid;grid-template-columns:1fr 1.02fr;gap:0 12px;
+  padding:10px 13px 11px;align-items:start}
+.yl-artspan > .yl-act{display:contents}
+.yl-artspan .yl-sbody.yl-split{display:contents}
+.yl-artspan .yl-ttext{grid-column:1;grid-row:1;min-width:0}
+/* A 1 / -1 span resolves against the EXPLICIT grid, and there are no declared rows here, so it
+   spanned a single row and left the white it was meant to remove. The rows are declared. */
+/* A 1fr middle row expanded the card to 1087px — auto rows, and the picture
+   spans them, so the CARD's height is still set by its content. */
+.yl-scard.yl-artspan{grid-template-rows:auto auto auto}
+.yl-artspan .yl-tvis{grid-column:2;grid-row:1 / span 3;align-self:stretch;display:flex;
+  min-width:0}
+.yl-artspan .yl-srows{grid-column:1;grid-row:2;padding:8px 0 0}
+.yl-artspan .yl-srows{grid-template-columns:1fr}
+.yl-artspan .yl-check{grid-column:1;grid-row:3;margin:8px 0 0}
+.yl-artspan > .yl-act > .yl-sbody{padding:0 !important}
+.yl-artspan .yl-tvis > .yl-illus{width:100%;height:100%;display:flex;flex-direction:column;
+  min-height:0}
+.yl-artspan .yl-tvis > .yl-illus img{flex:1 1 auto;min-height:0;max-height:none;
+  height:auto;object-fit:cover}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

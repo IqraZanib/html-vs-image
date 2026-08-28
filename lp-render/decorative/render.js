@@ -1246,6 +1246,14 @@ function ylStage(section, accent, images, idCls) {
       + (artIm.label ? '<figcaption>' + esc(cleanHeading(artIm.label)) + '</figcaption>' : '')
       + '</figure></div>'
     : '';
+  // A CARD WHOSE PICTURE IS TALLER THAN ITS TEXT gets the approved anatomy: the picture
+  // spans the card's full height in one column while the text, the asides and the
+  // checkpoint stack beside it. Left as a plain row with everything full-width beneath it,
+  // whichever column was shorter left a block of white — under the picture when the prose
+  // ran long, under the prose when the picture did.
+  const artInRow = acts.length === 1 && !!(acts[0].codeFigure ? false : true)
+    && !!(section.image && images[section.image] && images[section.image].dataUri)
+    && !!acts[0].body;
   const inner = gridFrom >= 0
     ? blocks.slice(0, gridFrom).join('')
       + '<div class="yl-actgrid yl-cols-' + cols + '">' + blocks.slice(gridFrom).join('')
@@ -1255,6 +1263,13 @@ function ylStage(section, accent, images, idCls) {
   // holds the header row, the asides and the checkpoint strip; and a white inner card
   // holding the teaching content. That outer block of colour is what makes a stage read
   // as one designed unit instead of a header floating above a white box.
+  const cardCls = 'yl-scard' + (artInRow && (diff || checks) ? ' yl-artspan' : '');
+  // with the picture spanning, the asides and the checkpoint belong INSIDE the card so they
+  // can sit in the column beside it
+  if (artInRow && (diff || checks)) {
+    return '<section class="section yl-stage' + idCls + '">' + head
+      + '<div class="' + cardCls + '">' + lead + inner + diff + checks + '</div></section>';
+  }
   return '<section class="section yl-stage' + idCls + '">' + head
     + '<div class="yl-scard">' + lead + inner + '</div>' + diff + checks + '</section>';
 }
