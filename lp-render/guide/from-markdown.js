@@ -1154,7 +1154,15 @@ function buildGuideFromMarkdown(md, opts = {}) {
         const sec = { id, heading: title, type: 'stage',
           body: sp.longCheck ? sp.body : (sp.check ? sp.body : partBody) };
         if (part.lead) sec.lead = part.lead;
-        if (ownName && ownName.length <= 24) sec.sourceName = ownName;
+        // …AND ONLY IF IT IS IN THE SAME SCRIPT AS THE DESIGN'S OWN NAME. The Yemen
+        // artifact lessons head their stages «Engage (الإحماء والتشويق) — 8-10 دقائق»: the
+        // part before the dash is an English structurer label, display-only, which this
+        // pack has always dropped. Taking it would have printed «Engage» on the tab of all
+        // fifteen shipped lessons.
+        const arabicOwn = /[؀-ۿ]/.test(ownName);
+        const arabicTpl = /[؀-ۿ]/.test(String(T[id] || ''));
+        if (ownName && ownName.length <= 24 && !/[A-Za-z]/.test(ownName)
+            && arabicOwn === arabicTpl) sec.sourceName = ownName;
         if (partAnswer) sec.answer = partAnswer;
         if (sp.check) sec.check = sp.check;
         if (first) {
