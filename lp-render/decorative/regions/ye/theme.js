@@ -2031,6 +2031,17 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .yl-ticktext{min-width:0;font-size:13.5px;font-weight:700;line-height:1.45;color:var(--ink)}
 /* a question-and-answer cell: the question reads as the prompt, the answer as the response */
 .yl-actgrid > .yl-act .yl-answer{background:#eef4f0;border-color:#cfe2d6}
+
+/* ── HEADER: A BROAD TOP BANNER ──────────────────────────────────────────────────────
+   Measured off the approved set, which uses BOTH shapes: page 1 carries a centred capsule
+   61% of the page width with 19% margin each side, page 2 a full-bleed bar. I had built the
+   capsule. The reviewer wants the banner, so: the full content width, a modest radius rather
+   than a pill, and no side margin. Title centred in white, the ministry line centred
+   directly under it — same text, same weights, only the shape changes. */
+.lp-header{max-width:none !important;width:auto !important;margin:0 22px 10px !important;
+  border-radius:11px !important;padding:13px 26px 12px !important}
+.lp-header h1{font-size:27px;line-height:1.2;letter-spacing:0}
+.lp-header .sub{margin:5px 0 0;font-size:14.5px;letter-spacing:.2px}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then
