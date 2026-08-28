@@ -1611,6 +1611,107 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .yl-ntab{order:-1}
 .section.yl-block.yl-tabbed .yl-bbody{order:1}
 .section.yl-notes .yl-nbody{order:2}
+
+/* ── GEOMETRY FIGURES ────────────────────────────────────────────────────────────────
+   The shapes are drawn in SVG and the boxes, ticks and captions in CSS, so an exercise
+   that would otherwise be a sentence becomes something a six-year-old can act on. */
+.geo-fig{display:flex;align-items:flex-end;justify-content:center;gap:14px;flex-wrap:wrap;
+  padding:4px 2px}
+.geo-cell{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}
+.geo-s{width:100%;max-width:104px;height:auto;display:block}
+.geo-w{width:100%;max-width:230px;height:auto;display:block}
+.geo-g{width:100%;max-width:132px;height:auto;display:block}
+.geo-box{width:26px;height:26px;border-radius:7px;border:2px solid;display:flex;
+  align-items:center;justify-content:center;font-size:15px;font-weight:800;line-height:1}
+.geo-box.geo-yes{border-color:#8fbf9c;color:#2f7d4a;background:#eaf5ec}
+.geo-box.geo-no{border-color:#e0a8a0;color:#c0392b;background:#fdeced}
+.geo-cap{font-size:11.5px;font-weight:800;line-height:1.2;text-align:center}
+.geo-cap.geo-ok{color:#2f7d4a}
+.geo-cap.geo-bad{color:#c0392b}
+.geo-cap.geo-mcap{color:#42506a}
+.geo-vs{font-size:17px;font-weight:800;color:#8896b3;align-self:center;padding-bottom:16px}
+.geo-two{gap:18px}
+.geo-two .geo-g{border-radius:6px}
+.geo-board{flex-direction:column;align-items:stretch;gap:8px}
+.geo-brow{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end;
+  padding-bottom:7px;border-bottom:1px dashed #dbe2ee}
+.geo-board .geo-brow:last-child{border-bottom:0;padding-bottom:0}
+.geo-small .geo-s{max-width:74px}
+.geo-match .geo-model .geo-s{max-width:96px}
+/* inside a stage's visual column the figure gets the card's white ground */
+.yl-tvis .geo-fig{background:#fff;border:1.5px solid #e1e6ef;border-radius:11px;
+  padding:8px 10px}
+
+/* the exercise's model answer, under its own exercise */
+.yl-answer{margin:5px 0 0;padding:4px 9px;background:#f3f6fa;border:1px solid #e0e6ef;
+  border-radius:8px;font-size:12px;line-height:1.45;font-weight:700;color:#42506a}
+.yl-actgrid.yl-cols-3{grid-template-columns:1fr 1fr 1fr;gap:0 10px}
+.yl-actgrid.yl-cols-3 .yl-alabel{font-size:12.5px;line-height:1.4}
+.yl-actgrid.yl-cols-3 .yl-answer{font-size:11px;padding:3px 7px}
+
+/* A FIGURE MUST SCALE TO ITS COLUMN, NOT WRAP INSIDE IT. In a three-column grid the
+   shapes were wider than the cell, so flex-wrap stacked them and a two-shape exercise
+   stood 248px tall — seven of those ran the lesson to five pages. Each shape takes an
+   equal share of the cell and shrinks; nothing wraps. */
+.yl-actgrid .geo-fig{flex-wrap:nowrap;gap:6px;padding:5px 6px;align-items:center}
+.yl-actgrid .geo-cell{flex:1 1 0;min-width:0}
+.yl-actgrid .geo-s,.yl-actgrid .geo-w,.yl-actgrid .geo-g{max-width:100%;max-height:62px}
+.yl-actgrid .geo-box{width:21px;height:21px;font-size:12.5px;border-radius:6px}
+.yl-actgrid .geo-cap{font-size:10px}
+.yl-actgrid .geo-vs{font-size:13px;padding-bottom:10px}
+.yl-actgrid .geo-two{gap:8px}
+.yl-actgrid .yl-answer{margin-top:4px}
+/* the demonstration board is one card's worth, not three stacked figures */
+.sec-stage-arad .geo-board{gap:5px}
+.sec-stage-arad .geo-brow{padding-bottom:5px}
+.sec-stage-arad .geo-s{max-height:58px}
+
+/* Seven short drawn exercises read fine four to a row — each is a thumbnail of what the
+   pupil does in the book, not a page of its own. */
+.yl-actgrid.yl-cols-4{grid-template-columns:repeat(4,1fr);gap:0 8px}
+.yl-actgrid.yl-cols-4 .yl-alabel{font-size:11.5px;line-height:1.35;padding-top:5px}
+.yl-actgrid.yl-cols-4 .yl-answer{font-size:10px;padding:3px 6px;margin-top:3px}
+.yl-actgrid.yl-cols-4 .geo-s,.yl-actgrid.yl-cols-4 .geo-w,
+.yl-actgrid.yl-cols-4 .geo-g{max-height:50px}
+.yl-actgrid.yl-cols-4 .geo-box{width:18px;height:18px;font-size:11px}
+.yl-actgrid.yl-cols-4 .geo-cap{font-size:9px}
+.yl-actgrid.yl-cols-4 .geo-fig{padding:4px 5px;gap:4px}
+/* the demonstration board and the stages, a notch tighter for a long lesson */
+.sec-stage-arad .geo-s{max-height:52px}
+.sec-stage-arad .geo-brow{padding-bottom:4px}
+
+/* أسرتي landed 4px over its two-page budget after the activity slots gained their answer
+   line. Taken from writing space and card padding, never from the teaching text. */
+.section.yl-notes .yl-nrules{gap:9px;padding:1px 0 2px}
+.section.yl-notes .yl-nbody{padding:7px 13px 8px}
+.section.yl-stage .yl-check{padding:4px 13px 5px}
+
+/* 25px past the last legal cut on page 2 — taken from the closing blocks' frames only,
+   so the page-1 boundary does not move. */
+.section.yl-block.sec-exit-ticket .yl-bbody,
+.section.yl-block.sec-solutions .yl-bbody{padding:5px 13px}
+.section.yl-block.sec-homework .yl-bbody{padding:5px 15px}
+.section.yl-notes .yl-nbody{padding:6px 13px 7px}
+.section.yl-notes .yl-nrules{gap:8px}
+.body > .section{margin-bottom:6px}
+
+/* the last 12px past page 2's final legal cut */
+.body > .section{margin-bottom:5px}
+.section.yl-block .yl-bhead{padding:3px 13px 2px}
+.section.sec-stage-taqwim .yl-assess{gap:5px 16px}
+.section.yl-block .yl-bbody .d-note,.section.yl-block .yl-bbody .d-text{padding:4px 9px}
+
+/* 4px of tail was still opening a third page for the two-page lesson. */
+.section.yl-notes .yl-nrules{gap:7px}
+.yl-btab{padding:6px 4px}
+
+/* The last card's bottom margin is dead space that opens a page for itself. This rule
+   existed already and was overridden by a later blanket .body > .section margin of equal
+   specificity — restated last so it wins. */
+.body > .section:last-child{margin-bottom:0}
+
+.section.yl-notes .yl-nlabel{margin-bottom:4px}
+.yl-ntab{padding:5px 5px}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

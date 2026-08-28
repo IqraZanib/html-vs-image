@@ -753,10 +753,121 @@ function cfMatchPairs({ items = [], wide = false } = {}) {
 }
 
 const CF_WIDE = new Set(['process', 'labeled-parts', 'match-pairs']);
-const CF_KINDS = new Set(['fraction-grid', 'count-set', 'compass', 'compare', 'expression', 'process', 'steps', 'labeled-parts', 'error-board', 'match-pairs']);
+// ── GEOMETRY FIGURES ────────────────────────────────────────────────────────────────
+// Drawn from a spec, never from a lesson: the shapes, how many, and which one is correct
+// all come from the spec the converter built out of the source's own words. A geometry
+// exercise printed as a sentence is unusable to a six-year-old; drawn, it is the exercise.
+const GEO_INK = '#2f3e63';
+const GEO_OK = '#2f7d4a';
+const GEO_NO = '#c0392b';
+
+// one drawn shape, on its own 100x74 canvas
+function geoShape(kind) {
+  const S = (inner) => '<svg viewBox="0 0 100 74" class="geo-s" aria-hidden="true">' + inner + '</svg>';
+  const st = `fill="none" stroke="${GEO_INK}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"`;
+  switch (kind) {
+    case 'line':   return S(`<path d="M12 37 H88" ${st}/><circle cx="12" cy="37" r="3.5" fill="${GEO_INK}"/><circle cx="88" cy="37" r="3.5" fill="${GEO_INK}"/>`);
+    case 'curve':  return S(`<path d="M12 52 Q50 6 88 52" ${st}/><circle cx="12" cy="52" r="3.5" fill="${GEO_INK}"/><circle cx="88" cy="52" r="3.5" fill="${GEO_INK}"/>`);
+    case 'quad-sm': return S(`<rect x="34" y="24" width="32" height="26" rx="2" ${st} fill="#f2f4f8"/>`);
+    case 'quad':   return S(`<rect x="20" y="14" width="60" height="46" rx="2" ${st} fill="#e7eef8"/>`);
+    case 'quad2':  return S(`<path d="M22 58 L34 16 L82 20 L74 60 Z" ${st} fill="#e7eef8"/>`);
+    case 'tri':    return S(`<path d="M50 14 L84 60 L16 60 Z" ${st} fill="#fdeaea"/>`);
+    case 'cube':   return S(`<path d="M26 26 H68 V62 H26 Z" ${st} fill="#e7eef8"/><path d="M26 26 L40 14 H82 L68 26" ${st} fill="#d6e2f2"/><path d="M68 26 L82 14 V50 L68 62" ${st} fill="#c9d9ee"/>`);
+    case 'cone':   return S(`<path d="M50 12 L76 58 H24 Z" ${st} fill="#fdf1e0"/><ellipse cx="50" cy="58" rx="26" ry="7" ${st} fill="#f5e2c4"/>`);
+    default:       return S('');
+  }
+}
+
+// «ضع إشارة (✓) على …» — candidates in a row, each with its own answer box
+function cfGeoPick(spec) {
+  const items = (spec.items || []).map((it) => {
+    const mark = it.ok
+      ? `<span class="geo-box geo-yes">✓</span>`
+      : `<span class="geo-box geo-no">✗</span>`;
+    return `<div class="geo-cell">${geoShape(it.shape)}${mark}</div>`;
+  }).join('');
+  return `<div class="geo-fig geo-pick">${items}</div>`;
+}
+
+// «ارسم قطعاً مستقيمة بين كل نقطتين» — pairs of points, the ruler line shown faintly
+function cfGeoDots(spec) {
+  const n = Math.max(2, Math.min(4, Number(spec.pairs) || 3));
+  const rows = [];
+  for (let i = 0; i < n; i++) {
+    const y = 22 + i * 30;
+    rows.push(`<circle cx="18" cy="${y}" r="4.5" fill="${GEO_INK}"/>`
+      + `<circle cx="${170 - i * 16}" cy="${y}" r="4.5" fill="${GEO_INK}"/>`
+      + `<path d="M18 ${y} H${170 - i * 16}" stroke="${GEO_OK}" stroke-width="2.4"`
+      + ` stroke-dasharray="6 6" opacity=".55"/>`);
+  }
+  const h = 22 + n * 30;
+  return `<div class="geo-fig"><svg viewBox="0 0 188 ${h}" class="geo-w" aria-hidden="true">`
+    + rows.join('') + '</svg></div>';
+}
+
+// «ارسم على الشبكة شكلاً يطابق» — the model on squared paper, empty squares beside it
+function cfGeoGrid(spec) {
+  const cols = Math.max(4, Math.min(8, Number(spec.cols) || 6));
+  const rows = Math.max(3, Math.min(7, Number(spec.rows) || 5));
+  const u = 15;
+  const grid = (filled) => {
+    let g = '';
+    for (let x = 0; x <= cols; x++) g += `<path d="M${x * u} 0 V${rows * u}" stroke="#c9d4e6" stroke-width="1"/>`;
+    for (let y = 0; y <= rows; y++) g += `<path d="M0 ${y * u} H${cols * u}" stroke="#c9d4e6" stroke-width="1"/>`;
+    if (filled) {
+      g += `<path d="M${u} ${u} H${u * 4} V${u * 2} H${u * 2} V${u * 4} H${u} Z"`
+        + ` fill="#cfe0f2" stroke="${GEO_INK}" stroke-width="2.6" stroke-linejoin="round"/>`;
+    }
+    return `<svg viewBox="0 0 ${cols * u} ${rows * u}" class="geo-g" aria-hidden="true">${g}</svg>`;
+  };
+  return `<div class="geo-fig geo-two">${grid(true)}${grid(false)}</div>`;
+}
+
+// «الشكل المطابق» — a model, then candidates, one of them congruent
+function cfGeoMatch(spec) {
+  const L = spec.labels || {};
+  const fill = spec.colour ? '#f6c445' : '#e7eef8';
+  const box = (w, h, f, cls) => `<svg viewBox="0 0 100 74" class="geo-s ${cls || ''}" aria-hidden="true">`
+    + `<rect x="${50 - w / 2}" y="${37 - h / 2}" width="${w}" height="${h}" rx="2" fill="${f}"`
+    + ` stroke="${GEO_INK}" stroke-width="3"/></svg>`;
+  const cap = (t, cls) => (t ? `<span class="geo-cap ${cls || ''}">${esc(t)}</span>` : '');
+  return '<div class="geo-fig geo-match">'
+    + `<div class="geo-cell geo-model">${box(52, 40, '#dfe9f5')}${cap(L.model, 'geo-mcap')}</div>`
+    + '<div class="geo-vs">=</div>'
+    + `<div class="geo-cell">${box(52, 40, fill)}${cap(L.same, 'geo-ok')}</div>`
+    + `<div class="geo-cell">${box(34, 26, '#f2f4f8')}${cap(L.diff, 'geo-bad')}</div>`
+    + '</div>';
+}
+
+// the demonstration board: every contrast the stage names, with ✓ and ✗
+function cfGeoBoard(spec) {
+  // The ✗ half of a congruence row must be VISIBLY different, or the row teaches the
+  // opposite of what it says: two identical squares under «صواب» and «خطأ» is a picture of
+  // two congruent shapes labelled as not congruent.
+  const pair = { line: ['line', 'curve'], quad: ['quad', 'tri'], congruent: ['quad', 'quad-sm'] };
+  const rows = (spec.rows || []).map((r) => {
+    const [a, b] = pair[r.pair] || ['quad', 'tri'];
+    const small = r.pair === 'congruent';
+    return '<div class="geo-brow">'
+      + `<div class="geo-cell">${geoShape(a)}<span class="geo-box geo-yes">✓</span>`
+      + (spec.yes ? `<span class="geo-cap geo-ok">${esc(spec.yes)}</span>` : '') + '</div>'
+      + `<div class="geo-cell${small ? ' geo-small' : ''}">${geoShape(b)}`
+      + `<span class="geo-box geo-no">✗</span>`
+      + (spec.no ? `<span class="geo-cap geo-bad">${esc(spec.no)}</span>` : '') + '</div>'
+      + '</div>';
+  }).join('');
+  return `<div class="geo-fig geo-board">${rows}</div>`;
+}
+
+const CF_KINDS = new Set(['geo-pick', 'geo-dots', 'geo-grid', 'geo-match', 'geo-board', 'fraction-grid', 'count-set', 'compass', 'compare', 'expression', 'process', 'steps', 'labeled-parts', 'error-board', 'match-pairs']);
 function cfMini(spec) {
   if (!spec) return '';
   switch (spec.kind) {
+    case 'geo-pick': return cfGeoPick(spec);
+    case 'geo-dots': return cfGeoDots(spec);
+    case 'geo-grid': return cfGeoGrid(spec);
+    case 'geo-match': return cfGeoMatch(spec);
+    case 'geo-board': return cfGeoBoard(spec);
     case 'fraction-grid': return cfFractionGrid(spec);
     case 'count-set': return cfCountSet(spec);
     case 'compass': return cfCompass(spec);
@@ -1078,21 +1189,27 @@ function ylStage(section, accent, images, idCls) {
     const text = a.body ? '<div class="yl-ttext">' + para(a.body) + '</div>' : '';
     const label = a.label
       ? '<div class="yl-alabel">' + esc(cleanHeading(a.label)) + '</div>' : '';
+    const answer = a.answer
+      ? '<div class="yl-answer">' + richText(a.answer, { engine }) + '</div>' : '';
     const wide = !!(a.codeFigure
       && (a.codeFigure.kind === 'match-pairs' || a.codeFigure.kind === 'assessment'));
     const vis = visual ? '<div class="yl-tvis">' + visual + '</div>' : '';
     const layout = !text || !visual ? ' yl-solo' : (wide ? ' yl-stacked' : ' yl-split');
     const body = (text || vis)
       ? '<div class="yl-sbody' + layout + '">' + text + vis + '</div>' : '';
-    return (label || body) ? '<div class="yl-act">' + label + body + '</div>' : '';
-  }).join('');
-  // TWO ACTIVITIES OF THE SAME KIND SIT SIDE BY SIDE, as the approved card does with the
-  // two halves of its exercise. Stacked, this lesson's two five-row matching grids made
-  // the card 500px tall on their own and pushed the LP onto a third page; in two columns
-  // they are the same size on the page and read as one exercise with two parts.
-  const wideActs = acts.filter((a) => a.codeFigure
-    && (a.codeFigure.kind === 'match-pairs' || a.codeFigure.kind === 'assessment')).length;
-  const grid = acts.length > 1 && wideActs === acts.length;
+    return (label || body || answer)
+      ? '<div class="yl-act">' + label + body + answer + '</div>' : '';
+  });
+  // EXERCISES OF THE SAME KIND SHARE A ROW, as the approved card does with the two halves
+  // of its exercise. Stacked, two five-row matching grids made one card 500px tall; a
+  // geometry lesson with seven drawn exercises stacked ran to five pages. The grid is
+  // built from the activities that CARRY A FIGURE — an instruction line with no figure
+  // stays full width above them, where it belongs — and it widens to three columns once
+  // there are enough of them for two columns to waste the page.
+  const figIdx = acts.map((a, i) => (a.codeFigure ? i : -1)).filter((i) => i >= 0);
+  const gridFrom = figIdx.length > 1 && figIdx[figIdx.length - 1] === acts.length - 1
+    ? figIdx[0] : -1;
+  const cols = figIdx.length >= 6 ? 4 : (figIdx.length >= 5 ? 3 : 2);
   const diff = (Array.isArray(section.callouts) && section.callouts.length)
     ? '<div class="yl-srows">' + section.callouts.map((c, k) =>
       '<div class="yl-srow ' + (k === 0 ? 'yl-support' : 'yl-challenge') + '">'
@@ -1106,10 +1223,16 @@ function ylStage(section, accent, images, idCls) {
   // A HEADING THE SOURCE LEFT EMPTY COLLAPSES to its label. «العرض — أنا أفعل (١٠ دقائق)»
   // carries no text in this lesson: inventing content is not an option, and neither is a
   // large blank card. The stage keeps its tab and its pills, and nothing else.
-  if (!lead && !blocks && !checks && !diff) {
+  // `blocks` is an ARRAY now — and an empty array is truthy, so this test silently stopped
+  // firing and «العرض», the stage the source leaves empty, went back to rendering a card.
+  const anyBlock = blocks.some((x) => x);
+  if (!lead && !anyBlock && !checks && !diff) {
     return '<section class="section yl-stage yl-empty' + idCls + '">' + head + '</section>';
   }
-  const inner = grid ? '<div class="yl-actgrid">' + blocks + '</div>' : blocks;
+  const inner = gridFrom >= 0
+    ? blocks.slice(0, gridFrom).join('')
+      + '<div class="yl-actgrid yl-cols-' + cols + '">' + blocks.slice(gridFrom).join('') + '</div>'
+    : blocks.join('');
   // The approved stage is TWO cards: an outer one carrying the stage's own tint, which
   // holds the header row, the asides and the checkpoint strip; and a white inner card
   // holding the teaching content. That outer block of colour is what makes a stage read

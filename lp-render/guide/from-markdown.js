@@ -81,10 +81,18 @@ function roleAtStart(title, profile) {
 
 function bareHeading(line, profile) {
   const raw = String(line).trim();
-  if (!raw || raw.length > 120) return null;
-  const m = raw.match(/^#{0,6}\s*\*{0,2}_{0,2}([^:*_\n]{2,80}?)_{0,2}\*{0,2}\s*:\s*(.*)$/)
-    || raw.match(/^#{0,6}\s*\*{0,2}_{0,2}([^:*_\n]{2,80}?)_{0,2}\*{0,2}\s*$/);
+  if (!raw) return null;
+  const withColon = raw.match(/^#{0,6}\s*\*{0,2}_{0,2}([^:*_\n]{2,80}?)_{0,2}\*{0,2}\s*:\s*(.*)$/);
+  // A LINE'S LENGTH IS NOT WHAT MAKES IT PROSE. The 120-character cap was there to stop a
+  // sentence being read as a heading, but it also rejected «بطاقة الخروج: ارسم شكلاً
+  // رباعياً في دفترك، ثم ارسم بجانبه شكلاً يطابقه. (الإجابة: …)» — a role heading whose
+  // content simply runs long on the same line, which cost that lesson its exit-ticket
+  // card. The real guard is the part BEFORE the colon: it has to name a role, lead with
+  // that name, and be short. Once it does, whatever follows the colon is content.
+  const m = withColon
+    || (raw.length <= 120 && raw.match(/^#{0,6}\s*\*{0,2}_{0,2}([^:*_\n]{2,80}?)_{0,2}\*{0,2}\s*$/));
   if (!m) return null;
+  if (withColon && m[1].trim().length > 40) return null;
   // The source's own bullet is list punctuation, never part of a heading's name, so it
   // comes off before the role is looked up and before the title is used.
   const title = m[1].replace(/^[•▪●◦*\-–—]\s*/, '').trim();
@@ -334,8 +342,31 @@ function stepsFigure(items, profile) {
 // into one giant card — so a source that does use bold marks splits exactly as before.
 const BOLD_MARK = /\*\*([^*\n]{2,80}?):\*\*/g;
 const BARE_MARK = /^[ \t]*([^\n:.!?؟*|]{2,60}):[ \t]*/gm;
+// «نقطة التحقق», «دعم» and «تحد» do not always start a line. This lesson writes a whole
+// stage as ONE paragraph — «…هل هذا الخط مستقيم أم منحني؟ نقطة التحقق: ٤ من كل ٥ تلاميذ…
+// دعم: … تحد: …» — and every splitter here anchors on ^, so all three were left buried in
+// prose: no checkpoint strip, no support or challenge row, on three of the four stages.
+//
+// Only the labels the PROFILE already names are broken out, and only when they are
+// preceded by sentence-ending punctuation, so an ordinary colon inside prose is untouched.
+// Everything is put back on its own line and the existing line-based splitters do the rest.
+function breakOutInlineLabels(text, profile) {
+  const names = [];
+  if (profile.checkLabel) names.push(profile.checkLabel);
+  for (const [, , label] of profile.subElements || []) if (label) names.push(label);
+  if (!names.length) return text;
+  let out = String(text);
+  for (const n of names) {
+    const esc = n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // preceded by . ؟ ! ” or ) and a space — i.e. a new sentence, not a mid-clause colon
+    out = out.replace(new RegExp(`([.!?؟”"'\\)])[ \t]+((?:نقطة\\s+)?${esc}\\s*:)`, 'g'),
+      (mm, p1, p2) => `${p1}\n${p2}`);
+  }
+  return out;
+}
+
 function labelledParts(body, profile = {}) {
-  const src = stripTables(String(body));   // fences kept: figureFor reads them
+  const src = stripTables(breakOutInlineLabels(String(body), profile));   // fences kept: figureFor reads them
   const collect = (re) => {
     const marks = []; let m;
     re.lastIndex = 0;
@@ -397,14 +428,30 @@ function labelledParts(body, profile = {}) {
     const upto = i + 1 < marks.length ? marks[i + 1].at : src.length;
     const raw = src.slice(mk.end, upto);
     const text = plain(raw);
-    if (text) parts.push({ label: mk.label, body: text, raw });
+    // A LABELLED PART WITH NO BODY IS STILL A PART. This dropped any exercise written as a
+    // single self-contained line — «١. ضع إشارة (✓) على القطعة المستقيمة. (الإجابة: …)» —
+    // because everything it says is in the label and there is nothing underneath. Six of
+    // one lesson's seven exercises disappeared that way, silently. أسرتي's exercises each
+    // had bullet lines beneath them, so they had bodies, so this never showed.
+    if (text || mk.label) parts.push({ label: mk.label, body: text, raw });
   });
   // AN INSTRUCTION LINE IS NOT AN ACTIVITY. «يفتح التلاميذ الكتاب صفحة ٣٢، ويحلون التمرين
   // الأول والثاني جماعياً:» introduces the two exercises under it, and as a card of its own
   // it became a thin text-only box — then the pagination put it on page 1 and its exercises
   // on page 2, so the teacher read the instruction one page away from the work it describes.
   // It rides on the first exercise as that card's lead line instead.
-  if (profile.leadIntoFirstPart && parts.length > 1 && !parts[0].label && parts[1].label) {
+  // …BUT ONLY INTO A PART THAT WILL BECOME AN ACTIVITY. A sub-element («دعم», «تحد») and a
+  // lifted role are absorbed elsewhere — the first is attached to the card above it as a
+  // callout, the second is moved to its own section — and folding the stage's teaching text
+  // into one of those took the text with it. A lesson written as a single paragraph
+  // («…أم منحني؟ نقطة التحقق: … دعم: … تحد: …») lost the whole of its التمهيد body that way.
+  const absorbed = (label) => {
+    for (const [, re] of (profile.subElements || [])) if (re.test(label)) return true;
+    for (const [, re] of (profile.lift || [])) if (re.test(label)) return true;
+    return false;
+  };
+  if (profile.leadIntoFirstPart && parts.length > 1 && !parts[0].label && parts[1].label
+      && !absorbed(parts[1].label)) {
     const [head, ...rest] = parts;
     rest[0] = { ...rest[0], lead: head.body };
     return rest;
@@ -543,7 +590,67 @@ function tableFigure(body) {
     items: rows.slice(0, 6).map((r) => ({ label: r.label, caption: r.value })) };
 }
 
+// GEOMETRY FIGURES. A geometry lesson's exercises — «ضع إشارة (✓) على القطعة المستقيمة»,
+// «ارسم قطعاً مستقيمة بين كل نقطتين باستخدام المسطرة», «ارسم على الشبكة شكلاً يطابق» — are
+// pictures, and printing them as prose is exactly the "dense text" the reviewer rejects.
+// The kind is chosen from the words the SOURCE uses, against vocabulary the profile owns,
+// so nothing here is specific to one lesson: another maths lesson naming other shapes gets
+// the same treatment, and a lesson with none of these words gets no geometry figure.
+function geoFigure(text, profile) {
+  const G = profile.geoTerms;
+  if (!G) return null;
+  const t = String(text || '');
+  const has = (k) => G[k] && G[k].test(t);
+  if (G.shapeNoun && !G.shapeNoun.test(t)) return null;   // it must be about a shape
+  const L = profile.geoLabels || {};
+  // solids: cube against cone
+  if (has('cube') && has('cone')) {
+    return { kind: 'geo-pick', items: [{ shape: 'cube', ok: true }, { shape: 'cone', ok: false }] };
+  }
+  // draw on a squared grid: the model on one side, empty squares on the other
+  if (has('grid')) return { kind: 'geo-grid', shape: 'L', cols: 6, rows: 5 };
+  // join the dots with a ruler
+  if (has('dots')) return { kind: 'geo-dots', pairs: 3, quad: has('quad') };
+  // colour or tick the congruent one: a model and three candidates
+  if (has('congruent')) {
+    return { kind: 'geo-match', colour: !!has('colour'),
+      labels: { model: L.model || '', same: L.same || '', diff: L.diff || '' } };
+  }
+  // tick the quadrilateral
+  if (has('quad')) {
+    return { kind: 'geo-pick',
+      items: [{ shape: 'quad', ok: true }, { shape: 'tri', ok: false }, { shape: 'quad2', ok: true }] };
+  }
+  // tick the straight segment
+  if (has('straight')) {
+    return { kind: 'geo-pick',
+      items: [{ shape: 'line', ok: true }, { shape: 'curve', ok: false }] };
+  }
+  return null;
+}
+
+// The teaching board a demonstration stage needs: every contrast the stage names, drawn
+// once, with ✓ and ✗ — «هذه قطعة مستقيمة، وهذه غير مستقيمة. هذا شكل رباعي… وهذا غير رباعي.
+// هذان شكلان متطابقان… وهذان غير متطابقين».
+function geoBoard(text, profile) {
+  const G = profile.geoTerms;
+  if (!G) return null;
+  const t = String(text || '');
+  const rows = [];
+  if (G.straight && G.straight.test(t) && G.curved && G.curved.test(t)) {
+    rows.push({ pair: 'line' });
+  }
+  if (G.quad && G.quad.test(t)) rows.push({ pair: 'quad' });
+  if (G.congruent && G.congruent.test(t)) rows.push({ pair: 'congruent' });
+  if (rows.length < 2) return null;
+  const L = profile.geoLabels || {};
+  return { kind: 'geo-board', rows, yes: L.yes || '', no: L.no || '' };
+}
+
 function figureFor(rawBody, profile) {
+  // A demonstration board that names several contrasts beats everything: it IS the stage.
+  const gb = geoBoard(rawBody, profile);
+  if (gb) return gb;
   // Order matters, most meaningful first: a matching exercise or a letter build IS the
   // example, so it beats a generic list; a classroom quote beats prose; a bulleted list
   // is the stage's real activity steps; a table's rows next. A fenced block is LAST
@@ -556,6 +663,11 @@ function figureFor(rawBody, profile) {
   // a greeting-and-answer list is the lesson's own matching exercise
   const ap = askAnswerPairsFigure(rawBody);
   if (ap) return ap;
+  // GEOMETRY COMES AFTER THE PAIR DETECTORS, not before: «أصل بين كل كلمتين متماثلتين» is a
+  // word-matching exercise that happens to contain «متماثل», and its own matching component
+  // must win. A shape exercise reaches here because no pair detector claimed it.
+  const gf = geoFigure(rawBody, profile);
+  if (gf) return gf;
   const bf = buildFigure(rawBody);
   if (bf) return bf;
   const qf = quoteFigure(rawBody, profile);
@@ -888,13 +1000,26 @@ function buildGuideFromMarkdown(md, opts = {}) {
         // label is prepended to the BODY instead: the title stays as short as the pilot's,
         // and not one word leaves the page. A numbered exercise heading always stays a
         // title — that IS its role, and those are short.
-        const rawLabel = String(part.label || blockHead || '').trim();
+        let rawLabel = String(part.label || blockHead || '').trim();
+        let partAnswer = '';
+        if (profile.answerParenRe) {
+          const am = rawLabel.match(profile.answerParenRe);
+          if (am) { partAnswer = am[1].trim(); rawLabel = rawLabel.replace(profile.answerParenRe, '').trim(); }
+        }
         const isExercise = /^[\d٠-٩]/.test(rawLabel);
         const longLabel = !isExercise && rawLabel.length > 34;
         const label = longLabel ? '' : rawLabel;
         const sep = isExercise ? ' — ' : ' · ';
         const title = [T[id], label].filter(Boolean).join(sep);
-        const fig = figureFor(part.raw || '', profile);
+        // THE LABEL IS THE EXERCISE. «١. ضع إشارة (✓) على القطعة المستقيمة.» carries all of
+        // its meaning in the label and has no body at all, so a detector fed only the body
+        // saw an empty string and drew nothing for seven exercises in a row.
+        // THE EXERCISE'S OWN INSTRUCTION FIRST, its surrounding text only as a fallback.
+        // «٢. لماذا يكون الشكلان غير متطابقين؟» sits above a check point that happens to
+        // mention مكعب and مخروط, and reading both together drew a cube-and-cone figure for
+        // a question about congruence.
+        const fig = (part.label ? figureFor(part.label, profile) : null)
+          || figureFor([part.label, part.raw].filter(Boolean).join('\n'), profile);
         // THE ACTIVITY IS THE VISUAL, NOT A PARAGRAPH TOO. When a matching figure carries
         // the pairs, printing «أبي ← صورة الأب أمي ← صورة الأم …» in the body as well is the
         // "labels squeezed into running text" the reviewer rejected. Every one of those
@@ -935,6 +1060,7 @@ function buildGuideFromMarkdown(md, opts = {}) {
         const sec = { id, heading: title, type: 'stage',
           body: sp.longCheck ? sp.body : (sp.check ? sp.body : partBody) };
         if (part.lead) sec.lead = part.lead;
+        if (partAnswer) sec.answer = partAnswer;
         if (sp.check) sec.check = sp.check;
         if (first) {
           sec.time = found.map((x) => minutesOf(x.title, profile)).find(Boolean) || '';
@@ -1195,9 +1321,15 @@ function buildGuideFromMarkdown(md, opts = {}) {
   // pills clean outside the card. The label belongs inside the card, above its activity.
   // The teacher's after-lesson notes belong to the design, not to the lesson text: every
   // plan gets them, in the same place. Declared by the profile so a region that does not
-  // want them simply omits the key.
+  // want them omits the key.
+  //
+  // INSERTED AFTER THE STAGE MERGE, AND AFTER THE LAST CARD OF THAT STAGE. Splicing it in
+  // earlier, at the FIRST section with that id, dropped it between two التقويم sections —
+  // which broke the run of consecutive sections the merge needs, so that stage stayed as
+  // two cards with the notes card wedged between them.
   if (profile.notes && profile.notes.after) {
-    const at = sections.findIndex((x) => x.id === profile.notes.after);
+    let at = -1;
+    sections.forEach((x, i) => { if (x.id === profile.notes.after) at = i; });
     if (at >= 0) {
       sections.splice(at + 1, 0, { id: 'notes', type: 'notes', label: profile.notes.label,
         tab: profile.notes.tab, lines: profile.notes.lines || 2 });
@@ -1222,7 +1354,7 @@ function buildGuideFromMarkdown(md, opts = {}) {
       const isStage = sec.type === 'stage' && stageIds.has(sec.id);
       const asActivity = (x) => ({
         label: String(x.heading || '').split(/\s+[—·]\s+/).slice(1).join(' — '),
-        body: x.body || '', codeFigure: x.codeFigure || null,
+        body: x.body || '', codeFigure: x.codeFigure || null, answer: x.answer || '',
       });
       if (isStage && prev && prev.id === sec.id && prev.type === 'stage') {
         prev.activities.push(asActivity(sec));
@@ -1246,5 +1378,5 @@ function buildGuideFromMarkdown(md, opts = {}) {
   return { meta, images, sections, sourceProfile: { id: profile.id, name: profile.name, mode: doc.mode } };
 }
 
-module.exports = { buildGuideFromMarkdown, blocks, roleOf, plain, tableRows, listItems,
+module.exports = { buildGuideFromMarkdown, blocks, roleOf, plain, tableRows, listItems, labelledParts,
   rubricItems, parseDocument, GUIDE_SECTION_IDS };

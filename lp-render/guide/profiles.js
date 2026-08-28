@@ -97,6 +97,27 @@ const YE = {
   oneCardPerStage: true,
   tabbedBlocks: ['homework'],
   badgeBlocks: { goal: 'target' },
+  // GEOMETRY VOCABULARY. A maths lesson names its own shapes; the renderer draws whatever
+  // the source asks for. Kept here so another region or language supplies its own words
+  // without a line of renderer code changing.
+  geoTerms: {
+    straight: /مستقيم/, curved: /منحن|غير\s*مستقيم/,
+    quad: /رباعي|أربعة\s*أضلاع|٤\s*أضلاع/, notQuad: /ثلاثة\s*أضلاع|غير\s*رباعي/,
+    congruent: /متطابق|يطابق|مطابق|متماثل/, notCongruent: /غير\s*متطابق|غير\s*متماثل/,
+    dots: /نقطتين|النقاط|نقاط/, grid: /الشبكة|شبكة/, colour: /لوّن|لون/,
+    cube: /مكعب/, cone: /مخروط/, ruler: /المسطرة|مسطرة/,
+    // A geometry figure needs an actual SHAPE to be about. Without this, «أصل بين كل
+    // كلمتين متماثلتين» — a WORD-matching exercise — matched «متماثل» and would have been
+    // drawn as congruent shapes.
+    shapeNoun: /شكل|أشكال|قطعة|قطع|خط|خطاً|مجسم|مربع/,
+  },
+  // «١. ضع إشارة (✓) على القطعة المستقيمة. (الإجابة: وضع الإشارة على الخط المستقيم فقط).»
+  // states the exercise and its model answer in one line. They are two different things to
+  // a teacher — the instruction is read out, the answer is not — so the answer comes out of
+  // the label and prints under the exercise. Not a character is dropped.
+  answerParenRe: /\s*[(（]\s*((?:الإجابة|الحل)\s*[:：][\s\S]*?)[)）]\s*[.،]?\s*$/,
+  answerLabel: 'الإجابة',
+  geoLabels: { yes: 'صواب', no: 'خطأ', model: 'النموذج', same: 'مطابق', diff: 'غير مطابق' },
   notes: { after: 'stage-taqwim', label: 'ملاحظات المعلّم بعد الدرس', tab: 'ملاحظات', lines: 2 },
   // The assessment activity must not be a second copy of the practice widget — the
   // reviewer asked for it to read differently inside the same design family.
@@ -149,7 +170,11 @@ const YE = {
   // teaching ACTIVITY, so it opens its own card and gets its own visual. The bare-label
   // splitter only fires on «label:» lines, so these ran together inside one card and the
   // matching exercises ended up as one small merged widget.
-  exerciseRe: /^[ \t]*([٠-٩0-9]{1,2}\s*[).\u061F]?\s*[^\n]{4,70})$/gm,
+  // 70 characters was the أسرتي exercise's length. A geometry lesson writes «١. ضع إشارة
+  // (✓) على القطعة المستقيمة. (الإجابة: وضع الإشارة على الخط المستقيم فقط).» — 85
+  // characters — so not one of its seven exercises was recognised and all seven ran
+  // together as prose. The line still has to BE a whole line and start with a digit.
+  exerciseRe: /^[ \t]*([٠-٩0-9]{1,2}\s*[).\u061F]?\s*[^\n]{4,170})$/gm,
   // the lesson's own «Watch out» wording, for the drawn ✗/✓ board
   warnRe: /watch out|تنبيه|احذر/i,
   fixRe: /(?:التصحيح|الصواب|الصحيح)\s*[:،]?\s*([^.!؟\n]{6,60})/,
