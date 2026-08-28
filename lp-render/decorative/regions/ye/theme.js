@@ -1945,6 +1945,28 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .yl-actgrid .yl-answer{padding:2px 6px}
 .section.yl-stage .yl-check{padding:4px 12px}
 .yl-srow{padding:3px 8px}
+
+/* ── NOTES: the ruled lines must read as separate lines to write on ──────────────────
+   Successive density passes had squeezed the gap to 4px, so the two dashed rules sat on
+   top of each other and read as one thick band. They are writing space: they need room to
+   write IN. */
+.section.yl-notes .yl-nbody{padding:7px 13px 9px}
+.section.yl-notes .yl-nlabel{margin-bottom:6px}
+.section.yl-notes .yl-nrules{gap:14px;padding:2px 0 3px}
+.section.yl-notes .yl-nrules i{border-bottom:1.5px dashed #b3c4de}
+
+/* ── the closing pair: a real gutter, and no card may reach into the other ───────────── */
+.body > .section.yl-block.sec-exit-ticket{grid-column:1 / 7;margin-inline-end:5px}
+.body > .section.yl-block.sec-solutions{grid-column:7 / 13;margin-inline-start:5px}
+.section.yl-block.sec-exit-ticket,.section.yl-block.sec-solutions{overflow:hidden}
+
+/* Giving the notes their writing room cost 17px, which pushed أسرتي onto a third page.
+   Taken back from the closing pair's own padding and the checkpoint strips — the writing
+   space stays, since that is what the reviewer asked for. */
+.section.yl-block.sec-exit-ticket .yl-bbody,
+.section.yl-block.sec-solutions .yl-bbody{padding:4px 11px 5px !important}
+.section.yl-stage .yl-check{padding:3px 12px 4px}
+.section.yl-notes .yl-nbody{padding:6px 13px 7px}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

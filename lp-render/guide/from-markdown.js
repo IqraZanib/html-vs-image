@@ -1466,8 +1466,13 @@ function buildGuideFromMarkdown(md, opts = {}) {
     if (m && m[1].trim().length > 1) {
       host.body = body.slice(0, m.index).trim();
       const at = sections.indexOf(host);
+      // TAGGED AS A BLOCK COMPONENT AT BIRTH. The block tagging pass runs earlier in this
+      // function, so a section created here never went through it — الإجابات fell to the
+      // generic panel while بطاقة الخروج beside it was a block component. That is why the
+      // pair looked mismatched no matter how carefully the pair CSS was written: half of it
+      // was styling a card that did not exist.
       sections.splice(at + 1, 0, { id: asp.to, heading: T[asp.to] || asp.to,
-        type: 'text', body: m[1].trim() });
+        type: 'text', body: m[1].trim(), component: 'block' });
     }
   }
 
