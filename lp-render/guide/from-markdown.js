@@ -401,7 +401,12 @@ function breakOutInlineLabels(text, profile) {
   // «* صورة البنت ← إيمان ٢) أَصِلُ…» put the next exercise's heading at the end of the
   // previous line, where nothing could see it. A digit followed by ')' after whitespace
   // starts a new line; «٥ تلاميذ» and «صفحة ٣٢» are untouched because they have no bracket.
-  out = out.replace(/([^\n])[ \t]+([٠-٩0-9]{1,2}\s*\)\s*)/g, (mm, p1, p2) => `${p1}\n${p2}`);
+  // …with a BRACKET OR A FULL STOP after the number: «١) أَصِلُ…» and «١. ضع إشارة…» are the
+  // same thing written two ways, and only the bracket form was handled — so a paste that
+  // numbered its exercises with dots ran all seven together as one blob of prose. A LETTER
+  // must follow the marker, which is what keeps «٤ أضلاع» and «صفحة ٣٢» out of it.
+  out = out.replace(/([^\n])[ \t]+([٠-٩0-9]{1,2}\s*[).]\s*)(?=[\p{L}])/gu,
+    (mm, p1, p2) => `${p1}\n${p2}`);
   return out;
 }
 

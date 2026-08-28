@@ -1826,6 +1826,13 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
    its own accent. */
 .section.yl-block.sec-exit-ticket .yl-title{color:#7a5910 !important}
 .section.yl-block.sec-solutions .yl-title{color:#155e46 !important}
+
+/* WHEN A CARD CARRIES BOTH AN ILLUSTRATION AND AN EXERCISE GRID, the exercises are the
+   content and the illustration is supporting art. At full intro size it left a column of
+   white beside a single line of instruction, because the row is as tall as the picture. */
+.section.yl-stage:has(.yl-actgrid) .yl-illus img{max-height:186px !important}
+.section.yl-stage:has(.yl-actgrid) .yl-sbody.yl-split{grid-template-columns:1fr 1fr;
+  align-items:start}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then
