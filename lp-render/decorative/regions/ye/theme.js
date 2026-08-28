@@ -1978,6 +1978,20 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
   border-radius:8px;display:block}
 .yl-artcell .yl-illus figcaption{font-size:9.5px;font-weight:700;color:#44506a;
   text-align:center;padding:3px 2px 0;line-height:1.3}
+
+/* ── THE ILLUSTRATION FILLS ITS COLUMN, WHICHEVER SIDE IS TALLER ─────────────────────
+   A stage card's row is as tall as its taller column. When the PICTURE is taller it drives
+   the row and there is no gap — which is why this was invisible in the lessons I had been
+   measuring. When the TEXT is taller, the picture keeps its own height and leaves white
+   underneath: the blank area under the illustration the reviewer is pointing at.
+   The panel now stretches and the image fills it, cropping rather than leaving a gap, so no
+   lesson can produce that space whichever stage the artwork lands in. */
+.yl-sbody.yl-split > .yl-tvis{align-self:stretch;display:flex}
+.yl-sbody.yl-split > .yl-tvis > .yl-illus{display:flex;flex-direction:column;width:100%;
+  height:100%;min-height:0}
+.yl-sbody.yl-split > .yl-tvis > .yl-illus img{flex:1 1 auto;min-height:120px;height:auto;
+  max-height:none;object-fit:cover;object-position:center}
+.yl-sbody.yl-split > .yl-tvis > .yl-illus figcaption{flex:0 0 auto}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then
