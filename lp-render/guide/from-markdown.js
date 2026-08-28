@@ -1092,6 +1092,13 @@ function buildGuideFromMarkdown(md, opts = {}) {
           const am = rawLabel.match(profile.answerParenRe);
           if (am) { partAnswer = am[1].trim(); rawLabel = rawLabel.replace(profile.answerParenRe, '').trim(); }
         }
+        if (!partAnswer && profile.answerTailRe) {
+          const am = rawLabel.match(profile.answerTailRe);
+          if (am && am.index > 6) {
+            partAnswer = am[1].trim();
+            rawLabel = rawLabel.slice(0, am.index).trim();
+          }
+        }
         const isExercise = /^[\d٠-٩]/.test(rawLabel);
         const longLabel = !isExercise && rawLabel.length > 34;
         const label = longLabel ? '' : rawLabel;
@@ -1520,6 +1527,32 @@ function buildGuideFromMarkdown(md, opts = {}) {
     sections.length = 0;
     sections.push(...merged);
   }
+  // A RUN OF TICKED ITEMS IS ONE EXERCISE, NOT FOUR. Runs AFTER the stage merge: before it
+  // a stage is still several part-sections and activities[] does not exist yet, which is
+  // why this quietly did nothing when it sat further up. The source marks each behaviour right
+  // or wrong by the tick in its answer — «الإجابة: (✔)» against «الإجابة: ( )». Collapsed
+  // into a single list with a box per row it is something a child can actually do.
+  if (profile.tickRe) {
+    for (const sec of sections) {
+      const acts = sec.activities;
+      if (!Array.isArray(acts) || acts.length < 3) continue;
+      const ticked = acts.filter((a) => a.answer
+        && (profile.tickRe.test(a.answer) || (profile.blankTickRe || /$^/).test(a.answer)));
+      if (ticked.length < 3) continue;
+      const items = ticked.map((a) => ({
+        text: String(a.label || '').replace(/^[٠-٩0-9]{1,2}\s*[).]\s*/, '').trim(),
+        ok: profile.tickRe.test(a.answer),
+      })).filter((x) => x.text);
+      if (items.length < 3) continue;
+      const first = acts.indexOf(ticked[0]);
+      const kept = acts.filter((a) => !ticked.includes(a));
+      kept.splice(Math.min(first, kept.length), 0,
+        { label: '', body: '', answer: '', codeFigure: { kind: 'tick-list', items } });
+      sec.activities = kept;
+    }
+  }
+
+
   // ENFORCED AFTER THE MERGE, whatever chose the card earlier: a stage that draws its own
   // activities does not also carry a photograph. It was putting a 228px picture beside a
   // 25px instruction line in a card that already held seven drawn exercises — 200px of dead

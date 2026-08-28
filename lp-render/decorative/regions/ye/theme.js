@@ -2019,6 +2019,18 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
   min-height:0}
 .yl-artspan .yl-tvis > .yl-illus img{flex:1 1 auto;min-height:0;max-height:none;
   height:auto;object-fit:cover}
+
+/* the behaviour checklist: one row per behaviour, box at the RTL start */
+.yl-ticklist{display:flex;flex-direction:column;gap:6px;width:100%}
+.yl-tickrow{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #e1e6ef;
+  border-radius:9px;padding:5px 9px}
+.yl-tickbox{flex:0 0 auto;width:24px;height:24px;border-radius:6px;border:1.8px solid;
+  display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800}
+.yl-tickbox.yl-t-yes{border-color:#8fbf9c;color:#2f7d4a;background:#eaf5ec}
+.yl-tickbox.yl-t-no{border-color:#cfd7e4;background:#fbfcfe}
+.yl-ticktext{min-width:0;font-size:13.5px;font-weight:700;line-height:1.45;color:var(--ink)}
+/* a question-and-answer cell: the question reads as the prompt, the answer as the response */
+.yl-actgrid > .yl-act .yl-answer{background:#eef4f0;border-color:#cfe2d6}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

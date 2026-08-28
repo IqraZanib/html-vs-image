@@ -753,6 +753,17 @@ function cfMatchPairs({ items = [], wide = false } = {}) {
 }
 
 const CF_WIDE = new Set(['process', 'labeled-parts', 'match-pairs']);
+// A BEHAVIOUR CHECKLIST — «أضع علامة (✔) أمام السلوك الصحيح». One row per behaviour with a
+// box at the RTL start: ticked where the source ticked it, empty where it did not. The text
+// and the marks are the source's own; nothing is judged here.
+function cfTickList(spec) {
+  const rows = (spec.items || []).slice(0, 8).map((it) => '<div class="yl-tickrow">'
+    + '<span class="yl-tickbox' + (it.ok ? ' yl-t-yes' : ' yl-t-no') + '">'
+    + (it.ok ? '✔' : '') + '</span>'
+    + '<span class="yl-ticktext">' + esc(cleanHeading(it.text || '')) + '</span></div>').join('');
+  return '<div class="yl-ticklist">' + rows + '</div>';
+}
+
 // ── GEOMETRY FIGURES ────────────────────────────────────────────────────────────────
 // Drawn from a spec, never from a lesson: the shapes, how many, and which one is correct
 // all come from the spec the converter built out of the source's own words. A geometry
@@ -859,10 +870,11 @@ function cfGeoBoard(spec) {
   return `<div class="geo-fig geo-board">${rows}</div>`;
 }
 
-const CF_KINDS = new Set(['geo-pick', 'geo-dots', 'geo-grid', 'geo-match', 'geo-board', 'fraction-grid', 'count-set', 'compass', 'compare', 'expression', 'process', 'steps', 'labeled-parts', 'error-board', 'match-pairs']);
+const CF_KINDS = new Set(['tick-list', 'geo-pick', 'geo-dots', 'geo-grid', 'geo-match', 'geo-board', 'fraction-grid', 'count-set', 'compass', 'compare', 'expression', 'process', 'steps', 'labeled-parts', 'error-board', 'match-pairs']);
 function cfMini(spec) {
   if (!spec) return '';
   switch (spec.kind) {
+    case 'tick-list': return cfTickList(spec);
     case 'geo-pick': return cfGeoPick(spec);
     case 'geo-dots': return cfGeoDots(spec);
     case 'geo-grid': return cfGeoGrid(spec);
@@ -1213,10 +1225,30 @@ function ylStage(section, accent, images, idCls) {
   // built from the activities that CARRY A FIGURE — an instruction line with no figure
   // stays full width above them, where it belongs — and it widens to three columns once
   // there are enough of them for two columns to waste the page.
-  const figIdx = acts.map((a, i) => (a.codeFigure ? i : -1)).filter((i) => i >= 0);
+  // A CELL EARNS ITS PLACE IN THE GRID BY CARRYING A FIGURE **OR** AN ANSWER. A question with
+  // its answer beneath it is as much an exercise block as a drawing is — «١. أين نمشي؟» over
+  // «أمشي على الرصيف» — and left out of the grid six of them stacked as six full-width text
+  // rows, which is the sparse column of prose the reviewer keeps rejecting.
+  const figIdx = acts.map((a, i) => ((a.codeFigure || a.answer) ? i : -1)).filter((i) => i >= 0);
   const gridFrom = figIdx.length > 1 && figIdx[figIdx.length - 1] === acts.length - 1
     ? figIdx[0] : -1;
-  const cols = figIdx.length >= 6 ? 4 : (figIdx.length >= 5 ? 3 : 2);
+  // THE COLUMN COUNT IS CHOSEN TO LEAVE THE FEWEST EMPTY CELLS. A fixed "four across once
+  // there are six" put six questions into 4 + 2 and left half of the second row blank —
+  // the same unused space the reviewer keeps pointing at, in miniature. Six go 3 + 3, five
+  // go 3 + 2, seven go 4 + 3. Ties break toward fewer rows.
+  const cols = (() => {
+    const n = figIdx.length;
+    if (n <= 2) return n === 1 ? 1 : 2;
+    let best = 2; let bestScore = Infinity;
+    for (const c of [4, 3, 2]) {
+      if (c > n) continue;
+      const rows = Math.ceil(n / c);
+      const empty = rows * c - n;
+      const score = empty * 10 + rows;      // empties dominate, then prefer fewer rows
+      if (score < bestScore) { bestScore = score; best = c; }
+    }
+    return best;
+  })();
   const diff = (Array.isArray(section.callouts) && section.callouts.length)
     ? '<div class="yl-srows">' + section.callouts.map((c, k) =>
       '<div class="yl-srow ' + (k === 0 ? 'yl-support' : 'yl-challenge') + '">'

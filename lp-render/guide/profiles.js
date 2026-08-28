@@ -116,6 +116,16 @@ const YE = {
   // a teacher — the instruction is read out, the answer is not — so the answer comes out of
   // the label and prints under the exercise. Not a character is dropped.
   answerParenRe: /\s*[(（]\s*((?:الإجابة|الحل)\s*[:：][\s\S]*?)[)）]\s*[.،]?\s*$/,
+  // …and it may follow the instruction with no brackets at all: «١. أين نمشي؟ الإجابة:
+  // أمشي على الرصيف.» The instruction is read to the class, the answer is not, so they are
+  // two different things on the card either way.
+  answerTailRe: /\s*(?:الإجابة|الحل)\s*[:：]\s*([\s\S]+?)\s*$/,
+  // A BEHAVIOUR CHECKLIST is «١. المشي على الرصيف. الإجابة: (✔)» against «٢. اللعب في
+  // الطريق العام. الإجابة: ( )» — the source states which behaviours are right by ticking
+  // them. Drawn as one list with a tick box per row it is an exercise a child can do; as
+  // four separate lines of prose it is unusable.
+  tickRe: /^[(（]\s*[✔✓√]\s*[)）]$/,
+  blankTickRe: /^[(（]\s*[)）]$/,
   answerLabel: 'الإجابة',
   geoLabels: { yes: 'صواب', no: 'خطأ', model: 'النموذج', same: 'مطابق', diff: 'غير مطابق' },
   notes: { after: 'stage-taqwim', label: 'ملاحظات المعلّم بعد الدرس', tab: 'ملاحظات', lines: 2 },
