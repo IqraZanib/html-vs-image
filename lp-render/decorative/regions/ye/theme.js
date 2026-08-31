@@ -2070,6 +2070,25 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .yl-swatch{display:flex;flex-direction:column;align-items:center;gap:4px}
 .yl-swchip{width:58px;height:42px;display:block}
 .yl-swname{font-size:12.5px;font-weight:600;color:#1d2739;line-height:1.2;text-align:center}
+
+/* ── AN ANSWER PANEL FILLS ITS CARD, IT DOES NOT FLOAT AT THE BOTTOM ─────────────────
+   Equal-height activity cards are right — a ragged row of cards reads as broken — but
+   the height of the row is set by whichever card carries a figure, and the others were
+   left with a white void between their question and a thin answer strip pushed to the
+   bottom by margin-top:auto. On the sight lesson, exercise 1 draws the traffic-light
+   colours and exercises 2 and 3 sat with roughly 90px of nothing in the middle of them.
+   So the answer becomes a PANEL that takes the space the card has spare, with its text
+   centred in it. Nothing is invented to fill the gap: the card's own answer grows into
+   it, which is what makes the three read as one designed set rather than one full card
+   beside two empty ones. A card whose figure already fills the height keeps a short
+   panel, because flex-grow has nothing left to give it. */
+.yl-actgrid > .yl-act{display:flex;flex-direction:column}
+.yl-actgrid > .yl-act > .yl-answer,
+.yl-actgrid > .yl-act .yl-sbody > .yl-answer{
+  margin-top:7px;flex:1 1 auto;display:flex;align-items:center;justify-content:center;
+  text-align:center;min-height:0}
+/* the picture cell is positioned by its own rule above and must keep it */
+.yl-actgrid > .yl-act.yl-artcell{justify-content:flex-end}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then
