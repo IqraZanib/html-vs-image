@@ -407,6 +407,18 @@ function breakOutInlineLabels(text, profile) {
   // must follow the marker, which is what keeps «٤ أضلاع» and «صفحة ٣٢» out of it.
   out = out.replace(/([^\n])[ \t]+([٠-٩0-9]{1,2}\s*[).]\s*)(?=[\p{L}])/gu,
     (mm, p1, p2) => `${p1}\n${p2}`);
+  // …and a question may be numbered with a PREFIX LETTER rather than a bare digit. A sight
+  // lesson writes its assessment as «يحل التلميذ في دفتره: س١: ما هو عضو حاسة الإبصار؟
+  // الإجابة: العين. س٢: ماذا نقول على نعمة البصر؟ الإجابة: … نقطة التحقق: …» — two questions,
+  // two answers and a checkpoint in one line. A bare digit is not what marks them, so none
+  // of the splitters above could see the second question, and the whole line rendered as
+  // one blob of prose while every other stage on the page rendered as tidy parts.
+  // Only a region that DECLARES the marker splits on it, so «س» never becomes structural
+  // for a language that does not number questions this way.
+  if (profile.questionMarkRe) {
+    out = out.replace(new RegExp(`([^\\n])[ \\t]+(${profile.questionMarkRe.source})`, 'g'),
+      (mm, p1, p2) => `${p1}\n${p2}`);
+  }
   return out;
 }
 
@@ -710,6 +722,31 @@ function geoBoard(text, profile) {
   return { kind: 'geo-board', rows, yes: L.yes || '', no: L.no || '' };
 }
 
+// COLOUR NAMING IS A DRAWING, NOT A SENTENCE. Only the colours the profile declares are
+// drawn, in the order the source names them, and a set of fewer than two is not a set — so
+// «وتسمية الألوان بدقة», which names no colour at all, draws nothing.
+function colourFigure(text, profile) {
+  const map = profile.colourNames;
+  if (!map) return null;
+  const t = unvocalised(String(text || ''));
+  const hits = [];
+  const seen = new Set();
+  // Longest name first: «الأحمر» must claim its own letters before «أحمر» can match inside
+  // it, or the swatch is labelled with half the word the teacher wrote.
+  for (const name of Object.keys(map).sort((a, b) => b.length - a.length)) {
+    const needle = unvocalised(name);
+    for (let from = 0; ; ) {
+      const at = t.indexOf(needle, from);
+      if (at < 0) break;
+      if (!seen.has(map[name])) { hits.push({ at, name, hex: map[name] }); seen.add(map[name]); }
+      from = at + needle.length;
+    }
+  }
+  if (hits.length < 2) return null;
+  hits.sort((a, b) => a.at - b.at);
+  return { kind: 'colour-set', items: hits.map((h) => ({ name: h.name, hex: h.hex })) };
+}
+
 function figureFor(rawBody, profile) {
   // A demonstration board that names several contrasts beats everything: it IS the stage.
   const gb = geoBoard(rawBody, profile);
@@ -721,6 +758,10 @@ function figureFor(rawBody, profile) {
   // elsewhere (poor labels) — preferring it produced cards reading «أ | أ | أح م د».
   const eb = errorBoardFigure(rawBody, profile);
   if (eb) return eb;
+  // Before the quote and prose detectors: العرض's colours sit inside a quoted sentence, and
+  // a quote box would have won and drawn nothing.
+  const cf = colourFigure(rawBody, profile);
+  if (cf) return cf;
   const pf = pairsFigure(rawBody);
   if (pf) return pf;
   // a greeting-and-answer list is the lesson's own matching exercise
@@ -758,8 +799,23 @@ function figureFor(rawBody, profile) {
 // places and a bare «MODEL ANSWER:» in others. Requiring one found nothing.
 function splitCheck(text, profile) {
   const t = String(text);
-  const m = t.search(profile.checkMarks);
-  if (m <= 40) return { body: t, check: '' };          // nothing before the marker
+  // THE MARKER SET HOLDS TWO DIFFERENT THINGS — an answer marker and the checkpoint — so
+  // searching once and giving up when the first hit lands early lets an «الإجابة:» in the
+  // opening clause suppress a «نقطة التحقق» later in the SAME paragraph. A sight lesson
+  // whose التقويم reads «…: س١: ما هو عضو حاسة الإبصار؟ الإجابة: العين. … نقطة التحقق: ٨٠٪…»
+  // lost its checkpoint strip while the other three stages kept theirs, because that first
+  // answer marker sits at character 34. Walk the matches and take the first one that
+  // actually has a body in front of it; when the first hit already qualifies — every case
+  // this function handled before — the result is unchanged.
+  let m = -1;
+  for (let from = 0; from < t.length;) {
+    const rel = t.slice(from).search(profile.checkMarks);
+    if (rel < 0) break;
+    const abs = from + rel;
+    if (abs > 40) { m = abs; break; }
+    from = abs + 1;                                    // zero-width match: step past it
+  }
+  if (m < 0) return { body: t, check: '' };            // nothing before the marker
   const body = t.slice(0, m).trim();
   const check = t.slice(m).trim();
   // The amber sidebar is a ~90px column sized for ONE line. Measured: a 600-character
@@ -1154,6 +1210,25 @@ function buildGuideFromMarkdown(md, opts = {}) {
         if (!sp.check && !sp.longCheck && partBody
             && partBody.search(profile.checkMarks) === 0 && partBody.length <= 160) {
           sp = { body: '', check: partBody.trim() };
+        }
+        // THE ANSWER MAY BE IN THE BODY RATHER THAN THE LABEL. «س١: ما هو عضو حاسة الإبصار؟
+        // الإجابة: العين.» puts the question after the label's colon, so the label — «س١» —
+        // carries no answer, and this question kept its answer buried in a sentence while the
+        // numbered exercises on the same page had theirs lifted into the answer slot. The slot
+        // belongs to the PART; which side of the colon the words landed on is an accident of
+        // how the teacher typed the line.
+        // This runs AFTER the check has been split off, and never touches it: answerTailRe
+        // reaches to the end of the string, so applied first it swallowed «نقطة التحقق: ٨٠٪
+        // من التلاميذ…» into the answer of the question that happened to precede it.
+        if (!partAnswer && profile.answerTailRe) {
+          const hasCheck = Boolean(sp.check || sp.longCheck);
+          const target = hasCheck ? sp.body : partBody;
+          const bm = String(target || '').match(profile.answerTailRe);
+          if (bm && bm.index > 6) {
+            partAnswer = bm[1].trim();
+            const kept = String(target).slice(0, bm.index).trim();
+            if (hasCheck) sp.body = kept; else partBody = kept;
+          }
         }
         // AN EXPLICIT STAGE COMPONENT WITH NAMED SLOTS — text, visual, checkpoint,
         // support, challenge — rather than a generic card whose contents arrange

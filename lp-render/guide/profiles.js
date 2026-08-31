@@ -172,6 +172,23 @@ const YE = {
   // meant guessing about the definite article — «تحقق» vs «نقطة التحقق» — and a guess that
   // fixed one paste broke three others.
   inlineLabels: ['نقطة التحقق', 'دعم', 'تحد'],
+  // «س١:» / «س٢:» — this curriculum numbers its assessment questions with a س prefix as
+  // readily as with a bare digit, and writes the whole set on one line. Declared here
+  // rather than in the mapper so that «س» stays an ordinary letter everywhere else.
+  questionMarkRe: /س\s*[٠-٩0-9]{1,2}\s*[:：.)]/,
+  // COLOURS THE DESIGN IS WILLING TO DRAW, keyed by the words the sources actually use.
+  // «ألوان علم بلادي: الأحمر، الأبيض، الأسود» and «ما هي ألوان إشارة المرور؟ … الأحمر،
+  // الأصفر، الأخضر» are the most drawable thing a Grade 1 lesson contains, and both were
+  // printing as running prose. Declared here, so a colour is never guessed from a word the
+  // renderer does not know, and a region that does not teach colour naming is unaffected.
+  colourNames: {
+    'الأحمر': '#d5262c', 'أحمر': '#d5262c', 'حمراء': '#d5262c',
+    'الأبيض': '#ffffff', 'أبيض': '#ffffff', 'بيضاء': '#ffffff',
+    'الأسود': '#1a1a1a', 'أسود': '#1a1a1a', 'سوداء': '#1a1a1a',
+    'الأصفر': '#f2c012', 'أصفر': '#f2c012', 'صفراء': '#f2c012',
+    'الأخضر': '#1e8b4d', 'أخضر': '#1e8b4d', 'خضراء': '#1e8b4d',
+    'الأزرق': '#1f5fa8', 'أزرق': '#1f5fa8', 'زرقاء': '#1f5fa8',
+  },
   // THE SAME LESSON MUST RENDER THE SAME WHETHER ITS ANSWER IS ON ITS OWN LINE OR INSIDE
   // THE SENTENCE. «بطاقة الخروج: أي كلمة…؟ الإجابة: أبي، أمي…» carries both in one line, so
   // the answer stayed inside the exit-ticket card and the الإجابات card disappeared — the

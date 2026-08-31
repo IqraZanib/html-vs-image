@@ -764,6 +764,26 @@ function cfTickList(spec) {
   return '<div class="yl-ticklist">' + rows + '</div>';
 }
 
+// COLOUR SWATCHES. The teacher names the colours; the card shows them. A swatch always
+// carries a border — white on a white card is otherwise invisible — and each name sits
+// under its own chip, so a six-year-old matches word to colour without reading a sentence.
+// The hex comes from the region profile, never from the lesson, and is re-validated here:
+// a colour is the one thing on this page that must not be interpolated on trust.
+function cfColourSet(spec) {
+  const items = (spec.items || []).slice(0, 6);
+  if (!items.length) return '';
+  const cells = items.map((it) => {
+    const hex = /^#[0-9a-fA-F]{6}$/.test(String(it.hex || '')) ? it.hex : '#cccccc';
+    return '<div class="yl-swatch">'
+      + '<svg viewBox="0 0 60 44" class="yl-swchip" aria-hidden="true">'
+      + '<rect x="2.5" y="2.5" width="55" height="39" rx="7" fill="' + hex
+      + '" stroke="#7d8798" stroke-width="1.6"/></svg>'
+      + '<span class="yl-swname">' + esc(cleanHeading(it.name || '')) + '</span>'
+      + '</div>';
+  }).join('');
+  return '<div class="yl-swatches">' + cells + '</div>';
+}
+
 // ── GEOMETRY FIGURES ────────────────────────────────────────────────────────────────
 // Drawn from a spec, never from a lesson: the shapes, how many, and which one is correct
 // all come from the spec the converter built out of the source's own words. A geometry
@@ -870,10 +890,11 @@ function cfGeoBoard(spec) {
   return `<div class="geo-fig geo-board">${rows}</div>`;
 }
 
-const CF_KINDS = new Set(['tick-list', 'geo-pick', 'geo-dots', 'geo-grid', 'geo-match', 'geo-board', 'fraction-grid', 'count-set', 'compass', 'compare', 'expression', 'process', 'steps', 'labeled-parts', 'error-board', 'match-pairs']);
+const CF_KINDS = new Set(['colour-set', 'tick-list', 'geo-pick', 'geo-dots', 'geo-grid', 'geo-match', 'geo-board', 'fraction-grid', 'count-set', 'compass', 'compare', 'expression', 'process', 'steps', 'labeled-parts', 'error-board', 'match-pairs']);
 function cfMini(spec) {
   if (!spec) return '';
   switch (spec.kind) {
+    case 'colour-set': return cfColourSet(spec);
     case 'tick-list': return cfTickList(spec);
     case 'geo-pick': return cfGeoPick(spec);
     case 'geo-dots': return cfGeoDots(spec);

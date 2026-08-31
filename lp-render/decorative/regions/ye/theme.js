@@ -2061,6 +2061,15 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .yl-artspan .yl-srows{grid-column:1;grid-row:3}
 .yl-artspan .yl-check{grid-column:1;grid-row:4}
 .yl-artspan .yl-tvis{grid-row:1 / span 4}
+
+/* ── COLOUR SWATCHES ────────────────────────────────────────────────────────────────
+   A row of chips, each with its name under it. It wraps rather than shrinks, so a
+   six-colour set stays readable in a half-card column. */
+.yl-swatches{display:flex;flex-wrap:wrap;gap:9px 12px;justify-content:center;
+  width:100%;padding:4px 0 2px}
+.yl-swatch{display:flex;flex-direction:column;align-items:center;gap:4px}
+.yl-swchip{width:58px;height:42px;display:block}
+.yl-swname{font-size:12.5px;font-weight:600;color:#1d2739;line-height:1.2;text-align:center}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then
