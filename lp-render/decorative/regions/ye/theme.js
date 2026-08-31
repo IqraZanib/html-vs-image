@@ -2042,6 +2042,25 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
   border-radius:11px !important;padding:13px 26px 12px !important}
 .lp-header h1{font-size:27px;line-height:1.2;letter-spacing:0}
 .lp-header .sub{margin:5px 0 0;font-size:14.5px;letter-spacing:.2px}
+
+/* ── A LABELLED ACTIVITY INSIDE A SPANNING-ILLUSTRATION CARD ─────────────────────────
+   The road-safety lesson printed its label «سؤال» ALONE at the bottom of the التمهيد
+   card, with the question it labels at the top. The markup was right — the label is the
+   first child of the activity — but the card is a grid whose wrappers are
+   display:contents, and every real child was given an explicit cell EXCEPT the label.
+   With all three declared rows occupied, the one unplaced item auto-placed into a new
+   implicit row after them, i.e. the bottom of the card. Any stage whose single activity
+   carries both a label and an illustration hits this; the reading lesson never did
+   because its opening stage has no label.
+   So the label gets a row of its own at the top of the text column, and everything below
+   it shifts down one. A card with no label leaves row 1 empty, which costs nothing: it is
+   an auto row with no content and the row gap here is 0. */
+.yl-scard.yl-artspan{grid-template-rows:auto auto auto auto}
+.yl-artspan .yl-alabel{grid-column:1;grid-row:1;margin:0 0 3px}
+.yl-artspan .yl-ttext{grid-column:1;grid-row:2}
+.yl-artspan .yl-srows{grid-column:1;grid-row:3}
+.yl-artspan .yl-check{grid-column:1;grid-row:4}
+.yl-artspan .yl-tvis{grid-row:1 / span 4}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then
