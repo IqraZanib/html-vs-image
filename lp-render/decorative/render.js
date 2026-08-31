@@ -752,7 +752,12 @@ function cfMatchPairs({ items = [], wide = false } = {}) {
   return cfSvg(out, W, H);
 }
 
-const CF_WIDE = new Set(['process', 'labeled-parts', 'match-pairs']);
+// A MATCHING EXERCISE IS ALWAYS WIDE, under either of its two names. The assessment
+// variant of match-pairs was missing here, so the reading lesson's «التوصيل» exercise
+// was placed in a compact visual column: three pairs of full phrases in a ~90px slot,
+// which rendered as a narrow dashed box with the words stacked on top of each other.
+// Same component, same content, one name absent from one set.
+const CF_WIDE = new Set(['process', 'labeled-parts', 'match-pairs', 'assessment']);
 // A BEHAVIOUR CHECKLIST — «أضع علامة (✔) أمام السلوك الصحيح». One row per behaviour with a
 // box at the RTL start: ticked where the source ticked it, empty where it did not. The text
 // and the marks are the source's own; nothing is judged here.

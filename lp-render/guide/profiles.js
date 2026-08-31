@@ -176,6 +176,13 @@ const YE = {
   // readily as with a bare digit, and writes the whole set on one line. Declared here
   // rather than in the mapper so that «س» stays an ordinary letter everywhere else.
   questionMarkRe: /س\s*[٠-٩0-9]{1,2}\s*[:：.)]/,
+  // A BULLETED QUESTION THAT CARRIES ITS OWN ANSWER IS AN EXERCISE, not a list item.
+  // «الكلب الوفي» writes nine of them under one heading — «* ما الذي كان لدى الرجل؟
+  // الإجابة: كلب ذكي وأمين.» — and read as a plain list they collapsed into one activity
+  // whose answer swallowed the following eight questions. A numbered lesson already gets
+  // one card per question; this gives a bulleted one the same treatment, with no numeral
+  // invented. Two or more, so a single such bullet stays part of its paragraph.
+  qaLineRe: /^[ \t]*[*•▪-]\s*([^\n]*[؟?][^\n]*(?:الإجابة|الحل)\s*[:：][^\n]+)$/m,
   // COLOURS THE DESIGN IS WILLING TO DRAW, keyed by the words the sources actually use.
   // «ألوان علم بلادي: الأحمر، الأبيض، الأسود» and «ما هي ألوان إشارة المرور؟ … الأحمر،
   // الأصفر، الأخضر» are the most drawable thing a Grade 1 lesson contains, and both were

@@ -342,17 +342,25 @@ function rubricItems(body) {
 // the body, so nothing is lost from the page.
 function stepsFigure(items, profile) {
   const budget = profile.chipWords || 3;
-  const picked = items.slice(0, 4).map((t) => {
-    const clean = t.replace(/\*\*/g, '').replace(/^[^:]{0,40}:\s*/, '');
-    const words = clean.split(/\s+/);
-    // A chip that stops mid-phrase reads as a defect rather than as a summary, so a
-    // profile that allows longer chips also marks the cut. Yemen's word cards are short
-    // enough that nothing is ever cut, and its budget is unchanged at three.
-    const cut = words.length > budget;
-    const label = words.slice(0, budget).join(' ') + (cut && profile.chipEllipsis ? '…' : '');
-    return { label, caption: '' };
-  }).filter((x) => x.label);
-  return picked.length >= 2 ? { kind: 'steps', items: picked } : null;
+  // A STEP LADDER IS FOR STEPS, AND A CHIP MUST NOT BE A SEVERED SENTENCE.
+  // The comment that used to sit here said Yemen's word cards are short enough that
+  // nothing is ever cut. That is true of a word-card lesson and false of a reading
+  // comprehension one: «الكلب الوفي» has bullets that are whole sentences, and every one
+  // of them was cut to three words and drawn as a numbered step card — «لماذا رفض الذئب»,
+  // «كسروا الباب وأخذوا», «(تم القبض على» — four fragments in a coloured box, which is
+  // what the reviewer called absurd. Two rules now:
+  //
+  //   1. If any item would be cut, this is the WRONG component. Return null and let the
+  //      part render as text. Silently truncating a teacher's sentence is never right,
+  //      and an ellipsis would only make the severing tidier.
+  //   2. A question-and-answer list is not a sequence. Comprehension bullets carry «؟» or
+  //      an answer marker; they belong in question/answer rows, not on a step ladder.
+  const cleaned = items.slice(0, 4).map((t) => t.replace(/\*\*/g, '').replace(/^[^:]{0,40}:\s*/, '').trim())
+    .filter(Boolean);
+  if (cleaned.length < 2) return null;
+  if (cleaned.some((t) => /[؟?]/.test(t) || /(?:الإجابة|الحل)\s*[:：]/.test(t))) return null;
+  if (cleaned.some((t) => t.split(/\s+/).length > budget)) return null;
+  return { kind: 'steps', items: cleaned.map((label) => ({ label, caption: '' })) };
 }
 
 // The lesson already labels its own parts — «**نشاط الافتتاح (Getting Started):**»,
@@ -459,6 +467,18 @@ function labelledParts(body, profile = {}) {
   // colon, so the bare-label splitter never saw it and both matching exercises ran together
   // inside one card as prose with one small merged figure. Each numbered line now starts its
   // own part, which is what lets each exercise get its own full-size visual.
+  // …and the same for a bulleted question that carries its own answer. Collected before the
+  // numbered pass so the overlap rule below sees both and keeps whichever consumes more of
+  // the line, exactly as it does for a numbered heading that also ends in a colon.
+  if (profile.qaLineRe) {
+    const qa = [];
+    const qre = new RegExp(profile.qaLineRe.source, 'gm');
+    let qm;
+    while ((qm = qre.exec(src))) {
+      qa.push({ label: qm[1].trim(), at: qm.index, end: qm.index + qm[0].length });
+    }
+    if (qa.length >= 2) marks = marks.concat(qa).sort((x, y) => x.at - y.at);
+  }
   if (profile.exerciseRe) {
     const ex = [];
     const re = new RegExp(profile.exerciseRe.source, profile.exerciseRe.flags);
@@ -569,6 +589,16 @@ function pairsFigure(body) {
   const bare = [...String(body).matchAll(/^[\s•▪●◦*-]*([^\n←→]{1,24}?)\s*[←→]\s*([^\n←→]{1,24})$/gm)]
     .map((m) => ({ label: m[1].trim(), caption: m[2].trim() }))
     .filter((x) => x.label && x.caption);
+  // AN INLINE PAIR RUN IS NOT SAFELY EXTRACTABLE, AND A WRONG DIAGRAM IS WORSE THAN NONE.
+  // Tried and reverted: splitting a line like «يكتب على السبورة: الجذور ← تثبيت وامتصاص
+  // الماء. الساق ← نقل الماء.» on its own punctuation to recover the pairs. It fires on
+  // real content but never cleanly — the plant lesson lost «الجذور» and kept the pairs in
+  // the prose as well, so the card said the same thing twice; the letter-completion lesson
+  // produced «بني ← الإجابة: يـ (يبني) ٢- بـ ..», which swallows the next exercise and
+  // states an answer marker as half of a pair; the reading lesson dropped one pair of three
+  // and carried a stray bracket into a drawn label. A matching visual asserts a fact about
+  // the lesson, so a partial extraction is a factual error, not a cosmetic one. The pairs
+  // stay in the text, whole and correct, until a line-anchored form makes them safe.
   const seen2 = new Set();
   const uniq2 = bare.filter((p) => !seen2.has(p.label + p.caption) && seen2.add(p.label + p.caption));
   // A MATCHING EXERCISE IS A MATCHING VISUAL, not a row of chips. «أصل بين الصورة والكلمة
@@ -1568,6 +1598,80 @@ function buildGuideFromMarkdown(md, opts = {}) {
       if (parts.length) sec.tab = parts[parts.length - 1];
     }
   }
+  // ── A COMPREHENSION LIST IS ONE ACTIVITY PER QUESTION ───────────────────────────────
+  // «الكلب الوفي» writes its assessment as nine bulleted «question؟ الإجابة: answer.» items.
+  // Nothing split them, so the first item swallowed the rest into its answer, the overflow
+  // became a >160-character "check" and therefore a card of its own titled «… · الحل», and
+  // that intervening card broke the run of same-id stages so التقويم rendered as THREE
+  // cards — one of them a wall of prose with «الإجابة:» in it nine times.
+  //
+  // A numbered lesson already renders this shape well: one activity per question, the
+  // question read out, the answer in its own panel. This gives a bulleted lesson the same
+  // treatment. The pairs are the source's own words in the source's own order; no numeral
+  // is invented, because the label stays empty and the question itself carries the card.
+  if (profile.answerLabel) {
+    const MARK = new RegExp(`(?:${profile.answerLabel}|الحل)\\s*[:：]`);
+    // Splitting on the answer marker gives: [Q1] [A1 + Q2] [A2 + Q3] … [An]. A lazy regex
+    // over the whole run cannot do this — the answer text contains its own «؟», so the
+    // lookahead fires immediately and every answer comes out empty with the next question
+    // glued to the previous answer. Walking the segments is exact.
+    const trailingQuestion = (seg) => {
+      const t = String(seg).trim();
+      if (!/[؟?]\s*$/.test(t)) return [t, null];          // no question at the end
+      const body = t.replace(/[؟?]\s*$/, '');
+      const at = Math.max(body.lastIndexOf('.'), body.lastIndexOf('!'), body.lastIndexOf('؟'));
+      if (at < 0) return ['', t];                          // the whole segment is a question
+      return [t.slice(0, at + 1).trim(), t.slice(at + 1).trim()];
+    };
+    const qaPairs = (text) => {
+      const segs = String(text || '').split(new RegExp(MARK.source, 'g'));
+      if (segs.length < 3) return [];                      // fewer than two Q&A pairs
+      const clean = (x) => String(x).trim().replace(/^[*•▪-]\s*/, '').replace(/\s*[*•▪-]\s*$/, '');
+      const qs = [clean(segs[0])];
+      const as = [];
+      for (let i = 1; i < segs.length - 1; i++) {
+        const [ans, nextQ] = trailingQuestion(segs[i]);
+        as.push(clean(ans));
+        qs.push(clean(nextQ || ''));
+      }
+      as.push(clean(segs[segs.length - 1]));
+      const out = [];
+      for (let i = 0; i < Math.min(qs.length, as.length); i++) {
+        if (qs[i] && qs[i].length > 6 && as[i]) {
+          out.push({ label: '', body: qs[i], answer: as[i], codeFigure: null });
+        }
+      }
+      return out;
+    };
+    for (const sec of sections) {
+      // every place the glued run can be sitting
+      const carriers = [];
+      if (sec.body) carriers.push({ get: () => sec.body, clear: () => { sec.body = ''; } });
+      for (const a of sec.activities || []) {
+        const joined = [a.body, a.answer].filter(Boolean).join(' ');
+        if ((joined.match(MARK) || []).length) {
+          carriers.push({ get: () => joined, clear: () => { a.body = ''; a.answer = ''; a.__drop = true; } });
+        }
+      }
+      for (const c of carriers) {
+        const text = c.get();
+        const hits = (String(text).match(new RegExp(MARK.source, 'g')) || []).length;
+        if (hits < 2) continue;                       // one answer is an ordinary activity
+        const pairs = qaPairs(text);
+        if (pairs.length < 2) continue;
+        c.clear();
+        sec.activities = (sec.activities || []).filter((a) => !a.__drop).concat(pairs);
+        if (sec.type !== 'stage' && (profile.stages || []).includes(sec.id)) {
+          sec.type = 'stage';
+          delete sec.component;
+          // the heading picked up the «· الحل» suffix from the card this used to become
+          sec.heading = T[sec.id] || sec.heading;
+        }
+      }
+      if (sec.activities) sec.activities = sec.activities.filter((a) => !a.__drop);
+    }
+  }
+
   if (profile.oneCardPerStage) {
     const stageIds = new Set(profile.stages || []);
     const merged = [];
