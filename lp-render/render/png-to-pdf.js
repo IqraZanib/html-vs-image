@@ -37,10 +37,16 @@ async function htmlToPixelPdf(html, opts = {}) {
     geom = await page.evaluate(() => {
       const y = (el, edge) => el.getBoundingClientRect()[edge] + window.scrollY;
       const cuts = [];
+      // …and, separately, only those boundaries that end a WHOLE card. Both kinds are legal
+      // to cut at — a grid-row gap crosses no content — but a row gap still leaves the
+      // card's own border open across the page break, so anything choosing between cuts for
+      // appearance rather than necessity should prefer these.
+      const safe = [];
       const header = document.querySelector('.lp-header');
-      if (header) cuts.push(y(header, 'bottom'));
+      if (header) { cuts.push(y(header, 'bottom')); safe.push(y(header, 'bottom')); }
       document.querySelectorAll('.body > .section').forEach((sec) => {
         cuts.push(y(sec, 'bottom'));
+        safe.push(y(sec, 'bottom'));
         // A ROW OF EXERCISES MAY BREAK; NOTHING ELSE INSIDE A CARD MAY. The gap between two
         // grid rows is the one place a cut cannot cross anything: cells that share a row
         // share a top edge, so the boundary is the lowest of their bottoms and the cut lands
@@ -80,7 +86,10 @@ async function htmlToPixelPdf(html, opts = {}) {
         ).forEach((item) => { const b = y(item, 'bottom'); if (b > figBottom + 6) cuts.push(b); });
       });
       const footer = document.querySelector('.lp-footer');
-      if (footer) { cuts.push(y(footer, 'top')); cuts.push(y(footer, 'bottom')); }
+      if (footer) {
+        cuts.push(y(footer, 'top')); cuts.push(y(footer, 'bottom'));
+        safe.push(y(footer, 'top')); safe.push(y(footer, 'bottom'));
+      }
       // OVERFLOW GUARD: no instructional text may leave its container. Checked here
       // because this is the one place the real laid-out DOM exists, before the PDF is
       // sliced. Each code-drawn card is a <g class="cf-card"> whose first child is its
@@ -170,7 +179,7 @@ async function htmlToPixelPdf(html, opts = {}) {
           }
         });
       });
-      return { cuts, overflow, height: document.documentElement.scrollHeight, width: document.documentElement.scrollWidth,
+      return { cuts, safe, overflow, height: document.documentElement.scrollHeight, width: document.documentElement.scrollWidth,
         bg: getComputedStyle(document.body).backgroundColor || '#ffffff' };
     });
     shot = await page.screenshot({ fullPage: true });
@@ -204,6 +213,8 @@ async function composeWithChromium(shotBuf, geom, opts = {}) {
   const height = Math.ceil(geom.height);
   const cuts = [...new Set((geom.cuts || []).map((c) => Math.round(c)))].sort((a, b) => a - b)
     .filter((c) => c > 0 && c <= height + 1);
+  const safeCuts = [...new Set((geom.safe || geom.cuts || []).map((c) => Math.round(c)))]
+    .sort((a, b) => a - b).filter((c) => c > 0 && c <= height + 1);
   const pages = [];
   let start = 0;
   while (start < height - 1) {
@@ -218,6 +229,36 @@ async function composeWithChromium(shotBuf, geom, opts = {}) {
     if (height - end < 48 && height - start <= usable) end = height;
     pages.push([start, Math.min(end, height)]);
     start = end;
+  }
+  // A LAST PAGE HOLDING ALMOST NOTHING READS AS UNFINISHED. Taking the last legal cut
+  // before the limit fills each page as far as it can, which is right until the tail is
+  // reached: five of the fifteen document lessons ended on a page 8–17% full, because the
+  // page before it was packed to 98% and only a sliver was left over. Page COUNT is not the
+  // problem and is not changed here — the same number of sheets, the same legal cuts — the
+  // last two pages are simply balanced against each other, so 98% + 8% becomes something a
+  // teacher reads as two pages rather than one page and an offcut.
+  //
+  // Only cuts that leave BOTH halves inside `usable` are considered, because the clip is a
+  // fixed box with overflow:hidden and a page longer than that silently loses content.
+  if (pages.length >= 2) {
+    const lastStart = pages[pages.length - 1][0];
+    const secondStart = pages[pages.length - 2][0];
+    if (height - lastStart < usable * 0.25) {
+      const mid = secondStart + Math.round((height - secondStart) / 2);
+      // Prefer a whole-card boundary: rebalancing is a cosmetic choice, and buying a
+      // fuller last page by opening a card across the break trades one defect for another.
+      // Measured — balancing on any cut moved the fractions lesson's boundary into the
+      // middle of a card and three boxes then crossed it. Only if no card boundary can
+      // split the tail is a row gap considered.
+      const fits = (c) => c > secondStart + 40 && c - secondStart <= usable && height - c <= usable;
+      const safeLegal = safeCuts.filter(fits);
+      const legal = safeLegal.length ? safeLegal : cuts.filter(fits);
+      if (legal.length) {
+        const best = legal.reduce((a, c) => (Math.abs(c - mid) < Math.abs(a - mid) ? c : a), legal[0]);
+        pages[pages.length - 2] = [secondStart, best];
+        pages[pages.length - 1] = [best, height];
+      }
+    }
   }
   const b64 = shotBuf.toString('base64');
   // Page-number chrome is pack-driven: 'ar-bottom' prints the pilot-style
