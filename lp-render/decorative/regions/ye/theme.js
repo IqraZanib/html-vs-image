@@ -2089,6 +2089,17 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
   text-align:center;min-height:0}
 /* the picture cell is positioned by its own rule above and must keep it */
 .yl-actgrid > .yl-act.yl-artcell{justify-content:flex-end}
+
+/* ── A GROUP HEADING INSIDE A STAGE ─────────────────────────────────────────────────
+   Spans the activity grid so the exercises below it read as its group, with a hairline
+   under it to separate one group from the next. Never a cell: a heading with an empty
+   answer panel beneath it is the abandoned-looking card the review kept catching. */
+/* Kept deliberately cheap in height: the fractions lesson sat 10px under a two-page fit,
+   and a heading that costs 14px each tipped it onto a third page that was 17% full. */
+.yl-ahead{font-size:12.5px;font-weight:700;color:#1d2739;line-height:1.3;
+  padding:2px 0 2px;border-bottom:1px solid #e4eaf3;margin:0}
+.yl-actgrid > .yl-ahead{grid-column:1/-1}
+.yl-actgrid > .yl-ahead:first-child{padding-top:2px}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

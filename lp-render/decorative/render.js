@@ -1242,6 +1242,20 @@ function ylStage(section, accent, images, idCls) {
     const layout = !text || !visual ? ' yl-solo' : (wide ? ' yl-stacked' : ' yl-split');
     const body = (text || vis)
       ? '<div class="yl-sbody' + layout + '">' + text + vis + '</div>' : '';
+    // A GROUP HEADING IS A HEADING, NOT A CARD. The reading lesson groups its exercises
+    // under «١. التعبير الشفهي:», «٣. قراءة الاستماع:» — labels with nothing of their own
+    // beneath them. Placed in the activity grid like the question cards, each one became a
+    // cell with an empty panel under it, so the row read as two composed cards beside two
+    // abandoned ones. It spans the grid instead and introduces the group below it, which is
+    // what the source means by it.
+    // …AND A HEADING IS THE ONE THAT ENDS IN A COLON. Without that test this also caught
+    // complete exercise statements that happen to have no separate answer — the fractions
+    // lesson's «٢. عدد المثلثات ٢، المظللة ١، الكسر هو: ١/٢.» is an exercise, not an
+    // introduction, and demoting it to a heading stripped its card. The colon is the
+    // source's own mark for "what follows belongs to me".
+    if (label && !body && !answer && /[:：]\s*$/.test(String(a.label || '').trim())) {
+      return '<div class="yl-ahead">' + esc(cleanHeading(a.label)) + '</div>';
+    }
     return (label || body || answer)
       ? '<div class="yl-act">' + label + body + answer + '</div>' : '';
   });
