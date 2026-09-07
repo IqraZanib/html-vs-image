@@ -60,13 +60,33 @@ async function htmlToPixelPdf(html, opts = {}) {
         // two grid rows. Only the gaps between them, never a boundary inside one: that
         // distinction is why a component-level candidate list was reverted once before, when
         // a page ended in the middle of a figure.
+        // EVERY ROW OF THE INNER CARD IS A BOUNDARY. The assessment redesign made
+        // .yl-scard itself a two-column grid, and its children are a MIX — question cards,
+        // plain activities, spanning group headings. Grouping only one of those kinds left
+        // the fractions lesson's 2611px assessment with no usable candidate and 31 boxes
+        // crossing a hard cut. Grouping by the top edge of every child is the general form
+        // of the rule already used for the activity grid: items that share a top share a
+        // row, so the row's lowest bottom is a boundary that crosses nothing.
+        sec.querySelectorAll('.yl-scard').forEach((card) => {
+          const kids = [...card.children].filter((el) => el.nodeType === 1);
+          if (kids.length < 2) return;
+          const byTop = new Map();
+          kids.forEach((c) => {
+            const r = c.getBoundingClientRect();
+            if (!r.height) return;
+            const t = Math.round(y(c, 'top'));
+            byTop.set(t, Math.max(byTop.get(t) || 0, y(c, 'bottom')));
+          });
+          [...byTop.entries()].sort((a, b) => a[0] - b[0]).slice(0, -1)
+            .forEach(([, bottom]) => cuts.push(bottom));
+        });
         const wholeActs = [...sec.querySelectorAll(':scope > .yl-scard > .yl-act')];
         wholeActs.slice(0, -1).forEach((el) => cuts.push(y(el, 'bottom')));
         sec.querySelectorAll('.yl-actgrid').forEach((grid) => {
           // EVERY CHILD, not only the cells. A spanning group heading sits in this grid too,
           // and grouping by the cells alone produced a "row bottom" that fell inside the
           // heading that follows it — the division lesson had an exercise cut in half by it.
-          const cells = [...grid.querySelectorAll(':scope > .yl-act, :scope > .yl-ahead')];
+          const cells = [...grid.querySelectorAll(':scope > .yl-act, :scope > .yl-ahead, :scope > .yl-qcard')];
           if (cells.length < 3) return;            // a 2-up row has no row to break between
           const byRow = new Map();
           cells.forEach((a) => {

@@ -1774,6 +1774,13 @@ function buildGuideFromMarkdown(md, opts = {}) {
     }
   }
 
+  // The region's own word for an answer travels with the guide, so the renderer can label
+  // an answer strip without an Arabic literal of its own — the same reason every other
+  // label in this pack is profile-declared.
+  if (profile.answerLabel) {
+    meta.answerLabel = profile.answerLabel;
+  }
+
   if (profile.oneCardPerStage) {
     const stageIds = new Set(profile.stages || []);
     const merged = [];

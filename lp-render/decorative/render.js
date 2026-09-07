@@ -264,6 +264,11 @@ let CF_DIR = 'rtl';
 const RTL_LOCALES = /^(ar|he|fa|ur|ps|sd|ku|yi|dv)\b/i;
 function cfDirFor(locale) { return RTL_LOCALES.test(String(locale || '')) ? 'rtl' : 'ltr'; }
 
+// The document's own word for «answer», supplied by the region profile through the guide.
+// Set per render beside CF_DIR; empty when a region does not declare one, in which case the
+// answer strip simply carries no chip rather than an invented label.
+let ANSWER_LABEL = '';
+
 function cfText(x, y, s, size = 13, weight = 700, fill = CF.ink, anchor = 'middle', dir = CF_DIR) {
   const txt = String(s || '');
   return '<text x="' + x + '" y="' + y + '" text-anchor="' + anchor + '" font-size="' + size
@@ -406,7 +411,14 @@ function cfGroupSet({ total = 0, per = 0, groups = 0 }) {
     }
   }
   // the sentence the drawing is of, under it, in the document's own reading direction
-  out += cfText(W / 2, H - 7, total + ' ÷ ' + per + ' = ' + groups, 19, 800, CF.ink, 'middle');
+  // THE DOCUMENT'S OWN NUMERALS. Built from JS numbers this printed «12 ÷ 4 = 3» in an
+  // Arabic lesson whose every other digit is Arabic-Indic — a drawn figure contradicting
+  // the page around it.
+  const AD = (v) => String(v).replace(/[0-9]/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]);
+  const sentence = CF_DIR === 'rtl'
+    ? AD(total) + ' ÷ ' + AD(per) + ' = ' + AD(groups)
+    : total + ' ÷ ' + per + ' = ' + groups;
+  out += cfText(W / 2, H - 7, sentence, 19, 800, CF.ink, 'middle');
   return cfSvg(out, W, H);
 }
 
@@ -1333,7 +1345,36 @@ function ylStage(section, accent, images, idCls) {
   const acts = Array.isArray(section.activities) && section.activities.length
     ? section.activities
     : [{ label: '', body: section.body || '', codeFigure: section.codeFigure || null }];
+  // ── AN ASSESSMENT IS A SET OF QUESTION CARDS, NOT A LIST ──────────────────────────
+  // The reviewer's brief, for «التقويم — أنت تفعل»: each question/answer pair becomes its
+  // own card with a numbered badge, the question as real HTML text, and the answer in a
+  // tinted strip of its own carrying an «الإجابة» chip — so a teacher can scan the
+  // assessment instead of reading a worksheet. Two across, and a long question spans the
+  // row rather than being squeezed. Every word is the source's; the numeral on the badge
+  // is the card's position, and the chip is the design's own label, which this pack
+  // already prints on an answer elsewhere.
+  const isAssess = section.id === 'stage-taqwim';
+  const AR = (n) => String(n).replace(/[0-9]/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]);
+  let qNo = 0;
   const blocks = acts.map((a) => {
+    if (isAssess && a.answer && (a.body || a.label)) {
+      const q = String(a.body || a.label || '');
+      const lbl = a.body ? String(a.label || '') : '';
+      qNo += 1;
+      const fig = ylVisual({ ...a, image: null }, images, engine);
+      // a long question, or one carrying a drawing, earns the whole row
+      const wideQ = q.length > 74 || !!fig || String(a.answer).length > 90;
+      return '<div class="yl-qcard' + (wideQ ? ' yl-qwide' : '') + '">'
+        + '<div class="yl-qhead"><span class="yl-qnum">' + esc(AR(qNo)) + '</span>'
+        + (lbl ? '<span class="yl-qlbl">' + esc(cleanHeading(lbl)) + '</span>' : '')
+        + '</div>'
+        + '<div class="yl-qtext">' + richText(q, { engine }) + '</div>'
+        + (fig ? '<div class="yl-qfig">' + fig + '</div>' : '')
+        + '<div class="yl-qans">'
+        + (ANSWER_LABEL ? '<span class="yl-anschip">' + esc(ANSWER_LABEL) + '</span>' : '')
+        + '<span class="yl-anstext">' + richText(a.answer, { engine }) + '</span></div>'
+        + '</div>';
+    }
     const visual = ylVisual({ ...a, image: a.image || section.image }, images, engine);
     const text = a.body ? '<div class="yl-ttext">' + para(a.body) + '</div>' : '';
     const label = a.label
@@ -1456,6 +1497,7 @@ function ylStage(section, accent, images, idCls) {
 function renderDecorativeLesson(content, images = {}, cast = {}) {
   const meta = content.meta || {};
   CF_DIR = cfDirFor(meta.locale);   // drawn labels read the way this document reads
+  ANSWER_LABEL = String(meta.answerLabel || '');
   const chips = (meta.chips || []).map((c) => `<span><b>${esc(cleanHeading(c.label))}</b>${esc(cleanHeading(c.value))}</span>`).join('');
   const htext =
     `<h1>${esc(cleanHeading(meta.title))}</h1>` +

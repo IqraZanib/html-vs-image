@@ -2135,6 +2135,43 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
 .yl-actgrid .yl-alabel{font-size:14px;line-height:1.42}
 .yl-actgrid .yl-answer{font-size:12.5px;line-height:1.45;padding:4px 8px}
 .yl-actgrid .yl-ttext p{font-size:14px;line-height:1.55}
+
+/* ── ASSESSMENT QUESTION CARDS ──────────────────────────────────────────────────────
+   «التقويم — أنت تفعل» was a long vertical list of question then answer, flat and with
+   no hierarchy between one pair and the next — a worksheet rather than part of this
+   design. Each pair is now a card: a numbered badge, the question as real HTML text in
+   the document's own Naskh, and the answer in a tinted strip of its own with the
+   region's «الإجابة» chip on it, so a question and its answer never read as two
+   paragraphs of the same weight.
+
+   Two across, because a question and a short answer do not need a full page width; a
+   long question, or one carrying a drawing, takes the whole row rather than being
+   squeezed into half of it. The grid is on the CARD's own container so the stage's
+   header, asides and checkpoint strip are untouched. */
+.yl-scard:has(> .yl-qcard){display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  align-items:start}
+.yl-scard > .yl-ttext.yl-lead{grid-column:1/-1}
+.yl-qcard{grid-column:auto;display:flex;flex-direction:column;
+  background:#f7f9fd;border:1px solid #d8e2f0;border-radius:11px;padding:8px 10px 9px;
+  min-width:0}
+.yl-qcard.yl-qwide{grid-column:1/-1}
+.yl-qhead{display:flex;align-items:center;gap:7px;margin-bottom:4px}
+.yl-qnum{flex:0 0 auto;width:21px;height:21px;border-radius:50%;background:#2f3e63;
+  color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;
+  justify-content:center;line-height:1}
+.yl-qlbl{font-size:12px;font-weight:700;color:#5a6b8a;line-height:1.3;min-width:0}
+.yl-qtext{font-size:14px;line-height:1.55;font-weight:700;color:#101a30;
+  margin:0 0 7px;min-width:0}
+.yl-qtext p{margin:0}
+.yl-qfig{margin:0 0 7px;width:100%}
+.yl-qfig .cf-svg{width:100% !important;max-width:100% !important;max-height:none !important;
+  height:auto !important;position:static !important}
+/* the answer is a state of its own, not another paragraph */
+.yl-qans{margin-top:auto;display:flex;align-items:flex-start;gap:7px;
+  background:#eaf4ee;border:1px solid #cfe3d7;border-radius:8px;padding:5px 8px}
+.yl-anschip{flex:0 0 auto;background:#2f7d55;color:#fff;font-size:10.5px;font-weight:800;
+  border-radius:5px;padding:2px 7px;line-height:1.35;white-space:nowrap}
+.yl-anstext{font-size:12.5px;line-height:1.5;font-weight:600;color:#20402f;min-width:0}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then
