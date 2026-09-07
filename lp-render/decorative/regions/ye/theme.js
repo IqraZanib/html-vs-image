@@ -2100,6 +2100,41 @@ body{background:#fcfcfc;font-family:'Noto Naskh Arabic','IBM Plex Sans Arabic','
   padding:2px 0 2px;border-bottom:1px solid #e4eaf3;margin:0}
 .yl-actgrid > .yl-ahead{grid-column:1/-1}
 .yl-actgrid > .yl-ahead:first-child{padding-top:2px}
+
+/* ── A STACKED FIGURE TAKES THE WHOLE CARD ──────────────────────────────────────────
+   In the stacked layout the visual sits BELOW the text rather than beside it, so it has
+   the card's full width to work with. Without these it kept the narrow column's cap and
+   a wide figure — a grid of arithmetic facts, a matching exercise — was drawn small in a
+   wide empty space. The height cap is generous because these figures ARE the exercise;
+   the page grows to fit them, which is what following the content means. */
+.yl-sbody.yl-stacked .yl-tvis{width:100%;min-width:0}
+.yl-sbody.yl-stacked .yl-tvis .cf-svg,
+.yl-sbody.yl-stacked .yl-tvis .d-code-fig .cf-svg{width:100% !important;max-width:100% !important;
+  max-height:none !important;height:auto !important;position:static !important}
+.yl-sbody.yl-stacked .yl-tvis .d-code-fig{width:100%;padding:2px 0 0}
+
+/* ── SOFT GROUNDS, AND TEXT BIG ENOUGH TO READ ──────────────────────────────────────
+   The stage tints declared earlier in this file have been dead: the StageCard reset
+   clears the wrapper with «background:none !important» because the component draws its
+   own white inner card, and a tint without !important cannot win against that. Measured
+   on the page — every stage wrapper computed to transparent, which is why the lessons
+   read as white with coloured borders rather than as the colourful design the review
+   asks for. Each stage now carries its own light ground, and the white inner card sits
+   on it so the content stays maximally readable.
+
+   Grid text was 12.5px for a label and 11px for an answer while the stage's own prose is
+   15px — the exercises, which are the part a teacher reads while teaching, were the
+   smallest text on the page. */
+.section.yl-stage{padding:7px 8px 8px !important;border-radius:15px !important}
+.section.yl-stage.sec-stage-tamhid{background:#fdf5e8 !important}
+.section.yl-stage.sec-stage-arad{background:#edf3fb !important}
+.section.yl-stage.sec-stage-tatbiq{background:#edf6ef !important}
+.section.yl-stage.sec-stage-taqwim{background:#eff0fa !important}
+.section.yl-stage.yl-empty{padding:0 !important;background:none !important}
+
+.yl-actgrid .yl-alabel{font-size:14px;line-height:1.42}
+.yl-actgrid .yl-answer{font-size:12.5px;line-height:1.45;padding:4px 8px}
+.yl-actgrid .yl-ttext p{font-size:14px;line-height:1.55}
 `;
 
 // NO MAX_PAGES. This pack used to declare a two-page contract, and the Studio then

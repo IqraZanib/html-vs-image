@@ -52,8 +52,21 @@ async function htmlToPixelPdf(html, opts = {}) {
         // share a top edge, so the boundary is the lowest of their bottoms and the cut lands
         // in the gutter. Every OTHER inner boundary is gone — with .yl-act, .yl-sbody and
         // .yl-check as candidates, a page ended in the middle of the cube-and-cone figure.
+        // A CARD TALLER THAN A PAGE STILL BREAKS BETWEEN WHOLE ACTIVITIES. The division
+        // lesson's assessment is 1108px against a 1059px page and lays its activities out as
+        // full-width blocks rather than a grid, so it offered no candidate at all and the
+        // composer fell back to cutting at the raw page limit — straight through an exercise.
+        // The boundary BETWEEN two activities crosses nothing, exactly like the gap between
+        // two grid rows. Only the gaps between them, never a boundary inside one: that
+        // distinction is why a component-level candidate list was reverted once before, when
+        // a page ended in the middle of a figure.
+        const wholeActs = [...sec.querySelectorAll(':scope > .yl-scard > .yl-act')];
+        wholeActs.slice(0, -1).forEach((el) => cuts.push(y(el, 'bottom')));
         sec.querySelectorAll('.yl-actgrid').forEach((grid) => {
-          const cells = [...grid.querySelectorAll(':scope > .yl-act')];
+          // EVERY CHILD, not only the cells. A spanning group heading sits in this grid too,
+          // and grouping by the cells alone produced a "row bottom" that fell inside the
+          // heading that follows it — the division lesson had an exercise cut in half by it.
+          const cells = [...grid.querySelectorAll(':scope > .yl-act, :scope > .yl-ahead')];
           if (cells.length < 3) return;            // a 2-up row has no row to break between
           const byRow = new Map();
           cells.forEach((a) => {
@@ -219,8 +232,18 @@ async function composeWithChromium(shotBuf, geom, opts = {}) {
   let start = 0;
   while (start < height - 1) {
     const limit = start + usable;
+    // A WHOLE-CARD BOUNDARY WINS WHENEVER ONE FITS. Taking the last legal cut fills the page
+    // as far as possible, and a grid-row gap is legal — but choosing one when a card boundary
+    // was available splits a card that would have fitted whole on the next page. Measured:
+    // the fractions lesson's assessment is 879px and a page holds 1059, so it had no need to
+    // be cut at all, yet the composer opened it to gain 300px on the page before. The rule
+    // the reviewer set is that a card is never split and whole rows move instead — so a row
+    // gap is now the FALLBACK, used only when no card boundary fits, which is the case a card
+    // taller than a page genuinely needs.
     const within = cuts.filter((c) => c > start + 40 && c <= limit);
-    let end = within.length ? within[within.length - 1] : Math.min(limit, height);
+    const withinSafe = safeCuts.filter((c) => c > start + 40 && c <= limit);
+    let end = withinSafe.length ? withinSafe[withinSafe.length - 1]
+      : (within.length ? within[within.length - 1] : Math.min(limit, height));
     // Absorb a small trailing remainder so a few px of padding does not earn its own
     // page — but ONLY when the page still fits. The clip is a fixed `usable` box with
     // overflow:hidden, so extending it past that silently CUT the content off (a
@@ -259,6 +282,11 @@ async function composeWithChromium(shotBuf, geom, opts = {}) {
         pages[pages.length - 1] = [best, height];
       }
     }
+  }
+  if (process.env.LP_DEBUG_PAGES === '1') {
+    console.log('[pages] height=' + height + ' usable=' + usable
+      + ' safe=' + JSON.stringify(safeCuts) + ' cuts=' + JSON.stringify(cuts.slice(0, 60))
+      + ' -> ' + JSON.stringify(pages));
   }
   const b64 = shotBuf.toString('base64');
   // Page-number chrome is pack-driven: 'ar-bottom' prints the pilot-style

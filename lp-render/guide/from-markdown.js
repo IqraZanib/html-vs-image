@@ -777,6 +777,72 @@ function colourFigure(text, profile) {
   return { kind: 'colour-set', items: hits.map((h) => ({ name: h.name, hex: h.hex })) };
 }
 
+// A RUN OF ARITHMETIC FACTS IS A GRID OF CARDS. The addition lesson states twelve in one
+// line and the division lesson sixty; each one drew a single «expression» chip for the
+// first match and left the rest as prose. Every fact the source states is drawn, in the
+// source's order, and the run is then removed from the card's text because it is the same
+// words in the same order — printed twice it is the running-text duplication already
+// rejected once for matching pairs.
+const ARITH_RE = /[٠-٩]{1,3}\s*[+\-×÷]\s*[٠-٩]{1,3}\s*=\s*[٠-٩]{1,3}/g;
+function factGridFigure(body) {
+  const found = String(body || '').match(ARITH_RE) || [];
+  const seen = new Set();
+  const items = found.map((t) => t.replace(/\s+/g, ' ').trim())
+    .filter((t) => !seen.has(t) && seen.add(t))
+    .map((text) => ({ text }));
+  return items.length >= 3 ? { kind: 'fact-grid', items } : null;
+}
+
+// «ظلل نصف الشكل» / «ظلل ربعين في كل شكل» — a shading instruction names the fraction, and
+// the fraction says how many parts and how many of them are filled.
+const FRAC_RE = /([٠-٩])\s*\/\s*([٠-٩])/g;
+function fractionFigure(text, profile) {
+  const words = profile.fractionWords;
+  if (!words) return null;
+  const t = unvocalised(String(text || ''));
+  // A LIST of fractions is a SET of figures — one circle each, not one circle for the first
+  // of nine. The fractions lesson states three such lists.
+  const all = [...t.matchAll(FRAC_RE)]
+    .map((m) => ({ shaded: '٠١٢٣٤٥٦٧٨٩'.indexOf(m[1]), parts: '٠١٢٣٤٥٦٧٨٩'.indexOf(m[2]) }))
+    .filter((f) => f.parts >= 2 && f.shaded >= 1 && f.shaded <= f.parts);
+  if (all.length >= 3) return { kind: 'fraction-set', items: all };
+  // an explicit fraction beats a word: «الشكل الأول: ٢/٤» states both numbers
+  const ex = t.match(/([٠-٩])\s*\/\s*([٠-٩])/);
+  if (ex) {
+    const shaded = '٠١٢٣٤٥٦٧٨٩'.indexOf(ex[1]);
+    const parts = '٠١٢٣٤٥٦٧٨٩'.indexOf(ex[2]);
+    if (parts >= 2 && shaded >= 1 && shaded <= parts) {
+      return { kind: 'fraction-grid', shape: 'circle', parts, shaded };
+    }
+  }
+  // Longest word first, so «ربعين» is not read as «ربع» — AND THE WORD MUST STAND ALONE.
+  // A substring test drew a quarter-circle for the division lesson's «٣ أربعات» and for the
+  // geometry lesson's «أربعة أضلاع», because «ربع» sits inside both. There is no \\b to
+  // lean on here: JavaScript defines it on ASCII, so at the edge of an Arabic word both
+  // sides are non-word and it can never match. A negative lookaround for another Arabic
+  // letter is the boundary that works — the same fix this repo's role patterns needed.
+  for (const w of Object.keys(words).sort((a, b) => b.length - a.length)) {
+    const re = new RegExp('(?<![؀-ۿ])' + unvocalised(w) + '(?![؀-ۿ])');
+    if (re.test(t)) {
+      const [parts, shaded] = words[w];
+      return { kind: 'fraction-grid', shape: 'circle', parts, shaded };
+    }
+  }
+  return null;
+}
+
+// «١٢ ÷ ٤ = ٣» drawn as what it means: twelve things in three groups of four.
+function groupingFigure(text, profile) {
+  if (!profile.groupingRe) return null;
+  const m = unvocalised(String(text || '')).match(profile.groupingRe);
+  if (!m) return null;
+  const num = (a) => Number(String(a).replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)));
+  const total = num(m[1]), per = num(m[2]), groups = num(m[3]);
+  // only when the sentence is arithmetically true and small enough to read as a picture
+  if (!(total && per && groups) || per * groups !== total || total > 30) return null;
+  return { kind: 'group-set', total, per, groups };
+}
+
 function figureFor(rawBody, profile) {
   // A demonstration board that names several contrasts beats everything: it IS the stage.
   const gb = geoBoard(rawBody, profile);
@@ -792,6 +858,17 @@ function figureFor(rawBody, profile) {
   // a quote box would have won and drawn nothing.
   const cf = colourFigure(rawBody, profile);
   if (cf) return cf;
+  const frac = fractionFigure(rawBody, profile);
+  if (frac) return frac;
+  // A RUN OF FACTS BEATS A SINGLE ONE. The division lesson states sixty divisions in one
+  // line; the grouping detector matched the first of them and drew three rings of four,
+  // which is a fine picture of «١٤ ÷ ٢ = ٧» and leaves the other fifty-nine as a strip of
+  // prose. The grid comes first when there is a run, and grouping keeps the case it is
+  // actually for: one division sentence a teacher is unpacking on the board.
+  const fg = factGridFigure(rawBody);
+  if (fg) return fg;
+  const grp = groupingFigure(rawBody, profile);
+  if (grp) return grp;
   const pf = pairsFigure(rawBody);
   if (pf) return pf;
   // a greeting-and-answer list is the lesson's own matching exercise
@@ -1200,8 +1277,18 @@ function buildGuideFromMarkdown(md, opts = {}) {
         // «٢. لماذا يكون الشكلان غير متطابقين؟» sits above a check point that happens to
         // mention مكعب and مخروط, and reading both together drew a cube-and-cone figure for
         // a question about congruence.
-        const fig = (part.label ? figureFor(part.label, profile) : null)
+        let fig = (part.label ? figureFor(part.label, profile) : null)
           || figureFor([part.label, part.raw].filter(Boolean).join('\n'), profile);
+        // …BUT A RUN OF FACTS IN THE BODY BEATS A SINGLE FACT IN THE LABEL. The label is
+        // consulted first because an exercise usually states itself there, and that is
+        // right — except when the label carries one division and the body carries twenty.
+        // The assessment of the division lesson did exactly that: «كم ٢ في العدد ١٢؟» drew
+        // its three rings, which is correct for the label, and the twenty divisions under
+        // it stayed as prose because a figure had already been found.
+        if (fig && (fig.kind === 'group-set' || fig.kind === 'expression')) {
+          const richer = factGridFigure([part.label, part.raw].filter(Boolean).join('\n'));
+          if (richer && richer.items.length >= 3) fig = richer;
+        }
         // THE ACTIVITY IS THE VISUAL, NOT A PARAGRAPH TOO. When a matching figure carries
         // the pairs, printing «أبي ← صورة الأب أمي ← صورة الأم …» in the body as well is the
         // "labels squeezed into running text" the reviewer rejected. Every one of those
@@ -1215,6 +1302,21 @@ function buildGuideFromMarkdown(md, opts = {}) {
         let partBody = longLabel && part.body
           ? `${rawLabel}: ${part.body}`
           : (longLabel ? rawLabel : part.body);
+        // THE FACTS ARE DRAWN, SO THEY DO NOT ALSO RUN THROUGH THE TEXT. Left in place, the
+        // addition lesson printed «٩ + ٤ = ١٣ ٧ + ٩ = ١٦ ٧ + ٥ = ١٢ …» above its own grid of
+        // cards — the same words twice, and in prose they run together into a strip of
+        // digits with no gaps a reader can use. The instruction that introduces them stays
+        // exactly as written; only the run itself moves into the figure, where every fact is
+        // still present in the guide and still checked by the fidelity pass.
+        if (fig && fig.kind === 'fact-grid' && partBody) {
+          partBody = partBody.replace(new RegExp(ARITH_RE.source, 'g'), ' ')
+            .replace(/[(（]\s*[)）]/g, ' ')            // brackets the facts sat inside
+            .replace(/(?:\s*[،,؛;]\s*){2,}/g, ' ')    // «: ، ، ، ،» left where a table was
+            .replace(/([:：])(?:\s*[،,؛;]\s*)+/g, '$1 ')
+            .replace(/\s{2,}/g, ' ')
+            .replace(/\s*[،,؛;:：]\s*$/, '')
+            .trim();
+        }
         if (fig && fig.kind === 'match-pairs') {
           // Strip at LINE level, from part.raw — part.body has already been flattened by
           // plain(), so a line filter applied to it matched nothing and the fallback regex

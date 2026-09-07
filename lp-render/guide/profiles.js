@@ -183,6 +183,20 @@ const YE = {
   // one card per question; this gives a bulleted one the same treatment, with no numeral
   // invented. Two or more, so a single such bullet stays part of its paragraph.
   qaLineRe: /^[ \t]*[*•▪-]\s*([^\n]*[؟?][^\n]*(?:الإجابة|الحل)\s*[:：][^\n]+)$/m,
+  // FRACTION WORDS THIS CURRICULUM NAMES, as parts and shaded parts. «ظلل نصف الشكل» is a
+  // drawing instruction, and the fractions lesson stated nine of them with no figure at all
+  // — the one lesson in the set whose whole subject is a picture. Declared, so a word the
+  // renderer does not know draws nothing rather than guessing a denominator.
+  fractionWords: {
+    'نصف': [2, 1], 'النصف': [2, 1],
+    'ثلث': [3, 1], 'الثلث': [3, 1],
+    'ربع': [4, 1], 'الربع': [4, 1],
+    'ربعين': [4, 2], 'ربعان': [4, 2],
+  },
+  // «كم ٤ في العدد ١٢؟» → «٣ أربعات، ١٢ ÷ ٤ = ٣». The lesson's own words for the answer are
+  // a count of equal groups, which is exactly what division means and exactly what a
+  // teacher draws on the board. Read from the division sentence itself, never invented.
+  groupingRe: /([٠-٩]{1,3})\s*÷\s*([٠-٩]{1,2})\s*=\s*([٠-٩]{1,3})/,
   // COLOURS THE DESIGN IS WILLING TO DRAW, keyed by the words the sources actually use.
   // «ألوان علم بلادي: الأحمر، الأبيض، الأسود» and «ما هي ألوان إشارة المرور؟ … الأحمر،
   // الأصفر، الأخضر» are the most drawable thing a Grade 1 lesson contains, and both were

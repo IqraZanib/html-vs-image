@@ -296,6 +296,38 @@ function cfFractionGrid({ shape, parts, shaded }) {
 }
 
 // A row of separate objects, K of them highlighted — counting and grouping.
+// A LIST OF FRACTIONS IS A ROW OF FRACTIONS. «٥. احصر الكسر الذي يدل على الجزء المظلل:
+// الشكل الأول: ٢/٤ الشكل الثاني: ١/٣ …» states nine of them; drawn as one figure it was a
+// single ~30px circle beside nine lines of prose. Each fraction gets its own circle at a
+// size a child can count, with the fraction written under it.
+function cfFractionSet({ items = [] }) {
+  const list = (items || []).filter((it) => it && it.parts >= 2 && it.shaded >= 1);
+  if (!list.length) return '';
+  const n = list.length;
+  const cols = n <= 3 ? n : n <= 4 ? 4 : n <= 6 ? 3 : n <= 9 ? 5 : 6;
+  const rows = Math.ceil(n / cols);
+  const R = 34, CW = R * 2 + 26, CH = R * 2 + 34, PAD = 3;
+  const W = cols * CW + PAD * 2, H = rows * CH + PAD * 2;
+  let out = '';
+  list.forEach((it, i) => {
+    const col = CF_DIR === 'rtl' ? (cols - 1 - (i % cols)) : (i % cols);
+    const row = Math.floor(i / cols);
+    const cx = PAD + col * CW + CW / 2;
+    const cy = PAD + row * CH + R + 5;
+    for (let k = 0; k < it.parts; k++) {
+      const a0 = -Math.PI / 2 + (2 * Math.PI * k) / it.parts;
+      const a1 = -Math.PI / 2 + (2 * Math.PI * (k + 1)) / it.parts;
+      const large = (a1 - a0) > Math.PI ? 1 : 0;
+      out += '<path d="M ' + cx + ' ' + cy + ' L ' + (cx + R * Math.cos(a0)) + ' ' + (cy + R * Math.sin(a0))
+        + ' A ' + R + ' ' + R + ' 0 ' + large + ' 1 ' + (cx + R * Math.cos(a1)) + ' ' + (cy + R * Math.sin(a1))
+        + ' Z" fill="' + (k < it.shaded ? CF.fill : CF.empty) + '" stroke="' + CF.stroke + '" stroke-width="2.5"/>';
+    }
+    const A = '٠١٢٣٤٥٦٧٨٩';
+    out += cfText(cx, cy + R + 20, A[it.shaded] + '/' + A[it.parts], 16, 800, CF.ink, 'middle');
+  });
+  return cfSvg(out, W, H);
+}
+
 function cfCountSet({ shape = 'circle', total = 4, shaded = 0 }) {
   const W = 240, H = 150, n = Math.max(1, Math.min(8, total));
   const gap = W / (n + 1), r = Math.min(26, gap / 2.4), cy = H / 2; let out = '';
@@ -309,6 +341,75 @@ function cfCountSet({ shape = 'circle', total = 4, shaded = 0 }) {
 }
 
 // Four labelled direction arrows (Arabic labels supplied by the guide).
+// ARITHMETIC FACTS ARE CARDS, NOT A PARAGRAPH. An addition lesson states twelve facts in
+// one line — «٩ + ٤ = ١٣ ٧ + ٩ = ١٦ ٧ + ٥ = ١٢ …» — and a division lesson states sixty. Read
+// as prose the teacher has to parse a wall of digits to find the next problem; one card per
+// fact is the exercise as a child meets it in the book. No direction override anywhere: an
+// Arabic equation steps right-to-left at token level, which is what default bidi produces,
+// and forcing it the other way is the bug this repo already fixed once.
+function cfFactGrid({ items = [], cols = 0 }) {
+  // NO CAP. The run is removed from the card's text once it is drawn, so a cap here would
+  // not shorten the figure — it would delete facts from the lesson. The division lesson
+  // states sixty-one; all sixty-one are drawn, and the page grows, which is what "page
+  // count follows the content" means.
+  const list = (items || []).map((x) => String(x && x.text !== undefined ? x.text : x).trim())
+    .filter(Boolean);
+  if (!list.length) return '';
+  const n = list.length;
+  const c = cols || (n <= 3 ? n : n <= 4 ? 2 : n <= 6 ? 3 : n <= 12 ? 4 : n <= 24 ? 6 : 7);
+  const rows = Math.ceil(n / c);
+  const CW = 120, CH = 54, GAP = 9, PAD = 3;
+  const W = c * CW + (c - 1) * GAP + PAD * 2;
+  const H = rows * CH + (rows - 1) * GAP + PAD * 2;
+  let out = '';
+  list.forEach((t, i) => {
+    // right-to-left placement: the first fact belongs at the start edge of the reading order
+    const col = CF_DIR === 'rtl' ? (c - 1 - (i % c)) : (i % c);
+    const row = Math.floor(i / c);
+    const x = PAD + col * (CW + GAP);
+    const y = PAD + row * (CH + GAP);
+    out += '<rect x="' + x + '" y="' + y + '" width="' + CW + '" height="' + CH + '" rx="9"'
+      + ' fill="#f4f8fb" stroke="' + CF.stroke + '" stroke-width="2"/>';
+    out += cfText(x + CW / 2, y + CH / 2 + 7, t, 20, 800, CF.ink, 'middle');
+  });
+  return cfSvg(out, W, H);
+}
+
+// DIVISION, DRAWN AS WHAT IT MEANS. «كم ٤ في العدد ١٢؟ … ٣ أربعات، ١٢ ÷ ٤ = ٣» is a
+// count of equal groups, which is what a teacher puts on the board and what the lesson's
+// own misconception warns about — a pupil who reads division as "make it bigger". Three
+// rings of four dots says it; a sentence with two numerals in it does not.
+function cfGroupSet({ total = 0, per = 0, groups = 0 }) {
+  const g = Math.max(1, Math.min(6, groups));
+  const p = Math.max(1, Math.min(6, per));
+  const cols = Math.min(p, 3);
+  const rws = Math.ceil(p / cols);
+  const DOT = 15, DG = 7;
+  const gw = cols * DOT * 2 + (cols - 1) * DG + 22;
+  const gh = rws * DOT * 2 + (rws - 1) * DG + 22;
+  const GAP = 13;
+  const W = g * gw + (g - 1) * GAP + 6;
+  const H = gh + 30;
+  let out = '';
+  for (let k = 0; k < g; k++) {
+    // right-to-left: the first group sits at the start edge of the reading order
+    const slot = CF_DIR === 'rtl' ? (g - 1 - k) : k;
+    const gx = 3 + slot * (gw + GAP);
+    out += '<rect x="' + gx + '" y="3" width="' + gw + '" height="' + gh + '" rx="11"'
+      + ' fill="#f2f7f4" stroke="' + CF.stroke + '" stroke-width="2" stroke-dasharray="6 4"/>';
+    for (let i = 0; i < p; i++) {
+      const c = i % cols, r = Math.floor(i / cols);
+      const cx = gx + 11 + DOT + c * (DOT * 2 + DG);
+      const cy = 14 + DOT + r * (DOT * 2 + DG);
+      out += '<circle cx="' + cx + '" cy="' + cy + '" r="' + DOT + '" fill="' + CF.fill
+        + '" stroke="' + CF.stroke + '" stroke-width="2.5"/>';
+    }
+  }
+  // the sentence the drawing is of, under it, in the document's own reading direction
+  out += cfText(W / 2, H - 7, total + ' ÷ ' + per + ' = ' + groups, 19, 800, CF.ink, 'middle');
+  return cfSvg(out, W, H);
+}
+
 function cfCompass({ north, east, south, west, center }) {
   const W = 240, H = 200, cx = W / 2, cy = H / 2 + 4, L = 58;
   const arrow = (dx, dy) => '<path d="M ' + cx + ' ' + cy + ' L ' + (cx + dx * L) + ' ' + (cy + dy * L)
@@ -757,7 +858,7 @@ function cfMatchPairs({ items = [], wide = false } = {}) {
 // was placed in a compact visual column: three pairs of full phrases in a ~90px slot,
 // which rendered as a narrow dashed box with the words stacked on top of each other.
 // Same component, same content, one name absent from one set.
-const CF_WIDE = new Set(['process', 'labeled-parts', 'match-pairs', 'assessment']);
+const CF_WIDE = new Set(['process', 'labeled-parts', 'match-pairs', 'assessment', 'fact-grid', 'fraction-set']);
 // A BEHAVIOUR CHECKLIST — «أضع علامة (✔) أمام السلوك الصحيح». One row per behaviour with a
 // box at the RTL start: ticked where the source ticked it, empty where it did not. The text
 // and the marks are the source's own; nothing is judged here.
@@ -895,10 +996,13 @@ function cfGeoBoard(spec) {
   return `<div class="geo-fig geo-board">${rows}</div>`;
 }
 
-const CF_KINDS = new Set(['colour-set', 'tick-list', 'geo-pick', 'geo-dots', 'geo-grid', 'geo-match', 'geo-board', 'fraction-grid', 'count-set', 'compass', 'compare', 'expression', 'process', 'steps', 'labeled-parts', 'error-board', 'match-pairs']);
+const CF_KINDS = new Set(['fraction-set', 'group-set', 'fact-grid', 'colour-set', 'tick-list', 'geo-pick', 'geo-dots', 'geo-grid', 'geo-match', 'geo-board', 'fraction-grid', 'count-set', 'compass', 'compare', 'expression', 'process', 'steps', 'labeled-parts', 'error-board', 'match-pairs']);
 function cfMini(spec) {
   if (!spec) return '';
   switch (spec.kind) {
+    case 'fraction-set': return cfFractionSet(spec);
+    case 'group-set': return cfGroupSet(spec);
+    case 'fact-grid': return cfFactGrid(spec);
     case 'colour-set': return cfColourSet(spec);
     case 'tick-list': return cfTickList(spec);
     case 'geo-pick': return cfGeoPick(spec);
@@ -1236,8 +1340,11 @@ function ylStage(section, accent, images, idCls) {
       ? '<div class="yl-alabel">' + esc(cleanHeading(a.label)) + '</div>' : '';
     const answer = a.answer
       ? '<div class="yl-answer">' + richText(a.answer, { engine }) + '</div>' : '';
-    const wide = !!(a.codeFigure
-      && (a.codeFigure.kind === 'match-pairs' || a.codeFigure.kind === 'assessment'));
+    // WIDE MEANS WIDE, FOR EVERY KIND THAT DECLARES IT. This named two kinds by hand while
+    // CF_WIDE named four, so a fact grid of sixty-one divisions was placed in the narrow
+    // visual column and shrank to cards a teacher cannot read — the "SVGs are too small"
+    // report, with the figure itself perfectly correct. One list, consulted everywhere.
+    const wide = !!(a.codeFigure && CF_WIDE.has(a.codeFigure.kind));
     const vis = visual ? '<div class="yl-tvis">' + visual + '</div>' : '';
     const layout = !text || !visual ? ' yl-solo' : (wide ? ' yl-stacked' : ' yl-split');
     const body = (text || vis)
