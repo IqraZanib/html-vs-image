@@ -843,6 +843,19 @@ function groupingFigure(text, profile) {
   return { kind: 'group-set', total, per, groups };
 }
 
+// WHICH SCENE THIS LESSON'S ILLUSTRATION SHOULD SHOW. First match wins, so the region's
+// ordering decides: a lesson that merely mentions «البيت» in a warm-up question does not
+// take the house scene from the lesson that is about building one. No match returns the
+// region's fallback, which is a plain classroom — a generic picture is honest, a specific
+// picture of something the lesson never mentions is not.
+function sceneFor(haystack, profile) {
+  for (const [re, scene] of (profile.sceneTerms || [])) {
+    if (re.test(haystack)) return scene;
+  }
+  return profile.sceneFallback
+    || 'primary-school children and their teacher working together in a classroom';
+}
+
 function figureFor(rawBody, profile) {
   // A demonstration board that names several contrasts beats everything: it IS the stage.
   const gb = geoBoard(rawBody, profile);
@@ -1607,6 +1620,13 @@ function buildGuideFromMarkdown(md, opts = {}) {
     ? String(goalSec.body || '').replace(/\*\*[^*]*\*\*/g, '').replace(/[.؟!]+\s*$/, '')
       .trim().slice(0, 90)
     : '');
+  // Every word the lesson uses, diacritics off, so a scene pattern can match «بَيْتَاً» as
+  // readily as «بيت» — the reading lesson writes its own subject fully vocalised.
+  const hay = unvocalised(sections.map((x) => [x.heading, x.body,
+    ...(x.activities || []).map((a) => [a.label, a.body, a.answer].filter(Boolean).join(' ')),
+    ...(x.checks || []), ...(x.items || []).map((it) => (it && (it.text || it.label)) || ''),
+  ].filter(Boolean).join(' ')).join(' '));
+
   if (warmup && artTopic && !warmup.codeFigure) {
     images.push({
       id: 'lesson-scene',
@@ -1640,10 +1660,21 @@ function buildGuideFromMarkdown(md, opts = {}) {
       // title line at all — this lesson's very first line is a heading — and the caption
       // already used it while the brief still used the raw variable. The composed brief
       // read «engaged in an activity about .» and the model was left to guess the subject.
-      prompt: 'Young primary-school children and their teacher together in a simple '
-        + 'classroom, engaged in an activity about ' + artTopic + '. Show faces, gestures '
-        + 'and posture; fill the frame with the people and a few simple objects they are '
-        + 'handling.',
+      // THE SCENE IS CHOSEN FROM THE LESSON'S OWN WORDS, IN ENGLISH THE MODEL CAN USE.
+      // This line used to read «engaged in an activity about <artTopic>» with the ARABIC
+      // goal interpolated. A model cannot act on an Arabic clause inside an English
+      // prompt, so every lesson got the same generic scene — a standing teacher, children
+      // in a ring, a mud-brick fortress — and the reviewer, seeing fifteen lessons with
+      // one picture, read it as a cache collision. It was not: fifteen distinct keys and
+      // fifteen distinct files, all of them the same picture, because the brief said the
+      // same thing fifteen times. The region declares what to draw for the topics it
+      // teaches; the goal still rides along for the caption and to keep the key specific.
+      prompt: sceneFor(hay, profile) + '. The composition is filled by the people and the '
+        + 'objects they are handling.',
+      // The lesson's own topic, carried as DATA for the asset key — never appended to the
+      // prompt. An Arabic clause inside an English brief is exactly what the model could not
+      // act on, and adding one back would also risk it trying to draw Arabic letters.
+      topic: artTopic,
     });
     warmup.image = 'lesson-scene';
   }

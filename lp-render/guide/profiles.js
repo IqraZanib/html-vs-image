@@ -197,6 +197,40 @@ const YE = {
   // a count of equal groups, which is exactly what division means and exactly what a
   // teacher draws on the board. Read from the division sentence itself, never invented.
   groupingRe: /([٠-٩]{1,3})\s*÷\s*([٠-٩]{1,2})\s*=\s*([٠-٩]{1,3})/,
+  // WHAT AN ILLUSTRATION SHOULD SHOW, per topic this curriculum actually teaches.
+  //
+  // The brief used to be ONE fixed English sentence — «children and their teacher in a
+  // simple classroom, engaged in an activity about <goal>» — with the lesson's ARABIC goal
+  // interpolated into it. A model cannot act on an Arabic clause inside an English prompt,
+  // so fifteen lessons produced fifteen DIFFERENT files of the SAME generic scene: a
+  // standing teacher, children in a ring, a mud-brick fortress behind them. The reviewer
+  // read that as a cache collision; the cache was working correctly and faithfully storing
+  // fifteen near-identical pictures. The brief was the fault.
+  //
+  // Each entry is a pattern over the lesson's OWN words and the English scene to draw for
+  // it. Ordered: the first match wins, so a lesson that mentions «البيت» in passing does not
+  // take the house scene from the lesson that is about one. Matching is diacritic-blind.
+  // Declared here — reviewable, and owned by the region — like every other label in this
+  // pack. A topic with no entry falls back to the classroom scene, which is honest: better
+  // a generic picture than one asserting something the lesson never mentions.
+  sceneTerms: [
+    [/الأسرة|أفراد الأسرة/, 'a mother, a father and their children standing together in the courtyard of a mud-brick house, the youngest child holding up a small drawing'],
+    [/الوالدين|والديك|أبويه/, 'a child carrying a cup of water to a tired father sitting down after work, the mother smiling beside them'],
+    [/الوضوء|الطهارة|المضمضة/, 'a boy with his sleeves rolled to the elbow washing his hands and face at a low water tap in a school courtyard'],
+    [/الأخدود|نجران|ذو نواس/, 'the tall mud-brick tower houses of an old walled Yemeni town at evening, seen across an empty square'],
+    [/الكلب|النباح/, 'a watchful dog sitting upright beside the shuttered wooden door of a small village shop at dusk'],
+    [/دورة الماء|التبخر|التكاثف|المياه الجوفية/, 'rain falling from a grey cloud onto terraced hillside fields with a low stone dam below, children watching from a wall'],
+    [/الجهات|الشرق|الغرب|الشمال والجنوب/, 'a child standing with both arms stretched wide in an open field, the low sun on one side and a long shadow falling to the other'],
+    [/النبات|الجذور|الساق|الأوراق/, 'children kneeling around a young seedling lifted out of dark soil so its roots, stem and leaves are all visible'],
+    [/البصر|أبصر|عضو حاسة/, 'a child cupping both hands around their eyes to peer at a bright red bottle cap that a classmate is holding up'],
+    [/الكسور|ظلل|المظلل/, 'a child colouring in one part of a large paper circle that has been folded into equal parts'],
+    [/القسمة|توزيع بالتساوي/, 'children sharing a heap of coloured bottle caps into several equal piles on a mat, one pile in front of each child'],
+    [/حقائق الجمع|العد التصاعدي/, 'two children counting small pebbles gathered into two separate heaps on a mat, one heap larger than the other'],
+    [/المكعب|المخروط|الشكل الرباعي|القطعة المستقيمة/, 'a child ruling a straight line on a slate with a wooden ruler, a clay cube and a clay cone resting on the mat beside it'],
+    [/الرصيف|آداب المشي|رجل المرور/, 'children walking in single file along the raised kerb of a village street while a traffic warden holds up an open hand to stop a car'],
+    [/العنب|يبني بيتا|البناء/, 'a builder pressing a mud brick into a half-built house wall while a girl carries a heavy bunch of grapes past him'],
+  ],
+  sceneFallback: 'primary-school children and their teacher working together at a low table in a Yemeni classroom',
   // COLOURS THE DESIGN IS WILLING TO DRAW, keyed by the words the sources actually use.
   // «ألوان علم بلادي: الأحمر، الأبيض، الأسود» and «ما هي ألوان إشارة المرور؟ … الأحمر،
   // الأصفر، الأخضر» are the most drawable thing a Grade 1 lesson contains, and both were
