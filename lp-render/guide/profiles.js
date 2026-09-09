@@ -244,6 +244,89 @@ const YE = {
     'الأخضر': '#1e8b4d', 'أخضر': '#1e8b4d', 'خضراء': '#1e8b4d',
     'الأزرق': '#1f5fa8', 'أزرق': '#1f5fa8', 'زرقاء': '#1f5fa8',
   },
+  // ── PATTERNS THAT ARE ALREADY DRAWINGS ──────────────────────────────────────────────
+  // Five figure primitives — process, labeled-parts, compass, compare, count-set — were
+  // built for the model path and were reachable from raw text by nothing at all: the
+  // mapper could emit sixteen kinds while the renderer could draw twenty-one. The
+  // vocabularies below are what the detectors read. Every one of them is a pattern over
+  // words a lesson USES, never a subject or a lesson id, so a science lesson and a maths
+  // lesson are offered exactly the same detectors and a lesson stating none of these
+  // patterns draws nothing and keeps its designed text card.
+  //
+  // A SEQUENCE THE SOURCE WROTE WITH ARROWS. «تبخر ← تكاثف ← هطول المطر ← المياه الجارية»
+  // is a process; «الجذور ← تثبيت وامتصاص الماء» is a pair, not a process, which is why
+  // three links are the minimum. `cycleRe` promotes it to a ring only where the lesson
+  // itself calls the sequence a cycle in the same sentence — the water-cycle lesson does,
+  // and a ring asserts a closing arrow that a linear chain must not be given for free.
+  cycleRe: /دورة/,
+  // A DIAGRAM'S NAMED PARTS. The lesson writes «الجذور ← تثبيت وامتصاص الماء. الساق ← نقل
+  // الماء. الأوراق ← صنع الغذاء» while the teacher draws the plant on the board — the parts
+  // are named, so they can be labelled on a drawing that already exists in the renderer.
+  // `objectRe` is the guard: the body must be about the object, or «الساق» in another sense
+  // would pull a plant. The chip carries the part word as the source wrote it; what the
+  // part DOES stays in the card's text, because the drawing's own contribution is showing
+  // WHERE each part is, which no sentence can do.
+  partObjects: [
+    { object: 'plant', objectRe: /نبات|النبات|نباتاً/,
+      terms: [
+        [/^(?:ال)?جذور$|^(?:ال)?جذر$/, 'root'],
+        [/^(?:ال)?ساق$/, 'stem'],
+        [/^(?:ال)?أوراق$|^(?:ال)?ورقة$/, 'leaf'],
+        [/^(?:ال)?أزهار$|^(?:ال)?زهرة$/, 'flower'],
+        [/^(?:ال)?ثمار$|^(?:ال)?ثمرة$/, 'fruit'],
+        [/^(?:ال)?بذور$|^(?:ال)?بذرة$/, 'seed'],
+        [/^(?:ال)?تربة$/, 'soil'],
+      ] },
+  ],
+  // THE FOUR DIRECTIONS, AND ONLY WHEN ALL FOUR ARE THERE. A compass drawn from three of
+  // them is a factual error, not an untidy figure. Matching is permissive (the lesson says
+  // «للجنوب» as often as «الجنوب») while the label drawn is the declared word, so a compass
+  // is never labelled with half a preposition. `nounRe` keeps it to lessons about
+  // direction: «تشرق الشمس» contains «شرق» in a sentence about sunrise.
+  compassTerms: [['north', /شمال/, 'الشمال'], ['east', /شرق/, 'الشرق'],
+    ['south', /جنوب/, 'الجنوب'], ['west', /غرب/, 'الغرب']],
+  compassNounRe: /الجهات|جهة|جهات/,
+  // A SIZE CONTRAST THE LESSON STATES. «بعيني أميز أن هذا كبير وهذا صغير» — two bars, the
+  // longer one for the word the lesson uses for bigger. The bar lengths carry no measured
+  // quantity because the source states none; they carry the only thing it does state,
+  // which is which of the two is larger. Both members of one pair must be present, and
+  // exactly one pair: two contrasts are four bars and the component draws three, so a
+  // second pair is a refusal rather than a dropped item. The cue keeps it to sentences
+  // that are ABOUT the contrast — «حباً كبيراً» is not a comparison.
+  // The bar is labelled with the word DECLARED here, not with the matched substring: the
+  // lesson writes «كبيراً», matching runs diacritic-blind so the text reads «كبيرا», and a
+  // pattern capturing that returned «كبير» — the source's word with its final letter left
+  // behind. Same rule as the colour swatches and the compass: the pattern finds it, the
+  // declared word is what gets drawn, so a chip is always a whole word.
+  comparePairs: [
+    { big: [/كبير/, 'كبير'], small: [/صغير/, 'صغير'] },
+    { big: [/طويل/, 'طويل'], small: [/قصير/, 'قصير'] },
+    { big: [/ثقيل/, 'ثقيل'], small: [/خفيف/, 'خفيف'] },
+    { big: [/كثير/, 'كثير'], small: [/قليل/, 'قليل'] },
+    { big: [/واسع/, 'واسع'], small: [/ضيق/, 'ضيق'] },
+  ],
+  compareCueRe: /أميز|نميز|أقارن|قارن|الفرق بين|أكبر|أصغر/,
+  // A COUNTED SET OF THINGS. Only where the lesson asks for the objects to be COUNTED —
+  // «كم عدد الحصى؟» — and only for objects this curriculum actually puts on the desk. A
+  // sentence that merely fetches six bottle caps is not a counting exercise, and drawing
+  // six rings for it would be decoration; the sentence keeps its words and its picture.
+  countNouns: [/أغطية(?:\s+زجاجات)?/, /حصى/, /أعواد/, /أقلام/, /ورقات/, /حبات/, /كرات/, /مربعات/],
+  countCueRe: /كم عدد|احسب عدد|اعدد|عُدّ|عدّ\s/,
+  // WHAT THE TEACHER PUTS ON THE BOARD IS A SET OF CARDS. The cue is the lesson's own
+  // «يكتب على السبورة:», and what follows it is drawn in whichever of three shapes it is
+  // written in — «الملك: ذو نواس. الدين: اليهودية. المكان: نجران» as fact cards, «(ذئب،
+  // كلباً، ذات، الهزال، آثار، طعام)» as word cards, «الرَّجُلُ يَبْنِيْ بَيْتَاً. الْبَيْتُ جَمِيْلٌ. …» as
+  // sentence cards. Three items minimum, so a single sentence on the board stays a
+  // sentence. `boardStopRe` ends the board content: «نقطة التحقق: ٨٠٪ من التلاميذ…» is a
+  // measurement of the class, not something written up for them to read.
+  boardCueRe: /يكتب(?:\s+\S+){0,3}\s+على\s+السبورة\s*[:：]|يكتب\s+على\s+السبورة\s*[:：]/,
+  boardStopRe: /نقطة التحقق|دعم\s*[:：]|تحد|الإجابة|الحل\s*[:：]|يقول المعلم|يكتب جملة/,
+  boardMetaLabels: /^(?:الإجابة|الحل|نقطة التحقق|دعم|تحد|سؤال|الهدف|المواد|التمرين|ملاحظة|مثال)/,
+  // A NUMBERED RUN OF INSTRUCTIONS IS ONE SEQUENCE, NOT TEN CARDS. The ablution lesson
+  // writes ten ordered steps; each became its own label-only row, and a stage that teaches
+  // an order printed as ten bare lines. Drawn as one numbered set it is the same words in
+  // the same order, and the order is visible. Whole run or nothing.
+  orderedRun: { minItems: 3, maxWords: 9, maxChars: 54 },
   // THE SAME LESSON MUST RENDER THE SAME WHETHER ITS ANSWER IS ON ITS OWN LINE OR INSIDE
   // THE SENTENCE. «بطاقة الخروج: أي كلمة…؟ الإجابة: أبي، أمي…» carries both in one line, so
   // the answer stayed inside the exit-ticket card and the الإجابات card disappeared — the
