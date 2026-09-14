@@ -822,6 +822,12 @@ const CF_OBJECTS = {
     // between the lower leaf and the soil, where nothing else can be mistaken for it.
     anchors: { flower: [240, 30], fruit: [268, 66], leaf: [296, 98], stem: [240, 142], soil: [160, 168], root: [240, 186], seed: [240, 176] },
     mirror: { leaf: [184, 120], fruit: [212, 66] },
+    // THE DRAWING'S OWN EXTENT, stroke included. The figure derives its scale and its
+    // height from this instead of a hardcoded zoom, so the object decides how much room
+    // it needs rather than hoping a fixed number still fits. Measured in a browser, and
+    // `labelled-parts-fit.test.js` re-measures it on every run — a declared box that
+    // silently drifts from the drawing is exactly how the flower got clipped.
+    bbox: { x0: 144, y0: 17, x1: 336, y1: 203 },
     /**
      * @param {string} uid unique suffix for gradient ids — SVG ids are document-global,
      *   and two labelled diagrams on one page would otherwise share (and fight over)
@@ -905,13 +911,40 @@ function cfLabeledParts({ object = 'plant', parts = [] }) {
   // the width — the label chips claimed the edges and the plant sat small in the
   // middle. Scale the object up about its own centre and give the figure the height
   // that needs; the anchors scale with it so every leader line still lands correctly.
-  const W = 480, H = 236, K = 1.35, CX = 240, CY = 112;
-  const tf = (pt) => [CX + K * (pt[0] - CX), CY + K * (pt[1] - CY)];
+  // FIT THE DRAWING TO THE CANVAS, don't zoom it about a guessed centre and hope.
+  //
+  // This was `K = 1.35` scaling about (240, 112) in a fixed 236-tall viewBox, and the
+  // flower's top petal landed at y = -14.2 — measured, not estimated — so the bloom was
+  // sliced off by the viewBox edge. Nothing in the code connected the drawing's real
+  // extent to the canvas it had to fit in, so enlarging the plant quietly pushed it out
+  // of frame.
+  //
+  // Now the object declares its own bounding box, the figure scales it to the width it
+  // is allowed, and the HEIGHT FOLLOWS THE DRAWING rather than the drawing being cropped
+  // to a fixed height. Padding is explicit on every side, so "nothing is clipped" is a
+  // property of the arithmetic instead of something to re-check by eye after each edit.
+  const W = 480, PAD_X = 12, PAD_TOP = 11, PAD_BOT = 13;
+  const bb = obj.bbox || { x0: 0, y0: 0, x1: W, y1: 236 };
+  const objW = Math.max(1, bb.x1 - bb.x0), objH = Math.max(1, bb.y1 - bb.y0);
+  // As large as it fits between the label chips — measured from THESE labels, not from
+  // the worst case a chip could ever be. Sizing against the 172px maximum made the plant
+  // SMALLER than the version that was clipping, which is the opposite of the ask: these
+  // three words are short, so the clear middle is wide and the drawing can grow into it.
+  const chipW = (label) => {
+    const fit = cfFit(label, 156, 12, 1, 8.5, 800);
+    return Math.min(172, Math.max(58, (fit.lines[0] || '').length * cfAdvance(fit.size, 800) + 22));
+  };
+  const widest = Math.max(...P.map((p) => chipW(p.label)));
+  const K = Math.min(1.45, (W - 2 * (widest + PAD_X + 6)) / objW);
+  const H = Math.round(PAD_TOP + objH * K + PAD_BOT);
+  const ox = (W - objW * K) / 2 - bb.x0 * K;   // centred across the figure
+  const oy = PAD_TOP - bb.y0 * K;              // top-aligned to its own padding
+  const tf = (pt) => [ox + K * pt[0], oy + K * pt[1]];
   // A gradient id is document-global, so two labelled diagrams on one page would share
   // one <defs> and the second would inherit the first's. Derived from the figure's own
   // parts rather than a counter, so an identical figure still renders byte-identically.
   const uid = P.map((p) => p.part).join('').replace(/[^a-z]/gi, '').slice(0, 12) + P.length;
-  let out = `<g transform="translate(${(CX - K * CX).toFixed(2)} ${(CY - K * CY).toFixed(2)}) scale(${K})">`
+  let out = `<g transform="translate(${ox.toFixed(2)} ${oy.toFixed(2)}) scale(${K.toFixed(4)})">`
     + obj.draw(uid) + '</g>';
   // Top to bottom, and each chip goes on the side its own part already leans to, so
   // a leader line never crosses the drawing. Parts sitting on the centre line
