@@ -165,7 +165,9 @@ async function htmlToPixelPdf(html, opts = {}) {
         });
         inner.forEach((v) => { if (!illegal(v)) cuts.push(v); });
 
-        const fig = sec.querySelector('.d-inline-img, .char-fig');
+        // A two-column split (.d-split) counts as the figure: a list item's bottom in one
+        // column is mid-card in the other, so no cut may land inside it.
+        const fig = sec.querySelector('.d-inline-img, .char-fig, .d-split');
         // A card holding a CODE-drawn figure is atomic: its figure is followed by a
         // value label and caption, so a cut 'below the figure' would slice the card
         // and orphan that text. Only the card's own bottom is a legal boundary.
