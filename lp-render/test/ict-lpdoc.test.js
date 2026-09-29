@@ -232,9 +232,9 @@ const V3 = () => ({
 test('all 16 block types and every 3.0 section field are mapped and drawn', () => {
   const { guide, report } = buildGuideFromLpDoc(V3());
   const { bodyHtml } = renderDecorativeLesson(guide, {}, {});
-  for (const s of ['BOARD-TEXT', 'TABLE-TITLE', 'short-row', 'LATEX-CAPTION', 'DIAGRAM-CAPTION', 'VIDEO-TITLE',
+  for (const s of ['BOARD-TEXT', 'TABLE-TITLE', 'short-row', 'LATEX-CAPTION', 'VIDEO-TITLE',
     'Teaching from p.20', 'CHECKPOINT-Q', 'MS-1', 'EXIT-Q', 'EXIT-A', 'RETEACH-RULE', 'HW-ITEM', '(Q4, p.21)', '[U] 3m',
-    'DRAW-1', 'BOARD-DIAGRAM', 'MCQ-Q', 'CODE-A', 'SRQ-Q', 'SRQ-MS', 'ERQ-Q', 'ERQ-PART', 'ERQ-NOTE', 'HOW-MARKED',
+    'DRAW-1', 'MCQ-Q', 'CODE-A', 'SRQ-Q', 'SRQ-MS', 'ERQ-Q', 'ERQ-PART', 'ERQ-NOTE', 'HOW-MARKED',
     'HWK-ITEM', 'HWK-ANSWER', 'COACH', 'REFLECT', 'Velocity', 'P-10-A-01']) {
     assert.ok(bodyHtml.includes(s), `"${s}" must be on the page`);
   }
@@ -242,7 +242,12 @@ test('all 16 block types and every 3.0 section field are mapped and drawn', () =
   assert.ok(/class="d-gtable"/.test(bodyHtml) && /katex/.test(bodyHtml), 'table and LaTeX are drawn as themselves');
   assert.strictEqual(guide.sections.find((s) => s.id === 'ict-table').rows[1].length, 2, 'a ragged row is padded, not dropped');
   assert.ok(!bodyHtml.includes('NOT-GOING'), 'not painted, as in ICT (bd-a8veu.20)');
-  assert.deepStrictEqual(report.unrendered.filter((u) => u.type === 'diagram').length, 2, 'both diagrams reported, not silently blank');
+  // both diagrams are drawn by ICT's engine, as SVG, captions inside the figure
+  assert.strictEqual(guide.images.length, 2);
+  const svgs = guide.images.map((im) => Buffer.from(im.dataUri.split(',')[1], 'base64').toString('utf8'));
+  assert.ok(svgs.every((x) => x.startsWith('<svg')), 'data:image/svg+xml of a real <svg>');
+  assert.ok(svgs[0].includes('DIAGRAM-CAPTION') && svgs[1].includes('BOARD-DIAGRAM'), 'the engine draws each caption');
+  assert.deepStrictEqual(report.unrendered.filter((u) => u.type === 'diagram'), []);
   assert.ok(guide.meta.chips.some((c) => c.value === 'pp. 20-21 · 40 min'), 'a page range uses the plural locator');
   const hosts = guide.sections.map((s) => s.id);
   assert.ok(hosts.indexOf('ict-diff') > hosts.indexOf('ict-practice'), 'differentiation follows the section with the practice');
@@ -253,4 +258,87 @@ test('all 16 block types and every 3.0 section field are mapped and drawn', () =
   for (const d of [toV3(G7()), toV3(G9UR()), V3()]) for (const s of d.sections) (s.blocks || []).forEach(walk);
   assert.deepStrictEqual([...types].sort(), ['ask', 'board', 'chem', 'diagram', 'faded_example', 'key_points', 'keywords',
     'latex', 'paragraph', 'practice', 'split', 'support_extension', 'table', 'textbook_figure', 'watch_out', 'worked_example']);
+});
+
+
+// ── Phase 2 ─────────────────────────────────────────────────────────────────────────────
+
+test('diagrams: ICT\'s engine draws them; a spec it cannot draw is a labelled placeholder, reported', () => {
+  const doc = V3();
+  doc.sections[1].blocks.push({ type: 'diagram', spec: { type: 'no_such_type', caption: 'NOPE' } });
+  const { guide, report } = buildGuideFromLpDoc(doc);
+  assert.strictEqual(guide.images.length, 2, 'the two good specs are drawn');
+  const im = guide.images[0];
+  assert.match(im.dataUri, /^data:image\/svg\+xml;base64,/);
+  const svg = Buffer.from(im.dataUri.split(',')[1], 'base64').toString('utf8');
+  assert.match(svg, /^<svg width="[\d.]+" height="[\d.]+"/, 'intrinsic size from the viewBox, so <img> can size it');
+  const bad = report.unrendered.find((u) => u.spec === 'no_such_type');
+  assert.ok(bad && /unknown diagram type/.test(bad.why), 'the engine\'s own refusal is reported');
+  const { bodyHtml } = renderDecorativeLesson(guide, Object.fromEntries(guide.images.map((x) => [x.id, x])), {});
+  assert.ok(bodyHtml.includes('diagram not drawn — no such type') && bodyHtml.includes('NOPE'));
+});
+
+test('a diagram inside a split column counts as shown — it is not appended again at the end', () => {
+  const doc = V3();
+  doc.sections[1].blocks.push({ type: 'split', left: [{ type: 'diagram', spec: { type: 'graph', caption: 'IN-SPLIT' } }], right: [{ type: 'key_points', items: ['k'] }] });
+  const { guide } = buildGuideFromLpDoc(doc);
+  const images = Object.fromEntries(guide.images.map((x) => [x.id, x]));
+  const { bodyHtml } = renderDecorativeLesson(guide, images, {});
+  const n = guide.images.length;
+  assert.strictEqual((bodyHtml.match(/<img /g) || []).length, n, 'every diagram drawn exactly once');
+});
+
+test('page chrome and structure: ICT\'s labels for the band, a fresh page for support, row-only breaks for card grids', () => {
+  const { guide } = buildGuideFromLpDoc(G7());
+  assert.strictEqual(guide.meta.pageLabel, 'page {n} of {m}');
+  assert.strictEqual(guide.meta.continuedLabel, 'continued');
+  assert.strictEqual(guide.meta.runTitle, 'Photosynthesis');
+  assert.strictEqual(buildGuideFromLpDoc(G9UR()).guide.meta.pageLabel, 'صفحہ {n} از {m}');
+  const head = guide.sections.find((s) => s.id === 'ict-p2head');
+  assert.match(head.cls, /\blp-break-before\b/);
+  for (const id of ['ict-mistakes', 'ict-diff', 'ict-hwkey', 'ict-keywords']) {
+    assert.match(guide.sections.find((s) => s.id === id).cls, /\blp-grid-rows\b/, id);
+  }
+  const pack = require('../decorative/regions/ict/theme');
+  assert.strictEqual(pack.PAGE_NUMBER_STYLE, 'foot-band');
+  assert.match(pack.THEME_OVERRIDE_CSS, /@font-face\{font-family:'Inter';font-weight:700/, 'Inter embedded in this pack only');
+  assert.ok(!require('../fonts/load').fontFaceCss().includes("'Inter'"), 'the shared font loader is untouched');
+});
+
+test('maths: a long display formula becomes breakable; an inline matrix is display-sized; bad TeX is reported', () => {
+  const doc = V3();
+  doc.sections[1].blocks.push({ type: 'latex', tex: 'v = u + gt, \\; u = \\text{initial}, \\; v = \\text{final}, \\; g = 9.8, \\; t = \\text{time}, \\; 78.5 = 0 + 9.8t' });
+  doc.sections[2].blocks[0].items.push({ q: 'Find $\\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}^{-1}$', a: 'A' });
+  doc.sections[2].blocks[0].items.push({ q: 'Blank $\\dfrac{1}{___}$', a: 'B' });
+  const { guide, report } = buildGuideFromLpDoc(doc);
+  const wrap = guide.sections.find((s) => /ict-math-wrap/.test(s.cls));
+  assert.ok(wrap && wrap.type === 'text' && wrap.body.startsWith('$\\displaystyle v = u + gt'));
+  const pr = guide.sections.find((s) => s.id === 'ict-practice');
+  assert.ok(pr.items.some((it) => it.text.includes('$\\displaystyle \\begin{bmatrix}')));
+  assert.ok(report.warnings.some((w) => /maths does not parse — \\dfrac\{1\}\{___\}/.test(w)), report.warnings.join('\n'));
+});
+
+test('the page chrome and forced breaks are wired only through the ict pack', () => {
+  const composer = fs.readFileSync(path.join(__dirname, '..', 'render', 'png-to-pdf.js'), 'utf8');
+  // compose_pdf.py knows neither feature, so a page that uses either never goes there
+  assert.match(composer, /opts\.pageStyle === 'foot-band' \|\| \(geom && Array\.isArray\(geom\.forced\) && geom\.forced\.length\)/);
+  // and no other pack asks for the new page style
+  const regions = path.join(__dirname, '..', 'decorative', 'regions');
+  for (const r of fs.readdirSync(regions).filter((d) => d !== 'ict' && fs.existsSync(path.join(regions, d, 'theme.js')))) {
+    assert.notStrictEqual(require(path.join(regions, r, 'theme.js')).PAGE_NUMBER_STYLE, 'foot-band', r);
+  }
+  // only the ICT adapter marks sections lp-break-before / lp-grid-rows or hands over a finished image
+  for (const f of ['guide/from-markdown.js', 'structure.js', 'condense.js', 'adapter.js']) {
+    const src = fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
+    assert.ok(!/lp-break-before|lp-grid-rows|dataUri\s*:/.test(src), f);
+  }
+});
+
+test('maths in a label is written in Unicode, not printed as TeX source', () => {
+  const doc = V3();
+  doc.sections[2].blocks.push({ type: 'worked_example', title: 'Find $A^{-1}$ (p.68)', steps: ['s'] });
+  doc.sections[2].blocks.push({ type: 'key_points', title: 'Burning $\\ce{CH4 + 2O2 -> CO2 + 2H2O}$', items: ['k'] });
+  const { guide } = buildGuideFromLpDoc(doc);
+  assert.ok(guide.sections.some((s) => s.label === 'Find A⁻¹ (p.68)'));
+  assert.ok(guide.sections.some((s) => s.lead === 'Burning CH₄ + 2O₂ → CO₂ + 2H₂O'), JSON.stringify(guide.sections.map((s) => s.lead).filter(Boolean)));
 });

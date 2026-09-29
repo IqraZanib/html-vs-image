@@ -29,6 +29,31 @@
 const { toV3 } = require('./vendor/lp_doc_migrate');
 const { applyOverlay, LABELS } = require('./vendor/lp_doc_overlay');
 const { questionIndex } = require('./vendor/lp_doc_questions');
+const { renderDiagram } = require('./vendor/lp_diagrams');
+const { texToUnicode } = require('./vendor/lp_diagrams/lib/tex');
+
+// LABELS ARE PLAIN TEXT in this renderer (card labels, list leads, headings, captions), and ICT
+// puts maths in them — "Worked example: $A^{-1}$ (p.68)". ICT's own diagram engine carries a TeX
+// to Unicode converter for exactly this (a figure label cannot hold KaTeX), so a label reads
+// "A⁻¹ (p.68)" instead of printing its source. Chemistry first: \ce{H2O} -> H₂O.
+const SUB = { 0: '₀', 1: '₁', 2: '₂', 3: '₃', 4: '₄', 5: '₅', 6: '₆', 7: '₇', 8: '₈', 9: '₉' };
+const plainChem = (x) => x.replace(/\\ce\{((?:[^{}]|\{[^{}]*\})*)\}/g, (_, b) => b
+  .replace(/([A-Za-z)\]])(\d+)/g, (m, a, d) => a + d.replace(/\d/g, (c) => SUB[c]))
+  .replace(/<->|<=>/g, '⇌').replace(/->(\[[^\]]*\])*/g, '→'));
+const plainLabel = (v) => (typeof v === 'string' && /\$|\\ce\{/.test(v)
+  ? texToUnicode(plainChem(v))
+  : v);
+
+// ICT's engine returns an SVG sized "width=100%" for inlining in ICT's page. Drawn here as an
+// <img> (a data URI: isolated, no markup reaches the page), it needs an intrinsic size, which
+// its own viewBox supplies — the page then scales it to the column by aspect ratio.
+function sizedSvg(svg) {
+  const head = /<svg\b[^>]*>/.exec(svg);
+  const vb = head && /viewBox="\s*[-\d.]+\s+[-\d.]+\s+([\d.]+)\s+([\d.]+)\s*"/.exec(head[0]);
+  if (!vb) return svg;
+  const tag = head[0].replace(/\s(width|height)="[^"]*"/g, '').replace(/^<svg\b/, `<svg width="${vb[1]}" height="${vb[2]}"`);
+  return tag + svg.slice(head[0].length);
+}
 
 const REGION = 'ict';
 const STAGES = ['introduction', 'development', 'activity', 'conclusion', 'homework'];
@@ -64,12 +89,42 @@ const ICT_MATH = /\$\$([\s\S]+?)\$\$|\$([^$]+?)\$|\\ce\{((?:[^{}]|\{[^{}]*\})*)\
 const dollarChem = (v) => (typeof v === 'string' && v.includes('\\ce{')
   ? v.replace(ICT_MATH, (m, _d, _i, ce) => (ce !== undefined ? `$\\ce{${ce}}$` : m))
   : v);
-const prep = (v) => noAutoBold(dollarChem(v));
+// ICT's own render decision (lib/rich.js, "a matrix is never typeset as a subscript"): an
+// inline matrix is promoted to \displaystyle — the same maths, at full height, in the line.
+const MATRIX_ENV = /\\begin\{(?:[bBpvV]?matrix|smallmatrix|array|cases|aligned)\}/;
+const displayMatrices = (v) => (typeof v === 'string' && MATRIX_ENV.test(v)
+  ? v.replace(ICT_MATH, (m, d, i) => (i !== undefined && MATRIX_ENV.test(i) && !/\\displaystyle/.test(i) ? `$\\displaystyle ${i}$` : m))
+  : v);
+const prep = (v) => noAutoBold(displayMatrices(dollarChem(v)));
 
+// Maths that does not parse is printed as its source by ICT's renderer and in red by this one.
+// It is the lesson's defect, not the renderer's, so it is reported rather than rewritten.
+const katex = require('katex');
+function badMaths(v, out, where) {
+  if (typeof v !== 'string' || !v.includes('$')) return;
+  const re = /\$\$([\s\S]+?)\$\$|\$([^$]+?)\$/g;
+  let m;
+  while ((m = re.exec(v)) !== null) {
+    const src = m[1] !== undefined ? m[1] : m[2];
+    if (/\\ce\{/.test(src)) continue;          // chemistry is MathJax's, not KaTeX's
+    try { katex.renderToString(src, { throwOnError: true }); } catch (e) {
+      out.push(`${where}: maths does not parse — ${src.slice(0, 60)} (${String(e.message).replace(/^KaTeX parse error: /, '').slice(0, 60)})`);
+    }
+  }
+}
+
+let MATH_SINK = null;   // set for the duration of one buildGuideFromLpDoc call (it is synchronous)
 function guardText(sec) {
   if (!sec || typeof sec !== 'object') return sec;
+  for (const k of ['label', 'lead', 'heading', 'caption']) if (typeof sec[k] === 'string') sec[k] = plainLabel(sec[k]);
+  for (const k of ['a', 'b']) if (sec[k] && typeof sec[k].label === 'string') sec[k].label = plainLabel(sec[k].label);
   let chem = false;
-  const fix = (v) => { if (typeof v === 'string' && v.includes('\\ce{')) chem = true; return prep(v); };
+  const fix = (v) => {
+    if (typeof v === 'string' && v.includes('\\ce{')) chem = true;
+    const out = prep(v);
+    if (MATH_SINK) badMaths(out, MATH_SINK, sec.id || sec.cls || 'card');
+    return out;
+  };
   if (typeof sec.body === 'string') sec.body = fix(sec.body);
   for (const it of sec.items || []) if (it && typeof it.text === 'string') it.text = fix(it.text);
   for (const k of ['a', 'b']) if (sec[k] && typeof sec[k].body === 'string') sec[k].body = fix(sec[k].body);
@@ -110,6 +165,25 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
     warnings: [],
   };
   const sections = [];
+  const images = [];
+  MATH_SINK = report.warnings;
+
+  // A diagram block, drawn by ICT's own engine. The engine draws the caption inside the SVG
+  // (ICT's template prints no second one), so the card carries none. An unknown or broken
+  // spec is not a blank box: it prints a labelled placeholder and is reported, as ICT does.
+  const diagramBody = (spec, where) => {
+    const sp = spec || {};
+    try {
+      const svg = sizedSvg(renderDiagram(sp));
+      const id = `ict-dg-${images.length + 1}`;
+      images.push({ id, label: '', concept: 'diagram',
+        dataUri: `data:image/svg+xml;base64,${Buffer.from(svg, 'utf8').toString('base64')}` });
+      return { role: 'diagram', type: 'images', imageIds: [id] };
+    } catch (e) {
+      report.unrendered.push({ type: 'diagram', spec: sp.type || null, where, why: String(e.message).slice(0, 200) });
+      return { role: 'diagram', type: 'note', label: `⚠ diagram not drawn — ${String(sp.type || '?').replace(/_/g, ' ')}`, body: sp.caption || sp.alt || '' };
+    }
+  };
 
   // ── one block → one body ─────────────────────────────────────────────────────────────
   // A body is a renderer section without its heading: `type` + that type's fields, plus
@@ -133,7 +207,7 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
         return { role: 'board', type: 'note', label: L.board, body: b.text };
       case 'keywords':
         return {
-          role: 'keywords', type: 'bullets', lead: L.keywords,
+          role: 'keywords', cls: 'lp-grid-rows', type: 'bullets', lead: L.keywords,
           items: (b.items || []).map((k) => ({ text: `${strong(k.word)} — ${k.meaning}` })),
         };
       case 'key_points': {
@@ -176,6 +250,11 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
           a: { label: L.support, body: b.support }, b: { label: L.extension, body: b.extension },
         };
       case 'latex':
+        // A display formula cannot wrap, and a long one ran off its card. As \displaystyle
+        // maths in a line it keeps its size and may break after = and +, as KaTeX allows.
+        if (String(b.tex || '').replace(/\\[a-zA-Z]+|[{}\s]/g, '').length > 44) {
+          return { role: 'latex', cls: 'ict-math-wrap', type: 'text', body: lines(`$\\displaystyle ${b.tex}$`, b.caption) };
+        }
         return { role: 'latex', type: 'math', items: [{ tex: b.tex, label: b.caption }] };
       case 'chem':
         // ICT writes \ce{…}; KaTeX here has no mhchem, MathJax does.
@@ -190,14 +269,8 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
           body: lines(`**● ${L.figureIn}${has(b.page) ? `, ${L.page}${b.page}` : ''}**`, b.caption,
             has(b.legend) ? `**${L.reading}:** ${b.legend}` : ''),
         };
-      case 'diagram': {
-        const spec = b.spec || {};
-        report.unrendered.push({ type: 'diagram', spec: spec.type || null, why: 'ICT diagram engine not vendored yet (Phase 2)' });
-        return {
-          role: 'diagram', type: 'note', label: `⚠ diagram not drawn yet — ${spec.type || '?'}`,
-          body: spec.caption || spec.alt || '',
-        };
-      }
+      case 'diagram':
+        return diagramBody(b.spec, 'flow');
       case 'split': {
         const side = (list) => (list || []).flatMap((x) => (x && x.type === 'split' ? [...(x.left || []), ...(x.right || [])] : [x]))
           .map(body).filter(Boolean).map(({ role, ...rest }) => ({ ...rest, cls: `ict-r-${role}` }));
@@ -263,11 +336,11 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
   const practiceHost = secs.find((s) => (s.blocks || []).some((b) => b && (b.type === 'practice' || b.type === 'faded_example')));
   const hosts = { mistakes: dev ? 'development' : null, differentiation: practiceHost ? practiceHost.id : null };
   const mistakesBody = () => ({
-    role: 'mistakes', type: 'bullets', lead: L.p2Mistakes,
+    role: 'mistakes', cls: 'lp-grid-rows', type: 'bullets', lead: L.p2Mistakes,
     items: (P2.mistakes || []).map((m) => ({ text: `**✗ ${L.pupilSays}**\n${m.pupil_says}\n**✓ ${L.youAsk}**\n${m.you_ask}` })),
   });
   const diffBody = () => ({
-    role: 'diff', type: 'bullets', lead: L.p2Diff,
+    role: 'diff', cls: 'lp-grid-rows', type: 'bullets', lead: L.p2Diff,
     items: [[L.stuck, P2.differentiation.stuck], [L.barrier, P2.differentiation.barrier], [L.early, P2.differentiation.early]]
       .filter(([, v]) => has(v)).map(([k, v]) => ({ text: `**${k}**\n${v}` })),
   });
@@ -332,7 +405,7 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
 
   // ── the support pages ───────────────────────────────────────────────────────────────
   push({
-    role: 'p2head', type: 'text',
+    role: 'p2head', type: 'text', cls: 'lp-break-before',   // ICT starts the support pages on a fresh page
     body: lines(`**${L.supportPage}** · ${L.grade} ${prov.grade} ${prov.subject || ''} · ${L.page}${prov.printed_pages || ''}`, strong(prov.topic)),
   });
   let letter = 0;
@@ -347,11 +420,9 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
   if (B) {
     const specs = [];
     if (B.diagram) {
-      report.unrendered.push({ type: 'diagram', spec: B.diagram.type || null, where: 'board plan', why: 'ICT diagram engine not vendored yet (Phase 2)' });
-      specs.push({
-        role: 'diagram', type: 'note', label: `⚠ diagram not drawn yet — ${B.diagram.type || '?'}`,
-        body: lines(B.diagram.caption, B.caption && B.caption !== B.diagram.caption ? B.caption : ''),
-      });
+      specs.push(diagramBody(B.diagram, 'board plan'));
+      // ICT prints the board caption only when it says something the diagram's own does not.
+      if (has(B.caption) && B.caption !== B.diagram.caption) specs.push({ role: 'boardcap', type: 'text', body: B.caption });
     }
     if ((B.draw_order || []).length) {
       specs.push({ role: 'draworder', type: 'bullets', marker: 'num', lead: L.drawOrder, items: B.draw_order.map((d) => ({ text: unnumber(d) })) });
@@ -400,7 +471,7 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
 
   const Q = questionIndex(doc);
   S(L.p2Hw, [(P2.homework_key || []).length ? {
-    role: 'hwkey', type: 'bullets',
+    role: 'hwkey', cls: 'lp-grid-rows', type: 'bullets',
     items: P2.homework_key.map((h) => {
       const it = h.ref ? Q.get(h.ref) : null;
       return {
@@ -426,7 +497,7 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
   const pagesLabel = /[-–,]/.test(pages) ? `${L.pp}${pages}` : `${L.page}${pages}`;
   const meta = {
     id: doc.lesson_id || `${prov.book_stem || 'lp'}-${prov.topic || ''}`,
-    title: prov.topic || doc.lesson_id || '',
+    title: plainLabel(prov.topic || doc.lesson_id || ''),
     subtitle: [grade != null ? `${L.grade} ${grade}` : '', prov.subject].filter(Boolean).join(' · '),
     locale: want,
     region: REGION,
@@ -439,8 +510,16 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
       .filter(has).map((value) => ({ label: '', value: String(value) })),
     footer: [[grade != null ? `${L.grade} ${grade}` : '', prov.subject].filter(Boolean).join(' '), prov.chapter, pages ? `${L.pp}${pages}` : '']
       .filter(has).join(' · '),
+    // the ict pack's page chrome (PAGE_NUMBER_STYLE 'foot-band'), in ICT's own words
+    pageLabel: L.pageOf('{n}', '{m}'),
+    runTitle: plainLabel(prov.topic || ''),
+    continuedLabel: L.continued,
   };
-  return { guide: { meta, sections, images: [] }, report };
+  MATH_SINK = null;
+  for (const s of sections) for (const it of (s.type === 'math' ? s.items || [] : [])) {
+    if (s.engine !== 'mathjax') badMaths(`$${it.tex}$`, report.warnings, s.id);
+  }
+  return { guide: { meta, sections, images }, report };
 }
 
 module.exports = { buildGuideFromLpDoc, REGION };

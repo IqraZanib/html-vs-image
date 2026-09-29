@@ -21,7 +21,35 @@
 // those needs !important here. Never put a backtick in a comment inside this template
 // literal: it ends the string and the pack fails to load.
 
-const THEME_OVERRIDE_CSS = `
+// INTER, EMBEDDED HERE AND NOWHERE ELSE. ICT's page is set in Inter. Adding it to the shared
+// font loader would put ~70 KB of base64 into every region's page; carried in this pack, it
+// reaches ICT's pages only. Read once at load from @fontsource/inter (latin 400/600/700).
+const fs = require('node:fs');
+const path = require('node:path');
+function interFaces() {
+  const dir = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '@fontsource', 'inter', 'files');
+  return [400, 600, 700].map((w) => {
+    const f = path.join(dir, `inter-latin-${w}-normal.woff2`);
+    if (!fs.existsSync(f)) return '';
+    return `@font-face{font-family:'Inter';font-weight:${w};font-display:swap;`
+      + `src:url(data:font/woff2;base64,${fs.readFileSync(f).toString('base64')}) format('woff2');}`;
+  }).join('');
+}
+
+// THE ﷺ LIGATURE (U+FDFA) paints about 3.2em of ink in Nastaliq — more than any line box can
+// hold, so it lands on the lines above and below. ICT wraps it in a span scaled to 0.61em
+// (lib/rich.js, bd-oak77); this renderer escapes all markup, so the same scale is applied as a
+// font face that covers that ONE code point: the bundled Naskh face at size-adjust 85% (Naskh draws it more compactly than Nastaliq, so 0.61em read too small). Every
+// other character falls through to the page's own font.
+function salawatFace() {
+  const f = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '@fontsource', 'noto-naskh-arabic', 'files',
+    'noto-naskh-arabic-arabic-400-normal.woff2');
+  if (!fs.existsSync(f)) return '';
+  return `@font-face{font-family:'ICT Salawat';font-display:block;unicode-range:U+FDFA;size-adjust:85%;`
+    + `src:url(data:font/woff2;base64,${fs.readFileSync(f).toString('base64')}) format('woff2');}`;
+}
+
+const THEME_OVERRIDE_CSS = interFaces() + salawatFace() + `
 :root{
   --navy:#0B2545; --navy2:#13315C; --amber:#F2A20C; --amber-soft:#FDEBC8;
   --ict-ink:#1a2233; --mut:#5b6472; --ict-line:#e5e9f0; --leaf:#1F7A4D; --warn:#B4531F;
@@ -35,7 +63,11 @@ const THEME_OVERRIDE_CSS = `
 
 /* ── page ─────────────────────────────────────────────────────────────────────────── */
 body,.sheet{background:#fff}
-html[lang="en"] body{font-family:Inter,'Noto Sans',system-ui,sans-serif}
+/* Nothing may widen the page: the composer draws the screenshot at 794px, so a page even a
+   little wider would be shrunk as a whole and every cut point would drift. */
+html,body{overflow-x:hidden}
+html[lang="en"] body{font-family:'ICT Salawat',Inter,'Noto Sans',system-ui,sans-serif}
+html[lang="ur"] body{font-family:'ICT Salawat',var(--font)}
 body{color:var(--ict-ink)}
 .body{padding:12px 24px 2px}
 .section{margin:0 0 10px}
@@ -89,7 +121,9 @@ body{color:var(--ict-ink)}
   padding:3px 0 0;margin-inline-start:10px}
 
 /* A bolded first line is set as a block, so the line break after it would open a blank line. */
-.ict .d-note > b:first-of-type + br{display:none}
+.ict-r-outcome .d-note > b:first-of-type + br,.ict-r-hook .d-note > b:first-of-type + br,
+.ict-r-ask .d-note > b:first-of-type + br,.ict-r-checkpoint .d-note > b:first-of-type + br,
+.d-sub.ict-r-figure .d-note > b:first-of-type + br{display:none}
 
 /* note role (amber): outcome, warm-up, worked example, coaching */
 .ict-r-outcome .panel{background:var(--amber-soft);border:0 !important;border-inline-start:6px solid var(--amber) !important}
@@ -128,6 +162,11 @@ body{color:var(--ict-ink)}
 .ict-r-faded .d-note .nt{background:var(--leaf)}
 .ict-r-worked .d-note b,.ict-r-faded .d-note b{color:var(--leaf)}
 .ict .d-mrow{background:none;border:0;padding:4px 0 0;display:flex;flex-direction:column-reverse;gap:6px}
+/* a flex item's min-width is its content by default, which let a long formula push the card
+   past the page edge; the formula stays inside its card and scrolls nothing */
+.ict .d-mformula{min-width:0;max-width:100%}
+.ict-math-wrap .d-text{text-align:center;line-height:1.9}
+.ict-math-wrap .d-text .katex{font-size:1.15em}
 .ict .d-mlabel{text-transform:none;letter-spacing:0;font-size:15.5px;font-weight:500;color:var(--s-do-ink);margin:0}
 .ict .d-mformula svg{max-width:100%}
 
@@ -183,7 +222,20 @@ body{color:var(--ict-ink)}
   padding:2px 12px;letter-spacing:.08em;text-transform:uppercase;font-size:13.5px}
 .ict-r-p2head .d-text b:last-of-type{display:block;font-size:23px;color:var(--navy);margin-top:4px}
 .ict-r-para .panel{border:0 !important;padding:2px 0;background:none}
-.lp-footer{text-align:start;margin:12px 24px 0;font-size:13px;color:var(--mut)}
+/* The locator prints in every page's footer band (PAGE_NUMBER_STYLE foot-band), so the
+   end-of-document footer line would only repeat it. */
+.lp-footer{display:none}
+
+/* diagrams: ICT's engine draws the figure AND its caption strip, so the card is just the figure */
+.ict .d-imgrow{gap:10px}
+.ict .d-img{border:0;box-shadow:none;border-radius:0;background:none}
+.ict .d-img img{width:100%;height:auto;max-height:400px;object-fit:contain;background:none}
+.ict .d-split .d-img img{max-height:320px}
+.ict .d-img .cap:empty{display:none}
+.ict-r-diagram .panel{padding:10px 12px}
+.d-sub.ict-r-diagram{border:1px solid var(--ict-line);border-radius:var(--r-2);padding:6px 8px}
+.ict-r-boardcap .panel{border:0 !important;background:none;padding:0 2px}
+.ict-r-boardcap .d-text{font-size:15.5px;color:var(--mut);text-align:center}
 
 /* ── Urdu (R6): right-to-left, Nastaliq, a tall unitless line-height ─────────────── */
 html[lang="ur"] .ict .d-text,html[lang="ur"] .ict .d-note,html[lang="ur"] .ict .d-bullets li,
@@ -199,9 +251,10 @@ html[lang="ur"] .ict .d-mlabel{line-height:2.1;padding-top:8px}
 module.exports = {
   THEME_OVERRIDE_CSS,
   REGION_NAME: 'ICT (NIETE)',
-  // The composer's default page number. ICT prints "page N of M" in a footer band; that
-  // needs a composer page style, which is a Phase 2 decision (see DESIGN.md).
-  PAGE_NUMBER_STYLE: '',
+  // ICT's page chrome: the locator and "page N of M" in a footer band, a running head with
+  // "<section> · continued" on later pages. Labels come from the lesson (meta.pageLabel,
+  // meta.runTitle, meta.continuedLabel), which the lp_doc adapter fills with ICT's strings.
+  PAGE_NUMBER_STYLE: 'foot-band',
   // ICT's plans carry no decorative characters; the cast is also a paid generator.
   CHARACTER_CAST: false,
 };

@@ -65,7 +65,7 @@ or `ict-st-p2 ict-p2-<letter>` on the support pages) and its block role (`ict-r-
 | support_extension | duo | `supext` | blue / green columns |
 | split | **split** | `split` | ONE card, two columns |
 | textbook_figure | note | `figure` | book reference (no crop yet) |
-| diagram | note | `diagram` | placeholder (engine not vendored yet) |
+| diagram | images (ICT's engine → SVG) | `diagram` | the figure itself; placeholder only if the engine refuses the spec |
 | latex / chem | math | `latex` / `chem` | green; chemistry via MathJax mhchem |
 
 Palette (ICT v9.3 tokens): navy `#0B2545`, amber `#F2A20C`, leaf `#1F7A4D`; section bands
@@ -73,35 +73,73 @@ Introduction `#0F6A73`, Development `#0B2545`, Activity `#1F7A4D`, Conclusion `#
 Home work `#5b6472`; five surface roles teach / do / watch / note / quiet. Body text 18px at
 794px (D4). Urdu: RTL, Nastaliq, unitless line-height 2.1 (R6).
 
-## The two renderer additions this pack needed
+## Shared renderer changes this pack needed
 
-`regions/README.md` asks that anything CSS cannot express be negotiated before it is
-built. Two additions were needed. Both are generic, and both are inert unless a guide
-asks for them. The A/B run proves this: every Yemen, Kenya, Tanzania and default render
-is byte-identical before and after.
+`regions/README.md` asks that anything CSS cannot express be agreed before it is built. These are
+the additions, all generic and all inert unless a guide or pack asks for them. The A/B run
+(main vs this branch, 82 inputs: 78 Yemen lessons, Kenya, Tanzania, 2 default) proves this: it
+was identical 82/82 after Phase 1, and again after Phase 2.
 
-1. **`section.cls`** (render.js): extra class names on a section, beside the existing
-   `sec-<id>`. The ICT adapter needs two roles per card (stage and block).
-2. **`type: 'split'`** (render.js), plus `.d-split` in the composer's figure query
-   (png-to-pdf.js): two columns of ordinary bodies inside ONE card. It has to be one
-   card because the composer only cuts pages at card edges. Two side-by-side sections of
-   different heights would hand it a cut through the taller one. Inside the split, a
-   list item's bottom in one column falls mid-card in the other, so the composer treats
-   the split like an inline figure and never cuts inside it.
+| Where | Addition | Triggered only by |
+|---|---|---|
+| render.js | `section.cls`: extra class names beside `sec-<id>` | a guide that sets `cls` |
+| render.js | `type: 'split'`: two columns of ordinary bodies inside ONE card; images inside it count as shown | a `split` section |
+| png-to-pdf.js | `.d-split` counts as a figure (no cut inside it) | a `.d-split` element |
+| png-to-pdf.js | `lp-grid-rows`: a card grid breaks between rows only | a section with that class |
+| png-to-pdf.js | `lp-break-before`: a forced page break; pagination runs per span (one span = the old code exactly) | a section with that class |
+| png-to-pdf.js | `PAGE_NUMBER_STYLE: 'foot-band'`: footer band, "page N of M", running head; always composed by Chromium | the ict pack |
+| pipeline.js | an image that arrives with its own `dataUri` is used as given (no cache, no generation) | a guide image with `dataUri` |
+| pipeline.js | band labels passed to the composer (`pageLabel`, `runTitle`, `continuedLabel`, `dir`) | read only by `foot-band` |
 
-## Known gaps (Phase 2 on FEAT-171)
+The split has to be one card because the composer only cuts pages at card edges. Two
+side-by-side sections of different heights would hand it a cut through the taller one.
 
-- **Page format.** ICT's delivery is now a **phone page, 520×2000 px, one column**
-  (`PAGE_FORMATS.phone`, v9.3). A4 is kept but unused by ICT's delivery path. This
-  renderer is A4-only. A pack-driven page size in the composer is a product decision.
-- **Diagrams.** ICT's diagram engine (`vendor/lp-v9/diagrams`, needs openchemlib) is not
-  vendored. Diagram blocks print a labelled placeholder and are listed in `report.unrendered`.
-- **Textbook crops.** `textbook_figure.src` points to a crop on ICT's side. It is printed
-  as a book reference (as ICT prints a missing crop) until the crops are reachable.
-- **Running heads / forced breaks.** ICT repeats "<Section> · continued" at the top of a
-  continuation page and starts the support pages on a fresh page. The composer has neither.
-- **Page chrome.** ICT prints "page N of M" in a footer band. We use the composer's default
-  top-corner "N / M" (`PAGE_NUMBER_STYLE: ''`).
-- **Coaching offer line.** The WhatsApp number is redacted in the code mirror, so the CTA is
-  withheld (listed in `report.unrendered`).
-- **Fonts.** Inter is not bundled. English falls back to Noto Sans.
+## Phase 2 (built 2026-09-29)
+
+- **Diagrams.** ICT's production diagram engine (29 types) is vendored verbatim under
+  `lp-render/guide/vendor/lp_diagrams/` (see its VENDORED.md). The adapter draws each spec to SVG
+  and hands it to the pipeline as a finished image (`images[].dataUri`), so there's no cache,
+  no generation and no cost. The engine draws the caption inside the figure. `molecule` needs
+  `openchemlib` (npm, the `^9.7.0` range ICT pins). A spec the engine refuses becomes a
+  labelled placeholder and goes into `report.unrendered`.
+- **Page chrome.** `PAGE_NUMBER_STYLE: 'foot-band'` puts the locator plus "page N of M" in a
+  footer band. Every later page gets a running head: the lesson title, plus "<section> ·
+  continued" when the page opens partway through a section. Labels are ICT's own
+  (`meta.pageLabel`, `meta.continuedLabel`), English or Urdu.
+- **Support pages start on a fresh page.** A section marked `lp-break-before` is a forced break.
+- **Card grids break between rows only.** A section marked `lp-grid-rows` covers mistakes,
+  differentiation, the homework key and key words.
+- **Inter** is embedded in this pack only; the shared font loader is untouched.
+- **ﷺ** (U+FDFA) draws about 3.2em of ink in Nastaliq and hits the lines around it. A face
+  covering only that one code point (bundled Naskh, size-adjust 85%) plays the role of ICT's 0.61em span.
+- **Maths.** A long display formula becomes breakable `\displaystyle` inline maths. An inline
+  matrix is promoted to display size (ICT's rule). TeX that doesn't parse is listed in
+  `report.warnings` rather than rewritten. TeX inside a label is converted to Unicode
+  (`$A^{-1}$` → A⁻¹, `\ce{H2O}` → H₂O) with ICT's own converter.
+- **The page can't widen.** `html,body{overflow-x:hidden}`, and a formula row can't grow past
+  its card. See the composer note below for why this matters.
+
+Tested on ICT's 10 real authored lessons (the lp_author samples: G6 Islamiat ur, G7 Science,
+G8 English, G9 Biology/Chemistry/Physics/Islamiat ur, G10 Maths/Urdu ur, G11 Chemistry) plus
+the two samples. All render, all 28 diagrams draw, there are 0 overflow findings, and 0 images
+are generated.
+
+### Composer notes (shared code, found while building)
+
+- `compose_pdf.py` is the composer's PRIMARY path whenever python3 has pillow + img2pdf. It
+  knows none of: whole-card preference, page balancing, page styles (Yemen's `ar-bottom`
+  band), forced breaks. ICT's page style is routed to the Chromium composer on every machine.
+  **Yemen still takes the Python path wherever pillow is installed.** Iqra's decision.
+- The composer draws the full-page screenshot at 794px wide. A page that overflows
+  horizontally is therefore shrunk AS A WHOLE, and every cut point drifts. That is what cut
+  a graph in half and printed the support header mid-page before the overflow was fixed.
+
+## Still open
+
+- **Page format.** ICT's delivery is a **phone page, 520×2000 px, one column** (v9.3). This
+  renderer is A4-only. Iqra's decision.
+- **Textbook crops.** `textbook_figure.src` points to a crop on ICT's side. It is printed as a book
+  reference (as ICT prints a missing crop) until the crops are reachable.
+- **Coaching offer line.** The WhatsApp number is redacted in the code mirror, so the CTA is withheld.
+- **Circuit diagrams** use the engine's built-in drawing. ICT's high-fidelity path needs a Python
+  `schemdraw` venv.

@@ -8,6 +8,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const https = require('node:https');
 const { buildShell } = require('./template/shell');
+const { resolveDirection } = require('./template/direction');
 const { htmlToPdf, closeBrowser } = require('./index');
 const { THEME_CSS } = require('./decorative/theme');
 const { renderDecorativeLesson } = require('./decorative/render');
@@ -135,6 +136,13 @@ async function renderLessonImage(content, opts = {}) {
   const toGen = [];
   const cacheKey = (prompt, topic, model) => artCacheKey(prompt, { region: meta.region, locale, topic, model });
   for (const im of wanted) {
+    // A PICTURE THE PRODUCER ALREADY HAS is used as given — no cache key, no store, no
+    // generation, no cost. Only the ICT lp_doc adapter supplies one today (its diagrams are
+    // drawn in code by ICT's own engine); no other producer sets dataUri on an image.
+    if (im && typeof im.dataUri === 'string' && /^data:image\//.test(im.dataUri)) {
+      imagesMap[im.id] = { dataUri: im.dataUri, label: im.label, cover: false };
+      continue;
+    }
     const model = modelForImage(im, { region: meta.region, locale });
     const key = cacheKey(im.prompt, im.topic, model);
     if (GAVE_UP.has(key)) { statsOut.dropped++; log(`  ⊘ image "${im.id}" skipped — already rejected earlier in this run`); continue; }
@@ -277,7 +285,12 @@ async function renderLessonImage(content, opts = {}) {
         overflowFindings = list || [];
       };
       pdf = await htmlToPixelPdf(html, regionPageStyle
-        ? { pageStyle: regionPageStyle, footerText: (content.meta && content.meta.footer) || '', onFindings }
+        ? {
+          pageStyle: regionPageStyle, footerText: (content.meta && content.meta.footer) || '', onFindings,
+          // read only by the 'foot-band' page style (the ICT pack); absent for every other region
+          pageLabel: meta.pageLabel, runTitle: meta.runTitle, continuedLabel: meta.continuedLabel,
+          dir: resolveDirection(locale).dir,
+        }
         : { onFindings });
     } catch (e) {
       log(`  (pixel-perfect PDF unavailable — ${e.message}; using vector fallback)`);
@@ -291,7 +304,7 @@ async function renderLessonImage(content, opts = {}) {
   // as unfinished, and its figures were the thing that should have been bigger.
   let stripHeight = null;
   try { stripHeight = png && png.length > 24 ? Buffer.from(png).readUInt32BE(20) : null; } catch (_) { /* not a PNG buffer */ }
-  const usablePerPage = 1123 - 28 - (regionPageStyle === 'ar-bottom' ? 36 : 12);
+  const usablePerPage = 1123 - 28 - (regionPageStyle === 'ar-bottom' ? 36 : (regionPageStyle === 'foot-band' ? 34 : 12));
   const pageBudget = regionMaxPages ? regionMaxPages * usablePerPage : null;
   return { png, pdf, html, contentId, locale, stats: statsOut, maxPages: regionMaxPages, stripHeight, pageBudget, overflow: overflowFindings };
 }

@@ -1785,6 +1785,14 @@ function renderDecorativeLesson(content, images = {}, cast = {}) {
   const referenced = new Set();
   if (meta.banner) referenced.add(meta.banner); // shown in the hero, not as a card
   for (const s of (content.sections || [])) if (s && s.type === 'images' && Array.isArray(s.imageIds)) s.imageIds.forEach((id) => referenced.add(id));
+  // …and so are the images inside a split card's columns.
+  for (const s of (content.sections || [])) {
+    if (s && s.type === 'split') {
+      for (const sub of [...(s.left || []), ...(s.right || [])]) {
+        if (sub && sub.type === 'images' && Array.isArray(sub.imageIds)) sub.imageIds.forEach((id) => referenced.add(id));
+      }
+    }
+  }
   for (const s of (content.sections || [])) if (s && s.image) referenced.add(s.image); // in-panel figures (see below)
   // …and an illustration placed in an exercise grid's spare slot is referenced too. Without
   // this it counted as leftover, so the same picture was drawn twice: once in the grid cell
