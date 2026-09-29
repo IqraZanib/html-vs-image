@@ -176,6 +176,10 @@ async function htmlToPixelPdf(html, opts = {}) {
           [...byRow.entries()].sort((a, b) => a[0] - b[0]).slice(0, -1).forEach(([, b]) => cuts.push(b));
           return;
         }
+        // A CARD MARKED .lp-atomic IS NEVER OPENED: its only legal boundary is its own edge. A
+        // note's bottom sits a padding's width above its card's, so a cut there only moves a
+        // sliver of border overleaf — the broken-card look the whole-card rule exists to stop.
+        if (sec.classList.contains('lp-atomic')) return;
         // A two-column split (.d-split) counts as the figure: a list item's bottom in one
         // column is mid-card in the other, so no cut may land inside it.
         const fig = sec.querySelector('.d-inline-img, .char-fig, .d-split');

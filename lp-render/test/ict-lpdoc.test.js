@@ -299,6 +299,10 @@ test('page chrome and structure: ICT\'s labels for the band, a fresh page for su
   for (const id of ['ict-mistakes', 'ict-diff', 'ict-hwkey', 'ict-keywords']) {
     assert.match(guide.sections.find((s) => s.id === id).cls, /\blp-grid-rows\b/, id);
   }
+  // only a list may continue overleaf; every other card moves whole
+  for (const s of guide.sections) {
+    assert.strictEqual(/\blp-atomic\b/.test(s.cls), s.type !== 'bullets', `${s.id} (${s.type})`);
+  }
   const pack = require('../decorative/regions/ict/theme');
   assert.strictEqual(pack.PAGE_NUMBER_STYLE, 'foot-band');
   assert.match(pack.THEME_OVERRIDE_CSS, /@font-face\{font-family:'Inter';font-weight:700/, 'Inter embedded in this pack only');
@@ -330,7 +334,7 @@ test('the page chrome and forced breaks are wired only through the ict pack', ()
   // only the ICT adapter marks sections lp-break-before / lp-grid-rows or hands over a finished image
   for (const f of ['guide/from-markdown.js', 'structure.js', 'condense.js', 'adapter.js']) {
     const src = fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
-    assert.ok(!/lp-break-before|lp-grid-rows|dataUri\s*:/.test(src), f);
+    assert.ok(!/lp-break-before|lp-grid-rows|lp-atomic|dataUri\s*:/.test(src), f);
   }
 });
 

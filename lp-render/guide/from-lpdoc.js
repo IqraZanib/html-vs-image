@@ -287,9 +287,12 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
   const push = (spec, { heading = '', time = '', stage = '' } = {}) => {
     if (!spec) return;
     const { role, cls, ...rest } = spec;
+    // Only a LIST may continue overleaf (between items, or between rows of a card grid);
+    // every other card moves whole.
+    const atomic = rest.type !== 'bullets' ? 'lp-atomic' : '';
     sections.push(guardText({
       ...rest, id: `ict-${role}`, heading, time,
-      cls: ['ict', stage && `ict-st ict-st-${stage}`, `ict-r-${role}`, cls].filter(Boolean).join(' '),
+      cls: ['ict', stage && `ict-st ict-st-${stage}`, `ict-r-${role}`, cls, atomic].filter(Boolean).join(' '),
     }));
   };
 
