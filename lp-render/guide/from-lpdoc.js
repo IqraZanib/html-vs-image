@@ -30,7 +30,9 @@ const { toV3 } = require('./vendor/lp_doc_migrate');
 const { applyOverlay, LABELS } = require('./vendor/lp_doc_overlay');
 const { questionIndex } = require('./vendor/lp_doc_questions');
 const { renderDiagram } = require('./vendor/lp_diagrams');
+const { diagramLabel } = require('./vendor/lp_diagram_labels');
 const { texToUnicode } = require('./vendor/lp_diagrams/lib/tex');
+const { requiredBox } = require('./vendor/lp_diagrams/lib/svg');
 
 // LABELS ARE PLAIN TEXT in this renderer (card labels, list leads, headings, captions), and ICT
 // puts maths in them — "Worked example: $A^{-1}$ (p.68)". ICT's own diagram engine carries a TeX
@@ -47,11 +49,26 @@ const plainLabel = (v) => (typeof v === 'string' && /\$|\\ce\{/.test(v)
 // ICT's engine returns an SVG sized "width=100%" for inlining in ICT's page. Drawn here as an
 // <img> (a data URI: isolated, no markup reaches the page), it needs an intrinsic size, which
 // its own viewBox supplies — the page then scales it to the column by aspect ratio.
+//
+// THE SIZE IS ICT'S OWN SLOT (template.js figureSlot, v9.3): a figure is drawn as small as its
+// smallest label allows and never wider than the column — the engine's requiredBox() gives the
+// width at which that label reaches the floor. On the phone page the drawing column is 455px
+// (520 − 2×21 page margin − 23 figure chrome) and the floor is 13.5px scaled by that column
+// against A4's 729: 8.43px. So a hundred-square with large cells prints compact and a mind map
+// with small labels prints full width, exactly as ICT prints them.
+const FIG_COL_PX = 520 - 2 * 21 - (10 * 2 + 3);                 // 455
+const FIG_MIN_PX = +(13.5 * (FIG_COL_PX / (794 - 2 * 21 - 23))).toFixed(2);   // 8.43
 function sizedSvg(svg) {
   const head = /<svg\b[^>]*>/.exec(svg);
   const vb = head && /viewBox="\s*[-\d.]+\s+[-\d.]+\s+([\d.]+)\s+([\d.]+)\s*"/.exec(head[0]);
   if (!vb) return svg;
-  const tag = head[0].replace(/\s(width|height)="[^"]*"/g, '').replace(/^<svg\b/, `<svg width="${vb[1]}" height="${vb[2]}"`);
+  let w = Number(vb[1]); let h = Number(vb[2]);
+  try {
+    const box = requiredBox(svg, { minPx: FIG_MIN_PX, colPx: FIG_COL_PX });
+    const slotW = Math.min(FIG_COL_PX, box.minWidthPx);
+    if (slotW > 0 && w > 0) { h = +(slotW * h / w).toFixed(1); w = slotW; }
+  } catch (_) { /* no viewBox the sizer can read — the figure's own size stands */ }
+  const tag = head[0].replace(/\s(width|height)="[^"]*"/g, '').replace(/^<svg\b/, `<svg width="${w}" height="${h}"`);
   return tag + svg.slice(head[0].length);
 }
 
@@ -70,6 +87,21 @@ const strong = (s) => {
   return !t || /\$|\*\*|\\ce\{/.test(t) ? t : `**${t}**`;
 };
 const has = (v) => v != null && String(v).trim() !== '';
+// AN ANSWER, as ICT prints one: bold green words and green maths. The renderer bolds plain text
+// only — a ** pair cannot span a $…$ run — so an answer with maths in it came out in ink. Each
+// run of words gets its own bold and each maths run its own colour (\color, which KaTeX and
+// MathJax both read). Display maths ($$…$$) is left exactly as written.
+const ANSWER_INK = '#1F7A4D';
+const boldRuns = (s, mathInk) => {
+  const t = String(s == null ? '' : s).trim();
+  if (!t.includes('$') || t.includes('$$')) return strong(t);
+  return t.split(/(\$[^$]+\$)/g).map((p) => {
+    if (/^\$[^$]+\$$/.test(p)) return mathInk ? `$\\color{${mathInk}}{${p.slice(1, -1)}}$` : p;
+    const w = p.trim();
+    return w ? p.replace(w, strong(w)) : p;
+  }).join('');
+};
+const answerText = (s) => boldRuns(s, ANSWER_INK);
 
 // THE RENDERER BOLDS A SHORT "Label:" AT THE START OF A LINE (math.js mdInline) — right for
 // the markdown producers, wrong here. An lp_doc marks emphasis explicitly with **…**, and ICT
@@ -127,6 +159,7 @@ function guardText(sec) {
   };
   if (typeof sec.body === 'string') sec.body = fix(sec.body);
   for (const it of sec.items || []) if (it && typeof it.text === 'string') it.text = fix(it.text);
+  for (const it of sec.items || []) for (const k of ['q', 'a']) if (it && typeof it[k] === 'string') it[k] = fix(it[k]);   // qa cards
   for (const k of ['a', 'b']) if (sec[k] && typeof sec[k].body === 'string') sec[k].body = fix(sec[k].body);
   for (const it of sec.items || []) if (it && typeof it.tex === 'string' && it.tex.includes('\\ce{')) chem = true;
   for (const k of ['left', 'right']) (sec[k] || []).forEach(guardText);
@@ -169,14 +202,17 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
   MATH_SINK = report.warnings;
 
   // A diagram block, drawn by ICT's own engine. The engine draws the caption inside the SVG
-  // (ICT's template prints no second one), so the card carries none. An unknown or broken
-  // spec is not a blank box: it prints a labelled placeholder and is reported, as ICT does.
-  const diagramBody = (spec, where) => {
+  // (ICT's template prints no second one), so the card carries none — only, on a teaching
+  // figure, ICT's badge naming what the figure is ("Geometry", "Mind map"; its own table, in the
+  // lesson's language). The board plan on the support page wears no badge in ICT's design either.
+  // An unknown or broken spec is not a blank box: it prints a labelled placeholder and is
+  // reported, as ICT does.
+  const diagramBody = (spec, where, { badge = false } = {}) => {
     const sp = spec || {};
     try {
       const svg = sizedSvg(renderDiagram(sp));
       const id = `ict-dg-${images.length + 1}`;
-      images.push({ id, label: '', concept: 'diagram',
+      images.push({ id, label: badge ? diagramLabel(sp.type, want) : '', concept: 'diagram',
         dataUri: `data:image/svg+xml;base64,${Buffer.from(svg, 'utf8').toString('base64')}` });
       return { role: 'diagram', type: 'images', imageIds: [id] };
     } catch (e) {
@@ -188,7 +224,7 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
   // ── one block → one body ─────────────────────────────────────────────────────────────
   // A body is a renderer section without its heading: `type` + that type's fields, plus
   // `role` (which becomes the card's ict-r-<role> class for the design pack).
-  const answerItem = (q, a) => `${q} ${AR} ${strong(a)}`;
+  const answerItem = (q, a) => `${q} ${AR} ${answerText(a)}`;
   const body = (b) => {
     if (!b || typeof b !== 'object') return null;
     switch (b.type) {
@@ -207,7 +243,7 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
         return { role: 'board', type: 'note', label: L.board, body: b.text };
       case 'keywords':
         return {
-          role: 'keywords', cls: 'lp-grid-rows', type: 'bullets', lead: L.keywords,
+          role: 'keywords', cls: 'lp-grid-rows', type: 'bullets', lead: `🔑 ${L.keywords}`,
           items: (b.items || []).map((k) => ({ text: `${strong(k.word)} — ${k.meaning}` })),
         };
       case 'key_points': {
@@ -228,8 +264,8 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
         const worked = b.type === 'worked_example';
         const steps = (b.steps || []).map((s, i) => `${i + 1}. ${s}`).join('\n');
         const tail = worked
-          ? (has(b.result) ? strong(b.result) : '')
-          : (has(b.answer) ? strong(`${L.answer}: ${b.answer}`) : '');
+          ? (has(b.result) ? answerText(b.result) : '')
+          : (has(b.answer) ? answerText(`${L.answer}: ${b.answer}`) : '');
         return {
           role: worked ? 'worked' : 'faded', type: 'note',
           label: b.title || (worked ? L.worked : L.faded), body: lines(b.prompt, steps, tail),
@@ -270,7 +306,7 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
             has(b.legend) ? `**${L.reading}:** ${b.legend}` : ''),
         };
       case 'diagram':
-        return diagramBody(b.spec, 'flow');
+        return diagramBody(b.spec, 'flow', { badge: true });
       case 'split': {
         const side = (list) => (list || []).flatMap((x) => (x && x.type === 'split' ? [...(x.left || []), ...(x.right || [])] : [x]))
           .map(body).filter(Boolean).map(({ role, ...rest }) => ({ ...rest, cls: `ict-r-${role}` }));
@@ -302,8 +338,9 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
     const s = doc.sequence;
     push({
       role: 'seq', type: 'text',
-      body: [has(s.previous) ? `**${L.seqPrev}:** ${s.previous} ${AR}` : '', strong(s.this),
-        has(s.checkpoint) ? `**${L.seqCheck}:** ${s.checkpoint}` : ''].filter(Boolean).join('  '),
+      // one line each, as ICT's strip prints them: where the class came from, this lesson, the checkpoint
+      body: lines(has(s.previous) ? `**${L.seqPrev}:** ${s.previous} ${AR}` : '', strong(s.this),
+        has(s.checkpoint) ? `**${L.seqCheck}:** ${s.checkpoint}` : ''),
     });
   }
   const fbise = Array.isArray(doc.fbise_slos) && doc.fbise_slos.length
@@ -312,7 +349,7 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
   push({
     role: 'outcome', type: 'note',
     label: `${L.outcome}${doc.slo && doc.slo.code ? ` · ${doc.slo.code}` : ''}${grade && grade < 9 ? ` · ${L.noBoardExam}` : ''}`,
-    body: lines(strong(O.outcome), fbise, has(O.by_the_end) ? `✓ ${O.by_the_end}` : ''),
+    body: lines(strong(O.outcome), fbise, has(O.by_the_end) ? `**✓** ${O.by_the_end}` : ''),
   });
   // bd-a8veu.3: ICT paints ONE outcome voice; the SLO wording and the objective list stay
   // in the document (the linter gates on them) and stop being painted.
@@ -324,24 +361,26 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
   const intro = secs.find((s) => s && s.id === 'introduction');
   const kwHoisted = intro && (intro.blocks || []).find((b) => b && b.type === 'keywords');
   const pacing = secs.map((s) => Number(s.minutes) || 0);
-  push({
-    role: 'resources', type: 'text',
-    body: lines(
-      video ? `**${L.video}:** ${video.title}${has(video.channel) ? ` · ${video.channel}` : ''}${has(video.duration) ? ` · ${video.duration}` : ''}` : '',
-      (doc.materials || []).length ? `**${L.materials}:** ${doc.materials.join(' · ')}` : '',
-      pacing.length ? `**${L.pacing}:** ${pacing.join(' + ')} = ${pacing.reduce((a, b) => a + b, 0)} ${L.min}` : '',
-    ),
-  });
+  // ICT's resource card: one tinted row each for the video (amber), the materials (green) and
+  // the pacing (blue), each with its icon, then the key words (grey). The video row names the
+  // video; the channel and length stay in the document, as ICT prints them.
+  if (video && has(video.title)) push({ role: 'rvideo', type: 'text', body: `📺 **${L.video}** ${video.title}` });
+  if ((doc.materials || []).length) push({ role: 'rmat', type: 'text', body: `🧰 **${L.materials}** ${doc.materials.join(' · ')}` });
+  if (pacing.length) push({ role: 'rpace', type: 'text', body: `⏱ **${L.pacing}** ${pacing.join(' + ')} = ${pacing.reduce((a, b) => a + b, 0)} ${L.min}` });
   if (kwHoisted) push(body(kwHoisted));
 
   // ── page 1 — the five sections ───────────────────────────────────────────────────────
   const P2 = doc.page2 || {};
   const practiceHost = secs.find((s) => (s.blocks || []).some((b) => b && (b.type === 'practice' || b.type === 'faded_example')));
   const hosts = { mistakes: dev ? 'development' : null, differentiation: practiceHost ? practiceHost.id : null };
+  // ICT's misconception card: what the pupil writes on a terracotta band over the question the
+  // teacher asks back on a green one, one card per mistake. In the flow the group carries its own
+  // label; on the support page the section bar names it.
   const mistakesBody = () => ({
-    role: 'mistakes', cls: 'lp-grid-rows', type: 'bullets', lead: L.p2Mistakes,
-    items: (P2.mistakes || []).map((m) => ({ text: `**✗ ${L.pupilSays}**\n${m.pupil_says}\n**✓ ${L.youAsk}**\n${m.you_ask}` })),
+    role: 'mistakes', cls: 'lp-grid-rows', type: 'qa',
+    items: (P2.mistakes || []).map((m) => ({ q: `**✗ ${L.pupilSays}**\n${m.pupil_says}`, a: `**✓ ${L.youAsk}**\n${m.you_ask}` })),
   });
+  const mistakesLabel = () => ({ role: 'grouplabel', type: 'text', body: L.p2Mistakes });
   const diffBody = () => ({
     role: 'diff', cls: 'lp-grid-rows', type: 'bullets', lead: L.p2Diff,
     items: [[L.stuck, P2.differentiation.stuck], [L.barrier, P2.differentiation.barrier], [L.early, P2.differentiation.early]]
@@ -373,7 +412,7 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
       if (kwHoisted && b === kwHoisted) continue;
       put(body(b));
     }
-    if (s.id === hosts.mistakes && (P2.mistakes || []).length) put(mistakesBody());
+    if (s.id === hosts.mistakes && (P2.mistakes || []).length) { put(mistakesLabel()); put(mistakesBody()); }
     if (s.id === hosts.differentiation && P2.differentiation) put(diffBody());
     if (s.id === 'conclusion') {
       if (s.checkpoint) {
@@ -409,7 +448,7 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
   // ── the support pages ───────────────────────────────────────────────────────────────
   push({
     role: 'p2head', type: 'text', cls: 'lp-break-before',   // ICT starts the support pages on a fresh page
-    body: lines(`**${L.supportPage}** · ${L.grade} ${prov.grade} ${prov.subject || ''} · ${L.page}${prov.printed_pages || ''}`, strong(prov.topic)),
+    body: lines(`**${L.supportPage}**`, `${L.grade} ${prov.grade} ${prov.subject || ''} · ${L.page}${prov.printed_pages || ''}`, strong(prov.topic)),
   });
   let letter = 0;
   const S = (label, specs) => {
@@ -447,26 +486,45 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
     const letterOf = (i) => 'ABCDE'[i];
     const isAnswer = (opt, i, ans) => ans != null
       && (String(ans).trim() === String(opt).trim() || String(ans).trim().toUpperCase() === letterOf(i));
+    // ICT's MCQ card: the question, the options as chips with the key in green, and the teacher
+    // note naming what each wrong option catches. One card per question, under the group label.
     const mcq = (eb.mcq || []).map((q) => {
       const wrong = q.options.map((o, i) => ({ o, i })).filter(({ o, i }) => !isAnswer(o, i, q.answer));
       const notes = (q.distractor_codes || []).map((c, k) => (wrong[k] ? `**${letterOf(wrong[k].i)}** ${c}` : null)).filter(Boolean);
       return {
-        text: lines(strong(q.q),
-          q.options.map((o, i) => (isAnswer(o, i, q.answer) ? strong(`${letterOf(i)}. ${o} ✓`) : `${letterOf(i)}. ${o}`)).join('   '),
-          notes.length ? `**${L.teacherNote}** ${L.distractors}: ${notes.join(' · ')}` : ''),
+        role: 'mcq', type: 'split',
+        left: [
+          { cls: 'ict-r-mcqq', type: 'text', body: boldRuns(q.q) },
+          { cls: 'ict-r-mcqopts', type: 'bullets',
+            // the key carries a ✓ tag, which the pack turns into ICT's green chip
+            items: q.options.map((o, i) => ({ text: `**${letterOf(i)}.** ${o}`, tag: isAnswer(o, i, q.answer) ? '✓' : undefined })) },
+          notes.length ? { cls: 'ict-r-mcqnote', type: 'text', body: `**${L.teacherNote}** ${L.distractors}: ${notes.join(' · ')}` } : null,
+        ].filter(Boolean),
+        right: [],
       };
     });
     const srqLabel = grade != null && grade >= 9 ? L.srq : L.srqEarly;
     const erq = eb.erq_skeleton;
     S(L.p2Exam, [
-      mcq.length ? { role: 'mcq', type: 'bullets', lead: L.mcq, items: mcq } : null,
+      mcq.length ? { role: 'grouplabel', type: 'text', body: L.mcq } : null,
+      ...mcq,
+      // the short-response question on navy, its mark scheme on a green card of its own
       eb.srq ? {
         role: 'srq', type: 'note', label: `${srqLabel}${eb.srq.marks ? ` · ${eb.srq.marks} ${L.marks}` : ''}`,
-        body: lines(strong(eb.srq.q), `**${L.markScheme}**`, (eb.srq.mark_scheme || []).map((m) => `- ${m}`).join('\n')),
+        body: strong(eb.srq.q),
       } : null,
+      eb.srq && (eb.srq.mark_scheme || []).length ? {
+        role: 'srqms', type: 'bullets', lead: L.markScheme, items: eb.srq.mark_scheme.map((m) => ({ text: m })),
+      } : null,
+      // the long question: its label, the question, then the plan with each part's marks at the end
       erq ? {
-        role: 'erq', type: 'note', label: `${L.erq}${erq.marks_total ? ` · ${erq.marks_total} ${L.marks}` : ''}`,
-        body: lines(erq.q, (erq.parts || []).map((pt) => `- ${pt.heading}${has(pt.note) ? ` — ${pt.note}` : ''}${pt.marks ? ` (${pt.marks} ${L.marks})` : ''}`).join('\n')),
+        role: 'erq', type: 'split',
+        left: [
+          { cls: 'ict-r-erqq', type: 'note', label: `${L.erq}${erq.marks_total ? ` · ${erq.marks_total} ${L.marks}` : ''}`, body: boldRuns(erq.q) },
+          (erq.parts || []).length ? { cls: 'ict-r-erqplan', type: 'bullets',
+            items: erq.parts.map((pt) => ({ text: `${pt.heading}${has(pt.note) ? ` — ${pt.note}` : ''}`, tag: pt.marks ? `${pt.marks} ${L.marks}` : undefined })) } : null,
+        ].filter(Boolean),
+        right: [],
       } : null,
       has(eb.how_marked) ? { role: 'howmarked', type: 'text', body: `**${L.howMarked}:** ${eb.how_marked}` } : null,
     ]);
@@ -477,10 +535,9 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
     role: 'hwkey', cls: 'lp-grid-rows', type: 'bullets',
     items: P2.homework_key.map((h) => {
       const it = h.ref ? Q.get(h.ref) : null;
-      return {
-        text: lines(it ? it.q : (h.item || L.refMissing), `${AR} ${strong(h.answer)}`),
-        tag: [h.ref, h.marks ? `${h.marks} ${L.marks}` : ''].filter(Boolean).join(' · ') || undefined,
-      };
+      const head = [h.ref, h.marks ? `${h.marks} ${L.marks}` : ''].filter(Boolean).join(' · ');
+      // ICT sets the answer on its own line in green, with no arrow
+      return { text: lines(head ? `**${head}**` : '', it ? it.q : (h.item || L.refMissing), answerText(h.answer)) };
     }),
   } : null]);
   if (has(P2.next_period) || has(P2.not_going)) {
@@ -497,7 +554,6 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
   }
 
   const pages = String(prov.printed_pages || '');
-  const pagesLabel = /[-–,]/.test(pages) ? `${L.pp}${pages}` : `${L.page}${pages}`;
   const meta = {
     id: doc.lesson_id || `${prov.book_stem || 'lp'}-${prov.topic || ''}`,
     title: plainLabel(prov.topic || doc.lesson_id || ''),
@@ -506,10 +562,12 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
     region: REGION,
     subject: prov.subject || '',
     grade: grade == null ? '' : String(grade),
-    // ICT's hero: chapter / "p.11 · 40 min" / the lp_type pill, one per line.
+    // ICT's hero (v9.3): chapter / "p.24-25 · 40 min" / what the topic is worth in the board
+    // exam, one per line. board_weight is absent for grades 6-8 (outside FBISE's remit), and
+    // then ICT paints no chip at all. The internal lp_type key is never printed.
     chips: [prov.chapter,
-      [pages ? pagesLabel : '', doc.period_minutes ? `${doc.period_minutes} ${L.min}` : ''].filter(has).join(' · '),
-      doc.lp_type]
+      [pages ? `${L.page}${pages}` : '', doc.period_minutes ? `${doc.period_minutes} ${L.min}` : ''].filter(has).join(' · '),
+      doc.board_weight]
       .filter(has).map((value) => ({ label: '', value: String(value) })),
     footer: [[grade != null ? `${L.grade} ${grade}` : '', prov.subject].filter(Boolean).join(' '), prov.chapter, pages ? `${L.pp}${pages}` : '']
       .filter(has).join(' · '),

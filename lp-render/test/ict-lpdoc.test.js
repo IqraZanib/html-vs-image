@@ -30,7 +30,11 @@ const G9UR = () => load('g9_urdu_smoke.lp.json');
 // matrix. Only those exact shapes are undone, so an ordinary "$c_{ij}$" is left alone.
 const visible = (s) => String(s).replace(/⁠/g, '')
   .replace(/\$(\\\\ce\{(?:[^{}]|\{[^{}]*\})*\})\$/g, '$1')
-  .replace(/\\\\displaystyle /g, '');
+  .replace(/\\\\displaystyle /g, '')
+  // an answer's maths wears ICT's green (adapter answerText): exactly $\color{#1F7A4D}{…}$
+  .replace(/\$\\\\color\{#1F7A4D\}\{([^$]*)\}\$/g, '$$$1$$')
+  // and its words are bolded run by run; bold is emphasis, not content
+  .replace(/\*\*/g, '');
 
 test('ICT\'s own migration lifts a 2.0 lp_doc to 3.0 before anything is mapped', () => {
   const v3 = toV3(G7());
@@ -48,7 +52,11 @@ test('the guide is an ict guide: region, header, and no images to buy', () => {
   assert.strictEqual(guide.meta.locale, 'en');
   assert.strictEqual(guide.meta.title, 'Photosynthesis');
   assert.strictEqual(guide.meta.subtitle, 'Grade 7 · General Science');
-  assert.deepStrictEqual(guide.meta.chips.map((c) => c.value), ['Ch.1 · Plant Systems', 'p.11 · 40 min', 'GEN-6-8']);
+  // ICT v9.3's hero: chapter, "p.11 · 40 min", then board_weight — absent for grades 6-8, so no
+  // chip at all; the internal lp_type key ("GEN-6-8") is never printed
+  assert.deepStrictEqual(guide.meta.chips.map((c) => c.value), ['Ch.1 · Plant Systems', 'p.11 · 40 min']);
+  const g9 = buildGuideFromLpDoc(NIETE()).guide;
+  assert.deepStrictEqual(g9.meta.chips.map((c) => c.value), ['Ch. 1 · Matrices and Determinants', 'p.24-25 · 40 min', 'FBISE SSC-I · ~5 marks']);
   assert.deepStrictEqual(guide.images, [], 'an lp_doc declares no generated art — rendering it costs nothing');
   for (const s of guide.sections) assert.match(s.cls, /^ict( |$)/, `${s.id} must carry the ict class`);
 });
@@ -56,10 +64,11 @@ test('the guide is an ict guide: region, header, and no images to buy', () => {
 test('page 1 follows ICT\'s order: outcome, resources, then the five sections with their hosts', () => {
   const { guide } = buildGuideFromLpDoc(G7());
   const ids = guide.sections.map((s) => s.id);
-  assert.deepStrictEqual(ids.slice(0, 18), [
-    'ict-outcome', 'ict-resources',
+  assert.deepStrictEqual(ids.slice(0, 20), [
+    'ict-outcome', 'ict-rmat', 'ict-rpace',                          // resource rows (this lesson has no video)
     'ict-warmup', 'ict-hook', 'ict-watch',                           // Introduction
-    'ict-split', 'ict-chem', 'ict-keywords', 'ict-mistakes',         // Development (+ mistakes)
+    'ict-split', 'ict-chem', 'ict-keywords',                         // Development
+    'ict-grouplabel', 'ict-mistakes',                                // … + the mistakes, under their label
     'ict-worked', 'ict-faded', 'ict-practice', 'ict-supext', 'ict-diff', // Activity (+ differentiation)
     'ict-ask', 'ict-practice', 'ict-para',                           // Conclusion
     'ict-keypoints',                                                 // Home work
@@ -78,7 +87,7 @@ test('nothing ICT paints from the teaching flow is dropped', () => {
   const missing = [];
   const walk = (v, key) => {
     if (typeof v === 'string') {
-      if ((PAINTED.has(key) || key === '[]') && v.trim() && !out.includes(JSON.stringify(v).slice(1, -1))) missing.push(`${key}: ${v.slice(0, 60)}`);
+      if ((PAINTED.has(key) || key === '[]') && v.trim() && !out.includes(visible(JSON.stringify(v).slice(1, -1)))) missing.push(`${key}: ${v.slice(0, 60)}`);
       return;
     }
     if (Array.isArray(v)) v.forEach((x) => walk(x, typeof x === 'string' && ['items', 'steps'].includes(key) ? '[]' : key));
@@ -125,7 +134,7 @@ test('inline chemistry: a bare \\ce{} gets its dollars and a MathJax card; $…$
   const { guide } = buildGuideFromLpDoc(G9UR());
   const mis = guide.sections.find((s) => s.id === 'ict-mistakes');
   assert.strictEqual(mis.engine, 'mathjax');
-  assert.match(mis.items[0].text, /\$\\ce\{H2O\}\$/);
+  assert.match(mis.items[0].q, /\$\\ce\{H2O\}\$/);
   assert.ok(!/\$\$\\ce/.test(JSON.stringify(guide)), 'never double-wrapped');
   const chem = guide.sections.find((s) => s.id === 'ict-chem');
   assert.strictEqual(chem.engine, 'mathjax');
@@ -252,7 +261,8 @@ test('all 16 block types and every 3.0 section field are mapped and drawn', () =
   assert.ok(svgs.every((x) => x.startsWith('<svg')), 'data:image/svg+xml of a real <svg>');
   assert.ok(svgs[0].includes('DIAGRAM-CAPTION') && svgs[1].includes('BOARD-DIAGRAM'), 'the engine draws each caption');
   assert.deepStrictEqual(report.unrendered.filter((u) => u.type === 'diagram'), []);
-  assert.ok(guide.meta.chips.some((c) => c.value === 'pp. 20-21 · 40 min'), 'a page range uses the plural locator');
+  assert.ok(guide.meta.chips.some((c) => c.value === 'p.20-21 · 40 min'), 'the hero prints "p.20-21", as ICT\'s hero does');
+  assert.match(guide.meta.footer, /pp\. 20-21$/, 'the footer keeps the plural locator, as ICT\'s footer does');
   const hosts = guide.sections.map((s) => s.id);
   assert.ok(hosts.indexOf('ict-diff') > hosts.indexOf('ict-practice'), 'differentiation follows the section with the practice');
   assert.deepStrictEqual(report.warnings, []);
@@ -308,7 +318,7 @@ test('page chrome and structure: ICT\'s labels for the band, a fresh page for su
     assert.strictEqual(/\blp-atomic\b/.test(s.cls), s.type !== 'bullets', `${s.id} (${s.type})`);
   }
   const pack = require('../decorative/regions/ict/theme');
-  assert.strictEqual(pack.PAGE_NUMBER_STYLE, 'foot-band');
+  assert.deepStrictEqual(pack.PAGE_LAYOUT, { width: 520, onePagePerPart: true }, 'ICT\'s phone page, one page per part');
   assert.match(pack.THEME_OVERRIDE_CSS, /@font-face\{font-family:'Inter';font-weight:700/, 'Inter embedded in this pack only');
   assert.ok(!require('../fonts/load').fontFaceCss().includes("'Inter'"), 'the shared font loader is untouched');
 });
@@ -381,7 +391,7 @@ test('the real NIETE lesson (G9 maths, schema 3.0) maps completely: nothing pain
   const missing = [];
   const walk = (v, key) => {
     if (typeof v === 'string') {
-      if ((PAINTED.has(key) || key === '[]') && v.trim() && !out.includes(JSON.stringify(v).slice(1, -1))) missing.push(`${key}: ${v.slice(0, 60)}`);
+      if ((PAINTED.has(key) || key === '[]') && v.trim() && !out.includes(visible(JSON.stringify(v).slice(1, -1)))) missing.push(`${key}: ${v.slice(0, 60)}`);
       return;
     }
     if (Array.isArray(v)) v.forEach((x) => walk(x, typeof x === 'string' && ['items', 'steps', 'mark_scheme'].includes(key) ? '[]' : key));

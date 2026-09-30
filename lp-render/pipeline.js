@@ -13,6 +13,7 @@ const { htmlToPdf, closeBrowser } = require('./index');
 const { THEME_CSS } = require('./decorative/theme');
 const { renderDecorativeLesson } = require('./decorative/render');
 const { htmlToPixelPdf } = require('./render/png-to-pdf');
+const { htmlToPartPagesPdf } = require('./render/part-pages-pdf');
 const { ensureCast } = require('./decorative/characters');
 const store = require('./store/assets');
 const { resolveRegion } = require('../imagegen/prompts/regions');
@@ -105,11 +106,11 @@ function readSkills(log) {
   log(`Read ${titles.length} skills from RULES.md first — applying them.`);
   return (policy || '').trim();
 }
-async function screenshot(html) {
+async function screenshot(html, width = 794) {
   const browser = await chromium.launch({ executablePath: chromePath(), args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'] });
   try {
     const page = await browser.newPage();
-    await page.setViewportSize({ width: 794, height: 1123 });
+    await page.setViewportSize({ width, height: 1123 });
     await page.setContent(html, { waitUntil: 'networkidle' });
     await page.evaluate(async () => { await document.fonts.ready; });
     return await page.screenshot({ fullPage: true });
@@ -249,6 +250,7 @@ async function renderLessonImage(content, opts = {}) {
   let regionCss = '';
   let regionPageStyle = '';
   let regionMaxPages = null;
+  let regionLayout = null;
   let overflowFindings = [];
   if (regionPack) {
     try {
@@ -256,6 +258,9 @@ async function renderLessonImage(content, opts = {}) {
       regionCss = pack.THEME_OVERRIDE_CSS || '';
       regionPageStyle = pack.PAGE_NUMBER_STYLE || '';
       regionMaxPages = Number(pack.MAX_PAGES) || null;
+      // A pack may deliver a page format of its own (ICT: one phone-width page per part).
+      // Absent for every other pack, which keeps the A4 composer below exactly as it was.
+      regionLayout = pack.PAGE_LAYOUT && pack.PAGE_LAYOUT.onePagePerPart ? pack.PAGE_LAYOUT : null;
       log(`  ⛨ region design pack "${themeRegion}" applied`);
     } catch (_) { /* no design pack for this region — default look */ }
   }
@@ -284,7 +289,12 @@ async function renderLessonImage(content, opts = {}) {
         if ((list || []).length > 8) log(`  ⚠ …and ${list.length - 8} more overflow finding(s)`);
         overflowFindings = list || [];
       };
-      pdf = await htmlToPixelPdf(html, regionPageStyle
+      if (regionLayout) {
+        pdf = (await htmlToPartPagesPdf(html, {
+          pageWidth: regionLayout.width, footerText: meta.footer || '', pageLabel: meta.pageLabel,
+          dir: resolveDirection(locale).dir, onFindings,
+        })).pdf;
+      } else pdf = await htmlToPixelPdf(html, regionPageStyle
         ? {
           pageStyle: regionPageStyle, footerText: (content.meta && content.meta.footer) || '', onFindings,
           // read only by the 'foot-band' page style (the ICT pack); absent for every other region
@@ -298,7 +308,7 @@ async function renderLessonImage(content, opts = {}) {
       await closeBrowser();
     }
   }
-  const png = await screenshot(html);
+  const png = await screenshot(html, regionLayout ? regionLayout.width : 794);
   // Report how full the page is, so a caller with a page contract can not only shrink
   // figures to fit but GROW them to fill: a lesson that lands with 450px spare reads
   // as unfinished, and its figures were the thing that should have been bigger.
