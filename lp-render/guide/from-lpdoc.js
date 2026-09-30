@@ -31,6 +31,7 @@ const { applyOverlay, LABELS } = require('./vendor/lp_doc_overlay');
 const { questionIndex } = require('./vendor/lp_doc_questions');
 const { renderDiagram } = require('./vendor/lp_diagrams');
 const { diagramLabel } = require('./vendor/lp_diagram_labels');
+const { buildPageModel } = require('./lpdoc-pages');
 const { texToUnicode } = require('./vendor/lp_diagrams/lib/tex');
 const { requiredBox } = require('./vendor/lp_diagrams/lib/svg');
 
@@ -207,7 +208,16 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
   // lesson's language). The board plan on the support page wears no badge in ICT's design either.
   // An unknown or broken spec is not a blank box: it prints a labelled placeholder and is
   // reported, as ICT does.
-  const diagramBody = (spec, where, { badge = false } = {}) => {
+  // Memoised by spec: the page model (lpdoc-pages.js) asks for the same figures, and each one is
+  // drawn — and listed in guide.images — once.
+  const drawn = new Map();
+  const diagramBody = (spec, where, opts = {}) => {
+    if (spec && drawn.has(spec)) return drawn.get(spec);
+    const out = drawDiagram(spec, where, opts);
+    if (spec) drawn.set(spec, out);
+    return out;
+  };
+  const drawDiagram = (spec, where, { badge = false } = {}) => {
     const sp = spec || {};
     try {
       const svg = sizedSvg(renderDiagram(sp));
@@ -540,9 +550,9 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
       return { text: lines(head ? `**${head}**` : '', it ? it.q : (h.item || L.refMissing), answerText(h.answer)) };
     }),
   } : null]);
-  if (has(P2.next_period) || has(P2.not_going)) {
-    report.notPrinted.push('page2.next_period / not_going — ICT stopped painting them; the sequence strip carries next (bd-a8veu.20)');
-  }
+  // ICT's production template stopped painting these (bd-a8veu.20); NIETE's approved page design
+  // prints the next lesson as COMING UP and "Tomorrow:", so the page model does — "not going" stays out
+  if (has(P2.not_going)) report.notPrinted.push('page2.not_going — not painted (bd-a8veu.20)');
   if (has(P2.coaching_lookfor)) {
     S(L.p2Coach, [{
       role: 'coach', type: 'text',
@@ -552,6 +562,13 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
     // is withheld rather than printed with a placeholder in it.
     report.unrendered.push({ type: 'coaching_offer', why: 'the WhatsApp number is redacted in the mirror — needs the real line from ICT' });
   }
+
+  // The approved NIETE page design, as a plain data model the ict pack lays out (lpdoc-pages.js).
+  const layout = buildPageModel({
+    doc, want, L, grade, prov, report, has, plainLabel, unnumber, questionIndex,
+    fix: (v) => prep(String(v)),
+    diagram: (spec, where, opts) => { const r = diagramBody(spec, where, opts); return r && r.imageIds ? r.imageIds[0] : null; },
+  });
 
   const pages = String(prov.printed_pages || '');
   const meta = {
@@ -580,7 +597,7 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
   for (const s of sections) for (const it of (s.type === 'math' ? s.items || [] : [])) {
     if (s.engine !== 'mathjax') badMaths(`$${it.tex}$`, report.warnings, s.id);
   }
-  return { guide: { meta, sections, images }, report };
+  return { guide: { meta, sections, images, layout: { kind: 'ict-pages', ...layout } }, report };
 }
 
 // IS THIS AN ICT lp_doc, and not a Guide? A Guide's sections carry a `type`; an lp_doc's carry

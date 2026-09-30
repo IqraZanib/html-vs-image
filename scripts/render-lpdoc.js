@@ -8,8 +8,9 @@
 // lp_doc -> ICT adapter (lp-render/guide/from-lpdoc.js) -> Guide -> renderLessonImage with the
 // ict design pack -> PDF. No model is called and no image is generated: an lp_doc carries no
 // generated art and the adapter draws its diagrams with ICT's own engine, so this costs nothing
-// and needs no API key. The PDF is ICT's delivery format: a 520px phone page, the lesson on page 1
-// and the teacher support on page 2, printed by Chrome from the HTML (vector, selectable text).
+// and needs no API key. The PDF is NIETE's approved page design: portrait pages, one per stage
+// (Start, Explanation, Practice, Conclusion) plus Teacher support, printed by Chrome from the HTML
+// (vector, selectable text).
 // Output goes to out/ict/ by default (git-ignored): the .pdf, the .html page it was printed from
 // (HTML + SVG), a .png preview, the .guide.json and the adapter report.
 const fs = require('node:fs');

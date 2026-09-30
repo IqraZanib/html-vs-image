@@ -103,9 +103,13 @@ test('what ICT has decided not to paint is not painted — and each omission is 
   const out = JSON.stringify(guide);
   assert.ok(!out.includes('Blank 1 = stomata'), 'model answers are never painted (bd-ir1aq)');
   assert.ok(!guide.sections.some((s) => s.id === 'ict-mcq'), 'no FBISE exam bank on a grade 7 plan (bd-a8veu.18)');
-  assert.ok(!out.includes('§1.8 Respiration'), 'next period is not painted (bd-a8veu.20)');
+  // ICT's production template stopped painting the next period (bd-a8veu.20); NIETE's approved page
+  // design prints it (COMING UP, "Tomorrow:"), so it is in the page model and nowhere else
+  assert.ok(!JSON.stringify(guide.sections).includes('§1.8 Respiration'), 'not in the v9 card flow');
+  assert.ok(guide.layout.conclusion.tomorrow.includes('§1.8 Respiration'), 'the approved design prints it as Tomorrow');
+  assert.ok(!out.includes(G7().page2.not_going), '"not going today" is never painted');
   const why = report.notPrinted.join('\n');
-  assert.match(why, /model_answers/); assert.match(why, /exam_bank/); assert.match(why, /next_period/);
+  assert.match(why, /model_answers/); assert.match(why, /exam_bank/); assert.match(why, /not_going/);
   // …but a grade 9 plan does carry its exam bank
   const g9 = buildGuideFromLpDoc(G9UR()).guide;
   assert.ok(g9.sections.some((s) => s.id === 'ict-mcq'), 'grade 9 prints the FBISE questions');
@@ -318,9 +322,9 @@ test('page chrome and structure: ICT\'s labels for the band, a fresh page for su
     assert.strictEqual(/\blp-atomic\b/.test(s.cls), s.type !== 'bullets', `${s.id} (${s.type})`);
   }
   const pack = require('../decorative/regions/ict/theme');
-  assert.deepStrictEqual(pack.PAGE_LAYOUT, { width: 520, onePagePerPart: true }, 'ICT\'s phone page, one page per part');
-  assert.match(pack.THEME_OVERRIDE_CSS, /@font-face\{font-family:'Inter';font-weight:700/, 'Inter embedded in this pack only');
-  assert.ok(!require('../fonts/load').fontFaceCss().includes("'Inter'"), 'the shared font loader is untouched');
+  assert.deepStrictEqual(pack.PAGE_LAYOUT, { width: 896, height: 1200, fixedPages: true }, 'NIETE\'s approved portrait page');
+  assert.match(pack.THEME_OVERRIDE_CSS, /@font-face\{font-family:'ICT Cond';font-weight:700/, 'the condensed face is embedded in this pack only');
+  assert.ok(!require('../fonts/load').fontFaceCss().includes("'ICT Cond'"), 'the shared font loader is untouched');
 });
 
 test('maths: a long display formula becomes breakable; an inline matrix is display-sized; bad TeX is reported', () => {

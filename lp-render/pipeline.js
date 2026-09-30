@@ -13,7 +13,7 @@ const { htmlToPdf, closeBrowser } = require('./index');
 const { THEME_CSS } = require('./decorative/theme');
 const { renderDecorativeLesson } = require('./decorative/render');
 const { htmlToPixelPdf } = require('./render/png-to-pdf');
-const { htmlToPartPagesPdf } = require('./render/part-pages-pdf');
+const { htmlToFixedPagesPdf } = require('./render/fixed-pages-pdf');
 const { ensureCast } = require('./decorative/characters');
 const store = require('./store/assets');
 const { resolveRegion } = require('../imagegen/prompts/regions');
@@ -239,7 +239,10 @@ async function renderLessonImage(content, opts = {}) {
   const cast = (anyImage || !castAllowed || process.env.LP_NO_IMAGES === '1')
     ? {} : await ensureCast({ apiKey, gatePolicy, locale });
   if (!anyImage && !castAllowed) log('  (no illustration in this lesson; this design set does not use the character cast)');
-  const { headerHtml, bodyHtml, headCss } = renderDecorativeLesson(content, imagesMap, cast);
+  // A pack may lay out its own page (ICT: NIETE's approved design, from guide.layout). It returns
+  // null for anything it does not draw; every other pack has no COMPOSE and renders as before.
+  const composed = regionPack && typeof regionPack.COMPOSE === 'function' ? regionPack.COMPOSE(content, imagesMap) : null;
+  const { headerHtml, bodyHtml, headCss } = composed || renderDecorativeLesson(content, imagesMap, cast);
   let html = buildShell({ headerHtml, bodyHtml, locale, title: meta.title || contentId });
   // Region DESIGN PACK: each region with an approved design set owns a folder
   // (decorative/regions/<region>/) holding its theme.js (CSS overrides, loaded AFTER
@@ -258,9 +261,9 @@ async function renderLessonImage(content, opts = {}) {
       regionCss = pack.THEME_OVERRIDE_CSS || '';
       regionPageStyle = pack.PAGE_NUMBER_STYLE || '';
       regionMaxPages = Number(pack.MAX_PAGES) || null;
-      // A pack may deliver a page format of its own (ICT: one phone-width page per part).
+      // A pack may deliver a page format of its own (ICT: NIETE's fixed portrait pages).
       // Absent for every other pack, which keeps the A4 composer below exactly as it was.
-      regionLayout = pack.PAGE_LAYOUT && pack.PAGE_LAYOUT.onePagePerPart ? pack.PAGE_LAYOUT : null;
+      regionLayout = pack.PAGE_LAYOUT && pack.PAGE_LAYOUT.fixedPages ? pack.PAGE_LAYOUT : null;
       log(`  ⛨ region design pack "${themeRegion}" applied`);
     } catch (_) { /* no design pack for this region — default look */ }
   }
@@ -289,15 +292,16 @@ async function renderLessonImage(content, opts = {}) {
         if ((list || []).length > 8) log(`  ⚠ …and ${list.length - 8} more overflow finding(s)`);
         overflowFindings = list || [];
       };
-      if (regionLayout) {
-        pdf = (await htmlToPartPagesPdf(html, {
-          pageWidth: regionLayout.width, footerText: meta.footer || '', pageLabel: meta.pageLabel,
-          dir: resolveDirection(locale).dir, onFindings,
-        })).pdf;
+      if (regionLayout && regionLayout.fixedPages) {
+        // fixed pages paginate in the browser; the paginated page is also the .html deliverable
+        const printed = await htmlToFixedPagesPdf(html, { pageWidth: regionLayout.width, pageHeight: regionLayout.height, onFindings });
+        pdf = printed.pdf;
+        html = printed.html;
+        for (const [k, st] of printed.stages.entries()) log(`  ▭ page ${k + 1}: ${st.replace(/\+$/, ' (continued)')} · scale ${printed.scales[k]}${printed.heights[k] !== regionLayout.height ? ` · grew to ${printed.heights[k]}px` : ''}`);
       } else pdf = await htmlToPixelPdf(html, regionPageStyle
         ? {
           pageStyle: regionPageStyle, footerText: (content.meta && content.meta.footer) || '', onFindings,
-          // read only by the 'foot-band' page style (the ICT pack); absent for every other region
+          // read only by the 'foot-band' page style, which no pack sets today (kept for an A4 ICT variant)
           pageLabel: meta.pageLabel, runTitle: meta.runTitle, continuedLabel: meta.continuedLabel,
           dir: resolveDirection(locale).dir,
         }
