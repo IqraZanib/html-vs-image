@@ -403,3 +403,14 @@ test('our copy of ICT\'s diagram engine draws the production molecules byte for 
   assert.strictEqual(renderDiagram(f.delivered_en), f.delivered_en_svg, 'the English delivery, prod 2026-09-06');
   assert.strictEqual(renderDiagram(f.failed_ur), f.failed_ur_svg, 'the Urdu spec from the same segment');
 });
+
+test('an ICT-authored English science lesson (G7 photosynthesis) maps cleanly, diagrams drawn in code', () => {
+  const { guide, report } = buildGuideFromLpDoc(load('authored_PK_G7_GSCI_CH1_PHOTOSYNTHESIS.lp.json'));
+  assert.strictEqual(guide.meta.locale, 'en');
+  assert.strictEqual(guide.meta.subtitle, 'Grade 7 · General Science');
+  assert.deepStrictEqual(report.warnings, []);
+  assert.strictEqual(guide.images.length, 2, 'the leaf cross-section and the board-plan flow');
+  assert.ok(guide.images.every((im) => /^data:image\/svg\+xml;base64,/.test(im.dataUri)), 'SVG, drawn by ICT\'s engine');
+  assert.ok(report.unrendered.some((u) => u.type === 'textbook_figure'), 'the book photo is a reference until ICT\'s crops are reachable');
+  assert.ok(!guide.sections.some((s) => s.id === 'ict-mcq'), 'grade 7: no FBISE question bank');
+});
