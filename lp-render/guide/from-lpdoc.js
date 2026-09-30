@@ -525,4 +525,14 @@ function buildGuideFromLpDoc(input, { lang } = {}) {
   return { guide: { meta, sections, images }, report };
 }
 
-module.exports = { buildGuideFromLpDoc, REGION };
+// IS THIS AN ICT lp_doc, and not a Guide? A Guide's sections carry a `type`; an lp_doc's carry
+// `blocks`, and every lp_doc has `provenance` or `page2`. LP Studio and scripts/render-lpdoc.js
+// use this to send an ICT file through the adapter instead of reading it as a finished guide —
+// read as a guide, an lp_doc renders as blank cards.
+function isLpDoc(v) {
+  return !!v && typeof v === 'object' && !Array.isArray(v) && Array.isArray(v.sections)
+    && v.sections.some((s) => s && Array.isArray(s.blocks))
+    && !!(v.provenance || v.page2);
+}
+
+module.exports = { buildGuideFromLpDoc, isLpDoc, REGION };

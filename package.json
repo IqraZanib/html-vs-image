@@ -6,6 +6,7 @@
     "test": "node --test lp-render/test/",
     "test:smoke": "node --test lp-render/test/render.smoke.test.js",
     "render": "node scripts/render-lp-image.js",
+    "render:ict": "node scripts/render-lpdoc.js",
     "studio": "node scripts/lp-studio.js",
     "test:imagegen": "node --test imagegen/test/",
     "test:visual": "node scripts/visual-regression.js",

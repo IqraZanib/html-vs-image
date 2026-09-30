@@ -29,6 +29,23 @@ const { guide: ur } = buildGuideFromLpDoc(lpDoc, { lang: 'ur' }); // needs ur_ov
 const { pdf } = await renderLessonImage(guide, { log: console.log });
 ```
 
+## Render an ICT lesson locally
+
+No API key is needed and nothing is bought. An lp_doc has no generated art, and its diagrams are drawn in code.
+
+```
+npm install                                   # openchemlib + @fontsource/inter
+npm run render:ict -- lp-render/fixtures/ict/niete_v9_gate_base.lp.json
+#   -> out/ict/PK_G9_MATH_CH1_MATRIX_MULTIPLY.en.{pdf,png,guide.json,report.json}
+#   --lang ur for a lesson with an Urdu overlay; --out <dir> to write elsewhere
+```
+
+In LP Studio (`npm run studio`, http://localhost:5178), paste an ICT lp_doc file as it is and
+press Render. Studio detects it (`isLpDoc`), converts it with the ICT adapter, applies the ict
+pack, and skips the 2-page passes that could call a paid model. No manual conversion is needed.
+
+Real inputs, and where each came from: `lp-render/fixtures/ict/README.md`.
+
 ## ICT's paint rules this follows (and where they come from)
 
 | Rule | ICT source |

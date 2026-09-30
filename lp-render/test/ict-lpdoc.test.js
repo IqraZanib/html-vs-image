@@ -25,8 +25,12 @@ const FIX = path.join(__dirname, '..', 'fixtures', 'ict');
 const load = (f) => JSON.parse(fs.readFileSync(path.join(FIX, f), 'utf8'));
 const G7 = () => load('g7_science_photosynthesis.lp.json');
 const G9UR = () => load('g9_urdu_smoke.lp.json');
-// What a reader sees of a string once the adapter's two notation changes are undone.
-const visible = (s) => String(s).replace(/⁠/g, '').replace(/\$\\ce\{/g, '\\ce{').replace(/\}\$/g, '}');
+// Undo the adapter's three notation changes, as they appear in JSON text: the word joiner after
+// a "Label:" colon, the dollars given to a bare \ce{...}, and ICT's \displaystyle on an inline
+// matrix. Only those exact shapes are undone, so an ordinary "$c_{ij}$" is left alone.
+const visible = (s) => String(s).replace(/⁠/g, '')
+  .replace(/\$(\\\\ce\{(?:[^{}]|\{[^{}]*\})*\})\$/g, '$1')
+  .replace(/\\\\displaystyle /g, '');
 
 test('ICT\'s own migration lifts a 2.0 lp_doc to 3.0 before anything is mapped', () => {
   const v3 = toV3(G7());
@@ -345,4 +349,57 @@ test('maths in a label is written in Unicode, not printed as TeX source', () => 
   const { guide } = buildGuideFromLpDoc(doc);
   assert.ok(guide.sections.some((s) => s.label === 'Find A⁻¹ (p.68)'));
   assert.ok(guide.sections.some((s) => s.lead === 'Burning CH₄ + 2O₂ → CO₂ + 2H₂O'), JSON.stringify(guide.sections.map((s) => s.lead).filter(Boolean)));
+});
+
+// ── Real NIETE-Rumi inputs (lp-render/fixtures/ict/README.md says where each came from) ─────────
+
+const NIETE = () => load('niete_v9_gate_base.lp.json');
+
+test('isLpDoc tells an ICT lp_doc from a guide, so LP Studio and the CLI route it to the adapter', () => {
+  const { isLpDoc } = require('../guide/from-lpdoc');
+  assert.strictEqual(isLpDoc(NIETE()), true, 'NIETE schema-3.0 lesson');
+  assert.strictEqual(isLpDoc(G7()), true, 'ICT schema-2.0 sample');
+  assert.strictEqual(isLpDoc(buildGuideFromLpDoc(G7()).guide), false, 'a guide is not an lp_doc');
+  assert.strictEqual(isLpDoc(load('niete_prod_2026-09-06_halicin_molecule.json')), false, 'a diagram fixture is not a lesson');
+  assert.strictEqual(isLpDoc(null), false);
+  const studio = fs.readFileSync(path.join(__dirname, '..', '..', 'scripts', 'lp-studio.js'), 'utf8');
+  assert.match(studio, /if \(isLpDoc\(parsed\)\)/, 'LP Studio converts a pasted lp_doc');
+  assert.match(studio, /const looksLikeGuide = fromLpDoc \|\|/, '…and skips the paid 2-page passes for it');
+});
+
+test('the real NIETE lesson (G9 maths, schema 3.0) maps completely: nothing painted is dropped', () => {
+  const doc = NIETE();
+  const { guide, report } = buildGuideFromLpDoc(doc);
+  assert.strictEqual(guide.meta.region, 'ict');
+  assert.strictEqual(guide.meta.title, 'Multiplying two 2×2 matrices');
+  assert.deepStrictEqual(report.warnings, [], 'no unknown block, no unparsed maths');
+  assert.strictEqual(guide.images.length, 2, 'the geometry diagram and the board-plan grid are drawn');
+  assert.deepStrictEqual(report.unrendered.map((u) => u.type), ['coaching_offer']);
+  const out = visible(JSON.stringify(guide));
+  const PAINTED = new Set(['text', 'question', 'look_for', 'q', 'a', 'word', 'meaning', 'title', 'prompt',
+    'result', 'answer', 'support', 'extension', 'caption', 'legend', 'from', 'reteach_rule']);
+  const missing = [];
+  const walk = (v, key) => {
+    if (typeof v === 'string') {
+      if ((PAINTED.has(key) || key === '[]') && v.trim() && !out.includes(JSON.stringify(v).slice(1, -1))) missing.push(`${key}: ${v.slice(0, 60)}`);
+      return;
+    }
+    if (Array.isArray(v)) v.forEach((x) => walk(x, typeof x === 'string' && ['items', 'steps', 'mark_scheme'].includes(key) ? '[]' : key));
+    else if (v && typeof v === 'object') for (const [k, x] of Object.entries(v)) { if (k !== 'spec') walk(x, k); }
+  };
+  for (const s of doc.sections) {
+    walk(s.blocks, 'blocks'); if (s.warmup) walk(s.warmup, 'warmup');
+    if (s.checkpoint) walk(s.checkpoint, 'checkpoint'); if (s.exit_ticket) walk(s.exit_ticket, 'exit_ticket');
+    if (s.reteach_rule) walk(s.reteach_rule, 'reteach_rule');
+  }
+  assert.deepStrictEqual(missing, [], 'every painted string of the real lesson reaches the guide verbatim');
+  assert.ok(guide.sections.some((s) => s.id === 'ict-seq'), 'the sequence strip (last / this / checkpoint)');
+  assert.ok(guide.sections.some((s) => s.id === 'ict-mcq'), 'grade 9: the FBISE question bank is printed');
+});
+
+test('our copy of ICT\'s diagram engine draws the production molecules byte for byte', () => {
+  const { renderDiagram } = require('../guide/vendor/lp_diagrams');
+  const f = load('niete_prod_2026-09-06_halicin_molecule.json');
+  assert.strictEqual(renderDiagram(f.delivered_en), f.delivered_en_svg, 'the English delivery, prod 2026-09-06');
+  assert.strictEqual(renderDiagram(f.failed_ur), f.failed_ur_svg, 'the Urdu spec from the same segment');
 });
