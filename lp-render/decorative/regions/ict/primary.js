@@ -1,0 +1,501 @@
+'use strict';
+// NIETE's approved lesson-plan page for GRADES 1–5 (lp_html v8.1, the "phone page"): one column,
+// 520 px wide, printed on tall 520×2000 pages that read on a phone the way a WhatsApp PDF is read
+// — top to bottom. Three approved lessons are the reference: Grade 1 English, Grade 1 Maths and
+// Grade 2 Urdu (shared 2026-10-01).
+//
+//   start      navy title card · day stepper · TODAY · journey so far / coming up · learning
+//              outcome · to prepare · video · key words · write on the board
+//   stages     a coloured bar per stage (Opening teal I, Explanation navy D, We Do blue A,
+//              You Do green A, Check purple C, Homework slate H) and that stage's cards
+//   close      coaching corner
+//
+// What this adds to the approved pages, and why: pictures drawn in code from the lesson's own
+// words (a clock at the lesson's time, the letters being blended, the story's scenes), so the page
+// is bright for young children and costs nothing; and the reference's print defects fixed (a
+// teacher line split at "p.", an ASCII clock, a leaked "model_solution:" key, arrows that point
+// against Urdu's reading direction).
+//
+// The page model is the lesson file itself (lp-render/guide/from-primary.js checks it). This file
+// lays it out as a column of blocks; lp-render/render/phone-pages-pdf.js flows those blocks onto
+// pages, continuing a stage on the next page under a "· continued" bar. Everything sits under
+// .ictq, so no other region or the grades 6–12 design (.ictp) is touched.
+const fs = require('node:fs');
+const path = require('node:path');
+const { draw, HTML_VISUALS, heroBadge, ICON, face, C } = require('./primary-art');
+
+const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const AR = /[؀-ۿ]/;
+
+// ── LABELS ────────────────────────────────────────────────────────────────────────────────
+// As the approved pages print them. The Urdu page mixes Urdu labels with some English ones
+// (TEACHER MODELS, WE DO · CLASS PRACTISES TOGETHER …) — kept as approved.
+const LABELS = {
+  en: {
+    grade: 'Grade', today: 'Today', journey: 'Journey so far', coming: 'Coming up', outcome: 'Learning outcome',
+    prepare: 'To prepare', video: 'Video resource', keywords: 'Key words', board: 'Write on the board',
+    warmup: 'Warm-up', setup: 'Set this up', hook: 'Open with this question', hookPill: '', teacherModels: 'Teacher models',
+    explain: 'Explain', ido: 'I do', worked: 'Worked example', ask: 'Ask this', mistakes: 'Common mistakes and the question you ask back',
+    youAsk: 'You ask', guided: 'Guided', wedo: 'We do', together: 'We do · class practises together', setTask: 'Set the task going',
+    say: 'Say:', independent: 'Independent', youdo: 'You do', alone: 'You do · pupils work alone', answer: 'Answer',
+    sample: 'Sample answer', diff: 'Differentiation', stuck: 'If stuck', early: 'If they finish early', exit: 'Exit ticket',
+    homework: 'Homework', homeworkPill: '', coaching: 'Coaching corner', askYourself: 'Ask yourself',
+    coachSteps: ['Record up to 40 minutes of this lesson', 'Send it to NIETE on WhatsApp', 'Same-day tips back: what worked, and one thing to try'],
+    continued: 'continued', page: 'page {n} of {m}', min: '{n} min', pp: 'pp.', p: 'p.',
+  },
+  ur: {
+    grade: 'جماعت', today: 'آج', journey: 'اب تک کا سفر', coming: 'آگے کیا', outcome: 'تدریسی نتیجہ',
+    prepare: 'تیاری کیجیے', video: 'ویڈیو', keywords: 'کلیدی الفاظ', board: 'تختۂ سیاہ پر لکھیے',
+    warmup: 'Warm-up', setup: 'Set this up', hook: 'اس سوال سے آغاز کریں', hookPill: 'آغاز', teacherModels: 'Teacher models',
+    explain: 'وضاحت', ido: 'کر کے دکھائیں', worked: 'Worked example', ask: 'یہ سوال پوچھیں', mistakes: 'Common mistakes',
+    youAsk: 'You ask', guided: 'رہنمائی', wedo: 'مل کر کریں', together: 'We do · class practises together', setTask: 'Set the task going',
+    say: 'استاد:', independent: 'خود کام', youdo: 'خود کریں', alone: 'You do · pupils work alone', answer: 'جواب',
+    sample: 'نمونہ جواب', diff: 'انفرادی فرق کے مطابق', stuck: 'اگر بچے اٹک جائیں', early: 'اگر جلد فارغ ہو جائیں', exit: 'اختتامی پرچی',
+    homework: 'Homework', homeworkPill: 'ہوم ورک', coaching: 'کوچنگ کارنر', askYourself: 'خود سے پوچھیے',
+    coachSteps: ['اس سبق کی چالیس منٹ تک کی ریکارڈنگ بنائیے', 'واٹس ایپ پر نیٹ کو بھیجیے', 'اسی دن جواب: کیا اچھا رہا، اور ایک بات جو آزمانی ہے'],
+    continued: 'جاری ہے', page: 'صفحہ {n} از {m}', min: '{n} منٹ', pp: 'صفحات', p: 'صفحہ',
+  },
+};
+
+// ── TEXT ──────────────────────────────────────────────────────────────────────────────────
+// A pause mark "⏸۲" in an Urdu lesson is a reading-pause sign with its number: drawn as a chip.
+// A run of underscores is a blank to fill: drawn as a writing line of the same length.
+function rich(text) {
+  return esc(text)
+    .replace(/⏸\s*([0-9۰-۹٠-٩]+)?/g, (_, n) => `<span class="q-pz"><i></i><i></i>${n ? `<b>${n}</b>` : ''}</span>`)
+    .replace(/_{3,}/g, (m) => `<span class="q-blank" style="width:${Math.min(5, Math.max(1.6, m.length * 0.32)).toFixed(2)}em"></span>`);
+}
+// A long paragraph in sentence groups of about `n` characters, so a page break can fall between
+// two sentences rather than move the whole paragraph (and leave half a page empty).
+function sentenceChunks(text, n = 170) {
+  // a sentence ends at . ! ? ۔ ؟ followed by a space and a capital, a digit, a quote or Urdu —
+  // not inside a quoted dictionary entry ("adjective. bright with sunlight")
+  const parts = String(text).split(/(?<=[.!?۔؟])\s+(?=[A-Z0-9"“‘'(\u0600-\u06FF])/);
+  const out = [];
+  for (const p of parts) {
+    if (out.length && out[out.length - 1].length < n) out[out.length - 1] += ` ${p}`;
+    else out.push(p);
+  }
+  if (out.length > 1 && out[out.length - 1].length < 50) out[out.length - 2] += ` ${out.pop()}`;
+  return out;
+}
+// pictures small enough to sit beside the text they belong to
+const SIDE = ['clock', 'tiles'];
+const quoted = (line) => (/^[“"‘'(—–-]/.test(line.trim()) || /[“”]/.test(line) ? line : `“${line}”`);
+
+function composePrimary(guide) {
+  const lesson = guide.layout.lesson;
+  const lang = lesson.lang === 'ur' ? 'ur' : 'en';
+  const L = LABELS[lang];
+  const rtl = lang === 'ur';
+  // the direction a piece of text reads in: an Urdu lesson's English-only lines read left to right
+  const dir = (s) => (rtl ? (AR.test(String(s)) ? 'rtl' : 'ltr') : 'ltr');
+  const T = (s, tag = 'span', cls = '') => `<${tag}${cls ? ` class="${cls}"` : ''} dir="${dir(s)}">${rich(s)}</${tag}>`;
+  const lab = (s) => `<bdi dir="${AR.test(s) ? 'rtl' : 'ltr'}">${esc(s)}</bdi>`;
+  // a paragraph as units a page break may fall between (sentence groups); `lead` opens the first
+  const para = (text, cls = '', lead = '') => sentenceChunks(text).map((c, i) => `<div data-units>${i === 0 ? lead : ''}<div class="q-chunk${cls ? ` ${cls}` : ''}" dir="${dir(c)}">${rich(c)}</div></div>`).join('');
+  const pill = (s, cls) => (s ? `<span class="q-pill ${cls}">${lab(s)}</span>` : '');
+  const minutes = (n) => (n ? L.min.replace('{n}', n) : '');
+  const ARROW = rtl ? '←' : '→';
+  const out = [];
+  const add = (stage, html, attrs = '') => out.push(`<div class="q-blk"${stage ? ` data-stage="${stage}"` : ''}${attrs ? ` ${attrs}` : ''}>${html}</div>`);
+  const counts = { visuals: 0 };
+  const fig = (spec, cls = '') => {
+    if (!spec) return '';
+    counts.visuals += 1;
+    if (spec.type === 'story_map') return storyMap(spec);
+    if (spec.type === 'tracker') return tracker(spec);
+    return `<figure class="q-fig ${cls}">${draw(spec)}${spec.caption ? `<figcaption>${esc(spec.caption)}</figcaption>` : ''}</figure>`;
+  };
+  // the story map: the story's events as boxes in reading order, the pause signs between them
+  const storyMap = (spec) => `<div class="q-story" dir="${rtl ? 'rtl' : 'ltr'}">${spec.items.map((it, i) => {
+    const step = /^⏸/.test(it) ? `<span class="q-arrow">${ARROW}</span>${rich(it)}` : `<span class="q-arrow">${ARROW}</span><span class="q-ev q-ev${i % 5}">${rich(it)}</span>`;
+    return i === 0 ? `<span class="q-ev q-ev0">${rich(it)}</span>` : step;
+  }).join('')}</div>`;
+  const tracker = (spec) => `<table class="q-track" dir="${rtl ? 'rtl' : 'ltr'}"><thead><tr>${spec.columns.map((c) => `<th>${rich(c)}</th>`).join('')}</tr></thead>`
+    + `<tbody>${spec.rows.map((r) => `<tr>${spec.columns.map((_, k) => `<td>${rich(r[k] || '')}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+
+  // ── START ───────────────────────────────────────────────────────────────────────────────
+  const subj = lesson.subject;
+  const kicker = rtl ? `${L.grade} ${lesson.grade} · ${subj.toUpperCase()}` : `Grade ${lesson.grade} · ${subj}`;
+  const where = `${L.p}${rtl ? ' ' : ''}${lesson.pages} · <b>${esc(minutes(lesson.period_minutes))}</b>`;
+  add('start', `<header class="q-hero"><div class="q-hero-top"><span class="q-kick">${lab(kicker)}</span><span class="q-where">${where}</span></div>`
+    + `<div class="q-hero-main"><div class="q-hero-text">${T(lesson.title, 'h1')}${T(lesson.chapter, 'div', 'q-chap')}</div>`
+    + `${lesson.hero_visual ? `<div class="q-hero-badge">${heroBadge(lesson.hero_visual)}</div>` : ''}</div></header>`);
+  const day = lesson.day || {};
+  if (day.of) {
+    add('start', `<div class="q-steps">${Array.from({ length: day.of }, (_, i) => i + 1)
+      .map((n) => `<span class="q-step${n === day.n ? ' on' : n < day.n ? ' done' : ''}">${n}</span>`).join('')}</div>`);
+  }
+  add('start', `<div class="q-today"><div class="q-cap">${lab(L.today)}</div>${T(lesson.title, 'div', 'q-today-t')}</div>`);
+  add('start', `<div class="q-two"><div class="q-journey"><div class="q-cap">${lab(L.journey)}</div>${T(lesson.journey, 'div')}</div>`
+    + `<div class="q-coming"><div class="q-cap">${lab(L.coming)}</div>${T(lesson.coming_up, 'div')}</div></div>`);
+  add('start', `<div class="q-outcome"><div class="q-cap">${lab(L.outcome)} · <bdi dir="ltr">${esc(lesson.outcome.code)}</bdi></div>${T(lesson.outcome.text, 'div', 'q-outcome-t')}</div>`);
+  add('start', `<div class="q-prepare"><div class="q-cap">${lab(L.prepare)}</div><ul class="q-checks">${lesson.prepare.map((p) => `<li>${T(p)}</li>`).join('')}</ul></div>`);
+  if (lesson.video) {
+    add('start', `<div class="q-video"><div class="q-video-h">${ICON.tv()}<span class="q-cap">${lab(L.video)}</span> ${T(lesson.video.title, 'span', 'q-video-t')}</div>${T(lesson.video.note, 'div', 'q-video-n')}</div>`);
+  }
+  add('start', `<div class="q-kw"><div class="q-kw-h" data-first-only>${ICON.key()}<span class="q-cap">${lab(L.keywords)}</span></div>`
+    + `<div class="q-kw-t units">${lesson.keywords.map((k) => `<div class="q-kw-r" data-units>${T(k.word, 'div', 'q-kw-w')}${T(k.meaning, 'div', 'q-kw-m')}</div>`).join('')}</div></div>`, 'data-split');
+  add('start', `<div class="q-board"><div class="q-board-h" data-first-only>${lab(L.board)}</div><div class="q-board-b units">${lesson.board.map((b, i) => {
+    const lines = b.drawn ? '' : b.lines.map((l) => T(l, 'div', 'q-board-l')).join('');
+    return `<div class="q-panel" data-units><span class="q-panel-n">${i + 1}</span><div class="q-panel-b">${b.title ? T(b.title, 'div', 'q-panel-t') : ''}${fig(b.visual, 'q-fig-board')}${lines}</div></div>`;
+  }).join('')}</div></div>`, 'data-split');
+
+  // ── STAGES ──────────────────────────────────────────────────────────────────────────────
+  const STAGE_CLS = { opening: 'op', explanation: 'ex', we_do: 'wd', you_do: 'yd', check: 'ck', homework: 'hw' };
+  for (const st of lesson.stages) {
+    const sid = st.id;
+    const bar = `<div class="q-bar q-bar-${STAGE_CLS[sid]}"><span class="q-bar-l">${esc(st.letter)}</span><span class="q-bar-name">${lab(st.label)}</span>`
+      + `<span class="q-bar-end">${st.minutes ? `<span class="q-bar-min">${esc(minutes(st.minutes))}</span>` : ''}${st.mode ? pill(st.mode, 'amber') : ''}</span></div>`;
+    add(sid, bar, 'data-bar data-keep');
+    const blocks = st.blocks;
+    for (let bi = 0; bi < blocks.length; bi++) {
+      const b = blocks[bi];
+      const next = blocks[bi + 1];
+      const askAfter = next && next.type === 'ask_this' ? next : null;
+      const askHtml = askAfter ? `<div class="q-ask"><div class="q-cap">${lab(L.ask)}</div>${T(askAfter.text, 'div')}</div>` : '';
+      switch (b.type) {
+        case 'warmup':
+          add(sid, `<div class="q-warm"><div class="q-lbl" data-first-only>${lab(L.warmup)}</div><div class="units">${b.items.map((it, i) => `<div class="q-wi" data-units>`
+            + `<span dir="${dir(it.q)}"><b class="q-n">${i + 1}.</b> ${rich(it.q)} <b class="q-ans">${ARROW} ${rich(it.a)}</b></span>${it.tag ? `<span class="q-tag">${esc(it.tag)}</span>` : ''}</div>`).join('')}</div></div>`, 'data-split');
+          break;
+        case 'setup':
+          add(sid, `<div class="q-lbl">${lab(L.setup)}</div>`, 'data-keep');
+          add(sid, `<ul class="q-dots">${b.lines.map((l) => `<li>${T(l)}</li>`).join('')}</ul>`);
+          break;
+        case 'hook':
+          add(sid, `<div class="q-hook"><div class="units">${para(b.text, 'q-hook-t', `${b.visual ? fig(b.visual, 'q-fig-hook') : ''}<div class="q-hook-h"><span class="q-cap">${lab(L.hook)}</span>${pill(L.hookPill, 'line-l')}</div>`)}</div></div>`, 'data-split');
+          break;
+        case 'read_aloud': {
+          add(sid, `<div class="q-lbl">${lab(b.label)}</div>`, 'data-keep');
+          const speakers = [];
+          add(sid, `<div class="q-read">${b.lines.map((l) => {
+            const m = /^([^:“"]{1,40}):\s*(.+)$/.exec(l);
+            if (!m) return `<ul class="q-dots"><li dir="${dir(l)}">${rich(l)}</li></ul>`;
+            let k = speakers.indexOf(m[1]); if (k < 0) { speakers.push(m[1]); k = speakers.length - 1; }
+            return `<div class="q-say" dir="${dir(l)}">${face(k)}<div class="q-bub"><b class="q-who">${esc(m[1])}</b>${rich(m[2])}</div></div>`;
+          }).join('')}${b.visual ? fig(b.visual, 'q-fig-read') : ''}</div>`);
+          break;
+        }
+        case 'teacher_models': {
+          const inWeDo = sid === 'we_do';
+          const head = inWeDo
+            ? `<div class="q-card-h" data-first-only><span class="q-pills">${pill(L.guided, 'line')}${pill(L.wedo, 'blue')}</span></div>`
+            : `<div class="q-card-h" data-first-only>${pill(L.teacherModels, 'amber big')}<span class="q-pills">${pill(L.explain, 'line')}${pill(L.ido, 'amber')}</span></div>`;
+          const units = [];
+          // We Do: the together lines, then the model, then the sentence frames — one card, as approved
+          const prevTogether = inWeDo ? blocks.find((x) => x.type === 'together') : null;
+          if (prevTogether) {
+            units.push(`<div class="q-sub" data-units>${pill(L.together, 'blue big')}</div>`);
+            for (const l of prevTogether.lines) units.push(`<div data-units><ul class="q-dots">${`<li>${T(l)}</li>`}</ul></div>`);
+          }
+          units.push(`<div class="q-instr" data-units dir="${dir(b.instruction)}">▸ ${rich(b.instruction)}</div>`);
+          const quote = (arr) => (arr || []).forEach((l) => units.push(`<div class="q-lead" data-units dir="${dir(l)}">${rich(l)}</div>`));
+          const script = (arr) => (arr || []).forEach((l) => units.push(`<div class="q-line" data-units dir="${dir(l)}">${rich(quoted(l))}</div>`));
+          quote(b.lead); script(b.script); quote(b.lead2); script(b.script2);
+          const frames = inWeDo ? blocks.find((x) => x.type === 'frames') : null;
+          if (frames) for (const f of frames.lines) units.push(`<div class="q-frame" data-units dir="${dir(f)}">${ICON.bubble()}<span>${rich(f)}</span></div>`);
+          if (askAfter) units.push(`<div data-units>${askHtml}</div>`);
+          add(sid, `<div class="q-card ${inWeDo ? 'q-card-wd' : 'q-card-tm'}">${head}<div class="units">${units.join('')}</div></div>`, 'data-split');
+          if (askAfter) bi += 1;
+          break;
+        }
+        case 'together': case 'frames':
+          if (sid === 'we_do' && blocks.some((x) => x.type === 'teacher_models')) break;   // drawn inside the We Do card
+          add(sid, `<ul class="q-dots">${(b.lines || []).map((l) => `<li>${T(l)}</li>`).join('')}</ul>`);
+          break;
+        case 'worked':
+          add(sid, `<div class="q-card q-card-tm"><div class="q-card-h" data-first-only>${pill(L.worked, 'amber big')}<span class="q-pills">${pill(L.ido, 'amber')}</span></div>`
+            + `<div class="units">${b.steps.length > 1 ? b.steps.map((s, i) => `<div class="q-wstep" data-units dir="${dir(s)}"><b class="q-n">${i + 1}.</b> ${rich(s)}</div>`).join('')
+              : para(b.steps[0], 'q-wstep')}`
+            + `${b.visual ? `<div data-units>${fig(b.visual, 'q-fig-worked')}</div>` : ''}${askAfter ? `<div data-units>${askHtml}</div>` : ''}</div></div>`, 'data-split');
+          if (askAfter) bi += 1;
+          break;
+        case 'ask_this':
+          add(sid, `<div class="q-card q-card-tm">${askHtml || `<div class="q-ask"><div class="q-cap">${lab(L.ask)}</div>${T(b.text, 'div')}</div>`}</div>`);
+          break;
+        case 'mistakes':
+          add(sid, `<div class="q-lbl">${lab(L.mistakes)}</div>`, 'data-keep');
+          add(sid, b.items.map((m) => `<div class="q-mis"><div class="q-cap">✓ ${lab(L.youAsk)}</div>${T(m.you_ask, 'div')}</div>`).join(''));
+          break;
+        case 'halfway':
+          add(sid, `<div class="q-half" dir="${dir(b.text)}">${ICON.clock()}<span>${rich(b.text)}</span></div>`);
+          break;
+        case 'set_task':
+          add(sid, `<div class="q-lbl q-lbl-pills"><span>${lab(L.setTask)}</span><span class="q-pills">${pill(L.independent, 'line')}${pill(L.youdo, 'green')}</span></div>`, 'data-keep');
+          add(sid, `<ul class="q-dots">${b.lines.map((l) => `<li>${T(l)}</li>`).join('')}${b.say ? `<li dir="${dir(b.say)}"><b class="q-sayl">${esc(L.say)}</b> ${rich(quoted(b.say))}</li>` : ''}</ul>`);
+          break;
+        case 'alone':
+          add(sid, `<div class="q-card q-card-yd"><div class="q-card-h" data-first-only><span class="q-pills">${pill(L.independent, 'line')}${pill(L.youdo, 'green')}</span></div>`
+            + `<div class="q-sub" data-first-only>${pill(L.alone, 'green big')}</div><div class="units">${b.items.map((it, i) => {
+              const ref = it.ref ? `<span class="q-ref">${rich(it.ref)}</span>` : '';
+              const pic = it.visual ? `<div class="q-ifig">${draw(it.visual)}</div>` : '';
+              if (it.visual) counts.visuals += 1;
+              const ans = it.answer ? `<div class="q-a" dir="${dir(it.answer)}"><b class="q-cap">${lab(it.sample ? L.sample : L.answer)}</b> ${rich(it.answer)}</div>` : '';
+              return `<div class="q-item${pic ? ' has-fig' : ''}" data-units><div class="q-item-q" dir="${dir(it.q)}"><b class="q-n">${i + 1}.</b> ${rich(it.q)} ${ref}</div>${pic}${ans}</div>`;
+            }).join('')}</div></div>`, 'data-split');
+          break;
+        case 'differentiation':
+          add(sid, `<div class="q-lbl">${lab(L.diff)}</div>`, 'data-keep');
+          add(sid, `<div class="q-diff q-stuck"><div class="units">${para(b.stuck, '', `<div class="q-cap">${ICON.help()} ${lab(L.stuck)}</div>`)}</div></div>`, 'data-split');
+          add(sid, `<div class="q-diff q-early"><div class="units">${para(b.early, '', `<div class="q-cap">${ICON.star()} ${lab(L.early)}</div>`)}${b.early_visual ? `<div data-units>${fig(b.early_visual, 'q-fig-early')}</div>` : ''}</div></div>`, 'data-split');
+          break;
+        case 'exit':
+          // a small picture (a clock, letter tiles) sits beside its question; a scene goes under it
+          add(sid, `<div class="q-exit"><div class="q-cap">${lab(L.exit)}</div>${b.items.map((it, i) => {
+            const side = it.visual && SIDE.includes(it.visual.type);
+            const text = `<div class="q-exit-i" dir="${dir(it.q)}"><b class="q-n">${i + 1}.</b> ${rich(it.q)} <b class="q-ans">${ARROW} ${rich(it.criterion)}</b></div>`;
+            if (side) { counts.visuals += 1; return `<div class="q-exit-row">${text}<div class="q-ifig">${draw(it.visual)}</div></div>`; }
+            return text + (it.visual ? fig(it.visual, 'q-fig-exit') : '');
+          }).join('')}</div>`);
+          break;
+        case 'homework':
+          add(sid, `<div class="q-lbl q-lbl-pills"><span>${ICON.house()} ${lab(L.homework)}</span>${L.homeworkPill ? `<span class="q-pills">${pill(L.homeworkPill, 'line')}</span>` : ''}</div>`, 'data-keep');
+          add(sid, `<ul class="q-dots">${b.lines.map((l) => `<li>${T(l)}</li>`).join('')}</ul>`);
+          break;
+        default:
+          throw new Error(`primary page: no layout for block type "${b.type}"`);
+      }
+    }
+  }
+  // ── COACHING CORNER ─────────────────────────────────────────────────────────────────────
+  const steps = L.coachSteps.map((s, i) => `<div class="q-cstep">${[ICON.mic(), ICON.chat(), ICON.reply()][i]}<b>${i + 1}</b><span>${lab(s)}</span></div>`).join('');
+  const ask = sentenceChunks(lesson.coaching.ask_yourself);
+  add('close', `<div class="q-coach"><div class="units">${ask.map((c, i) => `<div data-units>${i === 0 ? `<div class="q-cap">${lab(L.coaching)}</div>` : ''}<div dir="${dir(c)}">${i === 0 ? `<b class="q-cap q-ay">${lab(L.askYourself)}</b> ` : ''}${rich(c)}</div></div>`).join('')}`
+    + `<div class="q-csteps" data-units>${steps}</div></div></div>`);   // the corner stays whole: its steps never sit alone on a last page
+
+  // the page chrome the page printer clones onto every page
+  const footLine = rtl
+    ? `${L.grade} ${lesson.grade} · ${subj} · ${lesson.chapter} · ${L.pp} ${lesson.pages}`
+    : `Grade ${lesson.grade} ${subj} · ${lesson.chapter} · ${L.pp} ${lesson.pages}`;
+  const chrome = `<div class="q-chrome" hidden><div class="q-run"><b dir="${dir(lesson.title)}">${esc(lesson.title)}</b><span class="q-run-c">· ${lab(L.continued)}</span></div>`
+    + `<footer class="q-foot"><div dir="${dir(footLine)}">${esc(footLine)}</div><div class="q-pno"></div></footer></div>`;
+  const bodyHtml = `<div class="ictq" lang="${lang}" dir="${rtl ? 'rtl' : 'ltr'}" data-pno="${esc(L.page)}" data-cont="${esc(L.continued)}">`
+    + `<div class="q-src">${out.join('')}</div>${chrome}</div>`;
+  return { headerHtml: '', bodyHtml, headCss: PRIMARY_CSS(), pageLayout: { width: 520, height: 2000, flow: true }, counts };
+}
+
+// ── STYLE ─────────────────────────────────────────────────────────────────────────────────
+// Sizes measured from the approved pages (390×1500 pt = 520×2000 px): body 21 px Inter, labels
+// 16 px caps, title 32 px, 21 px side margins; colours sampled from their pixels.
+const FONTS = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '@fontsource', 'inter', 'files');
+function interFaces() {
+  return [400, 500, 600, 700, 800].map((w) => {
+    const f = path.join(FONTS, `inter-latin-${w}-normal.woff2`);
+    return fs.existsSync(f) ? `@font-face{font-family:'Inter';font-weight:${w};font-style:normal;font-display:block;src:url(data:font/woff2;base64,${fs.readFileSync(f).toString('base64')}) format('woff2');}` : '';
+  }).join('');
+}
+let _css = null;
+const PRIMARY_CSS = () => (_css || (_css = interFaces() + `
+.sheet{width:520px;padding:0}
+.ictq{--navy:${C.navy};--green:${C.green};--mint:${C.mint};--mint-bd:#CFEEDC;--grey:#EDEFF3;--grey-bd:#DFE3EA;--amber:${C.amber};
+  --outcome:#FDEBC8;--cream:${C.cream};--cream-bd:#F5E6C4;--teal:${C.teal};--blue:${C.blue};--blue-bar:#426D9A;--sky:#F0F4FA;--sky-bd:#C9D6E8;
+  --yd:#3D8D67;--purple:${C.purple};--slate:${C.slate};--ink:#1F2433;--mut:#5B6472;--gtext:#1E6B45;
+  font-family:'Inter','Noto Nastaliq Urdu',sans-serif;color:var(--ink);font-size:21px;line-height:1.55;font-weight:400;text-align:start}
+.ictq *{box-sizing:border-box}
+.ictq :where(b){color:inherit;font-weight:700}
+.ictq ul{list-style:none;margin:0;padding:0}
+.ictq[dir="rtl"],.ictq :where([dir="rtl"]){font-family:'Noto Nastaliq Urdu','Inter',sans-serif;line-height:2.05}
+.ictq :where([dir="ltr"]){font-family:'Inter','Noto Nastaliq Urdu',sans-serif;line-height:1.55}
+.ictq :where(bdi[dir="ltr"]){line-height:inherit}
+.ictq .q-src{display:flex;flex-direction:column;gap:10px;padding:16px 21px}
+.ictq .q-chrome[hidden]{display:none}
+.ictq .qart{display:block;width:100%;height:auto}
+.ictq .qic{display:inline-block;width:22px;height:22px;vertical-align:-4px;flex:none}
+/* ── the book of pages (built by the page printer) ── */
+.q-book{display:flex;flex-direction:column;align-items:center;gap:26px;padding:26px 0}
+html.lp-print .q-book{gap:0;padding:0}
+.qpg{width:520px;height:2000px;background:#fff;display:flex;flex-direction:column;padding:16px 21px 0;overflow:hidden;position:relative}
+html:not(.lp-print) .qpg{box-shadow:0 0 0 1px #d9dbe1,0 6px 20px rgba(30,32,48,.08)}
+.qpg.q-grow{height:auto}
+.q-body{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:10px}
+.q-run{display:flex;gap:6px;align-items:baseline;font-size:16px;line-height:1.4;padding:4px 0 8px;border-bottom:2px solid var(--grey);margin-bottom:12px;white-space:nowrap}
+.q-run b{font-family:'Inter','Noto Nastaliq Urdu',sans-serif;overflow:hidden;text-overflow:ellipsis;color:var(--navy);min-width:0}
+.ictq[dir="rtl"] .q-run b{font-family:'Noto Nastaliq Urdu',sans-serif;line-height:2}
+.q-run-c{color:var(--mut);flex:none}
+.q-foot{flex:none;border-top:1.5px solid var(--grey);margin-top:10px;padding:8px 0 14px;font-size:15px;line-height:1.5;color:var(--mut)}
+.ictq[dir="rtl"] .q-foot{line-height:1.9}
+/* ── start ── */
+.q-hero{background:var(--navy);color:#fff;border-radius:10px;padding:12px 14px 12px}
+.q-hero-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:16px;line-height:1.3}
+.q-kick{color:var(--amber);font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.q-where{color:#C9CDD8}.q-where b{color:#fff}
+.q-hero-main{display:flex;gap:12px;align-items:center;margin-top:4px}
+.q-hero-text{flex:1;min-width:0}
+.q-hero h1{font-size:32px;line-height:1.12;font-weight:700;margin:0;color:#fff}
+.q-hero h1[dir="rtl"]{font-size:30px;line-height:1.85;font-weight:700}
+.q-chap{color:#C9CDD8;font-size:17px;margin-top:6px;line-height:1.35}
+.q-chap[dir="rtl"]{line-height:1.9}
+.q-hero-badge{flex:none;width:104px;height:104px;border-radius:50%;overflow:hidden;background:#fff;border:4px solid var(--amber);box-shadow:0 0 0 3px rgba(255,255,255,.15)}
+.q-hero-badge svg{display:block;width:100%;height:100%}
+.q-steps{display:flex;flex-wrap:wrap;gap:6px}
+.q-step{width:36px;height:36px;border-radius:50%;background:#E5E9F0;color:#4B5263;font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif}
+.q-step.on{background:var(--green);color:#fff;font-weight:700;font-size:18px}
+.q-step.done{background:var(--mint);color:var(--green);box-shadow:inset 0 0 0 1.5px var(--mint-bd)}
+.q-cap{font-family:'Inter','Noto Nastaliq Urdu',sans-serif;font-size:16px;line-height:1.35;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.q-cap bdi[dir="rtl"],.q-cap[dir="rtl"]{letter-spacing:0;font-size:18px;line-height:1.9}
+.q-today{background:var(--green);color:#fff;border-radius:10px;padding:10px 14px 12px}
+.q-today .q-cap{color:#FFD36B}
+.q-today-t{font-size:25px;line-height:1.3;font-weight:700}
+.q-today-t[dir="rtl"]{line-height:1.9}
+.q-two{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.q-journey{background:var(--mint);border:1.5px solid var(--mint-bd);border-radius:9px;padding:9px 12px;color:var(--gtext)}
+.q-coming{background:var(--grey);border:1.5px solid var(--grey-bd);border-radius:9px;padding:9px 12px;color:var(--mut)}
+.q-journey .q-cap{color:var(--gtext)}.q-coming .q-cap{color:#4B5263}
+.q-outcome{background:var(--outcome);border-radius:9px;border-inline-start:6px solid var(--amber);padding:10px 14px 12px;color:#3D2C05}
+.q-outcome .q-cap{color:#8A5A00}
+.q-outcome-t{font-weight:600}
+.q-prepare{background:var(--mint);border:1.5px solid var(--mint-bd);border-radius:9px;padding:10px 14px 12px;color:var(--gtext)}
+.q-prepare .q-cap{color:var(--gtext);margin-bottom:4px}
+.q-checks{display:flex;flex-wrap:wrap;gap:4px 16px;font-weight:600}
+.q-checks li{position:relative;padding-inline-start:28px}
+.q-checks li::before{content:"";position:absolute;inset-inline-start:0;top:.42em;width:17px;height:17px;border:2.5px solid var(--green);border-radius:6px;background:#fff}
+.q-checks li[dir="rtl"]::before,.q-checks li > [dir="rtl"]{}
+.ictq[dir="rtl"] .q-checks li::before{top:.7em}
+.q-video{background:var(--cream);border:1.5px solid var(--cream-bd);border-radius:9px;padding:10px 14px 12px;color:#7A5200}
+.q-video-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.q-video-h .qic{width:26px;height:26px;vertical-align:-6px;align-self:center}
+.q-video-h .q-cap{color:#8A5A00}
+.q-video-t{text-decoration:underline;text-underline-offset:3px}
+.q-video-n{font-style:italic;font-size:19px;line-height:1.5;margin-top:4px}
+.q-kw{background:var(--grey);border-radius:9px;padding:10px 14px 14px}
+.q-kw-h{display:flex;align-items:center;gap:8px;margin-bottom:8px}.q-kw-h .q-cap{color:#4B5263}
+.q-kw-h .qic{width:26px;height:26px}
+.q-kw-t{display:flex;flex-direction:column;border-radius:6px;overflow:hidden;background:#fff}
+.q-kw-r{display:grid;grid-template-columns:44% 56%;border-bottom:1px solid var(--grey-bd)}
+.q-kw-r:last-child{border-bottom:0}
+.q-kw-w{background:#F5F6F9;font-weight:700;padding:7px 12px;color:var(--navy)}
+.q-kw-m{padding:7px 12px}
+.cont-card .q-kw-t{margin-top:0}
+.q-board{border:2.5px solid var(--navy);border-radius:10px;overflow:hidden;background:#fff}
+.q-board-h{background:var(--navy);color:#FFD36B;font-size:16px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:5px 14px;font-family:'Inter','Noto Nastaliq Urdu',sans-serif}
+.q-board-h bdi[dir="rtl"]{letter-spacing:0;font-size:18px;line-height:1.9}
+.q-board-b{display:flex;flex-direction:column;gap:10px;padding:10px 10px 12px}
+.q-panel{display:flex;gap:10px;align-items:stretch}
+.q-panel-n{flex:none;width:24px;border-radius:12px;background:var(--navy);color:#fff;font-size:14px;font-weight:700;text-align:center;padding-top:4px;font-family:'Inter',sans-serif}
+.q-panel-b{flex:1;min-width:0}
+.q-panel-t{font-weight:800;letter-spacing:.04em;text-transform:uppercase;font-size:18px;color:var(--navy);margin-bottom:4px}
+.q-panel-t[dir="rtl"]{text-transform:none;letter-spacing:0;font-size:20px}
+.q-board-l{font-weight:600}
+.q-fig{margin:4px 0}
+.q-fig .qart[aria-label^="clock"]{max-width:210px;margin:0 auto}
+.q-fig figcaption{font-size:16px;font-weight:700;color:var(--mut);text-align:center;margin-top:2px}
+/* ── stage bars ── */
+.q-bar{display:flex;align-items:center;gap:10px;border-radius:8px;color:#fff;padding:3px 12px;min-height:40px;font-size:21px;font-weight:700;line-height:1.3}
+.q-bar-l{flex:none;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;font-family:'Inter',sans-serif}
+.q-bar-name{flex:1;min-width:0}
+.q-bar-name bdi[dir="rtl"]{font-size:21px;line-height:1.9}
+.q-bar-end{display:flex;align-items:center;gap:8px;flex:none}
+.q-bar-min{font-size:19px}
+.q-bar-min:lang(ur),.ictq[dir="rtl"] .q-bar-min{font-family:'Noto Nastaliq Urdu',sans-serif;line-height:1.9}
+.q-bar-op{background:var(--teal)}.q-bar-ex{background:var(--navy)}.q-bar-wd{background:var(--blue-bar)}.q-bar-yd{background:var(--yd)}.q-bar-ck{background:var(--purple)}.q-bar-hw{background:var(--slate)}
+.q-bar.cont .q-bar-name{font-style:italic}
+.q-bar.cont{opacity:.92}
+.q-cont{font-weight:700}
+/* ── pills, labels ── */
+.q-pill{display:inline-flex;align-items:center;border-radius:999px;padding:2px 12px;font-size:15px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;line-height:1.5;font-family:'Inter','Noto Nastaliq Urdu',sans-serif;white-space:nowrap}
+.q-pill bdi[dir="rtl"]{letter-spacing:0;font-size:16px;line-height:1.8}
+.q-pill.amber{background:var(--amber);color:#3A2A00}
+.q-pill.blue{background:var(--blue);color:#fff}
+.q-pill.green{background:var(--green);color:#fff}
+.q-pill.line{background:#fff;color:#5B6472;box-shadow:inset 0 0 0 1.5px var(--grey-bd)}
+.q-pill.line-l{background:transparent;color:#C9CDD8;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35)}
+.q-pill.big{font-size:16px;padding:3px 14px}
+.q-pills{display:inline-flex;gap:6px;margin-inline-start:auto}
+.q-lbl{border-inline-start:4px solid var(--amber);padding-inline-start:10px;font-size:16px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#3B4152;font-family:'Inter','Noto Nastaliq Urdu',sans-serif;line-height:1.4}
+.q-lbl bdi[dir="rtl"]{letter-spacing:0;font-size:18px;line-height:1.9}
+.q-lbl-pills{display:flex;align-items:center;gap:8px}
+.q-dots{display:flex;flex-direction:column;gap:2px}
+.q-dots > li{position:relative;padding-inline-start:26px}
+.q-dots > li::before{content:"";position:absolute;inset-inline-start:6px;top:.62em;width:8px;height:8px;border-radius:50%;background:var(--navy)}
+.ictq[dir="rtl"] .q-dots > li::before{top:.95em}
+.q-n{color:#8A5A00;font-weight:700}
+.q-ans{color:#2A7A4E;font-weight:700}
+.q-tag{display:block;text-align:end;font-size:15px;font-weight:700;color:var(--mut);margin-top:-2px}
+/* ── opening ── */
+.q-warm{border:1.5px solid var(--grey-bd);border-radius:9px;padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px}
+.q-warm .units{display:flex;flex-direction:column;gap:6px}
+.cont-card.q-blk .q-warm,.q-blk.cont-card > .q-warm{padding-top:10px}
+.q-wi{background:var(--cream);border:1.5px solid var(--cream-bd);border-radius:8px;padding:8px 12px}
+.q-hook{background:var(--navy);color:#fff;border-radius:10px;padding:12px 14px 14px;overflow:hidden}
+.q-hook-h{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.q-hook .q-cap{color:var(--amber)}
+.q-hook-t{font-weight:700;font-size:21px}
+.q-hook-t[dir="rtl"]{font-weight:700}
+.q-fig-hook{margin:0 0 10px;border-radius:9px;overflow:hidden;background:#fff}
+.q-fig-hook .qart{border-radius:9px}
+.q-read{display:flex;flex-direction:column;gap:8px}
+.q-say{display:flex;gap:10px;align-items:flex-start}
+.qface{flex:none;width:44px;height:44px;margin-top:2px}
+.q-bub{flex:1;background:#F5F6F9;border:1.5px solid var(--grey-bd);border-radius:14px;border-start-start-radius:4px;padding:6px 12px}
+.q-who{display:block;font-size:16px;color:var(--teal);letter-spacing:.02em}
+.q-fig-read{margin-top:4px;background:#F2FAFF;border-radius:10px;padding:6px}
+/* ── cards ── */
+.q-card{border-radius:10px;padding:10px 14px 12px;display:flex;flex-direction:column;gap:6px}
+.q-card .units{display:flex;flex-direction:column;gap:5px}
+.q-card-tm{background:var(--cream);border:1.5px solid var(--cream-bd)}
+.q-card-wd{background:var(--sky);border:1.5px solid var(--sky-bd)}
+.q-card-yd{background:var(--mint);border:1.5px solid var(--mint-bd)}
+.q-card-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.q-sub{display:flex}
+.q-instr{color:#1E6B45;font-weight:700}
+.q-lead{font-weight:700;border-inline-start:3px solid #B9C7DB;padding-inline-start:12px;margin:4px 0;color:#2B3245}
+.q-line{color:#2B3245}
+.q-frame{display:flex;gap:10px;align-items:flex-start;background:#fff;border:2px dashed #B9C7DB;border-radius:9px;padding:8px 12px;margin-top:4px}
+.q-frame .qic{margin-top:6px}
+.q-wstep{color:#2B3245}
+.q-ask{border-top:1.5px solid var(--cream-bd);padding-top:8px;margin-top:4px}
+.q-ask .q-cap{color:#8A5A00}
+.q-fig-worked{background:#fff;border-radius:9px;padding:8px}
+.q-mis{background:var(--mint);border:1.5px solid var(--mint-bd);border-radius:9px;padding:9px 12px;color:#1E6B45}
+.q-mis .q-cap{color:#1E6B45}
+.q-half{display:flex;gap:8px;align-items:flex-start;color:#3B4152}
+.q-half .qic{margin-top:5px}
+.q-sayl{color:var(--green)}
+.q-item{border-bottom:1px solid var(--mint-bd);padding:6px 0 8px;display:grid;grid-template-columns:1fr;gap:4px}
+.q-item:last-child{border-bottom:0}
+.q-item.has-fig{grid-template-columns:1fr auto;grid-template-areas:"q f" "a a"}
+.q-item.has-fig .q-item-q{grid-area:q}.q-item.has-fig .q-ifig{grid-area:f}.q-item.has-fig .q-a{grid-area:a}
+.q-ifig{width:auto;max-width:180px;align-self:start}
+.q-ifig .qart{width:auto;max-width:180px;height:auto;max-height:110px}
+.q-ifig .qart[aria-label^="clock"]{width:112px;height:112px}
+.q-ref{display:inline-flex;align-items:center;font-size:15px;font-weight:700;color:var(--mut);background:#fff;border-radius:999px;padding:0 8px;box-shadow:inset 0 0 0 1.5px var(--mint-bd)}
+.q-a{border-inline-start:3px solid #8FD1AE;padding-inline-start:12px;color:#1E7A4A;font-weight:700}
+.q-a .q-cap{color:#1E6B45;font-size:15px}
+.q-diff{border:1.5px solid var(--grey-bd);border-radius:9px;padding:9px 12px 11px;background:#fff}
+.q-diff .q-cap{color:#3B4152;display:flex;align-items:center;gap:6px}
+.q-fig-early{margin-top:8px}
+.q-exit{background:var(--mint);border:1.5px solid var(--mint-bd);border-radius:10px;padding:10px 14px 12px}
+.q-exit .q-cap{color:#1E6B45}
+.q-fig-exit{margin-top:8px;background:#fff;border-radius:9px;padding:6px}
+.q-exit-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}
+.q-exit-row .q-ifig{background:#fff;border-radius:50%;padding:4px}
+.q-coach{background:var(--navy);color:#fff;border-radius:10px;padding:12px 14px 14px}
+.q-coach [data-units] > .q-cap{color:var(--amber);margin-bottom:2px}
+.q-ay{color:var(--amber);font-size:16px}
+.q-csteps{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.q-cstep{display:flex;gap:10px;align-items:center;background:rgba(255,255,255,.08);border-radius:9px;padding:7px 12px}
+.q-cstep .qic{width:26px;height:26px}
+.q-cstep > b{flex:none;display:inline-flex;width:26px;height:26px;border-radius:50%;background:var(--amber);color:#3A2A00;align-items:center;justify-content:center;font-size:15px;font-family:'Inter',sans-serif}
+.q-cstep > span{flex:1;min-width:0;line-height:1.4}
+.q-carrow{display:none}
+/* ── pause chips, blanks, story map, tracker ── */
+.q-pz{display:inline-flex;align-items:center;gap:2px;background:var(--navy);color:#fff;border-radius:6px;padding:0 6px;height:1.15em;vertical-align:-.12em;line-height:1}
+.q-pz i{display:inline-block;width:3px;height:.6em;background:#FFD36B;border-radius:1px}
+.q-pz b{font-size:.78em;margin-inline-start:3px;font-family:'Noto Nastaliq Urdu','Inter',sans-serif;line-height:1}
+.q-blank{display:inline-block;border-bottom:2.5px solid currentColor;height:.9em;vertical-align:baseline;opacity:.75}
+.q-story{display:flex;flex-wrap:wrap;align-items:center;gap:6px 6px}
+.q-ev{display:inline-block;border-radius:10px;padding:2px 12px;font-weight:700}
+.q-ev0{background:#DDEFFC;color:#1D4F7A}.q-ev1{background:#FDEBC8;color:#7A5200}.q-ev2{background:#DEF4E7;color:#1E6B45}.q-ev3{background:#EDE7FA;color:#4B3B8A}.q-ev4{background:#FDE2E1;color:#9B2C2C}
+.q-arrow{color:var(--slate);font-weight:800;font-family:'Inter',sans-serif;margin:0 2px}
+.q-track{width:100%;border-collapse:separate;border-spacing:0;border:2px solid var(--navy);border-radius:9px;overflow:hidden;font-size:19px}
+.q-track th{background:var(--navy);color:#fff;font-weight:700;padding:4px 8px;text-align:center}
+.q-track td{padding:8px;height:48px;text-align:center;border-top:1.5px solid var(--grey-bd);background:#fff}
+.q-track td + td,.q-track th + th{border-inline-start:1.5px solid var(--grey-bd)}
+/* continuation copies of a card keep its look, without its heading */
+.q-blk.cont-card > .q-card,.q-blk.cont-card > .q-warm,.q-blk.cont-card > .q-kw,.q-blk.cont-card > .q-board{border-start-start-radius:4px;border-start-end-radius:4px}
+html.lp-print body{background:#fff}
+`));
+
+module.exports = { composePrimary, LABELS, rich };

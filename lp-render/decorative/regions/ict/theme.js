@@ -1,5 +1,7 @@
 'use strict';
-// ICT (NIETE) design pack — grades 6–12, Islamabad Capital Territory.
+// ICT (NIETE) design pack — grades 6–12, Islamabad Capital Territory. (Grades 1–5 have their own
+// approved page, NIETE's tall phone page: primary.js, with its own style under .ictq; COMPOSE below
+// picks it for a guide built by lp-render/guide/from-primary.js. Nothing in this file's CSS reaches it.)
 //
 // THE DESIGN IS NIETE'S APPROVED LESSON-PLAN PAGES (the "lp_pdfs" references for English, Maths
 // and Urdu, shared 2026-09-30): portrait pages, one per stage — Start, Explanation, Practice,
@@ -18,6 +20,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { composeIctPages } = require('./pages');
+const { composePrimary } = require('./primary');
 
 const FONTS = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '@fontsource');
 function face(family, file, weight, style) {
@@ -351,8 +354,15 @@ ul.boxes li > i{width:15px;height:15px;border:1.6px solid var(--slate);flex:none
 module.exports = {
   THEME_OVERRIDE_CSS,
   REGION_NAME: 'ICT (NIETE)',
-  // The page is this pack's own layout (NIETE's approved design), built from guide.layout.
-  COMPOSE: (guide, images) => (guide && guide.layout && guide.layout.kind === 'ict-pages' ? composeIctPages(guide, images) : null),
+  // The page is this pack's own layout (NIETE's approved design), built from guide.layout:
+  // grades 6–12 on fixed portrait pages (pages.js), grades 1–5 on tall phone pages (primary.js,
+  // which names its own page layout).
+  COMPOSE: (guide, images) => {
+    const kind = guide && guide.layout && guide.layout.kind;
+    if (kind === 'ict-pages') return composeIctPages(guide, images);
+    if (kind === 'ict-primary') return composePrimary(guide);
+    return null;
+  },
   // Fixed portrait pages, one or more per stage; a stage too long for its page continues on the next.
   PAGE_LAYOUT: { width: PAGE.width, height: PAGE.height, fixedPages: true },
   // ICT's plans carry no decorative characters; the cast is also a paid generator.

@@ -1,4 +1,4 @@
-# ICT (NIETE) design pack — grades 6–12 lesson plans
+# ICT (NIETE) design pack — grades 6–12 and Grades 1–5 lesson plans
 
 **Status: built to NIETE's approved page design; not yet reviewed by ICT/NIETE.** Tracked on Notion
 as FEAT-171. Local validation only: nothing here is connected to NIETE-Rumi staging or production.
@@ -84,8 +84,53 @@ npm run render:ict -- lp-render/fixtures/ict/niete_v9_gate_base.lp.json
 No API key is needed and nothing is bought. Real inputs, and where each came from:
 `lp-render/fixtures/ict/README.md`.
 
+## Grades 1–5: the approved phone page
+
+**The reference:** NIETE's approved Grades 1–5 lesson plans (lp_html v8.1), shared 2026-10-01 —
+Grade 1 English, Grade 1 Maths, Grade 2 Urdu. One column 520 px wide on tall 520×2000 pages
+(390×1500 pt), read top to bottom on a phone; 6 pages each; no pictures.
+
+**The page, top to bottom:** navy title card (GRADE · SUBJECT, page · minutes, title, chapter) ·
+day stepper · TODAY · journey so far / coming up · learning outcome (amber) · to prepare (tick
+boxes) · video · key words · write on the board (numbered panels) · then a bar per stage — Opening
+teal I, Explanation navy D (I DO), We Do blue A, You Do green A, Check purple C, Homework slate H —
+with that stage's cards (warm-up, the opening question, read aloud, teacher models, worked example,
+ask this, common mistakes, the We Do card with its sentence frames, set the task going, pupils work
+alone with answers, differentiation, exit ticket, homework) · coaching corner. Every page after
+the first has the running head "<title> · continued"; every page the footer and "page N of M"; a
+stage that runs over continues under its own bar, "· continued". Urdu runs right to left in its
+approved labels (some stay English, as approved), Nastaliq; an English-only line reads left to
+right.
+
+**Built:** `lp-render/guide/from-primary.js` (checks an `ict-primary-lesson` file) → `primary.js`
+(lays out the column; colours sampled from the approved pages; Inter, as the approved PDFs embed)
+→ `lp-render/render/phone-pages-pdf.js` (flows the blocks onto pages in the browser and prints
+them: a heading moves with what it heads; a list, a table or a long paragraph may divide between
+its rows or sentences, so no page is left half empty; text is never shrunk to fit). The pack's
+`COMPOSE` picks the layout by `guide.layout.kind`; this page names its own page layout
+(`{width: 520, height: 2000, flow: true}`), which the pipeline routes to the phone printer.
+
+**Added to the approved pages (child-friendly, $0):** pictures drawn in code from the lesson's
+own words (`primary-art.js`) — clocks at the lesson's times, the letters being blended, the
+story's scenes, a story map, the fluency tracker as a real table, speech bubbles for the
+read-aloud lines, the reading-pause sign as a chip. **Fixed from the approved pages:** a teacher
+line split at "p."; a clock drawn in text characters; the leaked key "model_solution:"; "(avatar)";
+a text table of pipes; Urdu arrows that pointed against the reading direction.
+
+**Not printed:** the coaching WhatsApp number (waiting for a decision, as for grades 6–12), and
+"Support pages follow" (no support pages follow these lessons).
+
+```
+npm run render:ict -- lp-render/fixtures/ict-primary/g2_ch10_Urdu_seg2.lesson.json
+#   -> out/ict/g2_ch10_Urdu_seg2.ur.{pdf,html,png,page-N.svg,guide.json,report.json}
+```
+
 ## Still open
 
+- **Approval of the Grades 1–5 pages with pictures.** The pictures and the fixes above are this
+  pack's additions to the approved design.
+- **Grades 1–5 lesson data.** The three test lessons were transcribed from the approved PDFs;
+  real lessons need NIETE's Grades 1–5 lesson data in the `ict-primary-lesson` shape.
 - **Approval of the grades 6–12 adaptation.** The references are grade 1; the Teacher support page
   and the exam-bank exit option are this pack's reading of where grade 6–12 content belongs.
 - **Logo.** The header mark is a plain "N" monogram drawn in code; ICT's own logo file replaces it.

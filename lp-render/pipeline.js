@@ -14,6 +14,7 @@ const { THEME_CSS } = require('./decorative/theme');
 const { renderDecorativeLesson } = require('./decorative/render');
 const { htmlToPixelPdf } = require('./render/png-to-pdf');
 const { htmlToFixedPagesPdf } = require('./render/fixed-pages-pdf');
+const { htmlToPhonePagesPdf } = require('./render/phone-pages-pdf');
 const { ensureCast } = require('./decorative/characters');
 const store = require('./store/assets');
 const { resolveRegion } = require('../imagegen/prompts/regions');
@@ -264,6 +265,8 @@ async function renderLessonImage(content, opts = {}) {
       // A pack may deliver a page format of its own (ICT: NIETE's fixed portrait pages).
       // Absent for every other pack, which keeps the A4 composer below exactly as it was.
       regionLayout = pack.PAGE_LAYOUT && pack.PAGE_LAYOUT.fixedPages ? pack.PAGE_LAYOUT : null;
+      // ...or the page it composed may name its own (ICT Grades 1–5: tall phone pages, flowed)
+      if (composed && composed.pageLayout) regionLayout = composed.pageLayout;
       log(`  ⛨ region design pack "${themeRegion}" applied`);
     } catch (_) { /* no design pack for this region — default look */ }
   }
@@ -292,7 +295,13 @@ async function renderLessonImage(content, opts = {}) {
         if ((list || []).length > 8) log(`  ⚠ …and ${list.length - 8} more overflow finding(s)`);
         overflowFindings = list || [];
       };
-      if (regionLayout && regionLayout.fixedPages) {
+      if (regionLayout && regionLayout.flow) {
+        // phone pages flow in the browser; the paginated page is also the .html deliverable
+        const printed = await htmlToPhonePagesPdf(html, { pageWidth: regionLayout.width, pageHeight: regionLayout.height, onFindings });
+        pdf = printed.pdf;
+        html = printed.html;
+        for (const [k, st] of printed.stages.entries()) log(`  ▭ page ${k + 1}: ${st}${printed.heights[k] !== regionLayout.height ? ` · grew to ${printed.heights[k]}px` : ''}`);
+      } else if (regionLayout && regionLayout.fixedPages) {
         // fixed pages paginate in the browser; the paginated page is also the .html deliverable
         const printed = await htmlToFixedPagesPdf(html, { pageWidth: regionLayout.width, pageHeight: regionLayout.height, onFindings });
         pdf = printed.pdf;
