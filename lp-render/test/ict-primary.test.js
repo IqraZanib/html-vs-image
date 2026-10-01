@@ -117,6 +117,30 @@ test('the letter pictures show the lesson\'s own sounds and word', () => {
   assert.ok(!/<image\b|data:image\/(png|jpe?g)/.test(b + steps + list), 'drawn, not pictures');
 });
 
+test('the story pictures carry the lesson\'s own facts: the poster\'s shows at their times, Bunty\'s two clocks at 9:00', () => {
+  const handsAt = (svgText, cx, cy) => [...svgText.matchAll(new RegExp(`<line x1="${cx}" y1="${cy}" x2="([\\d.-]+)" y2="([\\d.-]+)"`, 'g'))].map((m) => [+m[1] - cx, +m[2] - cy]);
+  const deg = ([x, y]) => (Math.atan2(x, -y) * 180 / Math.PI + 360) % 360;
+  const p = art.draw({ type: 'poster', title: 'FUN FAIR', items: [{ text: 'PUPPET SHOW', time: '11:00', icon: 'puppet' }, { text: 'FIREWORKS', time: '6:00', icon: 'fireworks' }] });
+  for (const t of ['>FUN FAIR<', '>PUPPET SHOW<', '>11:00<', '>FIREWORKS<', '>6:00<']) assert.ok(p.includes(t), t);
+  const [h11] = handsAt(p, 410, 120);   // the first row's small clock
+  assert.ok(Math.abs(deg(h11) - 330) < 1, 'the Puppet Show clock\'s hour hand is on 11');
+  const home = art.draw({ type: 'scene', scene: 'bunty_home', time: '9:00', digital: '09:00' });
+  assert.ok(home.includes('>09:00<'), 'the digital clock on the table reads 09:00');
+  const [hw] = handsAt(home, 140, 78);
+  assert.ok(Math.abs(deg(hw) - 270) < 1, 'the wall clock\'s hour hand is on 9');
+  assert.throws(() => buildGuideFromPrimary(Object.assign(MATHS(), { hero_visual: { type: 'poster', items: [{ text: 'X', time: 'noon' }] } })), /poster time/);
+});
+
+test('every stage bar and label carries its picture; read-aloud speakers get their own faces; the story map is numbered', () => {
+  const m = compose(MATHS()).bodyHtml;
+  assert.strictEqual((m.match(/<span class="q-bar-ic"><svg/g) || []).length, 6, 'one picture per stage bar');
+  const u = compose(URDU()).bodyHtml;
+  assert.strictEqual((u.match(/class="qface"/g) || []).length, 4, 'four speakers, four faces');
+  assert.ok(u.includes('M-22 -110c0-14'), 'the local man wears his cap (speakers: man_cap)');
+  assert.deepStrictEqual([...u.matchAll(/<b class="q-evn">(\d)<\/b>/g)].map((x) => +x[1]), [1, 2, 3, 4, 5], 'the five story events, numbered in order');
+  assert.ok(!/<img\b|data:image\/(png|jpe?g)/.test(m + u), 'every picture and icon is drawn, not a bitmap');
+});
+
 test('only the Grades 1–5 page names its own page layout; everything else in the ict pack is as before', () => {
   const pack = require('../decorative/regions/ict/theme');
   assert.deepStrictEqual(pack.PAGE_LAYOUT, { width: 896, height: 1200, fixedPages: true }, 'grades 6–12 keep their fixed pages');

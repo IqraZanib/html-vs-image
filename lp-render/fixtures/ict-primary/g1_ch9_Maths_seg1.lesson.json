@@ -133,7 +133,8 @@
           "type": "hook",
           "text": "Everybody is planning to go to the fair. Bunty says, ‘Babloo we have to be punctual if we want to attend all these shows.’ Look at Bunty’s wall clock and the digital clock on the table. Both show 9 o'clock: the digital clock reads 09:00. Today we will learn how the two clocks tell the same time. Where do YOU see time in Bunty’s home or at the Fun Fair?",
           "visual": {
-            "type": "clock_pair",
+            "type": "scene",
+            "scene": "bunty_home",
             "time": "9:00",
             "digital": "09:00"
           }
@@ -236,7 +237,28 @@
             "Therefore, the clock shows 11 o'clock.",
             "On p.221, the Fun Fair poster says ‘PUPPET SHOW 11:00 o'clock.’",
             "The poster and the clock match."
-          ]
+          ],
+          "visual": {
+            "type": "poster",
+            "title": "FUN FAIR",
+            "items": [
+              {
+                "text": "PUPPET SHOW",
+                "time": "11:00",
+                "icon": "puppet"
+              },
+              {
+                "text": "FIREWORKS",
+                "time": "6:00",
+                "icon": "fireworks"
+              },
+              {
+                "text": "MAGIC SHOW",
+                "time": "12:00",
+                "icon": "magic"
+              }
+            ]
+          }
         },
         {
           "type": "frames",

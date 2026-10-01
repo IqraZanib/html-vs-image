@@ -97,7 +97,9 @@ const PACK_FLOW = ({ W, H }) => {
         for (let k = units.length - 1; k >= 1 && !fits(pg); k--) twin.prepend(units[k]);
         // a sub-heading left last on the page goes over with what it heads
         while (host.lastElementChild && host.lastElementChild.classList.contains('q-sub') && host.children.length > 1) twin.prepend(host.lastElementChild);
-        if (fits(pg)) {
+        // only headings left behind on this page is no division at all: the block moves whole
+        const kept = [...host.children];
+        if (fits(pg) && kept.some((u) => !u.classList.contains('q-sub'))) {
           queue.unshift(copy);
           pg = startPage(stage && stage !== 'start' && stage !== 'close' ? stage : null);
           continue;

@@ -111,9 +111,14 @@ its rows or sentences, so no page is left half empty; text is never shrunk to fi
 (`{width: 520, height: 2000, flow: true}`), which the pipeline routes to the phone printer.
 
 **Added to the approved pages (child-friendly, $0):** pictures drawn in code from the lesson's
-own words (`primary-art.js`) — clocks at the lesson's times, the letters being blended, the
-story's scenes, a story map, the fluency tracker as a real table, speech bubbles for the
-read-aloud lines, the reading-pause sign as a chip. **Fixed from the approved pages:** a teacher
+own words (`primary-art.js`), in a picture-book style (toy colours, round shapes, faces with rosy
+cheeks, a smiling sun) — alarm-style clocks at the lesson's times beside a cheerful digital clock,
+letter blocks, a smiling word blender, the blending steps as a staircase, the story's scenes
+(Bunty's room with both clocks, the Fun Fair poster, the songbird, the kite, the lake, the crying
+boy, pair reading), a numbered story map, the fluency tracker as a coloured table, speech bubbles
+with a face per speaker, a picture on every stage bar and an icon on every section label, the
+reading-pause sign as a chip. The teaching marks stay exact: hands, times and letters are the
+lesson's. **Fixed from the approved pages:** a teacher
 line split at "p."; a clock drawn in text characters; the leaked key "model_solution:"; "(avatar)";
 a text table of pipes; Urdu arrows that pointed against the reading direction.
 

@@ -22,6 +22,9 @@
     "type": "scene",
     "scene": "songbird"
   },
+  "speakers": {
+    "Pinky": "girl_scarf"
+  },
   "day": {
     "n": 1,
     "of": 10
@@ -202,7 +205,23 @@
           ],
           "visual": {
             "type": "blend_steps",
-            "steps": [["s", "u", "su"], ["su", "nn", "sun"], ["sun", "y", "sunny"]]
+            "steps": [
+              [
+                "s",
+                "u",
+                "su"
+              ],
+              [
+                "su",
+                "nn",
+                "sun"
+              ],
+              [
+                "sun",
+                "y",
+                "sunny"
+              ]
+            ]
           }
         },
         {
@@ -353,7 +372,8 @@
           "early_visual": {
             "type": "dictionary",
             "word": "sunny",
-            "entry": "sunny, /ˈsʌni/, adjective. bright with sunlight."
+            "entry": "sunny, /ˈsʌni/, adjective. bright with sunlight.",
+            "picture": "sun"
           }
         }
       ]

@@ -18,9 +18,9 @@ const BLOCKS = {
 const VISUALS = {
   clock: ['time'], clock_pair: ['time'], scene: ['scene'], blender: ['parts', 'word'], blender_list: ['words'],
   blend_steps: ['steps'], tiles: ['parts'], predict: ['title', 'prompt'], dictionary: ['word', 'entry'],
-  story_map: ['items'], tracker: ['columns', 'rows'],
+  story_map: ['items'], tracker: ['columns', 'rows'], poster: ['items'],
 };
-const SCENES = ['songbird', 'kite_tree', 'lake'];
+const SCENES = ['songbird', 'kite_tree', 'lake', 'crying_boy', 'pair_reading', 'bunty_home'];
 
 const isPrimaryLesson = (doc) => !!(doc && doc.kind === 'ict-primary-lesson');
 
@@ -30,6 +30,8 @@ function checkVisual(v, where, problems) {
   for (const f of VISUALS[v.type]) if (v[f] == null) problems.push(`${where}: picture "${v.type}" needs "${f}"`);
   if (v.type === 'scene' && !SCENES.includes(v.scene)) problems.push(`${where}: no drawing for scene "${v.scene}"`);
   if ((v.type === 'clock' || v.type === 'clock_pair') && !/^\d{1,2}:\d{2}$/.test(String(v.time))) problems.push(`${where}: clock time "${v.time}" is not h:mm`);
+  if (v.type === 'scene' && v.time != null && !/^\d{1,2}:\d{2}$/.test(String(v.time))) problems.push(`${where}: clock time "${v.time}" is not h:mm`);
+  if (v.type === 'poster') for (const it of v.items || []) if (!/^\d{1,2}:\d{2}$/.test(String(it.time))) problems.push(`${where}: poster time "${it.time}" is not h:mm`);
   return 1;
 }
 

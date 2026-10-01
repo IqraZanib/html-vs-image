@@ -27,9 +27,13 @@ The approved page's fields, in its order: `title`, `chapter`, `pages`, `period_m
 **Pictures** are named, never generated: `visual: {type, …}` on a board panel, a block or a
 question, drawn in code by `lp-render/decorative/regions/ict/primary-art.js` from the lesson's own
 words — `clock` / `clock_pair` (at the lesson's time), `tiles`, `blender`, `blender_list`,
-`blend_steps` (the lesson's own steps), `predict`, `dictionary`, `scene` (`songbird`, `kite_tree`,
-`lake`), `story_map`, `tracker`. `hero_visual` is the small round picture on the title card. A board
-panel marked `drawn: true` is printed as its picture (its `lines` are what the picture shows).
+`blend_steps` (the lesson's own steps, as a staircase), `predict`, `dictionary`, `poster` (a
+textbook poster's lines, each with a small clock at its time), `scene` (`songbird`, `kite_tree`,
+`lake`, `crying_boy`, `pair_reading`, `bunty_home` — the last at the lesson's `time`), `story_map`,
+`tracker`. `hero_visual` is the small round picture on the title card. A board panel marked
+`drawn: true` is printed as its picture (its `lines` are what the picture shows). `speakers` gives
+each read-aloud speaker a kind of face (`girl_scarf`, `girl`, `boy`, `boy_cheeky`, `man_cap`,
+`man_moustache`, `elder`, `woman`); a speaker not listed gets a plain face in its own colour.
 
 In Urdu text, `⏸۱` is the textbook's reading-pause sign with its number; it prints as a pause chip.
 
