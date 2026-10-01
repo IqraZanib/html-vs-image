@@ -13,6 +13,17 @@ the reference's print defects that the file does not carry over (`presentation_f
 | `g1_ch10_English_seg1.lesson.json` | Grade 1 English, Ch.10 "Pinky's Garden of Wonders!" — Predict + Word Blender + Using a Dictionary (Memory Lane), p.124, day 1 of 10 | from the PDF's own text layer |
 | `g2_ch10_Urdu_seg2.lesson.json` | Grade 2 Urdu, Ch.10 «جھیل سیف الملوک کی سیر» — بلند خوانی، p.72, day 2 of 8 | by hand from the page images (the PDF's Urdu text layer is in visual order and cannot be copied cleanly) |
 
+Three more lessons test the same page on other grades and other content. They are **not NIETE
+lessons**: they were written for design testing from the public Punjab Textbook Board books (Single
+National Curriculum 2020), with the textbook's own words kept word for word and the teaching steps
+written around them in the approved structure.
+
+| File | Lesson | From |
+|---|---|---|
+| `g3_u5_English_road_safety.lesson.json` | Grade 3 English, Unit 5 "Road Safety" — Road Safety Rules + road signs | PCTB English 3, pp. 47–50 |
+| `g2_u1_Maths_ordinal_numbers.lesson.json` | Grade 2 Maths, Unit 1 "Whole Numbers" — Ordinal Numbers, first to twentieth | PCTB Mathematics 2, pp. 2–3 |
+| `g4_l4_Urdu_achhe_shehri.lesson.json` | Grade 4 Urdu, سبق ۴ «ہم بنیں گے اچھے شہری» | PCTB Urdu 4, pp. 21–23 |
+
 The approved PDFs are NIETE's, shared with the Design lane on 2026-10-01 (Google Drive file links,
 not copied into this repo).
 
@@ -29,8 +40,11 @@ question, drawn in code by `lp-render/decorative/regions/ict/primary-art.js` fro
 words — `clock` / `clock_pair` (at the lesson's time), `tiles`, `blender`, `blender_list`,
 `blend_steps` (the lesson's own steps, as a staircase), `predict`, `dictionary`, `poster` (a
 textbook poster's lines, each with a small clock at its time), `scene` (`songbird`, `kite_tree`,
-`lake`, `crying_boy`, `pair_reading`, `bunty_home` — the last at the lesson's `time`), `story_map`,
-`tracker`. `hero_visual` is the small round picture on the title card. A board panel marked
+`lake`, `crying_boy`, `pair_reading`, `bunty_home` — at the lesson's `time` —, `bee_line`,
+`park_family` — with its `sign` —, `zebra_crossing` — `signal: false` for none), `traffic_light`,
+`road_signs` / `road_sign`, `look_steps`, `ordinal_row` (bees, or `object: 'child'`), `car_road`,
+`podium`, `signboards`, `deeds` (a good-citizen chart), `story_map`, `tracker`. In a question a
+clock, letter tiles or a road sign sits beside the question; any other picture goes under it. `hero_visual` is the small round picture on the title card. A board panel marked
 `drawn: true` is printed as its picture (its `lines` are what the picture shows). `speakers` gives
 each read-aloud speaker a kind of face (`girl_scarf`, `girl`, `boy`, `boy_cheeky`, `man_cap`,
 `man_moustache`, `elder`, `woman`); a speaker not listed gets a plain face in its own colour.

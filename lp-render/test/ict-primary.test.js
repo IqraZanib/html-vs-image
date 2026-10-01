@@ -17,7 +17,11 @@ const load = (f) => JSON.parse(fs.readFileSync(path.join(FX, f), 'utf8'));
 const MATHS = () => load('g1_ch9_Maths_seg1.lesson.json');
 const ENGLISH = () => load('g1_ch10_English_seg1.lesson.json');
 const URDU = () => load('g2_ch10_Urdu_seg2.lesson.json');
-const ALL = [['Maths', MATHS], ['English', ENGLISH], ['Urdu', URDU]];
+// three more lessons, other grades and other content, written from public textbook pages for design testing
+const G3_ENGLISH = () => load('g3_u5_English_road_safety.lesson.json');
+const G2_MATHS = () => load('g2_u1_Maths_ordinal_numbers.lesson.json');
+const G4_URDU = () => load('g4_l4_Urdu_achhe_shehri.lesson.json');
+const ALL = [['Maths', MATHS], ['English', ENGLISH], ['Urdu', URDU], ['G3 English', G3_ENGLISH], ['G2 Maths', G2_MATHS], ['G4 Urdu', G4_URDU]];
 const compose = (doc) => composePrimary(buildGuideFromPrimary(doc).guide);
 // the page's words, as a reader sees them: tags off, entities decoded, spaces collapsed
 const words = (html) => html.replace(/<style[\s\S]*?<\/style>/g, ' ').replace(/<[^>]+>/g, ' ')
@@ -25,7 +29,7 @@ const words = (html) => html.replace(/<style[\s\S]*?<\/style>/g, ' ').replace(/<
 // a source string as the page prints it: a pause mark becomes a chip (its number stays), a blank a line
 const asPrinted = (s) => String(s).replace(/⏸/g, ' ').replace(/_{3,}/g, ' ').replace(/\s+/g, ' ').trim();
 
-test('the three approved lessons are valid Grades 1–5 lesson files', () => {
+test('the approved lessons and three lessons from other grades are valid Grades 1–5 lesson files', () => {
   for (const [name, doc] of ALL) {
     assert.ok(isPrimaryLesson(doc()), name);
     const { guide, report } = buildGuideFromPrimary(doc());
@@ -139,6 +143,21 @@ test('every stage bar and label carries its picture; read-aloud speakers get the
   assert.ok(u.includes('M-22 -110c0-14'), 'the local man wears his cap (speakers: man_cap)');
   assert.deepStrictEqual([...u.matchAll(/<b class="q-evn">(\d)<\/b>/g)].map((x) => +x[1]), [1, 2, 3, 4, 5], 'the five story events, numbered in order');
   assert.ok(!/<img\b|data:image\/(png|jpe?g)/.test(m + u), 'every picture and icon is drawn, not a bitmap');
+});
+
+test('other grades, other content: road signs, positions and a park signboard are drawn from the lesson', () => {
+  const e = compose(G3_ENGLISH()).bodyHtml;
+  for (const t of ['>STOP<', '>Parking lot<', '>No cycling<', '>Look right<', '>Look left<', '>Look right again<']) assert.ok(e.includes(t), t);
+  const m = compose(G2_MATHS()).bodyHtml;
+  assert.ok(/>1<tspan[^>]*>st</.test(m) && />20<tspan[^>]*>th</.test(m), 'ordinals drawn as 1st … 20th');
+  for (const L of 'ABCDEFGHIJKLMNOPQRST') assert.ok(m.includes(`>${L}</text>`), `car ${L}`);
+  const u = compose(G4_URDU()).bodyHtml;
+  assert.ok(u.includes('>پھول توڑنا منع ہے<'), 'the park signboard carries the lesson\'s own words');
+  assert.strictEqual((u.match(/class="q-deed q-deed/g) || []).length, 6, 'six good-citizen deeds');
+  assert.ok(!(e + m + u).includes(' · <bdi dir="ltr"></bdi>'), 'no empty outcome code printed');
+  assert.ok(compose(MATHS()).bodyHtml.includes(' · <bdi dir="ltr">M-01-TM-01</bdi>'), 'a lesson with a code still prints it');
+  const bad = G2_MATHS(); bad.board[0].visual = { type: 'road_signs', signs: [{ sign: 'rocket', label: 'x' }] };
+  assert.throws(() => buildGuideFromPrimary(bad), /no drawing for road sign "rocket"/);
 });
 
 test('only the Grades 1–5 page names its own page layout; everything else in the ict pack is as before', () => {

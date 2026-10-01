@@ -19,8 +19,12 @@ const VISUALS = {
   clock: ['time'], clock_pair: ['time'], scene: ['scene'], blender: ['parts', 'word'], blender_list: ['words'],
   blend_steps: ['steps'], tiles: ['parts'], predict: ['title', 'prompt'], dictionary: ['word', 'entry'],
   story_map: ['items'], tracker: ['columns', 'rows'], poster: ['items'],
+  traffic_light: [], road_signs: ['signs'], road_sign: ['sign'], look_steps: ['steps'], ordinal_row: ['items'],
+  car_road: ['letters'], podium: ['places'], signboards: ['items'], deeds: ['items'],
 };
-const SCENES = ['songbird', 'kite_tree', 'lake', 'crying_boy', 'pair_reading', 'bunty_home'];
+const SCENES = ['songbird', 'kite_tree', 'lake', 'crying_boy', 'pair_reading', 'bunty_home', 'bee_line', 'park_family', 'zebra_crossing'];
+const SIGNS = ['stop', 'parking', 'turn_left', 'no_cycling', 'hump', 'crossroads', 'children'];
+const DEEDS = ['fan_bulb', 'tap', 'dustbin', 'queue', 'plant', 'ticket', 'heart'];
 
 const isPrimaryLesson = (doc) => !!(doc && doc.kind === 'ict-primary-lesson');
 
@@ -29,6 +33,8 @@ function checkVisual(v, where, problems) {
   if (!VISUALS[v.type]) { problems.push(`${where}: no drawing for picture type "${v.type}"`); return 0; }
   for (const f of VISUALS[v.type]) if (v[f] == null) problems.push(`${where}: picture "${v.type}" needs "${f}"`);
   if (v.type === 'scene' && !SCENES.includes(v.scene)) problems.push(`${where}: no drawing for scene "${v.scene}"`);
+  for (const g of v.type === 'road_signs' ? v.signs || [] : v.type === 'road_sign' ? [v] : []) if (!SIGNS.includes(g.sign)) problems.push(`${where}: no drawing for road sign "${g.sign}"`);
+  if (v.type === 'deeds') for (const d of v.items || []) if (!DEEDS.includes(d.icon)) problems.push(`${where}: no picture for "${d.icon}"`);
   if ((v.type === 'clock' || v.type === 'clock_pair') && !/^\d{1,2}:\d{2}$/.test(String(v.time))) problems.push(`${where}: clock time "${v.time}" is not h:mm`);
   if (v.type === 'scene' && v.time != null && !/^\d{1,2}:\d{2}$/.test(String(v.time))) problems.push(`${where}: clock time "${v.time}" is not h:mm`);
   if (v.type === 'poster') for (const it of v.items || []) if (!/^\d{1,2}:\d{2}$/.test(String(it.time))) problems.push(`${where}: poster time "${it.time}" is not h:mm`);

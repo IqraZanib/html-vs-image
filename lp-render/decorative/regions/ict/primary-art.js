@@ -464,14 +464,188 @@ function dictionary(spec) {
   return svg(480, 228, s, `dictionary entry: ${spec.entry}`);
 }
 
+// ── ROADS, BEES, PARKS ────────────────────────────────────────────────────────────────────
+// Pictures for more lessons in the same style: a road with a zebra crossing, traffic lights and
+// road signs; bees in a line and cars on a road for positions; a park with its signboard.
+const URDU = "font-family=\"'Noto Nastaliq Urdu',Inter,sans-serif\"";
+const isUr = (t) => /[؀-ۿ]/.test(String(t));
+const tfont = (t) => (isUr(t) ? URDU : FONT);
+// a traffic light: red on top, yellow, green; each light may carry a word beside it
+function trafficLight(x, y, k = 1, { faces = true } = {}) {
+  let s = `<g transform="translate(${x} ${y}) scale(${k})"><rect x="-7" y="96" width="14" height="96" rx="4" fill="#5B6472"/><rect x="-22" y="186" width="44" height="10" rx="5" fill="#5B6472"/>`
+    + '<rect x="-30" y="0" width="60" height="104" rx="16" fill="#2D3436"/><rect x="-26" y="4" width="52" height="96" rx="13" fill="#3B4450"/>';
+  [['#FF4D4D', 20], ['#FECA57', 52], ['#2ECC71', 84]].forEach(([col, cy]) => {
+    s += `<circle cx="0" cy="${cy}" r="13" fill="${col}"/><circle cx="-4" cy="${cy - 4}" r="4" fill="#fff" opacity=".45"/>`;
+    if (faces) s += `<circle cx="-4" cy="${cy - 1}" r="1.6" fill="#2D3436"/><circle cx="4" cy="${cy - 1}" r="1.6" fill="#2D3436"/><path d="M-4 ${cy + 4}c2.5 2.5 5.5 2.5 8 0" stroke="#2D3436" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+  });
+  return `${s}</g>`;
+}
+function trafficLightVisual(spec) {
+  const L = spec.labels || {};
+  let s = trafficLight(70, 8, 1.1);
+  const tag = (y, col, word) => (word ? `<path d="M108 ${y}h14" stroke="${col}" stroke-width="3" stroke-linecap="round"/><rect x="124" y="${y - 19}" width="${Math.max(84, String(word).length * 14 + 28)}" height="38" rx="19" fill="${col}"/>`
+    + `<text x="${124 + Math.max(84, String(word).length * 14 + 28) / 2}" y="${y + 7}" text-anchor="middle" ${tfont(word)} font-weight="800" font-size="20" fill="#fff">${esc(word)}</text>` : '');
+  s += tag(30, '#E04F4F', L.red) + tag(65, '#E0A100', L.yellow) + tag(100, '#1E9E57', L.green);
+  return svg(300, 222, s, `traffic light${L.red ? `: red ${L.red}` : ''}${L.green ? `, green ${L.green}` : ''}`);
+}
+// road signs, drawn as their shapes: r is the sign's size
+const SIGN = {
+  stop: (r) => `<path d="${[...Array(8)].map((_, i) => { const a = Math.PI / 8 + (i * Math.PI) / 4; return `${i ? 'L' : 'M'}${r1(Math.cos(a) * r)} ${r1(Math.sin(a) * r)}`; }).join('')}z" fill="#E53935" stroke="#fff" stroke-width="${r1(r * 0.08)}"/><text x="0" y="${r1(r * 0.24)}" text-anchor="middle" ${FONT} font-weight="800" font-size="${r1(r * 0.6)}" fill="#fff">STOP</text>`,
+  parking: (r) => `<rect x="${-r}" y="${-r}" width="${2 * r}" height="${2 * r}" rx="${r1(r * 0.22)}" fill="#1E64C8" stroke="#fff" stroke-width="${r1(r * 0.08)}"/><text x="0" y="${r1(r * 0.42)}" text-anchor="middle" ${FONT} font-weight="800" font-size="${r1(r * 1.25)}" fill="#fff">P</text>`,
+  turn_left: (r) => `<circle r="${r}" fill="#1E64C8" stroke="#fff" stroke-width="${r1(r * 0.08)}"/><path d="M${r1(r * 0.3)} ${r1(r * 0.55)}V${r1(-r * 0.05)}H${r1(-r * 0.25)}" stroke="#fff" stroke-width="${r1(r * 0.2)}" fill="none" stroke-linejoin="round"/><path d="M${r1(-r * 0.55)} ${r1(-r * 0.05)}l${r1(r * 0.36)} ${r1(-r * 0.3)}v${r1(r * 0.6)}z" fill="#fff"/>`,
+  no_cycling: (r) => `<circle r="${r}" fill="#fff" stroke="#E53935" stroke-width="${r1(r * 0.18)}"/><g stroke="#2D3436" stroke-width="${r1(r * 0.08)}" fill="none"><circle cx="${r1(-r * 0.36)}" cy="${r1(r * 0.2)}" r="${r1(r * 0.24)}"/><circle cx="${r1(r * 0.36)}" cy="${r1(r * 0.2)}" r="${r1(r * 0.24)}"/><path d="M${r1(-r * 0.36)} ${r1(r * 0.2)}L${r1(-r * 0.08)} ${r1(-r * 0.2)}H${r1(r * 0.22)}L${r1(r * 0.36)} ${r1(r * 0.2)}M${r1(-r * 0.08)} ${r1(-r * 0.2)}L${r1(r * 0.02)} ${r1(r * 0.2)}"/></g>`,
+  hump: (r) => `<path d="M0 ${r1(-r)}L${r1(r * 1.05)} ${r1(r * 0.8)}H${r1(-r * 1.05)}z" fill="#fff" stroke="#E53935" stroke-width="${r1(r * 0.16)}" stroke-linejoin="round"/><path d="M${r1(-r * 0.5)} ${r1(r * 0.45)}q${r1(r * 0.5)} ${r1(-r * 0.6)} ${r1(r)} 0z" fill="#2D3436"/>`,
+  crossroads: (r) => `<path d="M0 ${r1(-r)}L${r1(r * 1.05)} ${r1(r * 0.8)}H${r1(-r * 1.05)}z" fill="#fff" stroke="#E53935" stroke-width="${r1(r * 0.16)}" stroke-linejoin="round"/><path d="M0 ${r1(-r * 0.35)}v${r1(r * 0.9)}M${r1(-r * 0.36)} ${r1(r * 0.12)}h${r1(r * 0.72)}" stroke="#2D3436" stroke-width="${r1(r * 0.16)}"/>`,
+  children: (r) => `<path d="M0 ${r1(-r)}L${r1(r * 1.05)} ${r1(r * 0.8)}H${r1(-r * 1.05)}z" fill="#fff" stroke="#E53935" stroke-width="${r1(r * 0.16)}" stroke-linejoin="round"/>`
+    + `<g fill="#2D3436"><circle cx="${r1(-r * 0.2)}" cy="${r1(-r * 0.25)}" r="${r1(r * 0.11)}"/><circle cx="${r1(r * 0.22)}" cy="${r1(-r * 0.15)}" r="${r1(r * 0.1)}"/><path d="M${r1(-r * 0.32)} ${r1(-r * 0.1)}h${r1(r * 0.24)}l${r1(r * 0.08)} ${r1(r * 0.5)}h${r1(-r * 0.4)}z"/><path d="M${r1(r * 0.1)} ${r1(-r * 0.02)}h${r1(r * 0.24)}l${r1(r * 0.06)} ${r1(r * 0.48)}h${r1(-r * 0.36)}z"/></g>`,
+};
+const roadSign = (kind, x, y, r) => (SIGN[kind] ? `<g transform="translate(${x} ${y})">${SIGN[kind](r)}</g>` : '');
+function roadSigns(spec) {
+  const signs = spec.signs; const cols = Math.min(3, signs.length); const rows = Math.ceil(signs.length / cols);
+  const cw = 480 / cols; const rh = 118; let s = '';
+  signs.forEach((g, i) => {
+    const cx = (i % cols) * cw + cw / 2; const top = Math.floor(i / cols) * rh;
+    s += `<rect x="${r1((i % cols) * cw + 6)}" y="${top + 4}" width="${r1(cw - 12)}" height="${rh - 10}" rx="14" fill="${['#FFF1F0', '#EEF4FF', '#FFF8E8'][i % 3]}"/>`
+      + `<rect x="${r1(cx - 3)}" y="${top + 50}" width="6" height="30" fill="#9AA4B1"/>` + roadSign(g.sign, r1(cx), top + 40, 28)
+      + `<text x="${r1(cx)}" y="${top + 100}" text-anchor="middle" ${tfont(g.label)} font-weight="700" font-size="15" fill="${C.ink}">${esc(g.label)}</text>`;
+  });
+  return svg(480, rows * rh, s, `road signs: ${signs.map((g) => g.label).join(', ')}`);
+}
+function roadSignOne(spec) { return svg(100, 100, roadSign(spec.sign, 50, 50, 40), `road sign ${spec.sign}`); }
+// the three steps for crossing: a child seen from behind, looking right, left, right again
+function lookSteps(spec) {
+  const steps = spec.steps; const w = 480 / steps.length; let s = '';
+  steps.forEach((st, i) => {
+    const cx = i * w + w / 2; const right = st.dir === 'right';
+    s += `<rect x="${r1(i * w + 6)}" y="4" width="${r1(w - 12)}" height="186" rx="16" fill="${['#E3F0FF', '#FFF1D6', '#DDF7EC'][i % 3]}"/>`
+      + `<circle cx="${r1(i * w + 30)}" cy="30" r="15" fill="${TILE[i % TILE.length]}"/><text x="${r1(i * w + 30)}" y="36" text-anchor="middle" ${FONT} font-weight="800" font-size="17" fill="#fff">${i + 1}</text>`
+      // the child from behind: shoulders, the back of the head, hair, ears; the head turned toward the arrow
+      + `<path d="M${r1(cx - 38)} 150c4-24 18-34 38-34s34 10 38 34z" fill="${C.skyD}"/><rect x="${r1(cx - 12)}" y="140" width="24" height="10" fill="${C.skyD}"/>`
+      + `<g transform="rotate(${right ? 14 : -14} ${r1(cx)} 112)"><circle cx="${r1(cx)}" cy="88" r="27" fill="${HAIR}"/><ellipse cx="${r1(cx - 27)}" cy="92" rx="6" ry="9" fill="${SKIN}"/><ellipse cx="${r1(cx + 27)}" cy="92" rx="6" ry="9" fill="${SKIN}"/><rect x="${r1(cx - 9)}" y="110" width="18" height="10" fill="${SKIN}"/></g>`
+      + `<path d="M${r1(right ? cx + 30 : cx - 30)} 66h${right ? 22 : -22}" stroke="${C.coral}" stroke-width="7" stroke-linecap="round"/><path d="M${r1(right ? cx + 50 : cx - 50)} 55l${right ? 15 : -15} 11l${right ? -15 : 15} 11z" fill="${C.coral}"/>`
+      + `<text x="${r1(cx)}" y="178" text-anchor="middle" ${tfont(st.label)} font-weight="800" font-size="17" fill="${C.ink}">${esc(st.label)}</text>`;
+  });
+  return svg(480, 194, s, `steps: ${steps.map((st) => st.label).join(', ')}`);
+}
+// a bee, round and friendly
+function bee(x, y, k = 1) {
+  return `<g transform="translate(${x} ${y}) scale(${k})">`
+    + '<ellipse cx="-4" cy="-16" rx="9" ry="13" fill="#D6EEFF" stroke="#9CC9EE" stroke-width="1.5" transform="rotate(-20 -4 -16)"/><ellipse cx="6" cy="-16" rx="9" ry="13" fill="#D6EEFF" stroke="#9CC9EE" stroke-width="1.5" transform="rotate(20 6 -16)"/>'
+    + '<ellipse cx="0" cy="0" rx="19" ry="13" fill="#FECA57"/><rect x="-7" y="-12.5" width="5" height="25" rx="2" fill="#2D3436"/><rect x="3" y="-12" width="5" height="24" rx="2" fill="#2D3436"/>'
+    + '<path d="M-19 0l-7 -3v6z" fill="#2D3436"/><circle cx="20" cy="-3" r="9" fill="#FECA57"/><circle cx="22" cy="-5" r="1.8" fill="#2D3436"/><path d="M19 1c2 2 4 2 6 0" stroke="#2D3436" stroke-width="1.4" fill="none" stroke-linecap="round"/>'
+    + '<ellipse cx="17" cy="0" rx="2.5" ry="1.6" fill="#FF8FB1" opacity=".8"/><path d="M19 -11l-2 -7M24 -11l2 -7" stroke="#2D3436" stroke-width="1.4"/><circle cx="17" cy="-18" r="1.6" fill="#2D3436"/><circle cx="26" cy="-18" r="1.6" fill="#2D3436"/></g>';
+}
+// an ordinal number drawn as 1st, 2nd, 3rd: the ending small and raised
+const ordinalText = (x, y, n, end, fs, col) => `<text x="${r1(x)}" y="${r1(y)}" text-anchor="middle" ${FONT} font-weight="800" font-size="${fs}" fill="${col}">${esc(n)}<tspan font-size="${r1(fs * 0.55)}" dy="${r1(-fs * 0.38)}">${esc(end)}</tspan></text>`;
+const splitOrdinal = (o) => { const m = /^(\d+)(st|nd|rd|th)$/.exec(String(o)); return m ? [m[1], m[2]] : [String(o), '']; };
+// a row of bees or children, each with its position above and its word below
+function ordinalRow(spec) {
+  const items = spec.items; const w = 480 / items.length; let s = '';
+  items.forEach((it, i) => {
+    const cx = i * w + w / 2; const [n, end] = splitOrdinal(it.ord);
+    s += `<rect x="${r1(cx - 24)}" y="4" width="48" height="34" rx="10" fill="${TILE[i % TILE.length]}"/>` + ordinalText(cx, 30, n, end, 20, '#fff');
+    s += spec.object === 'child'
+      ? person(r1(cx), 162, { k: 0.62, top: TILE[(i + 2) % TILE.length], hair: i % 2 ? 'long' : 'short', look: 'ahead' })
+      : bee(r1(cx - 2), 92, Math.min(1.3, w / 52));
+    if (it.word) s += `<text x="${r1(cx)}" y="186" text-anchor="middle" ${FONT} font-weight="700" font-size="${w < 70 ? 14 : 16}" fill="${C.ink}">${esc(it.word)}</text>`;
+  });
+  if (spec.object === 'child') s += '<path d="M0 166h480" stroke="#B2BAC6" stroke-width="3" stroke-dasharray="6 6"/>';
+  return svg(480, 196, s, `positions: ${items.map((it) => `${it.ord} ${it.word || ''}`).join(', ')}`);
+}
+// bees flying in a line to their hive
+SCENES.bee_line = () => {
+  let s = skyDefs('qsky4', '#C9EBFF', '#F1FAFF') + '<rect width="480" height="240" rx="16" fill="url(#qsky4)"/>' + sunFace(46, 42, 16) + cloud(160, 30, 0.6) + meadow(204);
+  s += '<path d="M480 40c-60 6-100 10-150 26" stroke="#A0673E" stroke-width="10" fill="none" stroke-linecap="round"/><circle cx="440" cy="30" r="26" fill="#4FB45E"/><circle cx="470" cy="56" r="22" fill="#45A653"/>';
+  s += '<g transform="translate(372 92)"><path d="M-30 -24q30-30 60 0v48q-30 22-60 0z" fill="#F6B93B" stroke="#C98C2E" stroke-width="3"/><path d="M-30 -10h60M-30 6h60M-30 22h58" stroke="#C98C2E" stroke-width="2.5"/><ellipse cx="0" cy="14" rx="9" ry="8" fill="#5B3A1A"/><path d="M0 -38v10" stroke="#A0673E" stroke-width="4"/></g>';
+  [[300, 70], [244, 104], [188, 130], [132, 150], [76, 166]].forEach(([x, y], i) => {
+    s += bee(x, y, 0.95) + `<rect x="${x - 18}" y="${y + 18}" width="36" height="24" rx="8" fill="${TILE[i % TILE.length]}"/>` + ordinalText(x, y + 36, String(i + 1), ['st', 'nd', 'rd', 'th', 'th'][i], 15, '#fff');
+  });
+  s += flower(30, 226, C.pink) + flower(420, 228, C.violet) + flower(460, 222, C.yellow);
+  return svg(480, 240, s, 'five bees flying in a line to their hive: 1st to 5th');
+};
+// cars on a winding road, each with a letter; some show their position, the rest are boxes to fill
+function carRoad(spec) {
+  const letters = spec.letters; const per = 5; const rows = Math.ceil(letters.length / per); const rowH = 92; const show = spec.show || {};
+  let s = `<rect width="480" height="${rows * rowH + 16}" rx="16" fill="#BFEBDD"/>`;
+  for (let r = 0; r < rows; r++) {
+    const y = 24 + r * rowH + 44;
+    s += `<rect x="20" y="${y - 14}" width="440" height="28" rx="14" fill="#fff"/><path d="M36 ${y}h408" stroke="#B2BAC6" stroke-width="2" stroke-dasharray="8 8"/>`;
+    if (r < rows - 1) s += `<path d="M${r % 2 ? 34 : 446} ${y}v${rowH}" stroke="#fff" stroke-width="28" stroke-linecap="round"/>`;
+  }
+  letters.forEach((L, i) => {
+    const r = Math.floor(i / per); const c = i % per; const col = r % 2 ? per - 1 - c : c;
+    const x = 64 + col * 88; const y = 24 + r * rowH + 44;
+    s += `<g transform="translate(${x} ${y})"><path d="M-30 6v-14q0-6 6-6h8l8-10h20l10 10h4q6 0 6 6v14z" fill="#FECA57" stroke="#E0A100" stroke-width="2"/><path d="M-12 -14l6-8h16l7 8z" fill="#D9F2FF"/>`
+      + `<circle cx="-16" cy="8" r="6" fill="#2D3436"/><circle cx="18" cy="8" r="6" fill="#2D3436"/><circle cx="-16" cy="8" r="2.4" fill="#B2BAC6"/><circle cx="18" cy="8" r="2.4" fill="#B2BAC6"/>`
+      + `<text x="2" y="4" text-anchor="middle" ${FONT} font-weight="800" font-size="16" fill="#2D3436">${esc(L)}</text></g>`;
+    const label = show[L];
+    if (label) { const [n, end] = splitOrdinal(label); s += `<rect x="${x - 20}" y="${y - 54}" width="40" height="26" rx="8" fill="#fff" stroke="${C.blue}" stroke-width="2"/>` + ordinalText(x, y - 34, n, end, 15, C.blue); }
+    else s += `<rect x="${x - 20}" y="${y - 54}" width="40" height="26" rx="8" fill="#fff" stroke="#9AA4B1" stroke-width="2" stroke-dasharray="4 3"/>`;
+  });
+  return svg(480, rows * rowH + 16, s, `cars with the letters ${letters.join(' ')} in order`);
+}
+// a winners' podium: 2nd, 1st, 3rd, each child on their block
+function podium(spec) {
+  const at = { 1: [240, 110], 2: [120, 140], 3: [360, 160] }; let s = '<rect width="480" height="250" rx="16" fill="#FFF6E5"/>' + sparkle(60, 40, 1) + sparkle(420, 50, 0.9, C.pink) + sparkle(240, 24, 0.8, C.sky);
+  for (const p of spec.places) {
+    const [cx, top] = at[p.place] || [240, 110]; const col = { 1: '#FECA57', 2: '#C9D1DE', 3: '#F0B27A' }[p.place];
+    s += `<rect x="${cx - 60}" y="${top}" width="120" height="${240 - top}" rx="8" fill="${col}"/><text x="${cx}" y="${top + 50}" text-anchor="middle" ${FONT} font-weight="800" font-size="40" fill="#fff">${p.place}</text>`
+      + person(cx, top, { k: 0.62, top: TILE[p.place + 1], hair: p.hair || 'short', look: 'ahead', arm: p.place === 1 ? 'wave' : null, armSide: 1, armAngle: 20 });
+    if (p.name) s += `<rect x="${cx - 40}" y="${top - 112}" width="80" height="24" rx="12" fill="#fff" stroke="${C.slate}" stroke-width="1.5"/><text x="${cx}" y="${top - 95}" text-anchor="middle" ${tfont(p.name)} font-weight="700" font-size="15" fill="${C.ink}">${esc(p.name)}</text>`;
+  }
+  return svg(480, 250, s, `a race podium: ${spec.places.map((p) => `${p.name || ''} ${p.place}`).join(', ')}`);
+}
+// a signboard on a post, its words as the lesson writes them
+function signboard(x, y, text, w = 190) {
+  const lines = wrap(text, isUr(text) ? 18 : 16).slice(0, 3); const h = 26 + lines.length * 34;
+  let s = `<g transform="translate(${x} ${y})"><rect x="-6" y="${h - 6}" width="12" height="64" fill="#8D5A34"/><rect x="${-w / 2}" y="0" width="${w}" height="${h}" rx="10" fill="#C98C5E" stroke="#8D5A34" stroke-width="4"/>`
+    + `<rect x="${-w / 2 + 8}" y="8" width="${w - 16}" height="${h - 16}" rx="6" fill="#FFF8E8"/>`;
+  lines.forEach((l, i) => { s += `<text x="0" y="${42 + i * 34}" text-anchor="middle" ${tfont(l)} font-weight="700" font-size="20" fill="#B03A2E">${esc(l)}</text>`; });
+  return `${s}</g>`;
+}
+function signboardVisual(spec) {
+  const items = spec.items; const w = 480 / items.length; let s = '<rect width="480" height="190" rx="16" fill="#E8F7E4"/>' + meadow(150);
+  items.forEach((t, i) => { s += signboard(r1(i * w + w / 2), 16, t, Math.min(200, w - 20)); });
+  return svg(480, 190, s, `signboards: ${items.join(' · ')}`);
+}
+// a family in the park: the father, three children with flowers, the park's signboard
+SCENES.park_family = (spec) => {
+  let s = skyDefs('qsky5', '#B8E2FF', '#EEF8FF') + '<rect width="480" height="250" rx="16" fill="url(#qsky5)"/>' + sunFace(440, 40, 17) + cloud(220, 30, 0.7) + meadow(176);
+  s += tree(60, 200, 0.95) + tree(420, 196, 0.8);
+  s += signboard(370, 70, spec.sign || '', 170);
+  s += person(150, 236, { k: 0.95, top: '#4A69BD', hair: 'short', moustache: HAIR, look: 'ahead', mouth: 'sad', arm: 'point', armSide: 1, armAngle: 70 })
+    + person(222, 238, { k: 0.72, top: C.coral, hair: 'short', look: 'ahead', mouth: 'o' })
+    + person(276, 238, { k: 0.68, top: '#8E5BC6', hair: 'scarf', scarf: '#F6E58D', look: 'ahead' })
+    + person(320, 240, { k: 0.58, top: C.aqua, hair: 'scarf', scarf: '#FF8FB1', look: 'up' })
+    + flower(246, 168, C.pink, 1.1) + flower(296, 172, C.yellow, 1) + flower(340, 180, C.violet, 1)
+    + flower(110, 236, C.coral) + flower(380, 236, C.pink) + flower(440, 232, C.yellow) + butterfly(200, 120, C.orange, 0.8);
+  return svg(480, 250, s, `a father and three children in a park; a signboard: ${spec.sign || ''}`);
+};
+// a road with a zebra crossing: two children cross holding hands; a traffic light, or none
+SCENES.zebra_crossing = (spec) => {
+  const signal = spec.signal !== false;
+  let s = skyDefs('qsky6', '#B8E2FF', '#EEF8FF') + '<rect width="480" height="250" rx="16" fill="url(#qsky6)"/>' + sunFace(420, 40, 16) + cloud(220, 26, 0.6)
+    + '<rect x="0" y="120" width="480" height="20" fill="#C9CDD8"/><rect x="0" y="140" width="480" height="84" fill="#5B6472"/><rect x="0" y="224" width="480" height="26" fill="#C9CDD8"/>'
+    + '<path d="M0 182h120M360 182h120" stroke="#FECA57" stroke-width="4" stroke-dasharray="18 14"/>';
+  for (let i = 0; i < 7; i++) s += `<rect x="${140 + i * 30}" y="144" width="18" height="76" rx="2" fill="#fff"/>`;
+  // a car waiting, a school sign
+  s += '<g transform="translate(406 160)"><rect x="-44" y="-26" width="88" height="34" rx="10" fill="#54A0FF"/><path d="M-26 -26l10-18h34l12 18z" fill="#54A0FF"/><path d="M-20 -26l7-12h12v12zM6 -26v-12h10l8 12z" fill="#D9F2FF"/><circle cx="-24" cy="10" r="9" fill="#2D3436"/><circle cx="24" cy="10" r="9" fill="#2D3436"/><circle cx="-44" cy="-12" r="4" fill="#FECA57"/></g>'
+    + '<rect x="96" y="70" width="5" height="52" fill="#9AA4B1"/>' + roadSign('children', 98, 66, 20);
+  if (signal) s += trafficLight(40, 30, 0.5, { faces: false });
+  s += person(220, 214, { k: 0.66, top: C.coral, hair: 'short', look: 'ahead', arm: 'point', armSide: 1, armAngle: 100 })
+    + person(262, 214, { k: 0.6, top: C.violet, hair: 'scarf', scarf: '#fff', look: 'ahead' });
+  return svg(480, 250, s, signal ? 'two children cross the road at the zebra crossing; a traffic light' : 'a road with a zebra crossing and no traffic signal');
+};
+
 // ── THE HERO BADGE ───────────────────────────────────────────────────────────────────────
 // A small round picture for the lesson's title card.
 function heroBadge(spec) {
   if (!spec) return '';
   if (spec.type === 'clock') return `<svg class="qhero-art" viewBox="-6 -10 132 140" aria-hidden="true"><rect x="-6" y="-10" width="132" height="140" fill="#FFF3DC"/>${clockFace(60, 64, 46, spec.time)}</svg>`;
+  if (spec.type === 'traffic_light') return `<svg class="qhero-art" viewBox="-60 -14 120 120" aria-hidden="true"><rect x="-60" y="-14" width="120" height="120" fill="#E3F0FF"/>${trafficLight(0, -4, 0.82)}</svg>`;
   if (spec.type === 'scene') {
     const inner = scene(spec).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
-    const box = { songbird: '140 20 200 200', lake: '90 20 260 220', kite_tree: '120 20 230 210' }[spec.scene] || '0 0 480 240';
+    const box = { songbird: '140 20 200 200', lake: '90 20 260 220', kite_tree: '120 20 230 210', bee_line: '150 30 200 200', park_family: '110 60 190 190', zebra_crossing: '120 60 190 190' }[spec.scene] || '0 0 480 240';
     return `<svg class="qhero-art" viewBox="${box}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${inner}</svg>`;
   }
   return '';
@@ -532,9 +706,23 @@ function face(i, kind) {
   return `<svg class="qface" viewBox="-36 -142 72 72" aria-hidden="true"><circle cx="0" cy="-106" r="36" fill="${bg}"/>${person(0, 0, { ...o, k: 1 })}</svg>`;
 }
 
-const DRAW = { clock, clock_pair: clockPair, tiles, blender, blender_list: blenderList, blend_steps: blendSteps, scene, predict, dictionary, poster };
+// the good-citizen chart's small pictures (primary.js lays out the chart, with the lesson's words)
+const DEED = {
+  fan_bulb: () => ic('<circle cx="8" cy="8" r="2" fill="#5B6472"/><path d="M8 8c-1-4 0-6 2-6s1 4-2 6zM8 8c4-1 6 0 6 2s-4 1-6-2zM8 8c1 4 0 6-2 6s-1-4 2-6zM8 8c-4 1-6 0-6-2s4-1 6 2z" fill="#54A0FF"/><path d="M17 4a4 4 0 0 0-2.4 7.2c.4.3.6.8.6 1.3v.5h3.6v-.5c0-.5.2-1 .6-1.3A4 4 0 0 0 17 4z" fill="#FECA57"/><rect x="15.3" y="14.2" width="3.4" height="1.4" rx=".6" fill="#B2BAC6"/><path d="M3 21l18-18" stroke="#E53935" stroke-width="2.2" stroke-linecap="round"/>'),
+  tap: () => ic('<path d="M4 7h9a3 3 0 0 1 3 3v3h-4v-2H4z" fill="#9AA4B1"/><rect x="7" y="3" width="3" height="4" fill="#5B6472"/><rect x="5" y="2" width="7" height="2" rx="1" fill="#E53935"/><path d="M14 16c0 2-1.5 3.5-1.5 4.5a1.5 1.5 0 0 0 3 0c0-1-1.5-2.5-1.5-4.5z" fill="#54A0FF" opacity=".35"/><path d="M18 14l4 4" stroke="#1DD1A1" stroke-width="2.2" stroke-linecap="round"/>'),
+  dustbin: () => ic('<rect x="5" y="8" width="14" height="14" rx="2" fill="#1DD1A1"/><rect x="3.5" y="5.5" width="17" height="3" rx="1.5" fill="#16A085"/><rect x="10" y="3.5" width="4" height="2.5" rx="1" fill="#16A085"/><path d="M9 11v8M12 11v8M15 11v8" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><path d="M15 2.5l3 2-1 1.5" fill="#FECA57"/>'),
+  queue: () => ic('<circle cx="5" cy="7" r="2.3" fill="#E0A97E"/><circle cx="12" cy="7" r="2.3" fill="#C98C5E"/><circle cx="19" cy="7" r="2.3" fill="#E0A97E"/><path d="M2 20c0-5 1.5-9 3-9s3 4 3 9z" fill="#FF6B6B"/><path d="M9 20c0-5 1.5-9 3-9s3 4 3 9z" fill="#54A0FF"/><path d="M16 20c0-5 1.5-9 3-9s3 4 3 9z" fill="#1DD1A1"/>'),
+  plant: () => ic('<path d="M7 15h10l-1.5 7h-7z" fill="#E67E22"/><path d="M12 15V9" stroke="#2ECC71" stroke-width="2"/><path d="M12 10c-4 0-6-2-6-5 3 0 6 1 6 5zM12 9c0-4 2-6 6-6 0 3-2 6-6 6z" fill="#2ECC71"/><path d="M17.5 12.5c1-1.2 3-.6 3 1 0 1.7-3 3.5-3 3.5s-3-1.8-3-3.5c0-1.6 2-2.2 3-1z" fill="#FF6B6B"/>'),
+  ticket: () => ic('<path d="M3 6.5h18v3a2.5 2.5 0 0 0 0 5v3H3v-3a2.5 2.5 0 0 0 0-5z" fill="#FECA57"/><path d="M15 6.5v11" stroke="#fff" stroke-width="1.4" stroke-dasharray="1.6 1.6"/><rect x="5.5" y="10" width="7" height="1.6" rx=".8" fill="#A0673E"/><rect x="5.5" y="13" width="5" height="1.6" rx=".8" fill="#A0673E"/>'),
+  heart: () => ic('<path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z" fill="#FF6B6B"/><path d="M12 9.5l1 2 2.2.3-1.6 1.5.4 2.2-2-1-2 1 .4-2.2-1.6-1.5 2.2-.3z" fill="#fff"/>'),
+};
+const DRAW = {
+  clock, clock_pair: clockPair, tiles, blender, blender_list: blenderList, blend_steps: blendSteps, scene, predict, dictionary, poster,
+  traffic_light: trafficLightVisual, road_signs: roadSigns, road_sign: roadSignOne, look_steps: lookSteps, ordinal_row: ordinalRow,
+  car_road: carRoad, podium, signboards: signboardVisual,
+};
 // the visual types drawn as HTML by primary.js rather than as SVG here
-const HTML_VISUALS = ['story_map', 'tracker'];
+const HTML_VISUALS = ['story_map', 'tracker', 'deeds'];
 function draw(spec) {
   if (!spec || !spec.type) return '';
   const f = DRAW[spec.type];
@@ -542,4 +730,4 @@ function draw(spec) {
   return f(spec);
 }
 
-module.exports = { draw, DRAW, HTML_VISUALS, heroBadge, ICON, stageIcon, face, parseTime, C };
+module.exports = { draw, DRAW, HTML_VISUALS, heroBadge, ICON, DEED, stageIcon, face, parseTime, C };

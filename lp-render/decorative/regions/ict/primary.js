@@ -22,7 +22,7 @@
 // .ictq, so no other region or the grades 6–12 design (.ictp) is touched.
 const fs = require('node:fs');
 const path = require('node:path');
-const { draw, HTML_VISUALS, heroBadge, ICON, stageIcon, face, C } = require('./primary-art');
+const { draw, HTML_VISUALS, heroBadge, ICON, DEED, stageIcon, face, C } = require('./primary-art');
 
 const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const AR = /[؀-ۿ]/;
@@ -80,7 +80,7 @@ function sentenceChunks(text, n = 170) {
   return out;
 }
 // pictures small enough to sit beside the text they belong to
-const SIDE = ['clock', 'tiles'];
+const SIDE = ['clock', 'tiles', 'road_sign'];
 const quoted = (line) => (/^[“"‘'(—–-]/.test(line.trim()) || /[“”]/.test(line) ? line : `“${line}”`);
 
 function composePrimary(guide) {
@@ -105,6 +105,7 @@ function composePrimary(guide) {
     counts.visuals += 1;
     if (spec.type === 'story_map') return storyMap(spec);
     if (spec.type === 'tracker') return tracker(spec);
+    if (spec.type === 'deeds') return deeds(spec);
     return `<figure class="q-fig ${cls}">${draw(spec)}${spec.caption ? `<figcaption>${esc(spec.caption)}</figcaption>` : ''}</figure>`;
   };
   // the story map: the story's events as boxes in reading order, the pause signs between them
@@ -118,6 +119,8 @@ function composePrimary(guide) {
       return `${arrow}<span class="q-ev q-ev${(ev - 1) % 5}"><b class="q-evn">${ev}</b>${rich(it)}</span>`;
     }).join('')}</div>`;
   };
+  // a good-citizen chart: one card per deed, its picture and the lesson's words
+  const deeds = (spec) => `<div class="q-deeds" dir="${rtl ? 'rtl' : 'ltr'}">${spec.items.map((d, i) => `<div class="q-deed q-deed${i % 6}">${DEED[d.icon] ? DEED[d.icon]() : ''}<span dir="${dir(d.text)}">${rich(d.text)}</span></div>`).join('')}</div>`;
   const tracker = (spec) => `<table class="q-track" dir="${rtl ? 'rtl' : 'ltr'}"><thead><tr>${spec.columns.map((c, k) => `<th class="q-th${k % 3}">${rich(c)}</th>`).join('')}</tr></thead>`
     + `<tbody>${spec.rows.map((r) => `<tr>${spec.columns.map((_, k) => `<td>${rich(r[k] || '')}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
 
@@ -136,7 +139,7 @@ function composePrimary(guide) {
   add('start', `<div class="q-today"><div class="q-cap">${ICON.sun()} ${lab(L.today)}</div>${T(lesson.title, 'div', 'q-today-t')}</div>`);
   add('start', `<div class="q-two"><div class="q-journey"><div class="q-cap">${ICON.steps()} ${lab(L.journey)}</div>${T(lesson.journey, 'div')}</div>`
     + `<div class="q-coming"><div class="q-cap">${ICON.next()} ${lab(L.coming)}</div>${T(lesson.coming_up, 'div')}</div></div>`);
-  add('start', `<div class="q-outcome"><div class="q-cap">${ICON.target()} ${lab(L.outcome)} · <bdi dir="ltr">${esc(lesson.outcome.code)}</bdi></div>${T(lesson.outcome.text, 'div', 'q-outcome-t')}</div>`);
+  add('start', `<div class="q-outcome"><div class="q-cap">${ICON.target()} ${lab(L.outcome)}${lesson.outcome.code ? ` · <bdi dir="ltr">${esc(lesson.outcome.code)}</bdi>` : ''}</div>${T(lesson.outcome.text, 'div', 'q-outcome-t')}</div>`);
   add('start', `<div class="q-prepare"><div class="q-cap">${ICON.bag()} ${lab(L.prepare)}</div><ul class="q-checks">${lesson.prepare.map((p) => `<li>${T(p)}</li>`).join('')}</ul></div>`);
   if (lesson.video) {
     add('start', `<div class="q-video"><div class="q-video-h">${ICON.tv()}<span class="q-cap">${lab(L.video)}</span> ${T(lesson.video.title, 'span', 'q-video-t')}</div>${T(lesson.video.note, 'div', 'q-video-n')}</div>`);
@@ -238,10 +241,13 @@ function composePrimary(guide) {
           add(sid, `<div class="q-card q-card-yd"><div class="q-card-h" data-first-only><span class="q-pills">${pill(L.independent, 'line')}${pill(L.youdo, 'green')}</span></div>`
             + `<div class="q-sub" data-first-only>${pill(L.alone, 'green big', ICON.pencil())}</div><div class="units">${b.items.map((it, i) => {
               const ref = it.ref ? `<span class="q-ref">${rich(it.ref)}</span>` : '';
-              const pic = it.visual ? `<div class="q-ifig">${draw(it.visual)}</div>` : '';
-              if (it.visual) counts.visuals += 1;
+              // a small picture sits beside its question; a wide one (a road of cars, a signboard) goes under it
+              const side = it.visual && SIDE.includes(it.visual.type);
+              const pic = side ? `<div class="q-ifig">${draw(it.visual)}</div>` : '';
+              const wide = it.visual && !side ? fig(it.visual, 'q-fig-item') : '';
+              if (side) counts.visuals += 1;
               const ans = it.answer ? `<div class="q-a" dir="${dir(it.answer)}"><b class="q-cap">${lab(it.sample ? L.sample : L.answer)}</b> ${rich(it.answer)}</div>` : '';
-              return `<div class="q-item${pic ? ' has-fig' : ''}" data-units><div class="q-item-q" dir="${dir(it.q)}"><b class="q-n">${i + 1}.</b> ${rich(it.q)} ${ref}</div>${pic}${ans}</div>`;
+              return `<div class="q-item${pic ? ' has-fig' : ''}" data-units><div class="q-item-q" dir="${dir(it.q)}"><b class="q-n">${i + 1}.</b> ${rich(it.q)} ${ref}</div>${pic}${wide}${ans}</div>`;
             }).join('')}</div></div>`, 'data-split');
           break;
         case 'differentiation':
@@ -477,6 +483,9 @@ html:not(.lp-print) .qpg{box-shadow:0 0 0 1px #d9dbe1,0 6px 20px rgba(30,32,48,.
 .q-ifig{width:auto;max-width:180px;align-self:start}
 .q-ifig .qart{width:auto;max-width:180px;height:auto;max-height:110px}
 .q-ifig .qart[aria-label^="clock"]{width:112px;height:112px}
+.q-ifig .qart[aria-label^="road sign"]{width:84px;height:84px}
+.q-item.has-fig .q-fig-item{grid-column:1/-1}
+.q-fig-item{background:#fff;border-radius:12px;padding:6px;margin:2px 0}
 .q-ref{display:inline-flex;align-items:center;font-size:15px;font-weight:700;color:var(--mut);background:#fff;border-radius:999px;padding:0 8px;box-shadow:inset 0 0 0 1.5px var(--mint-bd)}
 .q-a{border-inline-start:3px solid #8FD1AE;padding-inline-start:12px;color:#1E7A4A;font-weight:700}
 .q-a .q-cap{color:#1E6B45;font-size:15px}
@@ -484,6 +493,11 @@ html:not(.lp-print) .qpg{box-shadow:0 0 0 1px #d9dbe1,0 6px 20px rgba(30,32,48,.
 .q-diff .q-cap{color:#3B4152;display:flex;align-items:center;gap:6px}
 .q-fig-early{margin-top:8px}
 .q-fig-tm,.q-fig-task{background:#fff;border-radius:12px;padding:6px;margin:4px 0}
+.q-deeds{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0}
+.q-deed{display:flex;align-items:center;gap:10px;border-radius:12px;padding:6px 10px;font-weight:700;font-size:18px;line-height:1.35;box-shadow:0 2px 0 rgba(0,0,0,.07)}
+.q-deed[dir="rtl"] span,.q-deed span[dir="rtl"]{line-height:1.9}
+.q-deed .qic{flex:none;width:36px;height:36px}
+.q-deed0{background:#E3F0FF}.q-deed1{background:#DDF7EC}.q-deed2{background:#FFF1D6}.q-deed3{background:#FFE6F0}.q-deed4{background:#E8F7E4}.q-deed5{background:#EFE3FF}
 .q-exit{background:var(--mint);border:1.5px solid var(--mint-bd);border-radius:10px;padding:10px 14px 12px}
 .q-exit .q-cap{color:#1E6B45}
 .q-fig-exit{margin-top:8px;background:#fff;border-radius:9px;padding:6px}
