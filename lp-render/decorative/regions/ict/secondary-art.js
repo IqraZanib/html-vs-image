@@ -147,7 +147,7 @@ const subjectPicture = (subject) => SUBJECT[subjectKind(subject)]();
 // there is one number per stage, so the bar can never disagree with the line it illustrates.
 const STAGE_COLOUR = { introduction: '#0F6A73', development: '#0B2545', activity: '#1F7A4D', conclusion: '#584A93', homework: '#5B6472' };
 const STAGE_LETTER = { introduction: 'I', development: 'D', activity: 'A', conclusion: 'C', homework: 'H' };
-function pacingBar(line, stages) {
+function pacingBar(line, stages, { rtl = false } = {}) {
   const m = /^([\d+\s.]+)=\s*(\d+)/.exec(String(line).replace(/[^\d+=.\s]/g, ' ').trim());
   if (!m) return '';
   const parts = m[1].split('+').map((x) => Number(x.trim())).filter((x) => Number.isFinite(x) && x >= 0);
@@ -158,11 +158,167 @@ function pacingBar(line, stages) {
   parts.forEach((p, i) => {
     if (!p) return;   // a stage of 0 minutes takes no room on the bar
     const w = (usable * p) / total; const col = STAGE_COLOUR[stages[i]] || '#5B6472';
-    s += `<rect x="${r1(x)}" y="0" width="${r1(w)}" height="26" rx="6" fill="${col}"/>`;
-    if (w > 26) s += `<text x="${r1(x + w / 2)}" y="17.5" text-anchor="middle" font-family="Inter,sans-serif" font-weight="800" font-size="13" fill="#fff">${STAGE_LETTER[stages[i]] || ''} ${p}</text>`;
+    // a right-to-left lesson runs its stages from the right, as it reads
+    const bx = rtl ? W - x - w : x;
+    s += `<rect x="${r1(bx)}" y="0" width="${r1(w)}" height="26" rx="6" fill="${col}"/>`;
+    if (w > 26) s += `<text x="${r1(bx + w / 2)}" y="17.5" text-anchor="middle" font-family="Inter,sans-serif" font-weight="800" font-size="13" fill="#fff">${STAGE_LETTER[stages[i]] || ''} ${p}</text>`;
     x += w + gap;
   });
   return `<svg class="space-bar" viewBox="0 0 ${W} 26" role="img" aria-label="pacing ${parts.join(' + ')} = ${total} minutes">${s}</svg>`;
 }
 
-module.exports = { ICON, stageIcon, subjectPicture, subjectKind, pacingBar, STAGE_COLOUR, STAGE_LETTER, K };
+
+// ── VISUAL EXAMPLES: the lesson's own examples, drawn as shapes ───────────────────────────
+// Every one of these draws ONLY what the line it belongs to already says — its numbers, its
+// formulas, its words. None adds a label, a value or an answer the lesson does not print; where
+// the lesson leaves a value for pupils to find, the drawing shows "?".
+const F = "font-family=\"'ICTS Inter',Inter,sans-serif\"";
+const xesc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const STEP_COLOURS = ['#E0533F', '#3B82C4', '#F2A20C', '#2BB673', '#8E5BC6', '#16A085'];
+
+// a 2×2 (or m×n) matrix written in the lesson as \begin{bmatrix} a & b \\ c & d \end{bmatrix}
+function parseMatrix(tex) {
+  const m = /\\begin\{bmatrix\}([\s\S]*?)\\end\{bmatrix\}/.exec(tex);
+  if (!m) return null;
+  const rows = m[1].split('\\\\').map((r) => r.split('&').map((c) => c.trim())).filter((r) => r.length && r.some((c) => c !== ''));
+  return rows.length && rows.every((r) => r.length === rows[0].length) ? rows : null;
+}
+// THE ROW × COLUMN PICTURE for a matrix-product worked example: the lesson's two matrices, each
+// "Row r with column c" step in its own colour on row r of the first and column c of the second,
+// and the product cell that step fills — with the value only where the step line states it.
+function matrixProduct({ left, right, steps }) {
+  const A = left; const B = right;
+  if (!A || !B || A[0].length !== B.length || !steps.length) return '';
+  const cs = 28;
+  const cellAt = (x0, y0, rows, paint) => rows.map((r, i) => r.map((v, j) => {
+    const col = paint(i, j);
+    return `<rect x="${x0 + j * cs}" y="${y0 + i * cs}" width="${cs - 3}" height="${cs - 3}" rx="6" fill="${col || '#F5F7FA'}" stroke="${col ? col : '#C9D4E6'}" stroke-width="1.5" fill-opacity="${col ? 0.22 : 1}"/>`
+      + `<text x="${x0 + j * cs + (cs - 3) / 2}" y="${y0 + i * cs + 18}" text-anchor="middle" ${F} font-weight="800" font-size="13" fill="#13315C">${xesc(v)}</text>`;
+  }).join('')).join('');
+  // each step keeps the number and colour it has in the text (step n → colour n), so the picture
+  // and the steps read as one
+  const colourOf = (st, k) => STEP_COLOURS[((st.n || k + 1) - 1) % STEP_COLOURS.length];
+  const colourFor = (r, c) => { const k = steps.findIndex((s) => s.r === r && s.c === c); return k >= 0 ? colourOf(steps[k], k) : null; };
+  // one small panel per step: A with row r lit, B with column c lit, and the product with cell (r,c)
+  const aW = A[0].length * cs; const bW = B[0].length * cs; const pW = B[0].length * cs; const h = Math.max(A.length, B.length) * cs;
+  const panelW = aW + 18 + bW + 24 + pW; const perRow = Math.max(1, Math.floor(476 / (panelW + 16)));
+  const rowsN = Math.ceil(steps.length / perRow); const H = rowsN * (h + 30);
+  let s = '';
+  steps.forEach((st, k) => {
+    const col = colourOf(st, k);
+    const px = (k % perRow) * (panelW + 16); const py = Math.floor(k / perRow) * (h + 30) + 18;
+    s += `<circle cx="${px + 9}" cy="${py - 8}" r="8" fill="${col}"/><text x="${px + 9}" y="${py - 4}" text-anchor="middle" ${F} font-weight="800" font-size="11" fill="#fff">${st.n || k + 1}</text>`;
+    s += cellAt(px, py, A, (i) => (i === st.r - 1 ? col : null));
+    s += `<text x="${px + aW + 7}" y="${py + h / 2 + 5}" text-anchor="middle" ${F} font-weight="800" font-size="15" fill="#5B6472">×</text>`;
+    s += cellAt(px + aW + 18, py, B, (i, j) => (j === st.c - 1 ? col : null));
+    s += `<text x="${px + aW + 18 + bW + 11}" y="${py + h / 2 + 5}" text-anchor="middle" ${F} font-weight="800" font-size="15" fill="#5B6472">=</text>`;
+    const prod = A.map((_, i) => B[0].map((__, j) => { const q = steps.find((x) => x.r === i + 1 && x.c === j + 1 && steps.indexOf(x) <= k); return q ? (q.value == null ? '?' : q.value) : ''; }));
+    s += cellAt(px + aW + 18 + bW + 24, py, prod, (i, j) => (i === st.r - 1 && j === st.c - 1 ? col : (colourFor(i + 1, j + 1) && prod[i][j] !== '' ? '#C9D4E6' : null)));
+  });
+  return `<svg class="sviz" viewBox="0 0 ${Math.min(476, perRow * (panelW + 16))} ${H}" role="img" aria-label="row by column, step by step">${s}</svg>`;
+}
+
+// THE REACTION as tiles: each substance in the lesson's equation, its coefficient drawn as that
+// many dots (one dot when it has none), the arrow between the two sides.
+function parseReaction(ce) {
+  const m = /^(.*?)\s*(?:->|→|<=>)\s*(.*)$/.exec(String(ce).trim());
+  if (!m) return null;
+  const side = (t) => t.split(/\s\+\s/).map((x) => x.trim()).filter(Boolean).map((x) => { const k = /^(\d+)\s*(.+)$/.exec(x); return k ? { n: Number(k[1]), f: k[2] } : { n: 1, f: x }; });
+  const L = side(m[1]); const R = side(m[2]);
+  if (!L.length || !R.length || [...L, ...R].some((p) => !/^[A-Z][A-Za-z0-9()]*$/.test(p.f) || p.n > 9)) return null;
+  return { left: L, right: R };
+}
+const formulaTspans = (f) => f.split(/(\d+)/).filter(Boolean).map((p) => (/^\d+$/.test(p) ? `<tspan font-size="11" dy="4">${p}</tspan><tspan dy="-4"></tspan>` : xesc(p))).join('');
+function reaction(ce) {
+  const r = parseReaction(ce);
+  if (!r) return '';
+  const tiles = []; const W = (f) => Math.max(44, f.length * 10 + 22);
+  const push = (p) => tiles.push({ kind: 'tile', ...p, w: W(p.f) });
+  r.left.forEach((p, i) => { if (i) tiles.push({ kind: 'op', t: '+', w: 18 }); push(p); });
+  tiles.push({ kind: 'arrow', w: 40 });
+  r.right.forEach((p, i) => { if (i) tiles.push({ kind: 'op', t: '+', w: 18 }); push(p); });
+  const total = tiles.reduce((a, t) => a + t.w, 0) + (tiles.length - 1) * 4;
+  let x = 0; let s = ''; let ti = 0;
+  for (const t of tiles) {
+    if (t.kind === 'tile') {
+      const col = STEP_COLOURS[ti++ % STEP_COLOURS.length];
+      s += `<rect x="${x}" y="18" width="${t.w}" height="30" rx="9" fill="${col}" fill-opacity=".16" stroke="${col}" stroke-width="1.6"/>`
+        + `<text x="${x + t.w / 2}" y="38" text-anchor="middle" ${F} font-weight="800" font-size="15" fill="#13315C">${formulaTspans(t.f)}</text>`;
+      const d = 9; const start = x + t.w / 2 - ((t.n - 1) * d) / 2;
+      for (let i = 0; i < t.n; i++) s += `<circle cx="${start + i * d}" cy="9" r="3.6" fill="${col}"/>`;
+    } else if (t.kind === 'op') s += `<text x="${x + t.w / 2}" y="38" text-anchor="middle" ${F} font-weight="800" font-size="17" fill="#5B6472">+</text>`;
+    else s += `<path d="M${x + 4} 33h${t.w - 14}" stroke="#13315C" stroke-width="2.6" stroke-linecap="round"/><path d="M${x + t.w - 12} 27l9 6-9 6z" fill="#13315C"/>`;
+    x += t.w + 4;
+  }
+  return `<svg class="sviz sreact" viewBox="0 0 ${Math.max(total, 10)} 52" role="img" aria-label="reaction ${xesc(ce)}">${s}</svg>`;
+}
+// a WORD equation the lesson writes out ("carbon dioxide + water --(light)--> glucose + oxygen"):
+// the same words, each in a tile, the condition over the arrow
+function wordEquation(line) {
+  const m = /([A-Za-z][A-Za-z ]*?(?:\s\+\s[A-Za-z][A-Za-z ]*?)+)\s*(?:--\(([^)]*)\)-->|-->|→)\s*([A-Za-z][A-Za-z ]*?(?:\s\+\s[A-Za-z][A-Za-z ]*?)*)(?=[.*\s]|$)/.exec(String(line).replace(/\*\*/g, ''));
+  if (!m) return '';
+  const L = m[1].split(/\s\+\s/).map((x) => x.trim()); const R = m[3].split(/\s\+\s/).map((x) => x.trim()); const cond = (m[2] || '').trim();
+  const W = (t) => t.length * 8.4 + 22; let x = 0; let s = ''; let ti = 0;
+  const tile = (t) => { const col = STEP_COLOURS[ti++ % STEP_COLOURS.length]; const w = W(t); s += `<rect x="${x}" y="16" width="${w}" height="30" rx="9" fill="${col}" fill-opacity=".16" stroke="${col}" stroke-width="1.6"/><text x="${x + w / 2}" y="36" text-anchor="middle" ${F} font-weight="700" font-size="14" fill="#13315C">${xesc(t)}</text>`; x += w + 4; };
+  const plus = () => { s += `<text x="${x + 7}" y="36" text-anchor="middle" ${F} font-weight="800" font-size="16" fill="#5B6472">+</text>`; x += 18; };
+  L.forEach((t, i) => { if (i) plus(); tile(t); });
+  const aw = Math.max(44, cond.length * 6.6 + 16);
+  s += `<path d="M${x + 4} 31h${aw - 14}" stroke="#13315C" stroke-width="2.6" stroke-linecap="round"/><path d="M${x + aw - 12} 25l9 6-9 6z" fill="#13315C"/>`;
+  if (cond) s += `<text x="${x + aw / 2}" y="11" text-anchor="middle" ${F} font-weight="600" font-size="11" fill="#5B6472">${xesc(cond)}</text>`;
+  x += aw + 4;
+  R.forEach((t, i) => { if (i) plus(); tile(t); });
+  return `<svg class="sviz sreact" viewBox="0 0 ${x} 50" role="img" aria-label="${xesc(m[0])}">${s}</svg>`;
+}
+// a RATIO the lesson states ("2:1", "2:3", "1 : 3 : 2"): that many blocks for each part
+function ratioBlocks(parts) {
+  if (parts.length < 2 || parts.some((p) => p < 1 || p > 6)) return '';
+  let x = 0; let s = '';
+  parts.forEach((p, i) => {
+    if (i) { s += `<text x="${x + 4}" y="11" text-anchor="middle" ${F} font-weight="800" font-size="12" fill="#5B6472">:</text>`; x += 9; }
+    const col = STEP_COLOURS[i % STEP_COLOURS.length];
+    for (let k = 0; k < p; k++) { s += `<rect x="${x}" y="2" width="9" height="11" rx="2" fill="${col}"/>`; x += 11; }
+  });
+  return `<svg class="sratio" viewBox="0 0 ${x} 15" width="${x}" height="15" aria-hidden="true">${s}</svg>`;
+}
+// MARKS as dots: "4 marks" → four dots
+function marksDots(n) {
+  if (!(n >= 1 && n <= 10)) return '';
+  const s = Array.from({ length: n }, (_, i) => `<circle cx="${5 + i * 11}" cy="6" r="4.2" fill="#F2A20C"/>`).join('');
+  return `<svg class="smarks" viewBox="0 0 ${n * 11} 12" width="${n * 11}" height="12" aria-hidden="true">${s}</svg>`;
+}
+
+// ── FIGURES: wordless flat people for the key cards ───────────────────────────────────────
+const SKIN = '#E0A97E'; const HAIR = '#2B2521';
+function figure(x, y, o = {}) {
+  const k = o.k || 1; const top = o.top || '#3B82C4';
+  let s = `<g transform="translate(${x} ${y}) scale(${k})">`;
+  s += `<path d="M-17 0c1-20 7-30 17-30s16 10 17 30z" fill="${top}"/><rect x="-5" y="-36" width="10" height="8" rx="3" fill="${SKIN}"/>`;
+  if (o.scarf) s += `<path d="M-19 -46c0-15 8-24 19-24s19 9 19 24c0 9-3 15-7 19h-24c-4-4-7-10-7-19z" fill="${o.scarf}"/>`;
+  s += `<circle cx="0" cy="-47" r="${o.scarf ? 13 : 15}" fill="${SKIN}"/>`;
+  if (o.scarf) s += `<path d="M-13 -53c2-7 7-10 13-10s11 3 13 10c-4-2-8-3-13-3s-9 1-13 3z" fill="${o.scarf}"/>`;
+  else s += `<path d="M-15 -50c-1-11 6-17 15-17s16 6 15 17c-3-6-8-8-15-8s-12 2-15 8z" fill="${o.hair || HAIR}"/>`;
+  s += `<circle cx="-5" cy="-47" r="1.9" fill="${HAIR}"/><circle cx="5" cy="-47" r="1.9" fill="${HAIR}"/><path d="M-4 -41c2.5 2.5 5.5 2.5 8 0" stroke="#8A2E2E" stroke-width="1.8" fill="none" stroke-linecap="round"/>`;
+  s += `<ellipse cx="-9" cy="-42" rx="3" ry="1.8" fill="#FF8FB1" opacity=".5"/><ellipse cx="9" cy="-42" rx="3" ry="1.8" fill="#FF8FB1" opacity=".5"/>`;
+  return `${s}</g>`;
+}
+const FIG = {
+  // a pupil thinking, a question mark in a bubble
+  think: () => `<svg class="sfigr" viewBox="0 0 90 80" aria-hidden="true"><circle cx="64" cy="18" r="15" fill="#fff" stroke="#F6C343" stroke-width="2.5"/><text x="64" y="25" text-anchor="middle" ${F} font-weight="800" font-size="20" fill="#F2A20C">?</text><circle cx="48" cy="38" r="3.5" fill="#fff" stroke="#F6C343" stroke-width="2"/><circle cx="42" cy="46" r="2.2" fill="#fff" stroke="#F6C343" stroke-width="1.6"/>${figure(30, 80, { k: 0.85, top: '#3B82C4' })}<path d="M20 64q-2-10 6-14" stroke="${SKIN}" stroke-width="6" fill="none" stroke-linecap="round"/></svg>`,
+  // the teacher at the board
+  teach: () => `<svg class="sfigr" viewBox="0 0 96 80" aria-hidden="true"><rect x="40" y="6" width="52" height="38" rx="4" fill="#2F5D50" stroke="#B88A5E" stroke-width="2.5"/><path d="M48 18h22M48 26h30M48 34h16" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".85"/>${figure(24, 80, { k: 0.85, top: '#F2A20C', scarf: '#8E5BC6' })}<path d="M36 52l12-14" stroke="#F2A20C" stroke-width="7" stroke-linecap="round"/><circle cx="49" cy="37" r="3.5" fill="${SKIN}"/></svg>`,
+  // two pupils working together
+  pair: () => `<svg class="sfigr" viewBox="0 0 96 80" aria-hidden="true">${figure(28, 80, { k: 0.8, top: '#E0533F' })}${figure(68, 80, { k: 0.8, top: '#2BB673', scarf: '#F6C343' })}<path d="M38 60c6-4 14-4 20 0" stroke="#5B6472" stroke-width="2" fill="none" stroke-dasharray="3 3"/><path d="M40 72h16l-2 8H42z" fill="#fff" stroke="#3B82C4" stroke-width="2"/></svg>`,
+  // a pupil writing in a notebook
+  write: () => `<svg class="sfigr" viewBox="0 0 90 80" aria-hidden="true">${figure(34, 74, { k: 0.8, top: '#8E5BC6' })}<rect x="14" y="66" width="62" height="12" rx="3" fill="#B88A5E"/><path d="M40 58h26l-3 9H43z" fill="#fff" stroke="#3B82C4" stroke-width="2"/><g transform="translate(62 46) rotate(35)"><rect width="5" height="18" rx="1" fill="#F6C343"/><path d="M0 18h5l-2.5 5z" fill="#F1C27D"/></g></svg>`,
+  // the teacher recording, then sending
+  coach: () => `<svg class="sfigr" viewBox="0 0 90 80" aria-hidden="true">${figure(32, 80, { k: 0.85, top: '#F2A20C', scarf: '#2BB673' })}<rect x="54" y="20" width="22" height="38" rx="5" fill="#fff" stroke="#C9D4E6" stroke-width="2"/><circle cx="65" cy="34" r="6" fill="#E0533F"/><path d="M60 46h10M60 51h7" stroke="#C9D4E6" stroke-width="2" stroke-linecap="round"/><path d="M42 58l12-8" stroke="#F2A20C" stroke-width="7" stroke-linecap="round"/></svg>`,
+};
+// icons for the homework levels — pictures only, no words: K recall, U understand, A apply
+const LEVEL_ICON = {
+  K: () => ic('<path d="M12 3c-4.4 0-8 3.1-8 7 0 2.6 1.6 4.8 4 6v4h8v-4c2.4-1.2 4-3.4 4-6 0-3.9-3.6-7-8-7z" fill="#2BB673"/><path d="M9 10h6M12 7v6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>', 'slv'),
+  U: () => ic('<path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.7.5 1.1 1.3 1.1 2.2v.5h5.4v-.5c0-.9.4-1.7 1.1-2.2A6.5 6.5 0 0 0 12 2.5z" fill="#3B82C4"/><rect x="9.3" y="18" width="5.4" height="1.8" rx=".7" fill="#13315C"/>', 'slv'),
+  A: () => ic('<path d="M14.5 3.5a5 5 0 0 0-6.2 6.2L3 15l3 3 5.3-5.3a5 5 0 0 0 6.2-6.2l-2.6 2.6-2.4-.6-.6-2.4z" fill="#F2A20C"/>', 'slv'),
+};
+
+module.exports = { ICON, stageIcon, subjectPicture, subjectKind, pacingBar, STAGE_COLOUR, STAGE_LETTER, K,
+  parseMatrix, matrixProduct, parseReaction, reaction, wordEquation, ratioBlocks, marksDots, FIG, LEVEL_ICON };

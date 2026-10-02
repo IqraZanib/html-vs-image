@@ -110,6 +110,22 @@ up, one per stage); a picture on every stage bar; an icon on every card label (t
 emoji are drawn as icons); ✗ / ✓ badges on the mistakes; tick boxes on the mark schemes; level
 pills on the homework; the coaching steps with icons. Diagrams are ICT's own engine's SVG.
 
+**Visual examples (2026-10-02, round 2)** — the lesson's own examples drawn as shapes, beside or
+under the words they illustrate; the words are never changed and nothing is added that the line
+does not say:
+- a matrix-product worked example (I do, We do): its own two matrices, each "Row r with column c"
+  step lit in the colour and number it has in the text, and the product cell it fills — "?" where the
+  lesson leaves the step to pupils;
+- a reaction or a word equation the lesson writes: the same substances or words as tiles, one dot
+  per coefficient, the condition over the arrow (each distinct one once, at most four);
+- a ratio (2:1, 2:3, at most 6 a part): that many blocks; "N marks": N dots;
+- a quotation: a quote chip; numbered steps: one path with a rail;
+- MCQ letters as answer-sheet bubbles, key-word initials as badges, ✗ → ✓ on the mistakes, a ticket
+  shape for the exit ticket, level icons on the homework, wordless figures on the opening question,
+  I do, We do, independent practice and coaching cards.
+Nothing is illustrated inside "What pupils write" (a pupil's mistake). Tests check the drawings carry
+only the lesson's numbers and formulas, and leave blank what the lesson leaves blank.
+
 **Printed** by `lp-render/render/part-pages-pdf.js`: each `.spart` on its own page, as tall as itself.
 
 **Measured against ICT's renderer on the same lessons:** our parts run about 4–7% taller (the added

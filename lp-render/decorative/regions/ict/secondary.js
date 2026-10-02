@@ -26,7 +26,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { richText, katexCss } = require('../../../math/math');
-const { ICON, stageIcon, subjectPicture, pacingBar, STAGE_LETTER } = require('./secondary-art');
+const { ICON, stageIcon, subjectPicture, pacingBar, STAGE_LETTER, parseMatrix, matrixProduct, reaction, wordEquation, ratioBlocks, marksDots, FIG, LEVEL_ICON } = require('./secondary-art');
 
 const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const has = (v) => v != null && String(v).trim() !== '';
@@ -55,21 +55,98 @@ function composeSecondary(guide, images) {
   // the direction of a piece of the lesson: an English-only line in an Urdu lesson reads left to right
   const dirOf = (s) => (rtl ? (AR.test(String(s)) ? 'rtl' : 'ltr') : 'ltr');
   const stripEmoji = (s) => String(s || '').replace(/^[\s⌀-⏿☀-➿⬀-⯿\u{1F300}-\u{1FAFF}️]+/u, '');
-  const counts = { cards: 0, pictures: 0, unknown: [] };
+  const counts = { cards: 0, pictures: 0, visuals: 0, unknown: [] };
+
+  // ── VISUALS FROM THE LESSON'S OWN LINES ──────────────────────────────────────────────────
+  // Inline, beside the words they illustrate (the words are never touched): a ratio's blocks, a
+  // mark count's dots, a quotation set as a quote chip. Under a line: the reaction or word
+  // equation it states, drawn as tiles — each distinct one once per lesson, at most four.
+  const PH = { ratio: '\uE001', marks: '\uE002', qo: '\uE003', qc: '\uE004' };
+  const inlineVis = [];
+  let quiet = false;   // inside "What pupils write" (a pupil's mistake) nothing is illustrated
+  const rtx = (raw) => {
+    if (quiet) return rt(raw);
+    // a formula keeps the full stop or comma that follows it on its own line
+    const glued = String(raw == null ? '' : raw).replace(/(\$[^$]+\$)([.,;:!?])(?=\s|$)/g, '\uE005$1$2\uE006');
+    const out = glued.split(/(\$[^$]+\$)/).map((seg) => {
+      if (/^\$[^$]+\$$/.test(seg)) return seg;
+      return seg
+        .replace(/(^|[^\d.~])(\d)\s*:\s*(\d)(?:\s*:\s*(\d))?(?![\d.])/g, (m, pre, a, b, c) => {
+          const svg = ratioBlocks([a, b, c].filter((x) => x != null).map(Number));
+          if (!svg) return m; inlineVis.push(svg); counts.visuals += 1; return `${m}${PH.ratio}${inlineVis.length - 1}${PH.ratio}`;
+        })
+        .replace(/(^|[^~\d])(\d{1,2})\s*(marks?|نمبر)\b/g, (m, pre, n) => {
+          const svg = marksDots(Number(n));
+          if (!svg) return m; inlineVis.push(svg); return `${m}${PH.marks}${inlineVis.length - 1}${PH.marks}`;
+        })
+        .replace(/(^|[\s(—–-])(['‘“])([^'’”\n]{3,90}?)(['’”])(?=[\s.,;:!?)—–-]|$)/g, (m, pre, o, q, c) => `${pre}${PH.qo}${o}${q}${c}${PH.qc}`);
+    }).join('');
+    return rt(out)
+      .replace(/\uE001(\d+)\uE001/g, (_, i) => inlineVis[Number(i)])
+      .replace(/\uE002(\d+)\uE002/g, (_, i) => inlineVis[Number(i)])
+      .replace(/\uE003/g, '<span class="squote">').replace(/\uE004/g, '</span>')
+      .replace(/\uE005/g, '<span class="snw">').replace(/\uE006/g, '</span>');
+  };
+  const seenViz = new Set();
+  const underViz = (raw) => {
+    if (quiet) return '';
+    const t = String(raw || ''); let out = '';
+    for (const m of t.matchAll(/\\ce\{([^{}]*(?:->|→)[^{}]*)\}/g)) {
+      const key = m[1].replace(/\((?:g|l|s|aq)\)/g, '').replace(/\s+/g, ' ').trim();
+      if (seenViz.has(key) || seenViz.size >= 4) continue;
+      const svg = reaction(key);
+      if (svg) { seenViz.add(key); counts.visuals += 1; out += `<div class="sviz-w">${svg}</div>`; }
+    }
+    if (!/\\ce\{/.test(t) && /\s\+\s/.test(t) && /-->|→/.test(t)) {
+      const svg = wordEquation(t); const key = `w:${t}`;
+      if (svg && !seenViz.has(key) && seenViz.size < 4) { seenViz.add(key); counts.visuals += 1; out += `<div class="sviz-w">${svg}</div>`; }
+    }
+    return out;
+  };
 
   // ── text: a body is lines; a line may be a numbered step, a bullet, or a paragraph ──────────
   const line = (l, cls = '') => {
     const t = String(l);
     const num = /^(\d+)\.\s+([\s\S]*)$/.exec(t);
-    if (num) return `<div class="sl sl-n${cls}" dir="${dirOf(t)}"><b class="sn">${esc(num[1])}</b><span class="st">${rt(num[2])}</span></div>`;
+    if (num) return `<div class="sl sl-n${cls}" dir="${dirOf(t)}"><b class="sn">${esc(num[1])}</b><span class="st">${rtx(num[2])}${underViz(num[2])}</span></div>`;
     const bul = /^[-•]\s+([\s\S]*)$/.exec(t);
-    if (bul) return `<div class="sl sl-b${cls}" dir="${dirOf(t)}"><i class="sbx"></i><span class="st">${rt(bul[1])}</span></div>`;
-    return `<div class="sl${cls}" dir="${dirOf(t)}">${rt(t)}</div>`;
+    if (bul) return `<div class="sl sl-b${cls}" dir="${dirOf(t)}"><i class="sbx"></i><span class="st">${rtx(bul[1])}${underViz(bul[1])}</span></div>`;
+    return `<div class="sl${cls}" dir="${dirOf(t)}">${rtx(t)}</div>${underViz(t)}`;
   };
-  const lines = (body, cls = '') => String(body || '').split('\n').filter(has).map((l) => line(l, cls)).join('');
+  // consecutive numbered steps are one path: a rail joins their numbers
+  const lines = (body, cls = '') => {
+    const ls = String(body || '').split('\n').filter(has);
+    let html = ''; let path = '';
+    for (const l of ls) {
+      if (/^\d+\.\s/.test(l)) { path += line(l, cls); continue; }
+      if (path) { html += `<div class="spath">${path}</div>`; path = ''; }
+      html += line(l, cls);
+    }
+    if (path) html += `<div class="spath">${path}</div>`;
+    return html;
+  };
+  // THE ROW × COLUMN PICTURE: a worked matrix product, drawn from its own two matrices and its own
+  // "Row r with column c" steps; a step left for pupils ("you fill this in") shows "?"
+  const matrixViz = (body) => {
+    const ls = String(body || '').split('\n');
+    const named = [...String(ls[0] || '').matchAll(/([A-Z])\s*=\s*(?:\\displaystyle\s*)?(\\begin\{bmatrix\}[\s\S]*?\\end\{bmatrix\})/g)].map((m) => parseMatrix(m[2]));
+    if (named.length < 2 || !named[0] || !named[1]) return '';
+    const steps = ls.map((l) => {
+      const m = /^(?:(\d+)\.\s+)?.*?Row (\d) with column (\d)/i.exec(l);
+      return m && { n: m[1] ? Number(m[1]) : null, r: Number(m[2]), c: Number(m[3]), value: ((/=\s*(-?[\d.]+)\s*\$?\.?\s*$/.exec(l) || [])[1]) || null };
+    }).filter(Boolean);
+    const svg = matrixProduct({ left: named[0], right: named[1], steps });
+    if (svg) counts.visuals += 1;
+    return svg ? `<div class="sviz-w sviz-m">${svg}</div>` : '';
+  };
   const label = (text, icon = '', cls = '') => (has(text) || icon ? `<div class="slab${cls ? ` ${cls}` : ''}" dir="${dirOf(text)}">${icon}<span>${rt(stripEmoji(text))}</span></div>` : '');
-  const tag = (t) => (has(t) ? `<span class="stag${/^\[(K)\]/.test(t) ? ' k' : /^\[(U)\]/.test(t) ? ' u' : /^\[(A)\]/.test(t) ? ' a' : /support|سہار/.test(t) ? ' sup' : /extension|توسیع/.test(t) ? ' ext' : ''}" dir="${dirOf(t)}">${rt(t)}</span>` : '');
-  const card = (cls, inner) => { counts.cards += 1; return `<div class="sc ${cls}">${inner}</div>`; };
+  const tag = (t) => {
+    if (!has(t)) return '';
+    const lv = (/^\[([KUA])\]/.exec(t) || [])[1];
+    const cls = lv ? ` ${lv.toLowerCase()}` : /support|سہار/.test(t) ? ' sup' : /extension|توسیع/.test(t) ? ' ext' : '';
+    return `<span class="stag${cls}" dir="${dirOf(t)}">${lv ? LEVEL_ICON[lv]() : ''}${rt(t)}</span>`;
+  };
+  const card = (cls, inner) => { counts.cards += 1; return `<div class="sc ${cls}${/class="sfigw"/.test(inner) ? ' hasfig' : ''}">${inner}</div>`; };
   const img = (id) => {
     const im = id && images[id];
     if (!im || !im.dataUri) return '';
@@ -81,7 +158,7 @@ function composeSecondary(guide, images) {
     const t = String(it.text || '');
     const body = t.split('\n').filter(has);
     const first = body.shift() || '';
-    return `<div class="srow" dir="${dirOf(t)}">${numbered ? `<b class="sn">${i + 1}</b>` : ''}<div class="srow-b"><div class="sl">${rt(first)}${it.tag ? ` ${tag(it.tag)}` : ''}</div>${body.map((l) => line(l)).join('')}</div></div>`;
+    return `<div class="srow" dir="${dirOf(t)}">${numbered ? `<b class="sn">${i + 1}</b>` : ''}<div class="srow-b"><div class="sl">${rtx(first)}${it.tag ? ` ${tag(it.tag)}` : ''}</div>${underViz(first)}${body.map((l) => line(l)).join('')}</div></div>`;
   }).join('')}</div>`;
 
   // ── one card, by the lp_doc block it came from ─────────────────────────────────────────────
@@ -110,10 +187,14 @@ function composeSecondary(guide, images) {
     },
     rvideo: (s) => card('s-res s-video', `${ICON.video()}<div class="sres-t" dir="${dirOf(s.body)}">${rt(stripEmoji(s.body))}</div>`),
     rmat: (s) => card('s-res s-mat', `${ICON.materials()}<div class="sres-t" dir="${dirOf(s.body)}">${rt(stripEmoji(s.body))}</div>`),
-    rpace: (s, ctx) => card('s-res s-pace', `${ICON.pacing()}<div class="sres-t" dir="${dirOf(s.body)}">${rt(stripEmoji(s.body))}${(() => { const b = pacingBar(s.body, ctx.stages); if (b) counts.pictures += 1; return b; })()}</div>`),
-    keywords: (s) => card('s-kw', label(s.lead, ICON.key()) + `<div class="skw">${(s.items || []).map((it) => `<div class="skw-i" dir="${dirOf(it.text)}">${rt(it.text)}</div>`).join('')}</div>`),
+    rpace: (s, ctx) => card('s-res s-pace', `${ICON.pacing()}<div class="sres-t" dir="${dirOf(s.body)}">${rt(stripEmoji(s.body))}${(() => { const b = pacingBar(s.body, ctx.stages, { rtl }); if (b) counts.pictures += 1; return b; })()}</div>`),
+    keywords: (s) => card('s-kw', label(s.lead, ICON.key()) + `<div class="skw">${(s.items || []).map((it, i) => {
+      // the word's own first letter, as a badge
+      const first = (String(it.text).replace(/^[\s*'‘“"]+/, '').match(/^./u) || [''])[0];
+      return `<div class="skw-i" dir="${dirOf(it.text)}"><span class="sini sini${i % 6}">${esc(first.toUpperCase())}</span><span class="skw-t">${rt(it.text)}</span></div>`;
+    }).join('')}</div>`),
     warmup: (s) => `<div class="sgrp">${label(s.lead, ICON.warmup(), 'rule')}</div>` + card('s-warm', rows(s.items, true)),
-    hook: (s) => card('s-navy s-hook', label(s.label, ICON.question()) + navyBody(s.body)),
+    hook: (s) => card('s-navy s-hook', `<span class="sfigw">${FIG.think()}</span>` + label(s.label, ICON.question()) + navyBody(s.body)),
     ask: (s) => card('s-ask', label(s.label, ICON.question()) + lines(s.body)),
     watch: (s) => card('s-watch', label(s.label, ICON.warn()) + lines(s.body)),
     reteach: (s) => card('s-watch s-reteach', label(s.label, ICON.redo()) + lines(s.body)),
@@ -123,8 +204,8 @@ function composeSecondary(guide, images) {
     keypoints: (s) => `<div class="skp">${has(s.lead) ? label(s.lead, ICON.bulb(), 'rule') : ''}${rows(s.items, false, ' dots')}</div>`,
     latex: (s) => card('s-latex', lines(s.body)),
     chem: (s) => card('s-latex', lines(s.body)),
-    worked: (s) => card('s-worked', `<div class="spill amber" dir="${dirOf(s.label)}">${ICON.teach()}<span>${rt(stripEmoji(s.label))}</span></div>` + lines(s.body)),
-    faded: (s) => card('s-faded', `<div class="spill green" dir="${dirOf(s.label)}">${ICON.group()}<span>${rt(stripEmoji(s.label))}</span></div>` + lines(s.body)),
+    worked: (s) => card('s-worked', `<span class="sfigw">${FIG.teach()}</span><div class="spill amber" dir="${dirOf(s.label)}">${ICON.teach()}<span>${rt(stripEmoji(s.label))}</span></div>` + lines(s.body) + matrixViz(s.body)),
+    faded: (s) => card('s-faded', `<span class="sfigw">${FIG.pair()}</span><div class="spill green" dir="${dirOf(s.label)}">${ICON.group()}<span>${rt(stripEmoji(s.label))}</span></div>` + lines(s.body) + matrixViz(s.body)),
     figure: (s) => card('s-fig', label(s.label) + lines(s.body)),
     diagram: (s) => card('s-diag', (s.imageIds || []).map(img).join('')),
     grouplabel: (s) => `<div class="sgrp">${label(s.body, /mcq|سوال/i.test(s.body) ? ICON.exam() : ICON.warn(), 'rule')}</div>`,
@@ -134,9 +215,10 @@ function composeSecondary(guide, images) {
         const head = ls.length && /^\*\*[^*]+\*\*$/.test(ls[0].trim()) ? ls.shift().replace(/^\*\*[✗✓]?\s*|\*\*$/g, '') : '';
         return `<div class="${cls}">${head ? `<div class="smh" dir="${dirOf(head)}">${icon}<span>${rt(head)}</span></div>` : ''}${ls.map((l) => line(l)).join('')}</div>`;
       };
-      return card('s-mis', half(it.q, ICON.cross(), 'smq') + half(it.a, ICON.tick(), 'sma'));
+      quiet = true; const q = half(it.q, ICON.cross(), 'smq'); quiet = false;
+      return card('s-mis', q + half(it.a, ICON.tick(), 'sma'));
     }).join(''),
-    practice: (s) => card(/exit|خارجی/i.test(s.lead || '') ? 's-exit' : 's-prac', `<div class="spill green" dir="${dirOf(s.lead)}">${/exit|خارجی/i.test(s.lead || '') ? ICON.ticket() : /گھر|home/i.test(s.lead || '') ? ICON.house() : ICON.pencil()}<span>${rt(stripEmoji(s.lead))}</span></div>` + rows(s.items, s.marker === 'num')),
+    practice: (s) => card(/exit|خارجی/i.test(s.lead || '') ? 's-exit' : 's-prac', `${/exit|خارجی|گھر|home/i.test(s.lead || '') ? '' : `<span class="sfigw">${FIG.write()}</span>`}<div class="spill green" dir="${dirOf(s.lead)}">${/exit|خارجی/i.test(s.lead || '') ? ICON.ticket() : /گھر|home/i.test(s.lead || '') ? ICON.house() : ICON.pencil()}<span>${rt(stripEmoji(s.lead))}</span></div>` + rows(s.items, s.marker === 'num')),
     exit: (s) => card('s-exit', label(s.lead, ICON.ticket()) + rows(s.items, s.marker === 'num')),
     hw: (s) => `<div class="shw">${has(s.lead) ? label(s.lead, ICON.house()) : ''}${rows(s.items, s.marker === 'num', ' cards')}</div>`,
     diff: (s) => `<div class="sgrp">${label(s.lead, ICON.star(), 'rule')}</div>` + (s.items || []).map((it, i) => {
@@ -162,7 +244,7 @@ function composeSecondary(guide, images) {
       const head = ls.length && /^\*\*[^*]+\*\*$/.test(ls[0].trim()) ? ls.shift().replace(/^\*\*|\*\*$/g, '') : '';
       return card('s-key', `${head ? `<div class="skh" dir="${dirOf(head)}">${rt(head)}</div>` : ''}${ls.map((l, i) => line(l, i === ls.length - 1 && ls.length > 1 ? ' sk-ans' : '')).join('')}`);
     }).join(''),
-    coach: (s) => card('s-navy s-coach', lines(s.body, ' scl')
+    coach: (s) => card('s-navy s-coach', `<span class="sfigw">${FIG.coach()}</span>` + lines(s.body, ' scl')
       + `<div class="scsteps">${C.coachSteps.map((t, i) => `<div class="scstep">${[ICON.mic(), ICON.chat(), ICON.reply()][i]}<b>${i + 1}</b><span dir="${dirOf(t)}">${esc(t)}</span></div>`).join('')}</div>`),
     // the exam bank's split cards: the parts are drawn in order, top to bottom, as on a phone
     mcq: (s) => card('s-mcq', subs([...(s.left || []), ...(s.right || [])])),
@@ -181,7 +263,12 @@ function composeSecondary(guide, images) {
     return list.map((b) => {
       const role = (/\bict-r-([a-z0-9]+)/.exec(b.cls || '') || [])[1] || '';
       if (role === 'mcqq') return `<div class="smcq-q">${lines(b.body)}</div>`;
-      if (role === 'mcqopts') return `<div class="sopts">${(b.items || []).map((it) => `<span class="sopt${it.tag ? ' key' : ''}" dir="${dirOf(it.text)}">${it.tag ? ICON.tick() : ''}${rt(it.text)}</span>`).join('')}</div>`;
+      if (role === 'mcqopts') return `<div class="sopts">${(b.items || []).map((it) => {
+        // the option's own letter, as an answer-sheet bubble
+        const m = /^\*\*([A-E])\.\*\*\s*([\s\S]*)$/.exec(String(it.text));
+        const body = m ? `<b class="sbub">${m[1]}</b> ${rt(m[2])}` : rt(it.text);
+        return `<span class="sopt${it.tag ? ' key' : ''}" dir="${dirOf(it.text)}">${body}${it.tag ? ICON.tick() : ''}</span>`;
+      }).join('')}</div>`;
       if (role === 'mcqnote') return `<div class="snote">${lines(b.body)}</div>`;
       if (role === 'erqq') return `<div class="serq-q">${label(b.label, ICON.exam())}<div class="sq-strong">${lines(b.body)}</div></div>`;
       if (role === 'erqplan') return `<div class="splan">${(b.items || []).map((it) => `<div class="splan-r" dir="${dirOf(it.text)}"><span>${rt(it.text)}</span>${has(it.tag) ? `<b class="smark">${rt(it.tag)}</b>` : ''}</div>`).join('')}</div>`;
@@ -489,6 +576,52 @@ html:not(.lp-print) .spart{margin:0 auto 24px;box-shadow:0 0 0 1px #d9dbe1,0 6px
 .scstep > b{flex:none;width:24px;height:24px;border-radius:50%;background:var(--amber);color:#3A2A00;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-family:'ICTS Inter',Inter,sans-serif}
 .icts[dir="rtl"] .scstep{line-height:1.9}
 .s-plain .slab{color:var(--navy2)}
+/* ── visual engagement (all drawn from the lesson's own lines) ── */
+.sviz-w{margin:4px 0 2px;padding:6px 8px;background:#fff;border:1px dashed #C9D4E6;border-radius:9px;overflow:hidden}
+.sviz{display:block;max-width:100%;height:auto;margin:0 auto}
+.sreact{max-height:54px}
+.sviz-m .sviz{width:100%}
+.snw{white-space:nowrap}
+.sratio,.smarks{display:inline-block;vertical-align:-1px;margin-inline-start:5px}
+.squote{background:#FFF3D6;border-radius:5px;padding:0 3px;box-shadow:inset 0 -2px 0 #F6C343}
+.s-navy .squote{background:rgba(246,195,67,.2);box-shadow:inset 0 -2px 0 #F6C343}
+/* a path of numbered steps: a rail joins their numbers */
+.spath{position:relative;display:flex;flex-direction:column;gap:3px}
+.spath .sl-n{position:relative}
+.spath .sl-n:not(:last-child)::after{content:'';position:absolute;top:1.5em;bottom:-0.9em;inset-inline-start:11px;width:2px;background:repeating-linear-gradient(to bottom,#C9D4E6 0 4px,transparent 4px 7px)}
+.spath .sl-n .sn{position:relative;z-index:1}
+.s-worked .spath .sl-n:nth-child(6n+1) .sn{background:#E0533F}.s-worked .spath .sl-n:nth-child(6n+2) .sn{background:#3B82C4}.s-worked .spath .sl-n:nth-child(6n+3) .sn{background:#F2A20C}
+.s-worked .spath .sl-n:nth-child(6n+4) .sn{background:#2BB673}.s-worked .spath .sl-n:nth-child(6n+5) .sn{background:#8E5BC6}.s-worked .spath .sl-n:nth-child(6n) .sn{background:#16A085}
+.s-faded .spath .sn{background:var(--leaf)}
+/* wordless figures on the key cards, at the card's end side */
+.sfigw{float:inline-end;width:72px;margin:-2px 0 2px 0;margin-inline-start:8px;margin-inline-end:-4px}
+.hasfig > .spill{max-width:calc(100% - 82px)}
+.spill > span{text-align:start}
+.sfigr{display:block;width:100%;height:auto}
+/* key words: the word's first letter as a badge */
+.skw-i{display:flex;gap:9px;align-items:flex-start}
+.sini{flex:none;width:26px;height:26px;border-radius:8px;color:#fff;font-weight:800;font-size:15px;display:inline-flex;align-items:center;justify-content:center;margin-top:.15em;font-family:'ICTS Inter','Noto Nastaliq Urdu',sans-serif}
+.icts[dir="rtl"] .sini{font-size:14px;line-height:1;margin-top:.45em}
+.sini0{background:#E0533F}.sini1{background:#3B82C4}.sini2{background:#F2A20C}.sini3{background:#2BB673}.sini4{background:#8E5BC6}.sini5{background:#16A085}
+.skw-t{flex:1;min-width:0}
+/* mistakes: an arrow from what the pupil writes to the question you ask back */
+.s-mis{position:relative}
+.sma{position:relative}
+.sma::before{content:'';position:absolute;top:-11px;inset-inline-end:14px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #2BB673;
+  background-image:linear-gradient(#2BB673,#2BB673),linear-gradient(45deg,transparent 45%,#2BB673 45% 60%,transparent 60%);background-size:2px 9px,0 0;background-position:center 4px;background-repeat:no-repeat}
+.sma::after{content:'';position:absolute;top:-3px;inset-inline-end:20px;width:8px;height:8px;border-inline-end:2px solid #2BB673;border-bottom:2px solid #2BB673;transform:rotate(45deg)}
+.icts[dir="rtl"] .sma::after{transform:rotate(-45deg)}
+/* the exit ticket is a ticket */
+.s-exit{position:relative;border-style:dashed;border-width:1.5px;
+  -webkit-mask:radial-gradient(circle 9px at 0 50%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 9px at 100% 50%,transparent 98%,#000) right/51% 100% no-repeat;
+  mask:radial-gradient(circle 9px at 0 50%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 9px at 100% 50%,transparent 98%,#000) right/51% 100% no-repeat}
+/* homework levels: a picture in the pill */
+.stag .slv{width:15px;height:15px;vertical-align:-3px;margin-inline-end:3px}
+/* MCQ options: the letter as an answer-sheet bubble */
+.sbub{display:inline-flex;width:22px;height:22px;border-radius:50%;border:2px solid #13315C;color:#13315C;font-size:12.5px;font-weight:800;align-items:center;justify-content:center;
+  margin-inline-end:7px;flex:none;font-family:'ICTS Inter',Inter,sans-serif;background:#fff}
+.sopt.key .sbub{background:#2BB673;border-color:#2BB673;color:#fff}
+.sopt{gap:0}
 html.lp-print body{background:#fff}
 `));
 

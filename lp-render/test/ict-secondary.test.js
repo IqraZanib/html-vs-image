@@ -25,7 +25,10 @@ const LESSONS = [
 // images as the pipeline hands them over: ICT's diagrams, drawn by its own engine, by id
 const imagesOf = (guide) => Object.fromEntries((guide.images || []).map((im) => [im.id, { dataUri: im.dataUri, label: im.label }]));
 const compose = (f) => { const { guide } = buildGuideFromLpDoc(load(f)); return { guide, out: composeSecondary(guide, imagesOf(guide)) }; };
-const words = (html) => html.replace(/<style[\s\S]*?<\/style>/g, ' ').replace(/<annotation[\s\S]*?<\/annotation>/g, ' ').replace(/<[^>]+>/g, ' ')
+// inline tags (a quote chip, a bold run) join their neighbours; block tags break; the wordless
+// inline drawings (a ratio's blocks, a mark count's dots) carry no words
+const words = (html) => html.replace(/<style[\s\S]*?<\/style>/g, ' ').replace(/<annotation[\s\S]*?<\/annotation>/g, ' ')
+  .replace(/<svg class="(?:sratio|smarks)"[\s\S]*?<\/svg>/g, '').replace(/<\/?(?:span|b|bdi|i|em|strong)\b[^>]*>/g, '').replace(/<[^>]+>/g, ' ')
   .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').replace(/\s+/g, ' ');
 const norm = (s) => String(s).replace(/⁠/g, '').replace(/\*\*/g, '').replace(/[✗✓⚠📺🧰⏱🔑]️?/gu, ' ').replace(/\s+/g, ' ').trim();
 
@@ -48,7 +51,8 @@ test('every card ICT prints reaches the page, word for word (seven real lessons,
       for (const raw of String(s).split(/\$[^$]+\$/)) {
         // a label's parts may print as separate chips (the outcome code is a pill), so each part is checked
         for (const ln of raw.split('\n').flatMap((l) => l.split(' · '))) {
-          const piece = norm(ln.replace(/^\s*(?:\d+\.|[-•])\s+/, ''));
+          // a numbered or bulleted line prints its marker as a badge; an MCQ option's letter as a bubble
+          const piece = norm(ln.replace(/^\s*(?:\d+\.|[-•])\s+/, '').replace(/^\s*(\*\*)?([A-E])\.(\*\*)?\s+/, '$2 '));
           if (piece.replace(/[\s.,;:—–()→←·|-]/g, '').length < 3) continue;
           checked += 1;
           assert.ok(page.includes(piece), `${name}: «${piece.slice(0, 60)}» (${id}) is on the page`);
@@ -90,6 +94,33 @@ test('the pacing bar is the lesson\'s own pacing line, or nothing', () => {
   assert.strictEqual(pacingBar('10 + 12 + 12 + 4 + 2 = 41 min', st), '', 'numbers that do not add up draw nothing');
   assert.strictEqual(pacingBar('10 + 30 = 40 min', st), '', 'one number per stage, or nothing');
   assert.strictEqual((pacingBar('10 + 15 + 10 + 5 + 0 = 40 منٹ', st).match(/<rect /g) || []).length, 4, 'a 0-minute stage takes no room');
+});
+
+test('the visual examples draw only the lesson\'s own numbers, formulas and words, and never an answer it leaves blank', () => {
+  const art = require('../decorative/regions/ict/secondary-art');
+  // the worked matrix product: the lesson's matrices, its steps' own values
+  const g9 = compose('niete_v9_gate_base.lp.json').out.bodyHtml;
+  const viz = [...g9.matchAll(/<div class="sviz-w sviz-m"><svg[\s\S]*?<\/svg><\/div>/g)].map((m) => m[0]);
+  assert.strictEqual(viz.length, 2, 'one picture for the worked example (I do), one for the one done together (We do)');
+  const nums = (svg) => [...svg.matchAll(/>(-?[\d.]+|\?)<\/text>/g)].map((m) => m[1]);
+  const lessonNums = new Set('1 2 3 0 4 5 8 11 12'.split(' '));
+  assert.ok(nums(viz[0]).every((n) => lessonNums.has(n) || /^[2-5]$/.test(n)), 'I do: only the lesson\'s numbers (and its step numbers 2–5)');
+  assert.ok(nums(viz[1]).includes('?'), 'We do: the steps left for pupils show "?"');
+  assert.ok(!/>8<\/text>[\s\S]*>6<\/text>/.test(viz[1].split('?')[0]), 'We do: the answers pupils fill in are not drawn before the "?"');
+  // reactions: one dot per coefficient
+  const r = art.reaction('2Mg + O2 -> 2MgO');
+  assert.strictEqual((r.match(/<circle /g) || []).length, 5, '2 + 1 + 2 dots');
+  assert.strictEqual(art.reaction('not a reaction'), '');
+  // ratios and marks
+  assert.strictEqual((art.ratioBlocks([2, 3]).match(/<rect /g) || []).length, 5);
+  assert.strictEqual(art.ratioBlocks([4, 32]), '', 'a ratio with a part over 6 draws nothing');
+  assert.strictEqual((art.marksDots(4).match(/<circle /g) || []).length, 4);
+  // nothing is illustrated inside "What pupils write" (it is a pupil's mistake)
+  const chem = compose('authored_PK_G11_CHEM_CH4_MOLE_RATIO.lp.json').out.bodyHtml;
+  for (const q of chem.split('<div class="smq">').slice(1).map((x) => x.split('<div class="sma">')[0])) assert.ok(!/class="(sratio|smarks|sviz-w)"/.test(q));
+  // every reaction drawn is one the lesson writes
+  const src = JSON.stringify(load('authored_PK_G11_CHEM_CH4_MOLE_RATIO.lp.json'));
+  for (const m of chem.matchAll(/aria-label="reaction ([^"]+)"/g)) assert.ok(src.includes(m[1].replace(/&gt;/g, '>').split(' ')[0]), m[1]);
 });
 
 test('each subject gets its own title picture, chosen by the subject only', () => {
