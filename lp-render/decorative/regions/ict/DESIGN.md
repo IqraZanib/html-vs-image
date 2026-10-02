@@ -84,6 +84,37 @@ npm run render:ict -- lp-render/fixtures/ict/niete_v9_gate_base.lp.json
 No API key is needed and nothing is bought. Real inputs, and where each came from:
 `lp-render/fixtures/ict/README.md`.
 
+## Grades 6–12: ICT's production page (the approved design since 2026-10-02)
+
+**The reference:** NIETE's approved grades 6–12 lesson plans, shared 2026-10-02 — Grade 9 English
+(`grade_9_english.c10.p135-136`), Grade 7 Mathematics (`grade_7_mathematics.c12.p237-238`), Grade 6
+Urdu (`grade_6_urdu.c08.p044-044`). They are ICT's own production renderer's output (lp_doc 3.0,
+v9.3 phone page): one 520 px column printed on TWO pages, 390 pt wide, each as tall as its part —
+the lesson, then the teacher support. This replaces, for grades 6–12, the stage-page design built on
+30 Sep from the Grade 1 references (`pages.js`, still in the repo, no longer dispatched to).
+
+**The page** (`secondary.js`, style under `.icts`): navy title card (GRADE · SUBJECT, title,
+chapter, pages · minutes, the board-weight chip) · lesson path · learning outcome (amber) · video ·
+materials · pacing · key words · a bar per stage — Introduction teal I, Development navy D, Activity
+green A, Conclusion purple C, Home work slate H — with that stage's cards in ICT's order; then
+TEACHER SUPPORT · NOT FOR THE BOARD and the lettered groups (the board at the end of the lesson,
+FBISE questions for grade 9+, homework in full, coaching corner). Urdu lessons run right to left in
+ICT's Urdu labels, as the approved Urdu page does. The cards come from the adapter
+(`lp-render/guide/from-lpdoc.js`), already in ICT's order; the page only lays them out, and a test
+checks every string of every card reaches it (seven real lessons).
+
+**Added, drawn in code ($0)** (`secondary-art.js`): a subject picture on the title card (maths,
+English, Urdu, science, chemistry, physics, biology, Islamiat, social studies, computer); the lesson
+path as three marked steps; the pacing line drawn as a bar of its stages (only when its numbers add
+up, one per stage); a picture on every stage bar; an icon on every card label (the approved page's
+emoji are drawn as icons); ✗ / ✓ badges on the mistakes; tick boxes on the mark schemes; level
+pills on the homework; the coaching steps with icons. Diagrams are ICT's own engine's SVG.
+
+**Printed** by `lp-render/render/part-pages-pdf.js`: each `.spart` on its own page, as tall as itself.
+
+**Measured against ICT's renderer on the same lessons:** our parts run about 4–7% taller (the added
+pictures). Not printed: the coaching WhatsApp number (pending a decision).
+
 ## Grades 1–5: the approved phone page
 
 **The reference:** NIETE's approved Grades 1–5 lesson plans (lp_html v8.1), shared 2026-10-01 —

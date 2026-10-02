@@ -208,21 +208,6 @@ test('a stage too long for its page continues on a "continued" page; a heading g
   assert.ok(mediaBoxes(r.pdf).every(([w, h]) => Math.abs(w - 300) < 0.5 && Math.abs(h - 375) < 0.5), 'every page is the fixed size (400×500 px)');
 });
 
-for (const [name, doc, lang] of [['G9 Maths (English)', NIETE, 'en'], ['G10 Urdu', URDU, 'ur']]) {
-  test(`${name} prints in the approved design: fixed 896×1200 pages from Start to Teacher support, nothing outside its page`, { timeout: 120000 }, async () => {
-    const { renderLessonImage } = require('../pipeline');
-    const { guide } = buildGuideFromLpDoc(doc());
-    const logs = [];
-    const r = await renderLessonImage(guide, { apiKey: '', pdf: true, log: (m) => logs.push(m) });
-    const boxes = mediaBoxes(r.pdf);
-    assert.ok(boxes.length >= 5 && boxes.length <= 8, `${boxes.length} pages`);
-    for (const [w, h] of boxes) { assert.strictEqual(w, 672); assert.strictEqual(h, 900); }
-    const stages = logs.filter((l) => /▭ page/.test(l)).map((l) => l.match(/: (\w+)/)[1]);
-    assert.deepStrictEqual([...new Set(stages)], ['start', 'explain', 'practice', 'conclusion', 'support'], 'the stages in order');
-    assert.deepStrictEqual(r.overflow, [], 'nothing leaves its page');
-    assert.strictEqual(r.stats.generated, 0, 'nothing bought');
-    assert.ok(r.html.includes('data-pid="p0"'), 'the .html is the paginated page, the same pages as the PDF');
-    assert.ok(r.html.includes(`<html lang="${lang}"`));
-    assert.ok(!/katex-error|mjx-merror|data-mjx-error/.test(r.html), 'every formula parsed');
-  });
-}
+// The end-to-end print of a grades 6–12 lesson moved to ict-secondary.test.js on 2026-10-02, when
+// NIETE's approved grades 6–12 design became ICT's production page (secondary.js). The tests above
+// still cover this earlier stage-page composer and its printer, which nothing dispatches to now.

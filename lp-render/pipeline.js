@@ -15,6 +15,7 @@ const { renderDecorativeLesson } = require('./decorative/render');
 const { htmlToPixelPdf } = require('./render/png-to-pdf');
 const { htmlToFixedPagesPdf } = require('./render/fixed-pages-pdf');
 const { htmlToPhonePagesPdf } = require('./render/phone-pages-pdf');
+const { htmlToPartPagesPdf } = require('./render/part-pages-pdf');
 const { ensureCast } = require('./decorative/characters');
 const store = require('./store/assets');
 const { resolveRegion } = require('../imagegen/prompts/regions');
@@ -295,7 +296,13 @@ async function renderLessonImage(content, opts = {}) {
         if ((list || []).length > 8) log(`  ⚠ …and ${list.length - 8} more overflow finding(s)`);
         overflowFindings = list || [];
       };
-      if (regionLayout && regionLayout.flow) {
+      if (regionLayout && regionLayout.parts) {
+        // one page per part, each as tall as itself (ICT grades 6–12); the .html is the same pages
+        const printed = await htmlToPartPagesPdf(html, { pageWidth: regionLayout.width, onFindings });
+        pdf = printed.pdf;
+        html = printed.html;
+        for (const [k, h] of printed.heights.entries()) log(`  ▭ page ${k + 1}: part ${k + 1} · ${h}px tall`);
+      } else if (regionLayout && regionLayout.flow) {
         // phone pages flow in the browser; the paginated page is also the .html deliverable
         const printed = await htmlToPhonePagesPdf(html, { pageWidth: regionLayout.width, pageHeight: regionLayout.height, onFindings });
         pdf = printed.pdf;

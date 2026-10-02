@@ -21,6 +21,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { composeIctPages } = require('./pages');
 const { composePrimary } = require('./primary');
+const { composeSecondary } = require('./secondary');
 
 const FONTS = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '@fontsource');
 function face(family, file, weight, style) {
@@ -359,7 +360,8 @@ module.exports = {
   // which names its own page layout).
   COMPOSE: (guide, images) => {
     const kind = guide && guide.layout && guide.layout.kind;
-    if (kind === 'ict-pages') return composeIctPages(guide, images);
+    // grades 6–12: ICT's production page, the approved design since 2026-10-02 (secondary.js)
+    if (kind === 'ict-pages') return composeSecondary(guide, images);
     if (kind === 'ict-primary') return composePrimary(guide);
     return null;
   },
