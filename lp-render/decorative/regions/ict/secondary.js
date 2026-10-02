@@ -26,7 +26,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { richText, katexCss } = require('../../../math/math');
-const { ICON, stageIcon, subjectPicture, pacingBar, STAGE_LETTER, parseMatrix, matrixProduct, reaction, wordEquation, ratioBlocks, marksDots, FIG, LEVEL_ICON } = require('./secondary-art');
+const { ICON, stageIcon, subjectPicture, pacingBar, STAGE_LETTER, parseMatrix, matrixProduct, reaction, wordEquation, ratioBlocks, marksDots, FIG, LEVEL_ICON,
+  termOf, termIcon, CE_ICON, ceArrow, meanChart } = require('./secondary-art');
 
 const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const has = (v) => v != null && String(v).trim() !== '';
@@ -62,15 +63,26 @@ function composeSecondary(guide, images) {
   // mark count's dots, a quotation set as a quote chip. Under a line: the reaction or word
   // equation it states, drawn as tiles — each distinct one once per lesson, at most four.
   const PH = { ratio: '\uE001', marks: '\uE002', qo: '\uE003', qc: '\uE004' };
+  // CAUSE and EFFECT, as an English reading lesson labels them ("Cause: … Effect: …", "this is the
+  // CAUSE"), and as an Urdu one does ("وجہ: … نتیجہ: …"): each word in its own coloured tag, an
+  // arrow before the effect when the cause comes first. The words stay exactly as written.
+  const CE = { c: '\uE007', e: '\uE008', end: '\uE009', ar: '\uE00A', arEnd: '\uE00B' };
+  const ceTags = (seg, state) => seg
+    .replace(/(^|[^A-Za-z\u0600-\u06FF])(Cause:|CAUSE\b|(?:وجہ|سبب):)/g, (m, pre, w) => { if (w.endsWith(':')) state.cause = true; return `${pre}${CE.c}${w}${CE.end}`; })
+    .replace(/(^|[^A-Za-z\u0600-\u06FF])(Effect:|EFFECT\b|(?:نتیجہ|اثر):)/g, (m, pre, w) => {
+      const ar = state.cause && w.endsWith(':'); if (ar) state.cause = false;
+      return ar ? `${pre}${CE.ar}${CE.e}${w}${CE.end}${CE.arEnd}` : `${pre}${CE.e}${w}${CE.end}`;
+    });
   const inlineVis = [];
   let quiet = false;   // inside "What pupils write" (a pupil's mistake) nothing is illustrated
   const rtx = (raw) => {
     if (quiet) return rt(raw);
     // a formula keeps the full stop or comma that follows it on its own line
     const glued = String(raw == null ? '' : raw).replace(/(\$[^$]+\$)([.,;:!?])(?=\s|$)/g, '\uE005$1$2\uE006');
+    const ceState = { cause: false };
     const out = glued.split(/(\$[^$]+\$)/).map((seg) => {
       if (/^\$[^$]+\$$/.test(seg)) return seg;
-      return seg
+      return ceTags(seg, ceState)
         .replace(/(^|[^\d.~])(\d)\s*:\s*(\d)(?:\s*:\s*(\d))?(?![\d.])/g, (m, pre, a, b, c) => {
           const svg = ratioBlocks([a, b, c].filter((x) => x != null).map(Number));
           if (!svg) return m; inlineVis.push(svg); counts.visuals += 1; return `${m}${PH.ratio}${inlineVis.length - 1}${PH.ratio}`;
@@ -85,7 +97,10 @@ function composeSecondary(guide, images) {
       .replace(/\uE001(\d+)\uE001/g, (_, i) => inlineVis[Number(i)])
       .replace(/\uE002(\d+)\uE002/g, (_, i) => inlineVis[Number(i)])
       .replace(/\uE003/g, '<span class="squote">').replace(/\uE004/g, '</span>')
-      .replace(/\uE005/g, '<span class="snw">').replace(/\uE006/g, '</span>');
+      .replace(/\uE005/g, '<span class="snw">').replace(/\uE006/g, '</span>')
+      .replace(/\uE007/g, () => { counts.visuals += 1; return `<span class="sce sce-c">${CE_ICON.cause()}`; })
+      .replace(/\uE008/g, () => `<span class="sce sce-e">${CE_ICON.effect()}`)
+      .replace(/\uE009/g, '</span>').replace(/\uE00A/g, ` <span class="sce-w">${ceArrow(AR.test(String(raw)))}`).replace(/\uE00B/g, '</span>');
   };
   const seenViz = new Set();
   const underViz = (raw) => {
@@ -139,6 +154,22 @@ function composeSecondary(guide, images) {
     if (svg) counts.visuals += 1;
     return svg ? `<div class="sviz-w sviz-m">${svg}</div>` : '';
   };
+  // THE MEAN, DRAWN: a worked example that finds the mean of a list the lesson writes out. The
+  // bars are its values; the line is its stated mean; a mean left for pupils ("you fill this in")
+  // is drawn as "?" with no line
+  const meanViz = (body) => {
+    const t = String(body || ''); const ls = t.split('\n');
+    if (!/\\bar\{X\}|\\overline\{x\}|\bmean\b|اوسط/i.test(t)) return '';
+    const list = [...String(ls[0] || '').matchAll(/\$([^$]+)\$/g)].map((m) => m[1].trim()).find((m) => /^-?\d+(?:\.\d+)?(?:\s*[,،]\s*-?\d+(?:\.\d+)?){2,11}$/.test(m));
+    if (!list) return '';
+    const values = list.split(/\s*[,،]\s*/).map(Number);
+    const blank = /you fill this in|آپ (?:بتائیں|لکھیں|مکمل کریں)/i.test(t);
+    const stated = [...t.matchAll(/\\bar\{X\}\s*=\s*(-?\d+(?:\.\d+)?)\s*\$/g)].map((m) => m[1]).pop();
+    const svg = meanChart({ values, mean: blank ? '?' : (stated == null ? null : stated), rtl });
+    if (!svg || (!blank && stated == null)) return '';
+    counts.visuals += 1;
+    return `<div class="sviz-w">${svg}</div>`;
+  };
   const label = (text, icon = '', cls = '') => (has(text) || icon ? `<div class="slab${cls ? ` ${cls}` : ''}" dir="${dirOf(text)}">${icon}<span>${rt(stripEmoji(text))}</span></div>` : '');
   const tag = (t) => {
     if (!has(t)) return '';
@@ -154,11 +185,12 @@ function composeSecondary(guide, images) {
     return `<figure class="sfig">${has(im.label) ? `<figcaption class="sbadge">${ICON.diagram()}<span dir="${dirOf(im.label)}">${esc(im.label)}</span></figcaption>` : ''}<img src="${im.dataUri}" alt="${esc(im.label || 'diagram')}"></figure>`;
   };
   // a numbered or plain list, each row with its tag at the end
-  const rows = (items, numbered, cls = '') => `<div class="srows${cls}">${(items || []).map((it, i) => {
+  const rows = (items, numbered, cls = '', iconOf = null) => `<div class="srows${cls}">${(items || []).map((it, i) => {
     const t = String(it.text || '');
     const body = t.split('\n').filter(has);
     const first = body.shift() || '';
-    return `<div class="srow" dir="${dirOf(t)}">${numbered ? `<b class="sn">${i + 1}</b>` : ''}<div class="srow-b"><div class="sl">${rtx(first)}${it.tag ? ` ${tag(it.tag)}` : ''}</div>${underViz(first)}${body.map((l) => line(l)).join('')}</div></div>`;
+    const ico = iconOf ? iconOf(it, i) : '';
+    return `<div class="srow${ico ? ' has-ti' : ''}" dir="${dirOf(t)}">${ico ? `<i class="skpi">${ico}</i>` : ''}${numbered ? `<b class="sn">${i + 1}</b>` : ''}<div class="srow-b"><div class="sl">${rtx(first)}${it.tag ? ` ${tag(it.tag)}` : ''}</div>${underViz(first)}${body.map((l) => line(l)).join('')}</div></div>`;
   }).join('')}</div>`;
 
   // ── one card, by the lp_doc block it came from ─────────────────────────────────────────────
@@ -191,7 +223,10 @@ function composeSecondary(guide, images) {
     keywords: (s) => card('s-kw', label(s.lead, ICON.key()) + `<div class="skw">${(s.items || []).map((it, i) => {
       // the word's own first letter, as a badge
       const first = (String(it.text).replace(/^[\s*'‘“"]+/, '').match(/^./u) || [''])[0];
-      return `<div class="skw-i" dir="${dirOf(it.text)}"><span class="sini sini${i % 6}">${esc(first.toUpperCase())}</span><span class="skw-t">${rt(it.text)}</span></div>`;
+      const term = termOf(it.text);
+      if (term) counts.visuals += 1;
+      const badge = term ? `<span class="sini sini-t">${termIcon(term)}</span>` : `<span class="sini sini${i % 6}">${esc(first.toUpperCase())}</span>`;
+      return `<div class="skw-i" dir="${dirOf(it.text)}">${badge}<span class="skw-t">${rt(it.text)}</span></div>`;
     }).join('')}</div>`),
     warmup: (s) => `<div class="sgrp">${label(s.lead, ICON.warmup(), 'rule')}</div>` + card('s-warm', rows(s.items, true)),
     hook: (s) => card('s-navy s-hook', `<span class="sfigw">${FIG.think()}</span>` + label(s.label, ICON.question()) + navyBody(s.body)),
@@ -201,11 +236,17 @@ function composeSecondary(guide, images) {
     board: (s) => card('s-board', label(s.label, ICON.board()) + lines(s.body)),
     cite: (s) => `<div class="scite" dir="${dirOf(s.body)}">${ICON.book()}<span>${rt(s.body)}</span></div>`,
     para: (s) => `<div class="spara">${lines(s.body)}</div>`,
-    keypoints: (s) => `<div class="skp">${has(s.lead) ? label(s.lead, ICON.bulb(), 'rule') : ''}${rows(s.items, false, ' dots')}</div>`,
+    keypoints: (s) => {
+      const items = s.items || [];
+      const terms = items.map((it) => termOf(it.text));
+      const pictured = items.length > 1 && terms.every(Boolean);
+      if (pictured) counts.visuals += items.length;
+      return `<div class="skp">${has(s.lead) ? label(s.lead, ICON.bulb(), 'rule') : ''}${rows(items, false, pictured ? ' dots pics' : ' dots', pictured ? (it, i) => termIcon(terms[i]) : null)}</div>`;
+    },
     latex: (s) => card('s-latex', lines(s.body)),
     chem: (s) => card('s-latex', lines(s.body)),
-    worked: (s) => card('s-worked', `<span class="sfigw">${FIG.teach()}</span><div class="spill amber" dir="${dirOf(s.label)}">${ICON.teach()}<span>${rt(stripEmoji(s.label))}</span></div>` + lines(s.body) + matrixViz(s.body)),
-    faded: (s) => card('s-faded', `<span class="sfigw">${FIG.pair()}</span><div class="spill green" dir="${dirOf(s.label)}">${ICON.group()}<span>${rt(stripEmoji(s.label))}</span></div>` + lines(s.body) + matrixViz(s.body)),
+    worked: (s) => card('s-worked', `<span class="sfigw">${FIG.teach()}</span><div class="spill amber" dir="${dirOf(s.label)}">${ICON.teach()}<span>${rt(stripEmoji(s.label))}</span></div>` + lines(s.body) + matrixViz(s.body) + meanViz(s.body)),
+    faded: (s) => card('s-faded', `<span class="sfigw">${FIG.pair()}</span><div class="spill green" dir="${dirOf(s.label)}">${ICON.group()}<span>${rt(stripEmoji(s.label))}</span></div>` + lines(s.body) + matrixViz(s.body) + meanViz(s.body)),
     figure: (s) => card('s-fig', label(s.label) + lines(s.body)),
     diagram: (s) => card('s-diag', (s.imageIds || []).map(img).join('')),
     grouplabel: (s) => `<div class="sgrp">${label(s.body, /mcq|سوال/i.test(s.body) ? ICON.exam() : ICON.warn(), 'rule')}</div>`,
@@ -422,6 +463,10 @@ html:not(.lp-print) .spart{margin:0 auto 24px;box-shadow:0 0 0 1px #d9dbe1,0 6px
 .scode{background:#fff;border:1.5px solid var(--amber);border-radius:999px;color:#7A5200;padding:0 8px;font-size:14.5px;letter-spacing:.04em;line-height:1.6}
 .so-main{font-size:21.58px;font-weight:600;color:#3A2C0A;line-height:1.5}
 .so-main b{font-weight:800}
+/* Nastaliq needs room: a wrapped Urdu line in any of these sat on the line above it */
+.icts[dir="rtl"] .so-main{line-height:2}
+.icts[dir="rtl"] .sres-t,.icts[dir="rtl"] .scont{line-height:1.95}
+.icts[dir="rtl"] .scstep,.icts[dir="rtl"] .sopt,.icts[dir="rtl"] .sp2s{line-height:1.9}
 .so-promise{display:flex;gap:7px;align-items:flex-start;font-size:19.83px;font-weight:600;color:#6B5312;margin-top:2px}
 .so-promise .sic{width:22px;height:22px;margin-top:.15em}
 /* resource rows */
@@ -604,6 +649,15 @@ html:not(.lp-print) .spart{margin:0 auto 24px;box-shadow:0 0 0 1px #d9dbe1,0 6px
 .icts[dir="rtl"] .sini{font-size:14px;line-height:1;margin-top:.45em}
 .sini0{background:#E0533F}.sini1{background:#3B82C4}.sini2{background:#F2A20C}.sini3{background:#2BB673}.sini4{background:#8E5BC6}.sini5{background:#16A085}
 .skw-t{flex:1;min-width:0}
+.sini-t{background:#fff;border:1.5px solid var(--quiet-l)}.sini-t .sti{width:20px;height:20px}
+.srows.pics .srow::before{display:none}
+.skpi{flex:none;display:inline-flex;margin-top:.12em}.skpi .sti{width:22px;height:22px}
+.icts[dir="rtl"] .skpi{margin-top:.5em}
+.sce{display:inline-flex;align-items:center;gap:3px;padding:0 7px 0 4px;border-radius:999px;color:#fff;font-weight:800;line-height:1.3;white-space:nowrap}
+.sce-c{background:#E0533F}.sce-e{background:#3B82C4}
+.sce .sce-i{width:12px;height:12px;flex:none}
+.sce-ar{display:inline-block;vertical-align:-1px;margin:0 3px 0 0}.sce-w{white-space:nowrap}
+.smean{max-height:170px}
 /* mistakes: an arrow from what the pupil writes to the question you ask back */
 .s-mis{position:relative}
 .sma{position:relative}

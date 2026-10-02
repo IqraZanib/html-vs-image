@@ -31,8 +31,8 @@ const G9UR = () => load('g9_urdu_smoke.lp.json');
 const visible = (s) => String(s).replace(/⁠/g, '')
   .replace(/\$(\\\\ce\{(?:[^{}]|\{[^{}]*\})*\})\$/g, '$1')
   .replace(/\\\\displaystyle /g, '')
-  // an answer's maths wears ICT's green (adapter answerText): exactly $\color{#1F7A4D}{…}$
-  .replace(/\$\\\\color\{#1F7A4D\}\{([^$]*)\}\$/g, '$$$1$$')
+  // an answer's maths wears ICT's green (adapter answerText): exactly $\color{#1F7A4D}…$
+  .replace(/\$\\\\color\{#1F7A4D\}([^$]*)\$/g, '$$$1$$')
   // and its words are bolded run by run; bold is emphasis, not content
   .replace(/\*\*/g, '');
 

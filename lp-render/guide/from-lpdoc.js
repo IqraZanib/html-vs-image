@@ -92,12 +92,15 @@ const has = (v) => v != null && String(v).trim() !== '';
 // only — a ** pair cannot span a $…$ run — so an answer with maths in it came out in ink. Each
 // run of words gets its own bold and each maths run its own colour (\color, which KaTeX and
 // MathJax both read). Display maths ($$…$$) is left exactly as written.
+// \color is used as a SWITCH (no braces round the formula): braced, the whole formula became
+// one group and could no longer break at its + and =, so a long answer ("Sum = 73 + 79 + … =
+// 756") ran off the page where ICT's own page wraps it.
 const ANSWER_INK = '#1F7A4D';
 const boldRuns = (s, mathInk) => {
   const t = String(s == null ? '' : s).trim();
   if (!t.includes('$') || t.includes('$$')) return strong(t);
   return t.split(/(\$[^$]+\$)/g).map((p) => {
-    if (/^\$[^$]+\$$/.test(p)) return mathInk ? `$\\color{${mathInk}}{${p.slice(1, -1)}}$` : p;
+    if (/^\$[^$]+\$$/.test(p)) return mathInk ? `$\\color{${mathInk}}${p.slice(1, -1)}$` : p;
     const w = p.trim();
     return w ? p.replace(w, strong(w)) : p;
   }).join('');

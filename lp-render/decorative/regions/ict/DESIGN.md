@@ -126,6 +126,25 @@ does not say:
 Nothing is illustrated inside "What pupils write" (a pupil's mistake). Tests check the drawings carry
 only the lesson's numbers and formulas, and leave blank what the lesson leaves blank.
 
+**Subject by subject (2026-10-02, round 3)**, checked against NIETE's three approved references
+rebuilt from ICT production's PDFs (`fixtures/ict/rebuilt_*`):
+- English reading: "Cause:" / "Effect:" (and "CAUSE", "EFFECT") as coral and blue tags; an arrow
+  joins a labelled cause to its effect. Urdu "وجہ: / سبب:" and "نتیجہ: / اثر:" are tagged the same
+  way, with the arrow pointing left.
+- Mathematics, the mean: a worked example that averages a list the lesson writes out gets the list
+  as bars, counted 1…n underneath. The stated mean is a dashed line, and each bar's part above it is
+  amber (the part that evens out the bars below). Where the lesson leaves the mean to pupils, the
+  chip reads "?" and no line is drawn. Nothing is drawn if the stated mean is not the values' mean.
+- Urdu grammar: each kind of اسم (ذات، جمع، صوت، آلہ، مکبر، مصغر، ظرف، خاص) has its own picture.
+- Every subject: a key word whose idea has a picture (cause, effect, fact, opinion, the mean, Σ, the
+  kinds of اسم) shows it in place of the letter badge. A key-point list shows a picture per point
+  only when every point has one; otherwise it keeps its dots.
+- Urdu lines that sat on the line above (the outcome, resources, coaching steps, MCQ options) now
+  have Nastaliq's line height.
+- A long answer formula ("Sum = 73 + … = 756") wraps at its + and = as on ICT's page. The adapter
+  colours answer maths with `\color` used as a switch; braced, the formula became one unbreakable
+  group.
+
 **Printed** by `lp-render/render/part-pages-pdf.js`: each `.spart` on its own page, as tall as itself.
 
 **Measured against ICT's renderer on the same lessons:** our parts run about 4–7% taller (the added

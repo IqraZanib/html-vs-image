@@ -287,6 +287,94 @@ function marksDots(n) {
   return `<svg class="smarks" viewBox="0 0 ${n * 11} 12" width="${n * 11}" height="12" aria-hidden="true">${s}</svg>`;
 }
 
+// ── PICTURES FOR THE IDEAS A LESSON NAMES ────────────────────────────────────────────────
+// A small wordless picture for an idea the lesson itself names — beside its word, never in place
+// of it. English reading (cause, effect, fact, opinion, a one-act play), Urdu grammar (the kinds of
+// اسم), mathematics (the mean, Σ). A word with no picture here keeps its plain badge.
+const TERM_ICON = {
+  cause: () => ic('<rect x="3" y="6" width="5" height="14" rx="1.2" fill="#E0533F" transform="rotate(-24 5.5 20)"/><rect x="10" y="6" width="5" height="14" rx="1.2" fill="#F2A20C"/><rect x="17" y="6" width="5" height="14" rx="1.2" fill="#F6C343"/><path d="M2 21.5h20" stroke="#5B6472" stroke-width="1.6" stroke-linecap="round"/>', 'sti'),
+  effect: () => ic('<path d="M12 1.8l2.3 5.6 5.9-1.9-2.6 5.5 5 3.5-6 .9.5 6-4.6-3.9L7.9 21.4l.5-6-6-.9 5-3.5-2.6-5.5 5.9 1.9z" fill="#3B82C4"/><circle cx="12" cy="12.5" r="3.3" fill="#fff"/>', 'sti'),
+  fact: () => ic('<circle cx="10" cy="10" r="7" fill="#fff" stroke="#1F7A4D" stroke-width="2.4"/><path d="M15.2 15.2 21 21" stroke="#1F7A4D" stroke-width="3" stroke-linecap="round"/><path d="M6.8 10.2l2.2 2.2 4.2-4.4" stroke="#2BB673" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>', 'sti'),
+  opinion: () => ic('<path d="M6.5 16.5a4.6 4.6 0 0 1-.6-9.1 5.6 5.6 0 0 1 10.6-1.2 4.8 4.8 0 0 1 1.2 9.5z" fill="#8E5BC6"/><circle cx="6" cy="19.3" r="1.6" fill="#8E5BC6"/><circle cx="3.4" cy="21.6" r="1" fill="#8E5BC6"/><path d="M12 13.6s-3-1.8-3-3.6a1.6 1.6 0 0 1 3-.8 1.6 1.6 0 0 1 3 .8c0 1.8-3 3.6-3 3.6z" fill="#fff"/>', 'sti'),
+  play: () => ic('<path d="M2.5 4.5h9v6.5a4.5 4.5 0 0 1-9 0z" fill="#F2A20C"/><path d="M5 9h1.4M8 9h1.4M5 12.2c1.2 1 2.8 1 4 0" stroke="#7A4A06" stroke-width="1.4" stroke-linecap="round" fill="none"/><path d="M12.5 8.5h9V15a4.5 4.5 0 0 1-9 0z" fill="#3B82C4"/><path d="M15 13h1.4M18 13h1.4M15 17.4c1.2-1 2.8-1 4 0" stroke="#fff" stroke-width="1.4" stroke-linecap="round" fill="none"/>', 'sti'),
+  mean: () => ic('<rect x="3" y="11" width="4" height="10" rx="1" fill="#3B82C4"/><rect x="10" y="5" width="4" height="16" rx="1" fill="#3B82C4"/><rect x="17" y="8" width="4" height="13" rx="1" fill="#3B82C4"/><path d="M1.5 10.5h21" stroke="#F2A20C" stroke-width="2.2" stroke-dasharray="3 2"/>', 'sti'),
+  sigma: () => ic('<circle cx="12" cy="12" r="10" fill="#13315C"/><path d="M16 7H8.2l4.4 5-4.4 5H16" stroke="#F6C343" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>', 'sti'),
+  // the kinds of اسم (Urdu grammar)
+  zaat: () => ic('<path d="M12 2.5l8.5 4.5v10L12 21.5 3.5 17V7z" fill="#F6C343"/><path d="M12 2.5l8.5 4.5L12 11.5 3.5 7z" fill="#FDE29A"/><path d="M12 11.5v10" stroke="#B07D06" stroke-width="1.4"/>', 'sti'),
+  jama: () => ic('<circle cx="6" cy="8.5" r="2.6" fill="#E0A97E"/><circle cx="12" cy="6.5" r="2.8" fill="#C98C5E"/><circle cx="18" cy="8.5" r="2.6" fill="#E0A97E"/><path d="M1.8 20c0-4.4 1.9-7.2 4.2-7.2S10.2 15.6 10.2 20z" fill="#2BB673"/><path d="M13.8 20c0-4.4 1.9-7.2 4.2-7.2s4.2 2.8 4.2 7.2z" fill="#E0533F"/><path d="M7.4 20c0-5 2-8.6 4.6-8.6s4.6 3.6 4.6 8.6z" fill="#3B82C4"/>', 'sti'),
+  saut: () => ic('<path d="M3 9.5h4l5-4.5v14l-5-4.5H3z" fill="#E0533F"/><path d="M15 8.5a5 5 0 0 1 0 7M17.8 6a8.5 8.5 0 0 1 0 12" stroke="#F2A20C" stroke-width="2.2" fill="none" stroke-linecap="round"/>', 'sti'),
+  aala: () => ic('<path d="M14.5 3.5a5 5 0 0 0-6.2 6.2L3 15l3 3 5.3-5.3a5 5 0 0 0 6.2-6.2l-2.6 2.6-2.4-.6-.6-2.4z" fill="#5B6472"/><path d="M15.5 14.5l5 5" stroke="#F2A20C" stroke-width="3" stroke-linecap="round"/>', 'sti'),
+  mukabbar: () => ic('<circle cx="13.5" cy="13" r="8.5" fill="#2BB673"/><circle cx="4.5" cy="19" r="2.4" fill="#C9D4E6"/><path d="M13.5 17.5v-9M10 11.5l3.5-3.5 3.5 3.5" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>', 'sti'),
+  musaghghar: () => ic('<circle cx="15.5" cy="9" r="6.5" fill="#C9D4E6"/><circle cx="6.5" cy="16.5" r="4.6" fill="#8E5BC6"/><path d="M6.5 14v5M4.6 17.2l1.9 1.9 1.9-1.9" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>', 'sti'),
+  zarf: () => ic('<path d="M8.5 21.5S2.5 14.6 2.5 10a6 6 0 0 1 12 0c0 4.6-6 11.5-6 11.5z" fill="#E0533F"/><circle cx="8.5" cy="10" r="2.3" fill="#fff"/><circle cx="17.5" cy="16" r="5" fill="#fff" stroke="#3B82C4" stroke-width="2"/><path d="M17.5 13.4V16l1.8 1.2" stroke="#13315C" stroke-width="1.6" stroke-linecap="round" fill="none"/>', 'sti'),
+  khaas: () => ic('<path d="M3 7.5a2 2 0 0 1 2-2h9l7 6.5-7 6.5H5a2 2 0 0 1-2-2z" fill="#F2A20C"/><circle cx="7.5" cy="12" r="1.8" fill="#fff"/>', 'sti'),
+};
+// the idea a line opens with, if it is one TERM_ICON draws (a key word, or a key point)
+const TERM_RX = [
+  [/^(?:a|an|the)?\s*cause\b/i, 'cause'], [/^(?:a|an|the)?\s*effects?\b/i, 'effect'], [/^(?:a|an|the)?\s*facts?\b/i, 'fact'],
+  [/^(?:a|an|the)?\s*opinions?\b/i, 'opinion'], [/^(?:a|an|the)?\s*one-act play\b/i, 'play'],
+  [/^(?:the\s+)?mean\b/i, 'mean'], [/^(?:\$\\Sigma\$|Σ)/, 'sigma'],
+  [/^اسم\s+ذات/, 'zaat'], [/^اسم\s+جمع/, 'jama'], [/^اسم\s+صوت/, 'saut'], [/^اسم\s+آلہ/, 'aala'],
+  [/^اسم\s+مکبر/, 'mukabbar'], [/^اسم\s+مصغر/, 'musaghghar'], [/^اسم\s+ظرف/, 'zarf'], [/^اسم\s+خاص/, 'khaas'],
+];
+function termOf(text) {
+  const t = String(text || '').replace(/^[\s*'‘“"]+/, '');
+  const hit = TERM_RX.find(([rx]) => rx.test(t));
+  return hit ? hit[1] : null;
+}
+const termIcon = (key) => (TERM_ICON[key] ? TERM_ICON[key]() : '');
+
+// "Cause:" and "Effect:" as the lesson labels them: a coloured tag each, joined by an arrow
+const CE_ICON = {
+  cause: () => ic('<rect x="4" y="4" width="6" height="16" rx="1.4" fill="#fff" transform="rotate(-24 7 20)"/><rect x="14" y="4" width="6" height="16" rx="1.4" fill="#fff" opacity=".75"/>', 'sce-i'),
+  effect: () => ic('<path d="M12 2l2.3 5.6 5.9-1.9-2.6 5.5 5 3.5-6 .9.5 6-4.6-3.9L7.9 21.6l.5-6-6-.9 5-3.5-2.6-5.5 5.9 1.9z" fill="#fff"/>', 'sce-i'),
+};
+// the arrow points the way the line reads: right in English, left in Urdu
+const ceArrow = (rtl = false) => `<svg class="sce-ar" viewBox="0 0 26 12" width="26" height="12" aria-hidden="true">${rtl
+  ? '<path d="M25 6H6" stroke="#5B6472" stroke-width="2.2" stroke-linecap="round"/><path d="M8 1.5 1.5 6 8 10.5z" fill="#5B6472"/>'
+  : '<path d="M1 6h19" stroke="#5B6472" stroke-width="2.2" stroke-linecap="round"/><path d="M18 1.5 24.5 6 18 10.5z" fill="#5B6472"/>'}</svg>`;
+
+// THE MEAN, DRAWN: the lesson's own values as bars, counted 1…n underneath, and — only where the
+// lesson states the mean — a dashed line at it, each bar's part above the line in amber (what
+// evens out the bars below it). Where the lesson leaves the mean for pupils, the line is left out
+// and the chip reads "?". Nothing is drawn if the stated mean is not the values' mean.
+function meanChart({ values, mean, rtl = false }) {
+  const v = (values || []).map(Number);
+  if (v.length < 3 || v.length > 12 || v.some((x) => !Number.isFinite(x) || x < 0)) return '';
+  const actual = v.reduce((a, b) => a + b, 0) / v.length;
+  const known = mean != null && mean !== '?';
+  if (known && Math.abs(Number(mean) - actual) > 0.01 * Math.max(1, actual)) return '';
+  const W = 476; const top = 24; const base = 132; const H = 170;
+  const max = Math.max(...v) * 1.12;
+  const y = (x) => base - (x / max) * (base - top);
+  const slot = (W - 96) / v.length; const bw = Math.min(34, slot * 0.62);
+  const order = rtl ? [...v.keys()].reverse() : [...v.keys()];
+  let s = `<path d="M8 ${base}H${W - 8}" stroke="#C9D4E6" stroke-width="1.5"/>`;
+  const my = known ? y(Number(mean)) : null;
+  order.forEach((idx, pos) => {
+    const val = v[idx]; const cx = 16 + slot * (pos + 0.5); const x0 = cx - bw / 2; const yt = y(val);
+    if (known && val > Number(mean)) {
+      s += `<rect x="${r1(x0)}" y="${r1(my)}" width="${r1(bw)}" height="${r1(base - my)}" fill="#3B82C4"/>`;
+      s += `<rect x="${r1(x0)}" y="${r1(yt)}" width="${r1(bw)}" height="${r1(my - yt)}" rx="3" fill="#F2A20C"/>`;
+    } else {
+      s += `<rect x="${r1(x0)}" y="${r1(yt)}" width="${r1(bw)}" height="${r1(base - yt)}" rx="3" fill="#3B82C4"/>`;
+      if (known && val < Number(mean)) s += `<rect x="${r1(x0)}" y="${r1(my)}" width="${r1(bw)}" height="${r1(yt - my)}" fill="none" stroke="#F2A20C" stroke-width="1.4" stroke-dasharray="3 2"/>`;
+    }
+    // a bar under the mean carries its number above the line, clear of the dashed gap it leaves
+    const ly = known && val < Number(mean) ? my - 6 : yt - 5;
+    s += `<text x="${r1(cx)}" y="${r1(ly)}" text-anchor="middle" ${F} font-weight="800" font-size="12" fill="#13315C">${xesc(String(val))}</text>`;
+    s += `<circle cx="${r1(cx)}" cy="${base + 14}" r="8" fill="${pos === v.length - 1 ? '#13315C' : '#E6ECF5'}"/><text x="${r1(cx)}" y="${base + 18}" text-anchor="middle" ${F} font-weight="800" font-size="10" fill="${pos === v.length - 1 ? '#fff' : '#13315C'}">${rtl ? v.length - pos : pos + 1}</text>`;
+  });
+  // the chip: X̄ = the lesson's mean, or ? (the bar over the X is drawn, not a combining mark)
+  const label = known ? xesc(String(mean)) : '?';
+  const cw = 34 + label.length * 8; const chipX = rtl ? 6 : W - cw - 6; const chipY = known ? Math.max(4, my - 11) : 4;
+  if (known) s += `<path d="M10 ${r1(my)}H${W - 10}" stroke="#F2A20C" stroke-width="2.4" stroke-dasharray="7 4"/>`;
+  s += `<rect x="${chipX}" y="${r1(chipY)}" width="${cw}" height="22" rx="11" fill="${known ? '#F2A20C' : '#fff'}" stroke="#F2A20C" stroke-width="2"/>`
+    + `<path d="M${chipX + 9} ${r1(chipY + 5)}h8" stroke="${known ? '#fff' : '#B07D06'}" stroke-width="1.6"/>`
+    + `<text x="${chipX + 10}" y="${r1(chipY + 16)}" ${F} font-weight="800" font-size="12" fill="${known ? '#fff' : '#B07D06'}">X = ${label}</text>`;
+  return `<svg class="sviz smean" viewBox="0 0 ${W} ${H}" role="img" aria-label="the values as bars${known ? ', the mean as a line' : ''}">${s}</svg>`;
+}
+
 // ── FIGURES: wordless flat people for the key cards ───────────────────────────────────────
 const SKIN = '#E0A97E'; const HAIR = '#2B2521';
 function figure(x, y, o = {}) {
@@ -321,4 +409,5 @@ const LEVEL_ICON = {
 };
 
 module.exports = { ICON, stageIcon, subjectPicture, subjectKind, pacingBar, STAGE_COLOUR, STAGE_LETTER, K,
-  parseMatrix, matrixProduct, parseReaction, reaction, wordEquation, ratioBlocks, marksDots, FIG, LEVEL_ICON };
+  parseMatrix, matrixProduct, parseReaction, reaction, wordEquation, ratioBlocks, marksDots, FIG, LEVEL_ICON,
+  TERM_ICON, termOf, termIcon, CE_ICON, ceArrow, meanChart };

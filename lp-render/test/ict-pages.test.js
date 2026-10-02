@@ -52,10 +52,10 @@ test('a teaching figure wears ICT\'s badge in the lesson\'s language; the board 
 test('an answer prints green: its words bolded, its maths coloured, the text itself unchanged', () => {
   const { guide } = buildGuideFromLpDoc(NIETE());
   const wu = guide.sections.find((s) => s.id === 'ict-warmup');
-  assert.match(wu.items[0].text, /→ \$\\color\{#1F7A4D\}\{26\}\$$/, 'a number answer');
-  assert.match(wu.items[2].text, /→ \$\\displaystyle \\color\{#1F7A4D\}\{\\begin\{bmatrix\}/, 'a matrix answer, still at full height');
+  assert.match(wu.items[0].text, /→ \$\\color\{#1F7A4D\}26\$$/, 'a number answer');
+  assert.match(wu.items[2].text, /→ \$\\displaystyle \\color\{#1F7A4D\}\\begin\{bmatrix\}/, 'a matrix answer, still at full height');
   const pr = guide.sections.find((s) => s.id === 'ict-practice');
-  assert.match(pr.items[0].text, /\*\*Defined, because the inner orders match; the product is\*\* \$\\color\{#1F7A4D\}\{2\\times2\}\$\*\*\.\*\*$/);
+  assert.match(pr.items[0].text, /\*\*Defined, because the inner orders match; the product is\*\* \$\\color\{#1F7A4D\}2\\times2\$\*\*\.\*\*$/);
   const katex = require('katex');
   for (const s of guide.sections) for (const it of s.items || []) {
     for (const m of String(it.text || '').matchAll(/\$([^$]+)\$/g)) {
