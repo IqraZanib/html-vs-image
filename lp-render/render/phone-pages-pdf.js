@@ -13,6 +13,7 @@
 //     rows, a card's paragraphs — into a copy of itself on the next page (its [data-first-only]
 //     heading stays behind), so a long card does not leave a half-empty page behind it;
 //   · a stage that continues on a new page starts that page with its own bar, "· continued";
+//   · a block marked data-newpage (the teacher-support pages) starts a page of its own;
 //   · only a single block taller than a whole page makes its page grow, so nothing is cut off.
 // Text is never set smaller to fit: on a phone, size is what makes a page readable.
 //
@@ -79,6 +80,8 @@ const PACK_FLOW = ({ W, H }) => {
   let guard = 0;
   while (queue.length && guard++ < 4000) {
     const blk = queue.shift();
+    // a block marked data-newpage (the teacher-support pages) starts a page of its own
+    if (blk.hasAttribute('data-newpage') && bodyOf(pg).children.length) pg = startPage(null);
     const body = bodyOf(pg);
     body.appendChild(blk);
     if (fits(pg)) continue;
@@ -122,7 +125,9 @@ const PACK_FLOW = ({ W, H }) => {
   }
   src.remove();
   const total = pages.length;
-  pages.forEach((p, k) => { const n = p.querySelector('.q-pno'); if (n) n.textContent = pno.replace('{n}', k + 1).replace('{m}', total); });
+  // a lesson that prints its numbers in Urdu digits numbers its pages in them too
+  const dg = (v) => (root.dataset.digits === 'urdu' ? String(v).replace(/[0-9]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d]) : String(v));
+  pages.forEach((p, k) => { const n = p.querySelector('.q-pno'); if (n) n.textContent = pno.replace('{n}', dg(k + 1)).replace('{m}', dg(total)); });
   // nothing may leave its page sideways, nor run past its foot
   const overflow = [];
   pages.forEach((p, k) => {

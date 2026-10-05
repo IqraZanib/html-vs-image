@@ -642,6 +642,10 @@ SCENES.zebra_crossing = (spec) => {
 function heroBadge(spec) {
   if (!spec) return '';
   if (spec.type === 'clock') return `<svg class="qhero-art" viewBox="-6 -10 132 140" aria-hidden="true"><rect x="-6" y="-10" width="132" height="140" fill="#FFF3DC"/>${clockFace(60, 64, 46, spec.time)}</svg>`;
+  if (spec.type === 'festivals') return festivalsBadge();
+  if (spec.type === 'greeting') return greeting(spec).replace('class="qart"', 'class="qhero-art" preserveAspectRatio="xMidYMid slice"').replace(/viewBox="[^"]*"/, 'viewBox="40 80 400 150"');
+  if (spec.type === 'stairs') return stairs(spec).replace('class="qart"', 'class="qhero-art" preserveAspectRatio="xMidYMid slice"').replace(/viewBox="[^"]*"/, 'viewBox="60 30 360 180"');
+  if (spec.type === 'solar_system') return solarSystem(spec).replace('class="qart"', 'class="qhero-art" preserveAspectRatio="xMidYMid slice"').replace(/viewBox="[^"]*"/, 'viewBox="130 40 220 170"');
   if (spec.type === 'traffic_light') return `<svg class="qhero-art" viewBox="-60 -14 120 120" aria-hidden="true"><rect x="-60" y="-14" width="120" height="120" fill="#E3F0FF"/>${trafficLight(0, -4, 0.82)}</svg>`;
   if (spec.type === 'scene') {
     const inner = scene(spec).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
@@ -682,6 +686,8 @@ const ICON = {
   sun: () => ic('<circle cx="12" cy="12" r="5" fill="#FECA57"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" stroke="#FECA57" stroke-width="2" stroke-linecap="round"/>'),
   board: () => ic('<rect x="2" y="3" width="20" height="14" rx="2" fill="#2F6F5E" stroke="#C98C5E" stroke-width="1.6"/><path d="M5.5 8h7M5.5 11.5h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><path d="M8 17l-2 4.5M16 17l2 4.5" stroke="#C98C5E" stroke-width="1.8" stroke-linecap="round"/><rect x="15" y="12" width="4" height="2" rx=".8" fill="#fff"/>'),
   bag: () => ic('<rect x="4" y="7" width="16" height="14.5" rx="4" fill="#54A0FF"/><path d="M8.5 7V5.5a3.5 3.5 0 0 1 7 0V7" stroke="#2E86DE" stroke-width="2" fill="none"/><rect x="7.5" y="13" width="9" height="5.5" rx="1.6" fill="#FECA57"/>'),
+  bulb: () => ic('<path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.7.5 1.1 1.3 1.1 2.2v.5h5.4v-.5c0-.9.4-1.7 1.1-2.2A6.5 6.5 0 0 0 12 2.5z" fill="#FECA57"/><rect x="9.3" y="18" width="5.4" height="1.8" rx=".7" fill="#B2BAC6"/><rect x="10" y="20.4" width="4" height="1.6" rx=".7" fill="#B2BAC6"/><path d="M10.3 9.5l1.7 2 1.7-2" stroke="#F2A20C" stroke-width="1.4" fill="none"/>'),
+  clipboard: () => ic('<rect x="4" y="4" width="16" height="18" rx="2.5" fill="#fff" stroke="#FECA57" stroke-width="1.8"/><rect x="8" y="2" width="8" height="4" rx="1.5" fill="#FECA57"/><path d="M7.5 11l1.5 1.5 3-3M7.5 16.5l1.5 1.5 3-3" stroke="#1DD1A1" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M13.5 11h3.5M13.5 16.5h3.5" stroke="#C9D4E6" stroke-width="1.8" stroke-linecap="round"/>'),
   check: () => ic('<circle cx="12" cy="12" r="10" fill="#1DD1A1"/><path d="M7 12.4l3.3 3.3L17 9" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'),
 };
 // the stage bars' badges: a white disc with the stage's own picture
@@ -716,13 +722,126 @@ const DEED = {
   ticket: () => ic('<path d="M3 6.5h18v3a2.5 2.5 0 0 0 0 5v3H3v-3a2.5 2.5 0 0 0 0-5z" fill="#FECA57"/><path d="M15 6.5v11" stroke="#fff" stroke-width="1.4" stroke-dasharray="1.6 1.6"/><rect x="5.5" y="10" width="7" height="1.6" rx=".8" fill="#A0673E"/><rect x="5.5" y="13" width="5" height="1.6" rx=".8" fill="#A0673E"/>'),
   heart: () => ic('<path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z" fill="#FF6B6B"/><path d="M12 9.5l1 2 2.2.3-1.6 1.5.4 2.2-2-1-2 1 .4-2.2-1.6-1.5 2.2-.3z" fill="#fff"/>'),
 };
+
+// THE SOLAR SYSTEM, as a board sketch: the Sun at the centre, eight orbits (unlabelled, as the
+// board says), a planet on each (small rocky ones near the Sun, big gas ones farther out), the
+// asteroid belt between the fourth and fifth orbits, and one comet with its tail pointing away
+// from the Sun. No names are written on it: the lesson's board leaves the labels to the class.
+function solarSystem(spec) {
+  const W = 480; const H = 250; const cx = 240; const cy = 125;
+  const rx = [44, 62, 80, 98, 140, 168, 194, 218]; const k = 0.43;
+  const planet = [
+    { r: 4.5, c: '#B8B2A8' }, { r: 6.5, c: '#F2C27B' }, { r: 7, c: '#4FA3E0', land: '#4CC37A' }, { r: 5.5, c: '#E2683C' },
+    { r: 13, c: '#E8A15B', bands: '#C97B3A' }, { r: 11, c: '#F1D08A', ring: true }, { r: 8.5, c: '#8FE0E8' }, { r: 8.5, c: '#4C6FE6' },
+  ];
+  const ang = [200, 320, 70, 160, 300, 30, 230, 120];
+  let s = `<rect width="${W}" height="${H}" rx="14" fill="#1B2140"/>`;
+  // a few stars
+  [[24, 30], [70, 210], [120, 22], [380, 26], [450, 200], [430, 70], [40, 120], [300, 230], [200, 18], [460, 130]].forEach(([x, y], i) => { s += `<circle cx="${x}" cy="${y}" r="${i % 3 ? 1.2 : 1.8}" fill="#fff" opacity=".8"/>`; });
+  rx.forEach((r) => { s += `<ellipse cx="${cx}" cy="${cy}" rx="${r}" ry="${r1(r * k)}" fill="none" stroke="#7F8BC4" stroke-width="1.2" stroke-dasharray="${r > 100 ? '4 4' : '3 3'}"/>`; });
+  // the asteroid belt between the 4th and 5th orbits
+  for (let i = 0; i < 46; i++) {
+    const a = (i / 46) * Math.PI * 2; const rr = 112 + ((i * 37) % 13);
+    s += `<circle cx="${r1(cx + Math.cos(a) * rr)}" cy="${r1(cy + Math.sin(a) * rr * k)}" r="${(i % 3) + 1}" fill="#A0673E" opacity=".9"/>`;
+  }
+  // the Sun, smiling
+  s += `<circle cx="${cx}" cy="${cy}" r="30" fill="#FECA57" opacity=".25"/><circle cx="${cx}" cy="${cy}" r="21" fill="#FECA57" stroke="#F2A20C" stroke-width="2"/>`
+    + `<circle cx="${cx - 7}" cy="${cy - 4}" r="2.2" fill="#7A4B00"/><circle cx="${cx + 7}" cy="${cy - 4}" r="2.2" fill="#7A4B00"/><path d="M${cx - 8} ${cy + 5}q8 7 16 0" stroke="#7A4B00" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+  rx.forEach((r, i) => {
+    const a = (ang[i] * Math.PI) / 180; const x = r1(cx + Math.cos(a) * r); const y = r1(cy + Math.sin(a) * r * k); const p = planet[i];
+    if (p.ring) s += `<ellipse cx="${x}" cy="${y}" rx="${r1(p.r * 1.9)}" ry="${r1(p.r * 0.55)}" fill="none" stroke="#D9B26A" stroke-width="2.4"/>`;
+    s += `<circle cx="${x}" cy="${y}" r="${p.r}" fill="${p.c}"/>`;
+    if (p.bands) s += `<path d="M${r1(x - p.r * 0.9)} ${r1(y - 3)}h${r1(p.r * 1.8)}M${r1(x - p.r * 0.95)} ${r1(y + 3)}h${r1(p.r * 1.9)}" stroke="${p.bands}" stroke-width="2"/>`;
+    if (p.land) s += `<path d="M${r1(x - 3)} ${r1(y - 2)}q2 -3 4 0q1 3 -2 3z" fill="${p.land}"/>`;
+  });
+  // a comet, its tail pointing away from the Sun
+  s += `<path d="M408 52 L470 18 L474 30 Z" fill="#BFE6FF" opacity=".55"/><path d="M408 52 L462 28" stroke="#E3F4FF" stroke-width="3" stroke-linecap="round" opacity=".8"/><circle cx="408" cy="52" r="6" fill="#E3F4FF" stroke="#8FD0FF" stroke-width="1.6"/>`;
+  return svg(W, H, s, 'the solar system: the Sun, eight orbits, the asteroid belt and a comet');
+}
+
+// THE THREE STAIRS of a self-introduction (or any ordered steps a lesson names): a staircase, one
+// step per item in reading order with its number and the lesson's own word, a child at the foot.
+function stairs(spec) {
+  const steps = spec.steps || []; const n = steps.length; const rtl = !!spec.rtl;
+  const W = 480; const H = 210; const sw = 120; const sh = 46; const x0 = 70;
+  let s = `<rect width="${W}" height="${H}" rx="14" fill="#EAF6FF"/><rect y="${H - 22}" width="${W}" height="22" fill="#CDEFD9"/>`;
+  steps.forEach((t, i) => {
+    const xi = rtl ? W - x0 - (i + 1) * sw : x0 + i * sw; const top = H - 22 - (i + 1) * sh;
+    s += `<rect x="${xi}" y="${top}" width="${sw}" height="${(i + 1) * sh}" rx="8" fill="${TILE[i % TILE.length]}"/>`
+      + `<circle cx="${xi + 22}" cy="${top + 22}" r="14" fill="#fff"/><text x="${xi + 22}" y="${top + 28}" text-anchor="middle" ${FONT} font-weight="800" font-size="16" fill="${C.ink}">${esc(String(t.n || i + 1))}</text>`
+      + `<text x="${xi + 72}" y="${top + 30}" text-anchor="middle" ${FONT} font-weight="700" font-size="${/[؀-ۿ]/.test(t.word) ? 20 : 17}" fill="#fff">${esc(t.word)}</text>`;
+  });
+  // a child at the foot of the stairs, ready to climb
+  const cx = rtl ? W - 32 : 32;
+  s += `<g transform="translate(${cx} ${H - 22})"><path d="M-12 0c1-16 5-24 12-24s11 8 12 24z" fill="${C.sky}"/><circle cx="0" cy="-34" r="11" fill="${SKIN}"/>`
+    + `<path d="M-11 -36c-1-8 4-12 11-12s12 4 11 12c-2-4-6-6-11-6s-9 2-11 6z" fill="${HAIR}"/><circle cx="-4" cy="-34" r="1.5" fill="${HAIR}"/><circle cx="4" cy="-34" r="1.5" fill="${HAIR}"/>`
+    + `<path d="M-4 -29c2.5 2 5.5 2 8 0" stroke="#8A2E2E" stroke-width="1.6" fill="none" stroke-linecap="round"/></g>`;
+  return svg(W, H, s, steps.map((t) => t.word).join(' → '));
+}
+
+// A GREETING, as the lesson's board states it: the child who is walking greets first, the child who
+// is standing replies in full. Two ordinary children (never a revered figure); the words in the two
+// bubbles are the lesson's own board lines.
+function greeting(spec) {
+  const W = 480; const H = 250; const ur = (t) => /[؀-ۿ]/.test(String(t));
+  const bubble = (x, y, w, text, tail) => `<g><rect x="${x}" y="${y}" width="${w}" height="54" rx="16" fill="#fff" stroke="${C.sky}" stroke-width="2.4"/>`
+    + `<path d="M${tail} ${y + 54}l10 16 7-16z" fill="#fff" stroke="${C.sky}" stroke-width="2.4" stroke-linejoin="round"/><rect x="${tail - 1}" y="${y + 50}" width="19" height="6" fill="#fff"/>`
+    + `<text x="${x + w / 2}" y="${y + 35}" text-anchor="middle" ${FONT} ${ur(text) ? 'direction="rtl"' : ''} font-size="18" fill="${C.ink}">${esc(text)}</text></g>`;
+  let s = `<rect width="${W}" height="${H}" rx="14" fill="#EAF6FF"/><rect y="${H - 34}" width="${W}" height="34" fill="#CDEFD9"/>`;
+  // the walking child (on the right, moving left) and the standing child (on the left)
+  const child = (x, top, scarf, walking) => `<g transform="translate(${x} ${H - 34}) scale(1.45)">`
+    + `<path d="M-15 0c1-22 6-32 15-32s14 10 15 32z" fill="${top}"/>`
+    + (walking ? '<path d="M-6 0l-9 14M6 0l10 13" stroke="#5B6472" stroke-width="5" stroke-linecap="round"/><path d="M22 -20h12M24 -12h10M22 -4h12" stroke="#9AA4B1" stroke-width="2.4" stroke-linecap="round"/>' : '<path d="M-6 0v14M6 0v14" stroke="#5B6472" stroke-width="5" stroke-linecap="round"/>')
+    + (scarf ? `<path d="M-16 -44c0-14 7-21 16-21s16 7 16 21c0 7-2 12-6 15h-20c-4-3-6-8-6-15z" fill="${scarf}"/>` : '')
+    + `<circle cx="0" cy="-45" r="${scarf ? 11 : 13}" fill="${SKIN}"/>`
+    + (scarf ? '' : `<path d="M-13 -48c-1-9 5-14 13-14s14 5 13 14c-3-5-7-7-13-7s-10 2-13 7z" fill="${HAIR}"/>`)
+    + `<circle cx="-4" cy="-45" r="1.6" fill="${HAIR}"/><circle cx="4" cy="-45" r="1.6" fill="${HAIR}"/><path d="M-4 -39c2.5 2 5.5 2 8 0" stroke="#8A2E2E" stroke-width="1.6" fill="none" stroke-linecap="round"/>`
+    + (top === C.coral ? '<path d="M14 -24q14 -10 12 -24" stroke="#E0A97E" stroke-width="5" fill="none" stroke-linecap="round"/>' : '') + '</g>';
+  s += child(372, C.coral, null, true) + child(108, C.aqua, C.violet, false);
+  const [first, reply] = spec.lines || [];
+  s += bubble(212, 12, 258, first, 380) + bubble(10, 78, 290, reply, 100);
+  return svg(W, H, s, [first, reply].filter(Boolean).join(' / '));
+}
+// TWO FESTIVALS ON THE BOARD, as a lesson's hook states it: the teacher draws two circles on the
+// board and writes a festival in each (the lesson's own words). Eid is a crescent over a mosque, the
+// national day the flag of Pakistan. No person is drawn.
+const BOARD = '#2F4A3F';
+const starPath = (cx, cy, r) => `M${Array.from({ length: 10 }, (_, k) => {
+  const a = -Math.PI / 2 + (k * Math.PI) / 5; const q = k % 2 ? r * 0.42 : r;
+  return `${r1(cx + q * Math.cos(a))} ${r1(cy + q * Math.sin(a))}`;
+}).join('L')}z`;
+const eidIcon = (bg) => `<circle cx="24" cy="-44" r="13" fill="${C.yellow}"/><circle cx="30" cy="-49" r="11" fill="${bg}"/>`
+  + `<path d="${starPath(-20, -46, 6)}" fill="${C.yellow}"/>`
+  + `<rect x="-41" y="-24" width="8" height="46" fill="#DEF4E7"/><path d="M-41 -24l4-11 4 11z" fill="#DEF4E7"/>`
+  + `<rect x="33" y="-24" width="8" height="46" fill="#DEF4E7"/><path d="M33 -24l4-11 4 11z" fill="#DEF4E7"/>`
+  + `<path d="M-20 -2a20 20 0 0 1 40 0z" fill="#DEF4E7"/><path d="M0 -22v-9" stroke="#DEF4E7" stroke-width="2.4" stroke-linecap="round"/>`
+  + `<rect x="-28" y="-3" width="56" height="25" rx="2" fill="#DEF4E7"/><path d="M-6 22v-12a6 6 0 0 1 12 0v12z" fill="${bg}"/>`;
+const flagIcon = () => `<rect x="-40" y="-50" width="4.5" height="74" rx="2" fill="#D9DEE5"/><circle cx="-37.7" cy="-52" r="4" fill="${C.yellow}"/>`
+  + '<rect x="-35.5" y="-47" width="18" height="46" fill="#fff"/><rect x="-17.5" y="-47" width="58" height="46" fill="#01411C"/>'
+  + '<circle cx="10" cy="-23" r="13" fill="#fff"/><circle cx="14.5" cy="-27.5" r="11" fill="#01411C"/>'
+  + `<path d="${starPath(19, -31, 5.5)}" fill="#fff" transform="rotate(-35 19 -31)"/>`;
+function festivals(spec) {
+  const W = 480; const H = 220; const [a, b] = spec.circles || []; const rtl = spec.rtl !== false;
+  const circle = (cx, label, icon) => `<circle cx="${cx}" cy="106" r="86" fill="none" stroke="#F4F1E6" stroke-width="3.5" opacity=".9"/>`
+    + `<g transform="translate(${cx} 108)">${icon}</g>`
+    + `<text x="${cx}" y="168" text-anchor="middle" ${FONT} ${/[؀-ۿ]/.test(String(label)) ? 'direction="rtl" ' : ''}font-size="21" font-weight="700" fill="#F4F1E6">${esc(label)}</text>`;
+  let s = `<rect width="${W}" height="${H}" rx="14" fill="#8A5A36"/><rect x="9" y="9" width="${W - 18}" height="${H - 18}" rx="8" fill="${BOARD}"/>`;
+  const [x1, x2] = rtl ? [350, 130] : [130, 350];
+  s += circle(x1, a, eidIcon(BOARD)) + circle(x2, b, flagIcon());
+  return svg(W, H, s, [a, b].filter(Boolean).join(' · '));
+}
+// the badge on the title card: the two festivals' pictures side by side, without their words
+function festivalsBadge() {
+  return `<svg class="qhero-art" viewBox="0 0 120 120" aria-hidden="true"><rect width="120" height="120" fill="${BOARD}"/>`
+    + `<g transform="translate(84 72) scale(.62)">${eidIcon(BOARD)}</g><g transform="translate(36 70) scale(.62)">${flagIcon()}</g></svg>`;
+}
 const DRAW = {
   clock, clock_pair: clockPair, tiles, blender, blender_list: blenderList, blend_steps: blendSteps, scene, predict, dictionary, poster,
   traffic_light: trafficLightVisual, road_signs: roadSigns, road_sign: roadSignOne, look_steps: lookSteps, ordinal_row: ordinalRow,
-  car_road: carRoad, podium, signboards: signboardVisual,
+  car_road: carRoad, podium, signboards: signboardVisual, solar_system: solarSystem, stairs, greeting, festivals,
 };
 // the visual types drawn as HTML by primary.js rather than as SVG here
-const HTML_VISUALS = ['story_map', 'tracker', 'deeds'];
+const HTML_VISUALS = ['story_map', 'tracker', 'deeds', 'compare', 'flow'];
 function draw(spec) {
   if (!spec || !spec.type) return '';
   const f = DRAW[spec.type];

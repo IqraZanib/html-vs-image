@@ -42,6 +42,8 @@ const LABELS = {
     homework: 'Homework', homeworkPill: '', coaching: 'Coaching corner', askYourself: 'Ask yourself',
     coachSteps: ['Record up to 40 minutes of this lesson', 'Send it to NIETE on WhatsApp', 'Same-day tips back: what worked, and one thing to try'],
     continued: 'continued', page: 'page {n} of {m}', min: '{n} min', pp: 'pp.', p: 'p.',
+    concept: 'Core idea', conceptPill: 'Aim', pupilsWrite: 'What pupils write', remember: 'Remember', rememberPill: 'Final check',
+    lookFor: 'Look for this', support: 'Reference material', supportFollow: 'Support pages follow — planning material for you, not read aloud in class.',
   },
   ur: {
     grade: 'جماعت', today: 'آج', journey: 'اب تک کا سفر', coming: 'آگے کیا', outcome: 'تدریسی نتیجہ',
@@ -54,6 +56,8 @@ const LABELS = {
     homework: 'Homework', homeworkPill: 'ہوم ورک', coaching: 'کوچنگ کارنر', askYourself: 'خود سے پوچھیے',
     coachSteps: ['اس سبق کی چالیس منٹ تک کی ریکارڈنگ بنائیے', 'واٹس ایپ پر نیٹ کو بھیجیے', 'اسی دن جواب: کیا اچھا رہا، اور ایک بات جو آزمانی ہے'],
     continued: 'جاری ہے', page: 'صفحہ {n} از {m}', min: '{n} منٹ', pp: 'صفحات', p: 'صفحہ',
+    concept: 'بنیادی تصور', conceptPill: 'مقصد', pupilsWrite: 'طلبہ کیا لکھتے ہیں', remember: 'یاد رکھیں', rememberPill: 'اختتامی جانچ',
+    lookFor: 'اس پر نظر رکھیے', support: 'حوالہ جاتی مواد', supportFollow: 'اگلے صفحات معاون مواد ہیں—یہ آپ کی تیاری کے لیے ہیں، کلاس میں پڑھ کر نہ سنائیں۔',
   },
 };
 
@@ -86,7 +90,7 @@ const quoted = (line) => (/^[“"‘'(—–-]/.test(line.trim()) || /[“”]/.
 function composePrimary(guide) {
   const lesson = guide.layout.lesson;
   const lang = lesson.lang === 'ur' ? 'ur' : 'en';
-  const L = LABELS[lang];
+  const L = { ...LABELS[lang], ...(lesson.labels || {}) };
   const rtl = lang === 'ur';
   // the direction a piece of text reads in: an Urdu lesson's English-only lines read left to right
   const dir = (s) => (rtl ? (AR.test(String(s)) ? 'rtl' : 'ltr') : 'ltr');
@@ -95,7 +99,9 @@ function composePrimary(guide) {
   // a paragraph as units a page break may fall between (sentence groups); `lead` opens the first
   const para = (text, cls = '', lead = '') => sentenceChunks(text).map((c, i) => `<div data-units>${i === 0 ? lead : ''}<div class="q-chunk${cls ? ` ${cls}` : ''}" dir="${dir(c)}">${rich(c)}</div></div>`).join('');
   const pill = (s, cls, icon = '') => (s ? `<span class="q-pill ${cls}">${icon ? `<span class="q-pill-ic">${icon}</span>` : ''}${lab(s)}</span>` : '');
-  const minutes = (n) => (n ? L.min.replace('{n}', n) : '');
+  // the newer approved Urdu lessons print their numbers (grade, minutes, page and step numbers) in Urdu digits
+  const N = (v) => (lesson.numerals === 'urdu' ? String(v).replace(/[0-9]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d]) : String(v));
+  const minutes = (n) => (n ? L.min.replace('{n}', N(n)) : '');
   const ARROW = rtl ? '←' : '→';
   // AN ANSWER: a green tick badge (structure) before it; the answer's own words stay in plain ink.
   // Teachers asked that no word of a lesson be coloured: colour marks structure, never words.
@@ -109,6 +115,8 @@ function composePrimary(guide) {
     if (spec.type === 'story_map') return storyMap(spec);
     if (spec.type === 'tracker') return tracker(spec);
     if (spec.type === 'deeds') return deeds(spec);
+    if (spec.type === 'compare') return compare(spec);
+    if (spec.type === 'flow') return flow(spec);
     return `<figure class="q-fig ${cls}">${draw(spec)}${spec.caption ? `<figcaption>${esc(spec.caption)}</figcaption>` : ''}</figure>`;
   };
   // the story map: the story's events as boxes in reading order, the pause signs between them
@@ -124,12 +132,16 @@ function composePrimary(guide) {
   };
   // a good-citizen chart: one card per deed, its picture and the lesson's words
   const deeds = (spec) => `<div class="q-deeds" dir="${rtl ? 'rtl' : 'ltr'}">${spec.items.map((d, i) => `<div class="q-deed q-deed${i % 6}">${DEED[d.icon] ? DEED[d.icon]() : ''}<span dir="${dir(d.text)}">${rich(d.text)}</span></div>`).join('')}</div>`;
+  // a two-column comparison (e.g. religious festival | national festival), each column a card
+  const compare = (spec) => `<div class="q-cmp" dir="${rtl ? 'rtl' : 'ltr'}">${spec.title ? T(spec.title, 'div', 'q-cmp-t') : ''}<div class="q-cmp-cols">${spec.columns.map((c, k) => `<div class="q-cmp-c q-cmp${k % 3}">${T(c.head, 'div', 'q-cmp-h')}${(c.lines || []).map((l) => T(l, 'div', 'q-cmp-l')).join('')}</div>`).join('')}</div>${spec.caption ? T(spec.caption, 'div', 'q-cmp-cap') : ''}</div>`;
+  // a step-by-step flow: boxes joined by arrows in reading order
+  const flow = (spec) => `<div class="q-flow" dir="${rtl ? 'rtl' : 'ltr'}">${spec.title ? T(spec.title, 'div', 'q-cmp-t') : ''}<div class="q-flow-row">${spec.items.map((it, k) => `${k ? `<span class="q-flow-ar"${spec.arrow ? '' : ' aria-hidden="true"'}>${spec.arrow ? `<small dir="${dir(spec.arrow)}">${esc(spec.arrow)}</small>` : ''}${ARROW}</span>` : ''}<div class="q-flow-b q-cmp${k % 3}">${T(it.head, 'div', 'q-cmp-h')}${(it.lines || []).map((l) => T(l, 'div', 'q-cmp-l')).join('')}</div>`).join('')}</div></div>`;
   const tracker = (spec) => `<table class="q-track" dir="${rtl ? 'rtl' : 'ltr'}"><thead><tr>${spec.columns.map((c, k) => `<th class="q-th${k % 3}">${rich(c)}</th>`).join('')}</tr></thead>`
     + `<tbody>${spec.rows.map((r) => `<tr>${spec.columns.map((_, k) => `<td>${rich(r[k] || '')}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
 
   // ── START ───────────────────────────────────────────────────────────────────────────────
   const subj = lesson.subject;
-  const kicker = rtl ? `${L.grade} ${lesson.grade} · ${subj.toUpperCase()}` : `Grade ${lesson.grade} · ${subj}`;
+  const kicker = rtl ? `${L.grade} ${N(lesson.grade)} · ${subj.toUpperCase()}` : `Grade ${lesson.grade} · ${subj}`;
   const where = `${L.p}${rtl ? ' ' : ''}${lesson.pages} · <b>${esc(minutes(lesson.period_minutes))}</b>`;
   add('start', `<header class="q-hero"><div class="q-hero-top"><span class="q-kick">${lab(kicker)}</span><span class="q-where">${where}</span></div>`
     + `<div class="q-hero-main"><div class="q-hero-text">${T(lesson.title, 'h1')}${T(lesson.chapter, 'div', 'q-chap')}</div>`
@@ -137,22 +149,30 @@ function composePrimary(guide) {
   const day = lesson.day || {};
   if (day.of) {
     add('start', `<div class="q-steps">${Array.from({ length: day.of }, (_, i) => i + 1)
-      .map((n) => `<span class="q-step${n === day.n ? ' on' : n < day.n ? ' done' : ''}">${n}${n < day.n ? '<i class="q-tick">✓</i>' : ''}</span>`).join('')}</div>`);
+      .map((n) => `<span class="q-step${n === day.n ? ' on' : n < day.n ? ' done' : ''}">${N(n)}${n < day.n ? '<i class="q-tick">✓</i>' : ''}</span>`).join('')}</div>`);
   }
   add('start', `<div class="q-today"><div class="q-cap">${ICON.sun()} ${lab(L.today)}</div>${T(lesson.title, 'div', 'q-today-t')}</div>`);
   add('start', `<div class="q-two"><div class="q-journey"><div class="q-cap">${ICON.steps()} ${lab(L.journey)}</div>${T(lesson.journey, 'div')}</div>`
     + `<div class="q-coming"><div class="q-cap">${ICON.next()} ${lab(L.coming)}</div>${T(lesson.coming_up, 'div')}</div></div>`);
-  add('start', `<div class="q-outcome"><div class="q-cap">${ICON.target()} ${lab(L.outcome)}${lesson.outcome.code ? ` · <bdi dir="ltr">${esc(lesson.outcome.code)}</bdi>` : ''}</div>${T(lesson.outcome.text, 'div', 'q-outcome-t')}</div>`);
+  add('start', `<div class="q-outcome"><div class="q-cap">${ICON.target()} ${lab(L.outcome)}${lesson.outcome.code ? ` · <bdi dir="ltr">${esc(lesson.outcome.code)}</bdi>` : ''}</div>${lesson.outcome.text ? T(lesson.outcome.text, 'div', 'q-outcome-t') : ''}`
+    + `${(lesson.outcome.items || []).length ? `<ul class="q-dots q-outl">${lesson.outcome.items.map((it) => `<li>${T(it, 'span', 'q-outcome-t')}</li>`).join('')}</ul>` : ''}</div>`);
   add('start', `<div class="q-prepare"><div class="q-cap">${ICON.bag()} ${lab(L.prepare)}</div><ul class="q-checks">${lesson.prepare.map((p) => `<li>${T(p)}</li>`).join('')}</ul></div>`);
   if (lesson.video) {
     add('start', `<div class="q-video"><div class="q-video-h">${ICON.tv()}<span class="q-cap">${lab(L.video)}</span> ${T(lesson.video.title, 'span', 'q-video-t')}</div>${T(lesson.video.note, 'div', 'q-video-n')}</div>`);
   }
-  add('start', `<div class="q-kw"><div class="q-kw-h" data-first-only>${ICON.key()}<span class="q-cap">${lab(L.keywords)}</span></div>`
+  if (lesson.keywords.length) add('start', `<div class="q-kw"><div class="q-kw-h" data-first-only>${ICON.key()}<span class="q-cap">${lab(L.keywords)}</span></div>`
     + `<div class="q-kw-t units">${lesson.keywords.map((k) => `<div class="q-kw-r" data-units>${T(k.word, 'div', 'q-kw-w')}${T(k.meaning, 'div', 'q-kw-m')}</div>`).join('')}</div></div>`, 'data-split');
   add('start', `<div class="q-board"><div class="q-board-h" data-first-only>${ICON.board()} ${lab(L.board)}</div><div class="q-board-b units">${lesson.board.map((b, i) => {
-    const lines = b.drawn ? '' : b.lines.map((l) => T(l, 'div', 'q-board-l')).join('');
-    return `<div class="q-panel" data-units><span class="q-panel-n">${i + 1}</span><div class="q-panel-b">${b.title ? T(b.title, 'div', 'q-panel-t') : ''}${fig(b.visual, 'q-fig-board')}${lines}</div></div>`;
+    const lines = b.drawn ? [] : b.lines.map((l) => T(l, 'div', 'q-board-l'));
+    // the picture goes where the approved board has it: first, or after its first `visual_after` lines
+    lines.splice(b.visual_after || 0, 0, fig(b.visual, 'q-fig-board'));
+    return `<div class="q-panel" data-units><span class="q-panel-n">${N(i + 1)}</span><div class="q-panel-b">${b.title ? T(b.title, 'div', 'q-panel-t') : ''}${lines.join('')}</div></div>`;
   }).join('')}</div></div>`, 'data-split');
+  // the board as it should look at the end of the lesson (the newer approved lessons): its own card
+  if (lesson.board_end) {
+    add('start', `<div class="q-lbl">${ICON.board()} ${lab(lesson.board_end.label)}</div>`, 'data-keep');
+    add('start', `<div class="q-figcard">${fig(lesson.board_end.visual, 'q-fig-card')}</div>`);
+  }
 
   // ── STAGES ──────────────────────────────────────────────────────────────────────────────
   const STAGE_CLS = { opening: 'op', explanation: 'ex', we_do: 'wd', you_do: 'yd', check: 'ck', homework: 'hw' };
@@ -166,11 +186,12 @@ function composePrimary(guide) {
       const b = blocks[bi];
       const next = blocks[bi + 1];
       const askAfter = next && next.type === 'ask_this' ? next : null;
-      const askHtml = askAfter ? `<div class="q-ask"><div class="q-cap">${ICON.question()} ${lab(L.ask)}</div>${T(askAfter.text, 'div')}</div>` : '';
+      const askBody = (a) => (a.items ? `<ul class="q-dots">${a.items.map((l) => `<li>${T(l)}</li>`).join('')}</ul>` : T(a.text, 'div'));
+      const askHtml = askAfter ? `<div class="q-ask"><div class="q-cap">${ICON.question()} ${lab(L.ask)}</div>${askBody(askAfter)}</div>` : '';
       switch (b.type) {
         case 'warmup':
           add(sid, `<div class="q-warm"><div class="q-lbl" data-first-only>${ICON.warmup()} ${lab(L.warmup)}</div><div class="units">${b.items.map((it, i) => `<div class="q-wi" data-units>`
-            + `<span dir="${dir(it.q)}"><b class="q-n">${i + 1}.</b> ${rich(it.q)} ${answer(it.a)}</span>${it.tag ? `<span class="q-tag">${esc(it.tag)}</span>` : ''}</div>`).join('')}</div></div>`, 'data-split');
+            + `<span dir="${dir(it.q)}"><b class="q-n">${N(i + 1)}.</b> ${rich(it.q)}${it.a ? ` ${answer(it.a)}` : ''}</span>${it.tag ? `<span class="q-tag">${esc(it.tag)}</span>` : ''}</div>`).join('')}</div></div>`, 'data-split');
           break;
         case 'setup':
           add(sid, `<div class="q-lbl">${ICON.setup()} ${lab(L.setup)}</div>`, 'data-keep');
@@ -192,21 +213,39 @@ function composePrimary(guide) {
         }
         case 'teacher_models': {
           const inWeDo = sid === 'we_do';
-          const head = inWeDo
-            ? `<div class="q-card-h" data-first-only><span class="q-pills">${pill(L.guided, 'line')}${pill(L.wedo, 'blue')}</span></div>`
-            : `<div class="q-card-h" data-first-only>${pill(L.teacherModels, 'amber big', ICON.teach())}<span class="q-pills">${pill(L.explain, 'line')}${pill(L.ido, 'amber')}</span></div>`;
+          const pills = (arr, last) => (arr || []).map((t, k, all) => pill(t, k === all.length - 1 ? last : 'line')).join('');
+          const head = b.head
+            ? `<div class="q-card-h" data-first-only>${pill(b.head, `${inWeDo ? 'blue' : 'amber'} big`, inWeDo ? ICON.group() : ICON.teach())}<span class="q-pills">${pills(b.pills, inWeDo ? 'blue' : 'amber')}</span></div>`
+            : inWeDo
+              ? `<div class="q-card-h" data-first-only><span class="q-pills">${pill(L.guided, 'line')}${pill(L.wedo, 'blue')}</span></div>`
+              : `<div class="q-card-h" data-first-only>${pill(L.teacherModels, 'amber big', ICON.teach())}<span class="q-pills">${pill(L.explain, 'line')}${pill(L.ido, 'amber')}</span></div>`;
           const units = [];
           // We Do: the together lines, then the model, then the sentence frames — one card, as approved
           const prevTogether = inWeDo ? blocks.find((x) => x.type === 'together') : null;
           if (prevTogether) {
-            units.push(`<div class="q-sub" data-units>${pill(L.together, 'blue big', ICON.group())}</div>`);
+            if (!b.head) units.push(`<div class="q-sub" data-units>${pill(L.together, 'blue big', ICON.group())}</div>`);
             for (const l of prevTogether.lines) units.push(`<div data-units><ul class="q-dots">${`<li>${T(l)}</li>`}</ul></div>`);
           }
-          units.push(`<div class="q-instr" data-units dir="${dir(b.instruction)}"><span class="q-instr-m" aria-hidden="true"></span>${rich(b.instruction)}</div>`);
+          const instr = (t) => units.push(`<div class="q-instr" data-units dir="${dir(t)}"><span class="q-instr-m" aria-hidden="true"></span>${rich(t)}</div>`);
+          if (b.seq) {
+            // the card's lines in the order the approved page gives them
+            for (const it of b.seq) {
+              if (it.k === 'instr') instr(it.t);
+              else if (it.k === 'quote') units.push(`<div class="q-line" data-units dir="${dir(it.t)}">${rich(quoted(it.t))}</div>`);
+              else if (it.k === 'think') units.push(`<div class="q-lead" data-units dir="${dir(it.t)}">${rich(it.t)}</div>`);
+              else if (it.k === 'frame') units.push(`<div class="q-frame" data-units dir="${dir(it.t)}">${ICON.bubble()}<span>${rich(it.t)}</span></div>`);
+              else if (it.k === 'bullet') units.push(`<div data-units><ul class="q-dots"><li>${T(it.t)}</li></ul></div>`);
+              else if (it.k === 'visual') units.push(`<div data-units>${fig(it.v, 'q-fig-tm')}</div>`);
+              else throw new Error(`primary page: no layout for a teacher-models line of kind "${it.k}"`);
+            }
+          } else instr(b.instruction);
           if (b.visual) units.push(`<div data-units>${fig(b.visual, 'q-fig-tm')}</div>`);
           const quote = (arr) => (arr || []).forEach((l) => units.push(`<div class="q-lead" data-units dir="${dir(l)}">${rich(l)}</div>`));
           const script = (arr) => (arr || []).forEach((l) => units.push(`<div class="q-line" data-units dir="${dir(l)}">${rich(quoted(l))}</div>`));
-          quote(b.lead); script(b.script); quote(b.lead2); script(b.script2);
+          if (!b.seq) { quote(b.lead); script(b.script); quote(b.lead2); }
+          // a second teacher instruction in the same card (the approved pages print it with the same ▸)
+          if (b.instruction2) units.push(`<div class="q-instr" data-units dir="${dir(b.instruction2)}"><span class="q-instr-m" aria-hidden="true"></span>${rich(b.instruction2)}</div>`);
+          if (!b.seq) script(b.script2);
           const frames = inWeDo ? blocks.find((x) => x.type === 'frames') : null;
           if (frames) for (const f of frames.lines) units.push(`<div class="q-frame" data-units dir="${dir(f)}">${ICON.bubble()}<span>${rich(f)}</span></div>`);
           if (askAfter) units.push(`<div data-units>${askHtml}</div>`);
@@ -220,17 +259,31 @@ function composePrimary(guide) {
           break;
         case 'worked':
           add(sid, `<div class="q-card q-card-tm"><div class="q-card-h" data-first-only>${pill(L.worked, 'amber big', ICON.pencil())}<span class="q-pills">${pill(L.ido, 'amber')}</span></div>`
-            + `<div class="units">${b.steps.length > 1 ? b.steps.map((s, i) => `<div class="q-wstep" data-units dir="${dir(s)}"><b class="q-n">${i + 1}.</b> ${rich(s)}</div>`).join('')
+            + `<div class="units">${b.steps.length > 1 ? b.steps.map((s, i) => `<div class="q-wstep" data-units dir="${dir(s)}"><b class="q-n">${N(i + 1)}.</b> ${rich(s)}</div>`).join('')
               : para(b.steps[0], 'q-wstep')}`
             + `${b.visual ? `<div data-units>${fig(b.visual, 'q-fig-worked')}</div>` : ''}${askAfter ? `<div data-units>${askHtml}</div>` : ''}</div></div>`, 'data-split');
           if (askAfter) bi += 1;
           break;
         case 'ask_this':
-          add(sid, `<div class="q-card q-card-tm">${askHtml || `<div class="q-ask"><div class="q-cap">${ICON.question()} ${lab(L.ask)}</div>${T(b.text, 'div')}</div>`}</div>`);
+          add(sid, `<div class="q-card q-card-tm">${askHtml || `<div class="q-ask"><div class="q-cap">${ICON.question()} ${lab(L.ask)}</div>${askBody(b)}</div>`}</div>`);
           break;
         case 'mistakes':
           add(sid, `<div class="q-lbl">${ICON.warn()} ${lab(L.mistakes)}</div>`, 'data-keep');
-          add(sid, b.items.map((m) => `<div class="q-mis"><div class="q-cap">✓ ${lab(L.youAsk)}</div>${T(m.you_ask, 'div')}</div>`).join(''));
+          add(sid, b.items.map((m) => (m.pupil_says
+            ? `<div class="q-mis2"><div class="q-mis2-q"><div class="q-cap">✗ ${lab(L.pupilsWrite)}</div>${T(m.pupil_says, 'div')}</div><div class="q-mis2-a"><div class="q-cap">✓ ${lab(L.youAsk)}</div>${T(m.you_ask, 'div')}</div></div>`
+            : `<div class="q-mis"><div class="q-cap">✓ ${lab(L.youAsk)}</div>${T(m.you_ask, 'div')}</div>`)).join(''));
+          break;
+        case 'concept':
+          add(sid, `<div class="q-concept"><div class="q-concept-h"><span class="q-cap">${ICON.bulb()} ${lab(L.concept)}</span>${pill(L.conceptPill, 'line')}</div>`
+            + `${b.items.map((it) => `<div class="q-concept-i" dir="${dir(it.text)}">${it.lead ? `<b class="q-concept-l">${rich(it.lead)}</b> ` : ''}${rich(it.text)}</div>`).join('')}</div>`);
+          break;
+        case 'remember':
+          add(sid, `<div class="q-lbl q-lbl-pills"><span>${ICON.star()} ${lab(L.remember)}</span><span class="q-pills">${pill(L.rememberPill, 'line')}</span></div>`, 'data-keep');
+          add(sid, `<ul class="q-dots">${b.lines.map((l) => `<li>${T(l)}</li>`).join('')}</ul>`);
+          break;
+        case 'figure':
+          // a chart of its own (the approved pages' "comparison" and "step by step" cards), its name on a pill
+          add(sid, `<div class="q-figcard"><div class="q-card-h">${pill(b.label, 'navy big')}</div>${fig(b.visual, 'q-fig-card')}</div>`);
           break;
         case 'halfway':
           add(sid, `<div class="q-half" dir="${dir(b.text)}">${ICON.clock()}<span>${rich(b.text)}</span></div>`);
@@ -241,8 +294,9 @@ function composePrimary(guide) {
           if (b.visual) add(sid, fig(b.visual, 'q-fig-task'));
           break;
         case 'alone':
-          add(sid, `<div class="q-card q-card-yd"><div class="q-card-h" data-first-only><span class="q-pills">${pill(L.independent, 'line')}${pill(L.youdo, 'green')}</span></div>`
-            + `<div class="q-sub" data-first-only>${pill(L.alone, 'green big', ICON.pencil())}</div><div class="units">${b.items.map((it, i) => {
+          add(sid, `<div class="q-card q-card-yd">${b.head
+            ? `<div class="q-card-h" data-first-only>${pill(b.head, 'green big', ICON.pencil())}<span class="q-pills">${(b.pills || []).map((t, k, all) => pill(t, k === all.length - 1 ? 'green' : 'line')).join('')}</span></div>`
+            : `<div class="q-card-h" data-first-only><span class="q-pills">${pill(L.independent, 'line')}${pill(L.youdo, 'green')}</span></div><div class="q-sub" data-first-only>${pill(L.alone, 'green big', ICON.pencil())}</div>`}<div class="units">${b.items.map((it, i) => {
               const ref = it.ref ? `<span class="q-ref">${rich(it.ref)}</span>` : '';
               // a small picture sits beside its question; a wide one (a road of cars, a signboard) goes under it
               const side = it.visual && SIDE.includes(it.visual.type);
@@ -250,19 +304,22 @@ function composePrimary(guide) {
               const wide = it.visual && !side ? fig(it.visual, 'q-fig-item') : '';
               if (side) counts.visuals += 1;
               const ans = it.answer ? `<div class="q-a" dir="${dir(it.answer)}"><b class="q-cap q-a-cap"><span class="q-ansb" aria-hidden="true">${ICON.check()}</span>${lab(it.sample ? L.sample : L.answer)}</b> ${rich(it.answer)}</div>` : '';
-              return `<div class="q-item${pic ? ' has-fig' : ''}" data-units><div class="q-item-q" dir="${dir(it.q)}"><b class="q-n">${i + 1}.</b> ${rich(it.q)} ${ref}</div>${pic}${wide}${ans}</div>`;
+              return `<div class="q-item${pic ? ' has-fig' : ''}" data-units><div class="q-item-q" dir="${dir(it.q)}"><b class="q-n">${N(i + 1)}.</b> ${rich(it.q)} ${ref}</div>${pic}${wide}${ans}</div>`;
             }).join('')}</div></div>`, 'data-split');
           break;
         case 'differentiation':
           add(sid, `<div class="q-lbl">${ICON.star()} ${lab(L.diff)}</div>`, 'data-keep');
-          add(sid, `<div class="q-diff q-stuck"><div class="units">${para(b.stuck, '', `<div class="q-cap">${ICON.help()} ${lab(L.stuck)}</div>`)}</div></div>`, 'data-split');
-          add(sid, `<div class="q-diff q-early"><div class="units">${para(b.early, '', `<div class="q-cap">${ICON.star()} ${lab(L.early)}</div>`)}${b.early_visual ? `<div data-units>${fig(b.early_visual, 'q-fig-early')}</div>` : ''}</div></div>`, 'data-split');
+          const diffBody = (v, cap) => (Array.isArray(v)
+            ? `<div data-units>${cap}</div>${v.map((l) => `<div data-units><ul class="q-dots"><li>${T(l)}</li></ul></div>`).join('')}`
+            : para(v, '', cap));
+          add(sid, `<div class="q-diff q-stuck"><div class="units">${diffBody(b.stuck, `<div class="q-cap">${ICON.help()} ${lab(L.stuck)}</div>`)}</div></div>`, 'data-split');
+          add(sid, `<div class="q-diff q-early"><div class="units">${diffBody(b.early, `<div class="q-cap">${ICON.star()} ${lab(L.early)}</div>`)}${b.early_visual ? `<div data-units>${fig(b.early_visual, 'q-fig-early')}</div>` : ''}</div></div>`, 'data-split');
           break;
         case 'exit':
           // a small picture (a clock, letter tiles) sits beside its question; a scene goes under it
           add(sid, `<div class="q-exit"><div class="q-cap">${ICON.ticket()} ${lab(L.exit)}</div>${b.items.map((it, i) => {
             const side = it.visual && SIDE.includes(it.visual.type);
-            const text = `<div class="q-exit-i" dir="${dir(it.q)}"><b class="q-n">${i + 1}.</b> ${rich(it.q)} ${answer(it.criterion)}</div>`;
+            const text = `<div class="q-exit-i" dir="${dir(it.q)}"><b class="q-n">${N(i + 1)}.</b> ${rich(it.q)} ${answer(it.criterion)}</div>`;
             if (side) { counts.visuals += 1; return `<div class="q-exit-row">${text}<div class="q-ifig">${draw(it.visual)}</div></div>`; }
             return text + (it.visual ? fig(it.visual, 'q-fig-exit') : '');
           }).join('')}</div>`);
@@ -277,18 +334,29 @@ function composePrimary(guide) {
     }
   }
   // ── COACHING CORNER ─────────────────────────────────────────────────────────────────────
-  const steps = L.coachSteps.map((s, i) => `<div class="q-cstep">${[ICON.mic(), ICON.chat(), ICON.reply()][i]}<b>${i + 1}</b><span>${lab(s)}</span></div>`).join('');
+  const steps = L.coachSteps.map((s, i) => `<div class="q-cstep">${[ICON.mic(), ICON.chat(), ICON.reply()][i]}<b>${N(i + 1)}</b><span>${lab(s)}</span></div>`).join('');
   const ask = sentenceChunks(lesson.coaching.ask_yourself);
-  add('close', `<div class="q-coach"><div class="units">${ask.map((c, i) => `<div data-units>${i === 0 ? `<div class="q-cap">${ICON.mic()} ${lab(L.coaching)}</div>` : ''}<div dir="${dir(c)}">${i === 0 ? `<b class="q-cap q-ay">${lab(L.askYourself)}</b> ` : ''}${rich(c)}</div></div>`).join('')}`
+  const look = lesson.coaching.look_for ? `<div data-units><div class="q-cap">${ICON.mic()} ${lab(L.coaching)}</div><b class="q-cap q-ay">${lab(L.lookFor)}</b><div dir="${dir(lesson.coaching.look_for)}">${rich(lesson.coaching.look_for)}</div></div>` : '';
+  add('close', `<div class="q-coach"><div class="units">${look}${ask.map((c, i) => `<div data-units>${i === 0 && !look ? `<div class="q-cap">${ICON.mic()} ${lab(L.coaching)}</div>` : ''}<div dir="${dir(c)}">${i === 0 ? `<b class="q-cap q-ay">${lab(L.askYourself)}</b> ` : ''}${rich(c)}</div></div>`).join('')}`
     + `<div class="q-csteps" data-units>${steps}</div></div></div>`);   // the corner stays whole: its steps never sit alone on a last page
+  // THE TEACHER-SUPPORT PAGES (newer approved lessons): the homework answered in full, on a page of their own
+  if (lesson.support) {
+    add('close', `<div class="q-follow" dir="${dir(L.supportFollow)}">${esc(L.supportFollow)}</div>`);
+    const kick = rtl ? `${L.grade} ${N(lesson.grade)} ${subj} · ${L.p} ${lesson.pages}` : `Grade ${lesson.grade} ${subj} · ${L.p} ${lesson.pages}`;
+    add('support', `<div class="q-p2"><div class="q-p2r"><span class="q-pill navy big">${ICON.clipboard()}${lab(L.support)}</span><span class="q-p2k">${lab(kick)}</span></div>${T(lesson.title, 'div', 'q-p2-t')}</div>`, 'data-newpage data-keep');
+    lesson.support.sections.forEach((sec, si) => {
+      add('support', `<div class="q-p2h"><b class="q-p2l">${esc(sec.letter || String.fromCharCode(65 + si))}</b>${T(sec.heading, 'span', 'q-p2n')}</div>`, 'data-keep');
+      for (const it of sec.items) add('support', `<div class="q-key">${it.label ? T(it.label, 'div', 'q-key-l') : ''}${T(it.q, 'div', 'q-key-q')}${T(it.a, 'div', 'q-key-a')}</div>`);
+    });
+  }
 
   // the page chrome the page printer clones onto every page
   const footLine = rtl
-    ? `${L.grade} ${lesson.grade} · ${subj} · ${lesson.chapter} · ${L.pp} ${lesson.pages}`
+    ? `${L.grade} ${N(lesson.grade)} · ${subj} · ${lesson.chapter} · ${L.pp} ${lesson.pages}`
     : `Grade ${lesson.grade} ${subj} · ${lesson.chapter} · ${L.pp} ${lesson.pages}`;
   const chrome = `<div class="q-chrome" hidden><div class="q-run"><b dir="${dir(lesson.title)}">${esc(lesson.title)}</b><span class="q-run-c">· ${lab(L.continued)}</span></div>`
     + `<footer class="q-foot"><div dir="${dir(footLine)}">${esc(footLine)}</div><div class="q-pno"></div></footer></div>`;
-  const bodyHtml = `<div class="ictq" lang="${lang}" dir="${rtl ? 'rtl' : 'ltr'}" data-pno="${esc(L.page)}" data-cont="${esc(L.continued)}">`
+  const bodyHtml = `<div class="ictq" lang="${lang}" dir="${rtl ? 'rtl' : 'ltr'}" data-pno="${esc(L.page)}" data-cont="${esc(L.continued)}"${lesson.numerals === 'urdu' ? ' data-digits="urdu"' : ''}>`
     + `<div class="q-src">${out.join('')}</div>${chrome}</div>`;
   return { headerHtml: '', bodyHtml, headCss: PRIMARY_CSS(), pageLayout: { width: 520, height: 2000, flow: true }, counts };
 }
@@ -528,6 +596,38 @@ html:not(.lp-print) .qpg{box-shadow:0 0 0 1px #d9dbe1,0 6px 20px rgba(30,32,48,.
 .q-evn{flex:none;width:25px;height:25px;border-radius:50%;background:#fff;font-size:14px;line-height:1;display:inline-flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;color:inherit}
 .q-ev0{background:#DDEFFC;color:#1D4F7A}.q-ev1{background:#FDEBC8;color:#7A5200}.q-ev2{background:#DEF4E7;color:#1E6B45}.q-ev3{background:#EDE7FA;color:#4B3B8A}.q-ev4{background:#FDE2E1;color:#9B2C2C}
 .q-arrow{color:var(--slate);font-weight:800;font-family:'Inter',sans-serif;margin:0 2px}
+/* the newer approved blocks (2026-10-05); every word in ink, colour on the structure */
+.q-outl{margin-top:4px}
+.q-concept{background:var(--sky);border:1.5px solid var(--sky-bd);border-inline-start:5px solid var(--blue-bar);border-radius:9px;padding:9px 12px 11px;display:flex;flex-direction:column;gap:6px}
+.q-concept-h{display:flex;align-items:center;justify-content:space-between;gap:8px}.q-concept-h .q-cap{color:#2E5E90;display:flex;align-items:center;gap:6px}
+.q-concept-l{font-weight:700}
+.q-mis2{border:1.5px solid var(--grey-bd);border-radius:9px;overflow:hidden}
+.q-mis2-q{background:#FDECEA;padding:8px 12px}.q-mis2-q .q-cap{color:#B23B2E}
+.q-mis2-a{background:var(--mint);padding:8px 12px}.q-mis2-a .q-cap{color:#1E6B45}
+.q-cmp,.q-flow{background:#fff;border:1.5px solid var(--grey-bd);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.q-cmp-t{font-weight:700;text-align:center}
+.q-cmp-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.q-cmp-c,.q-flow-b{border-radius:9px;padding:8px 10px;background:#fff;display:flex;flex-direction:column;gap:4px}
+.q-cmp0{box-shadow:inset 0 0 0 2px var(--navy)}.q-cmp1{box-shadow:inset 0 0 0 2px var(--amber)}.q-cmp2{box-shadow:inset 0 0 0 2px var(--green)}
+.q-cmp-h{font-weight:800;text-align:center;padding-bottom:3px;border-bottom:1.5px dashed var(--grey-bd)}
+.q-cmp-l{font-size:18px;line-height:1.6}.ictq[dir="rtl"] .q-cmp-l{line-height:2}
+.q-cmp-cap{font-size:17px;text-align:center}
+.q-flow-row{display:flex;align-items:stretch;gap:6px}.q-flow-b{flex:1 1 0;min-width:0}
+.q-flow-ar{align-self:center;font-weight:800;color:var(--slate);font-family:'Inter',sans-serif}
+.q-flow-ar small{display:block;font-size:13px;font-weight:600;line-height:1.6;text-align:center;font-family:'Inter','Noto Nastaliq Urdu',sans-serif}
+.q-figcard{background:#fff;border:1.5px solid var(--grey-bd);border-radius:10px;padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px}
+.q-figcard > .q-card-h{justify-content:flex-start}
+.q-figcard .q-cmp,.q-figcard .q-flow{border:0;padding:0}
+.q-follow{font-style:italic;font-size:17px;color:var(--ink);border-top:1.5px solid var(--grey);padding-top:8px}
+.q-p2{display:flex;flex-direction:column;gap:6px;border-bottom:3px solid var(--navy);padding-bottom:8px}
+.q-pill.navy{background:var(--navy);color:#fff}
+.q-p2-t{font-size:26px;font-weight:700;line-height:1.3}.ictq[dir="rtl"] .q-p2-t{line-height:1.9}
+.q-p2h{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:700}
+.q-p2r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.q-p2k{color:var(--slate);font-size:15px;font-weight:600}
+.q-p2l{display:inline-flex;min-width:24px;padding:0 6px;height:24px;border-radius:6px;background:var(--navy);color:#fff;align-items:center;justify-content:center;font-size:14px;font-family:'Inter','Noto Nastaliq Urdu',sans-serif;flex:none}
+.q-key{background:#F3F5F9;border:1.5px solid var(--grey-bd);border-radius:9px;padding:8px 12px;display:flex;flex-direction:column;gap:2px}
+.q-key-l{font-size:16px;font-weight:700;color:#4B5263}.q-key-q{font-weight:600}
+.q-key-a{border-inline-start:3px solid #8FD1AE;padding-inline-start:10px;font-weight:600}
 .q-track{width:100%;border-collapse:separate;border-spacing:0;border:2px solid var(--navy);border-radius:9px;overflow:hidden;font-size:19px}
 .q-track th{background:var(--navy);color:#fff;font-weight:700;padding:4px 8px;text-align:center}
 .q-track th.q-th0{background:#2E86DE}.q-track th.q-th1{background:#FF9F43}.q-track th.q-th2{background:#1DD1A1}

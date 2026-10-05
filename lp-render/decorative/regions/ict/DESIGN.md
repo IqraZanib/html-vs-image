@@ -203,8 +203,34 @@ The word-building board (syllable tiles, arrows, a line to write the word) and t
 unchanged. `ict-primary.test.js` checks in the browser that every word the page prints, outside a
 label, chip, bar or picture, is ink, for all six lessons. The test fails when an answer turns green.
 
-**Not printed:** the coaching WhatsApp number (waiting for a decision, as for grades 6–12), and
-"Support pages follow" (no support pages follow these lessons).
+**The newer approved lessons (2026-10-05): Science G4, GK G1, Islamiat G1, SST G5.** Four more
+approved Grades 1–5 lesson plans (lp_doc 3.0 rendered by lp_html v8.1, the same phone page, made
+5 Oct). ICT's own Grades 1–5 production pipeline does not make these: it delivers pre-rendered
+image PDFs for English, Maths, Urdu (G1–5) and General Science (G4–5) only, and GK, Islamiat and SST
+exist there only as a pilot. Their lp_doc JSON is not reachable from here, so each lesson was
+rebuilt field by field from its approved PDF (`fixtures/ict-primary/README.md`); every letter of
+the lesson file was checked against the approved PDF's text (none differs). The page gained the
+pieces these lessons use, each from its approved page:
+- a core-idea box ("بنیادی تصور" with its "مقصد" pill) and a "remember" line;
+- a teacher-models card as a run of instructions, quoted lines, think-alouds, sentence frames,
+  bullets and charts;
+- a two-part mistakes card (what pupils say / what you ask);
+- a numbered list of outcomes;
+- a comparison chart and a step-by-step chart with a word on each arrow (HTML, words in ink), on
+  their own card ("موازنہ", "مرحلہ وار خاکہ");
+- the board as it should look at the end of the lesson;
+- a coaching "look for this" line;
+- the teacher-support page (homework answered in full), which starts a page of its own;
+- Urdu digits for the page's own numbers (grade, minutes, steps, page N of M), as these lessons
+  print them (`numerals: "urdu"`).
+Pictures added, drawn from each lesson's own words: the solar system (Science), the introduction's
+three stairs (GK), the greeting (Islamiat: two ordinary children, never a revered figure, the
+bubbles carrying the board's own words), and the hook's two circles on the board (SST: a crescent
+over a mosque and the flag of Pakistan; no person). Each lesson prints on as many pages as its
+approved PDF (6, 7, 7, 8). The six earlier lessons print exactly as before.
+
+**Not printed:** the coaching WhatsApp number (waiting for a decision, as for grades 6–12), and,
+in a lesson with no support pages, "Support pages follow".
 
 ```
 npm run render:ict -- lp-render/fixtures/ict-primary/g2_ch10_Urdu_seg2.lesson.json
@@ -215,8 +241,9 @@ npm run render:ict -- lp-render/fixtures/ict-primary/g2_ch10_Urdu_seg2.lesson.js
 
 - **Approval of the Grades 1–5 pages with pictures.** The pictures and the fixes above are this
   pack's additions to the approved design.
-- **Grades 1–5 lesson data.** The three test lessons were transcribed from the approved PDFs;
-  real lessons need NIETE's Grades 1–5 lesson data in the `ict-primary-lesson` shape.
+- **Grades 1–5 lesson data.** All seven NIETE lessons here were transcribed or rebuilt from the
+  approved PDFs. Real lessons need ICT's Grades 1–5 lp_doc JSON (the v17 files behind the newer
+  references), which is not reachable from here.
 - **Approval of the grades 6–12 adaptation.** The references are grade 1; the Teacher support page
   and the exam-bank exit option are this pack's reading of where grade 6–12 content belongs.
 - **Logo.** The header mark is a plain "N" monogram drawn in code; ICT's own logo file replaces it.

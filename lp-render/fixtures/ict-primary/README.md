@@ -24,8 +24,25 @@ written around them in the approved structure.
 | `g2_u1_Maths_ordinal_numbers.lesson.json` | Grade 2 Maths, Unit 1 "Whole Numbers" — Ordinal Numbers, first to twentieth | PCTB Mathematics 2, pp. 2–3 |
 | `g4_l4_Urdu_achhe_shehri.lesson.json` | Grade 4 Urdu, سبق ۴ «ہم بنیں گے اچھے شہری» | PCTB Urdu 4, pp. 21–23 |
 
-The approved PDFs are NIETE's, shared with the Design lane on 2026-10-01 (Google Drive file links,
-not copied into this repo).
+Four newer approved lessons (lp_doc 3.0 rendered by lp_html v8.1, shared 2026-10-05) were **rebuilt
+from their approved PDFs**. Their lp_doc JSON is not reachable from here: it is not in NIETE-Rumi, its
+staging or the skills pack, and ICT's Grades 1–5 production pipeline makes image PDFs, not these.
+So these four files are not pipeline JSON. For the Urdu ones, the PDF's Urdu text layer was decoded
+to reading order for exact letters; word breaks, numbers and the order of list items were read from
+the page images. Every letter of each file was checked against its approved PDF: none differs.
+
+| File | Lesson | Approved PDF | Pages |
+|---|---|---|---|
+| `g4_ch8_Science_seg2.lesson.json` | Grade 4 General Science, Ch.8 "Space Safari" — The Solar System, p.188, day 2 of 11 (English) | `g4_ch8_Science_seg2.pdf` | 6 |
+| `g1_ch1_GK_seg1.lesson.json` | Grade 1 General Knowledge, باب ۱ میرا تعارف — Self-Introduction, p.۱, day 1 of 6 (Urdu) | `GK_g1_seg1_v9_r2.pdf` | 7 |
+| `g1_ch4_Islamiat_seg6.lesson.json` | Grade 1 Islamiat, باب ۴ اخلاق و آداب — سلام کرنا, p.۴۷, day 6 of 9 (Urdu) | `Islamiat_g1_seg6_v17.pdf` | 7 |
+| `g5_ch2_SST_seg3.lesson.json` | Grade 5 Social Studies, باب ۲ ثقافت — تہوار، شمولیت، مذہبی ہم آہنگی…, p.۲۰, day 3 of 7 (Urdu) | `SST_g5_seg3_v17.pdf` | 8 |
+
+The Islamiat lesson's honorifics were assembled cluster by cluster from the approved PDF's own code
+points and are printed exactly as given.
+
+The approved PDFs are NIETE's, shared with the Design lane on 2026-10-01 and 2026-10-05 (Google
+Drive file links, not copied into this repo).
 
 ## What a file holds
 
@@ -50,6 +67,26 @@ each read-aloud speaker a kind of face (`girl_scarf`, `girl`, `boy`, `boy_cheeky
 `man_moustache`, `elder`, `woman`); a speaker not listed gets a plain face in its own colour.
 
 In Urdu text, `⏸۱` is the textbook's reading-pause sign with its number; it prints as a pause chip.
+
+**The newer lessons' pieces:**
+- `labels` overrides the page's own labels where a lesson names them differently.
+- `numerals: "urdu"` prints the page's own numbers (grade, minutes, steps, page N of M) in Urdu digits.
+- `outcome.items` is a list of outcomes.
+- `board_end: {label, visual}` is the board as it should look at the end of the lesson.
+- A board panel's `visual_after: n` places its picture after its first n lines.
+- `support.sections` is the teacher-support page (homework answered in full), on a page of its own.
+- `coaching.look_for` is the coaching corner's "look for this" line.
+- Blocks:
+  - `concept` is the core-idea box.
+  - `remember` is the "remember" line.
+  - `figure: {label, visual}` puts a chart on its own card.
+  - `teacher_models.seq` lists the card's lines in order. Each has a kind `k`: `instr`, `quote`,
+    `think`, `frame`, `bullet` or `visual`.
+  - `mistakes[].pupil_says` gives the two-part mistakes card.
+- Pictures:
+  - `compare` is a chart of columns.
+  - `flow` is boxes joined by arrows, with `arrow`, a word on each arrow.
+  - `solar_system`, `stairs`, `greeting` and `festivals` are drawn.
 
 ## Render
 

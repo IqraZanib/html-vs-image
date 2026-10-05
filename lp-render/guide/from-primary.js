@@ -4,7 +4,7 @@
 // A Grades 1–5 lesson arrives as an "ict-primary-lesson" file: the fields of NIETE's approved
 // lp_html v8.1 phone page (title card, day, journey, outcome, to prepare, video, key words, the
 // board, then the stages Opening · Explanation · We Do · You Do · Check · Homework and the
-// coaching corner). Real ones are in lp-render/fixtures/ict-primary/ — transcribed from the three
+// coaching corner). Real ones are in lp-render/fixtures/ict-primary/ — transcribed or rebuilt from the
 // approved PDFs, since NIETE's Grades 1–5 lesson data is not reachable from here.
 //
 // This checks the file (every block and picture type must be one the page can lay out, so nothing
@@ -12,15 +12,16 @@
 const STAGES = ['opening', 'explanation', 'we_do', 'you_do', 'check', 'homework'];
 const BLOCKS = {
   warmup: ['items'], setup: ['lines'], hook: ['text'], read_aloud: ['lines'], teacher_models: ['instruction'],
-  worked: ['steps'], ask_this: ['text'], mistakes: ['items'], halfway: ['text'], together: ['lines'], frames: ['lines'],
+  worked: ['steps'], ask_this: [], mistakes: ['items'], halfway: ['text'], together: ['lines'], frames: ['lines'],
   set_task: ['lines'], alone: ['items'], differentiation: ['stuck', 'early'], exit: ['items'], homework: ['lines'],
+  concept: ['items'], remember: ['lines'], figure: ['label', 'visual'],
 };
 const VISUALS = {
   clock: ['time'], clock_pair: ['time'], scene: ['scene'], blender: ['parts', 'word'], blender_list: ['words'],
   blend_steps: ['steps'], tiles: ['parts'], predict: ['title', 'prompt'], dictionary: ['word', 'entry'],
   story_map: ['items'], tracker: ['columns', 'rows'], poster: ['items'],
   traffic_light: [], road_signs: ['signs'], road_sign: ['sign'], look_steps: ['steps'], ordinal_row: ['items'],
-  car_road: ['letters'], podium: ['places'], signboards: ['items'], deeds: ['items'],
+  car_road: ['letters'], podium: ['places'], signboards: ['items'], deeds: ['items'], solar_system: [], compare: ['columns'], flow: ['items'], stairs: ['steps'], greeting: ['lines'], festivals: ['circles'],
 };
 const SCENES = ['songbird', 'kite_tree', 'lake', 'crying_boy', 'pair_reading', 'bunty_home', 'bee_line', 'park_family', 'zebra_crossing'];
 const SIGNS = ['stop', 'parking', 'turn_left', 'no_cycling', 'hump', 'crossroads', 'children'];
@@ -43,29 +44,44 @@ function checkVisual(v, where, problems) {
 
 // Every piece of lesson text the page must print, in order (the "nothing dropped" test reads this).
 // Board lines a picture draws (board[].drawn) are the picture's, not the page's text.
+// the words a drawn comparison, flow or table carries are the lesson's too
+const visualTexts = (v) => (!v ? [] : v.type === 'compare' ? [v.title, ...v.columns.flatMap((c) => [c.head, ...(c.lines || [])]), v.caption]
+  : v.type === 'flow' ? [v.title, ...v.items.flatMap((c) => [c.head, ...(c.lines || [])]), v.arrow]
+    : v.type === 'tracker' ? [...v.columns, ...v.rows.flat()] : []);
+const list = (v) => (Array.isArray(v) ? v : v == null ? [] : [v]);
 function printedTexts(lesson) {
-  const out = [lesson.title, lesson.chapter, lesson.journey, lesson.coming_up, lesson.outcome.code, lesson.outcome.text, ...lesson.prepare];
+  const out = [lesson.title, lesson.chapter, lesson.journey, lesson.coming_up, lesson.outcome.code, lesson.outcome.text, ...(lesson.outcome.items || []), ...lesson.prepare];
   if (lesson.video) out.push(lesson.video.title, lesson.video.note);
   for (const k of lesson.keywords) out.push(k.word, k.meaning);
-  for (const b of lesson.board) { if (b.title) out.push(b.title); if (!b.drawn) out.push(...b.lines); }
+  for (const b of lesson.board) { if (b.title) out.push(b.title); if (!b.drawn) out.push(...(b.lines || [])); out.push(...visualTexts(b.visual)); }
+  if (lesson.board_end) out.push(lesson.board_end.label, ...visualTexts(lesson.board_end.visual));
   for (const st of lesson.stages) {
     out.push(st.label);
     for (const b of st.blocks) {
       switch (b.type) {
         case 'warmup': for (const it of b.items) out.push(it.q, it.a, ...(it.tag ? [it.tag] : [])); break;
-        case 'hook': case 'ask_this': case 'halfway': out.push(b.text); break;
-        case 'teacher_models': out.push(b.instruction, ...(b.lead || []), ...(b.script || []), ...(b.lead2 || []), ...(b.script2 || [])); break;
+        case 'hook': case 'halfway': out.push(b.text); break;
+        case 'ask_this': out.push(...list(b.text), ...(b.items || [])); break;
+        case 'teacher_models':
+          if (b.seq) for (const it of b.seq) { if (it.t) out.push(it.t); out.push(...visualTexts(it.v)); }
+          else out.push(b.instruction, ...(b.lead || []), ...(b.script || []), ...(b.lead2 || []), ...(b.instruction2 ? [b.instruction2] : []), ...(b.script2 || []));
+          break;
+        case 'concept': for (const it of b.items) out.push(it.lead, it.text); break;
+        case 'remember': out.push(...b.lines); break;
+        case 'figure': out.push(b.label); break;
         case 'worked': out.push(...b.steps); break;
-        case 'mistakes': for (const m of b.items) out.push(m.you_ask); break;
+        case 'mistakes': for (const m of b.items) out.push(m.pupil_says, m.you_ask); break;
         case 'set_task': out.push(...b.lines, ...(b.say ? [b.say] : [])); break;
         case 'alone': for (const it of b.items) out.push(it.q, ...(it.ref ? [it.ref] : []), ...(it.answer ? [it.answer] : [])); break;
-        case 'differentiation': out.push(b.stuck, b.early); break;
+        case 'differentiation': out.push(...list(b.stuck), ...list(b.early)); break;
         case 'exit': for (const it of b.items) out.push(it.q, it.criterion); break;
         default: out.push(...(b.lines || []));
       }
+      out.push(...visualTexts(b.visual));
     }
   }
-  out.push(lesson.coaching.ask_yourself);
+  out.push(lesson.coaching.look_for, lesson.coaching.ask_yourself);
+  for (const sec of (lesson.support || {}).sections || []) { out.push(sec.heading); for (const it of sec.items) out.push(it.label, it.q, it.a); }
   return out.filter((s) => s != null && String(s).trim());
 }
 
@@ -78,6 +94,7 @@ function buildGuideFromPrimary(lesson) {
   if (problems.length) throw new Error(`ict-primary-lesson ${lesson.lesson_id || '?'}: ${problems.join('; ')}`);
   let visuals = checkVisual(lesson.hero_visual, 'hero', problems);
   lesson.board.forEach((b, i) => { visuals += checkVisual(b.visual, `board ${i + 1}`, problems); });
+  if (lesson.board_end) visuals += checkVisual(lesson.board_end.visual, 'board at the end', problems);
   const ids = lesson.stages.map((s) => s.id);
   for (const id of ids) if (!STAGES.includes(id)) problems.push(`unknown stage "${id}"`);
   if (ids.join() !== STAGES.filter((s) => ids.includes(s)).join()) problems.push(`stages out of order: ${ids.join(', ')}`);
@@ -87,6 +104,7 @@ function buildGuideFromPrimary(lesson) {
       const where = `${st.id} block ${i + 1} (${b.type})`;
       if (!BLOCKS[b.type]) { problems.push(`${where}: no layout for block type "${b.type}"`); continue; }
       for (const f of BLOCKS[b.type]) if (b[f] == null) problems.push(`${where}: needs "${f}"`);
+      if (b.type === 'ask_this' && b.text == null && !(b.items || []).length) problems.push(`${where}: needs "text" or "items"`);
       blocks += 1;
       visuals += checkVisual(b.visual, where, problems) + checkVisual(b.early_visual, where, problems);
       for (const it of b.items || []) visuals += checkVisual(it.visual, where, problems);
@@ -107,7 +125,7 @@ function buildGuideFromPrimary(lesson) {
     presentationFixes: (lesson.source && lesson.source.presentation_fixes) || [],
     notPrinted: [
       'the coaching WhatsApp number (shown on the approved pages; waiting for a decision)',
-      '"Support pages follow" — no support pages follow these lessons',
+      ...(lesson.support ? [] : ['"Support pages follow" — no support pages follow this lesson']),
     ],
   };
   return { guide, report };

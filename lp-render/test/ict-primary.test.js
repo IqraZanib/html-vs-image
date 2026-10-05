@@ -22,6 +22,13 @@ const G3_ENGLISH = () => load('g3_u5_English_road_safety.lesson.json');
 const G2_MATHS = () => load('g2_u1_Maths_ordinal_numbers.lesson.json');
 const G4_URDU = () => load('g4_l4_Urdu_achhe_shehri.lesson.json');
 const ALL = [['Maths', MATHS], ['English', ENGLISH], ['Urdu', URDU], ['G3 English', G3_ENGLISH], ['G2 Maths', G2_MATHS], ['G4 Urdu', G4_URDU]];
+// the four newer approved Grades 1–5 lessons (2026-10-05: Science G4, GK G1, Islamiat G1, SST G5), rebuilt
+// field by field from the approved PDFs — their lp_doc JSON is not reachable from here
+const SCIENCE = () => load('g4_ch8_Science_seg2.lesson.json');
+const GK = () => load('g1_ch1_GK_seg1.lesson.json');
+const ISLAMIAT = () => load('g1_ch4_Islamiat_seg6.lesson.json');
+const SST = () => load('g5_ch2_SST_seg3.lesson.json');
+const REBUILT = [['G4 Science', SCIENCE], ['G1 GK', GK], ['G1 Islamiat', ISLAMIAT], ['G5 SST', SST]];
 const compose = (doc) => composePrimary(buildGuideFromPrimary(doc).guide);
 // the page's words, as a reader sees them: tags off, entities decoded, spaces collapsed
 const words = (html) => html.replace(/<style[\s\S]*?<\/style>/g, ' ').replace(/<[^>]+>/g, ' ')
@@ -53,7 +60,7 @@ test('a lesson the page cannot lay out is refused, not printed with parts missin
 });
 
 test('nothing the lesson says is dropped: every text prints on the page', () => {
-  for (const [name, doc] of ALL) {
+  for (const [name, doc] of [...ALL, ...REBUILT]) {
     const lesson = doc();
     const page = words(compose(lesson).bodyHtml);
     for (const s of printedTexts(lesson)) {
@@ -169,6 +176,34 @@ test('only the Grades 1–5 page names its own page layout; everything else in t
   assert.ok(!/\.ictp\b/.test(c.headCss) && /\.ictq\b/.test(c.headCss), 'its style sits under .ictq only');
 });
 
+test('the four rebuilt lessons are valid, say how they were made, and draw no person where a revered figure could be meant', () => {
+  for (const [name, doc] of REBUILT) {
+    const lesson = doc();
+    const { guide, report } = buildGuideFromPrimary(lesson);
+    assert.deepStrictEqual(guide.images, [], `${name}: nothing to buy`);
+    assert.deepStrictEqual(report.stages, ['opening', 'explanation', 'we_do', 'you_do', 'check', 'homework']);
+    assert.match(lesson.source.method, /^REBUILT: /, `${name}: labelled as rebuilt, not as pipeline data`);
+    assert.match(lesson.source.method, /not the real pipeline JSON/, name);
+  }
+  // the festivals drawing (SST) is a crescent over a mosque and a flag: no face, no skin
+  const f = art.draw({ type: 'festivals', circles: ['عید کا دن', 'آزادی کا دن'] });
+  assert.ok(f.includes('>عید کا دن<') && f.includes('>آزادی کا دن<'), 'the circles carry the lesson\'s own words');
+  assert.ok(!f.includes('#E0A97E') && !f.includes('#C98C5E'), 'no person drawn');
+});
+
+test('the newer approved pieces: a chart card, the board at the end of the lesson, a word on each flow arrow, Urdu digits', () => {
+  const s = compose(SST()).bodyHtml;
+  assert.strictEqual((s.match(/class="q-figcard"/g) || []).length, 3, 'the end-of-lesson board, the comparison and the step-by-step chart');
+  assert.ok(/<table class="q-track"/.test(s) && !/مذہبی تہوار\|قومی تہوار/.test(words(s)), 'the board\'s festival table is a real table');
+  assert.ok(words(s).indexOf('کامیابی کا معیار') < words(s).indexOf('جانچ فہرست') && s.indexOf('q-track') > s.indexOf('کامیابی کا معیار'), 'the table sits where the approved board has it: after the success criterion');
+  assert.strictEqual((s.match(/<span class="q-flow-ar"><small dir="rtl">پھر<\/small>←<\/span>/g) || []).length, 2, 'each flow arrow carries its word and points right to left');
+  assert.ok(s.includes('data-digits="urdu"') && /جماعت ۵ · /.test(s) && s.includes('۴۰ منٹ') && /class="q-step on">۳</.test(s), 'Urdu digits on grade, minutes and steps');
+  const u = compose(URDU()).bodyHtml;
+  assert.ok(!u.includes('data-digits') && /q-step on">\d/.test(u), 'a lesson that does not ask for Urdu digits keeps its digits');
+  const bad = SST(); bad.stages[1].blocks.find((b) => b.type === 'figure').visual = { type: 'volcano' };
+  assert.throws(() => buildGuideFromPrimary(bad), /no drawing for picture type "volcano"/);
+});
+
 // ── the page printer ─────────────────────────────────────────────────────────────────────
 const mediaBoxes = (pdf) => [...pdf.toString('latin1').matchAll(/\/MediaBox\s*\[\s*0 0 ([\d.]+) ([\d.]+)\s*\]/g)].map((m) => [Number(m[1]), Number(m[2])]);
 
@@ -217,21 +252,36 @@ for (const [name, doc, lang] of [['Grade 1 Maths', MATHS, 'en'], ['Grade 2 Urdu'
   });
 }
 
+test('Grade 5 SST prints like its approved PDF: 8 pages, the teacher-support page on its own, pages numbered in Urdu', { timeout: 120000 }, async () => {
+  const { renderLessonImage } = require('../pipeline');
+  const { guide } = buildGuideFromPrimary(SST());
+  const r = await renderLessonImage(guide, { apiKey: '', pdf: true, log: () => {} });
+  const boxes = mediaBoxes(r.pdf);
+  assert.strictEqual(boxes.length, 8, 'as many pages as the approved PDF');
+  assert.deepStrictEqual(r.overflow, []);
+  assert.strictEqual(r.stats.generated, 0, 'nothing bought');
+  const pages = r.html.split('<section class="qpg"').slice(1);
+  assert.ok(pages[0].includes('صفحہ ۱ از ۸') && pages[7].includes('صفحہ ۸ از ۸'), 'page N of M in Urdu digits');
+  assert.ok(/<div class="q-p2">/.test(pages[7]) && !/<div class="q-p2">/.test(pages[6]), 'the support page starts a page of its own');
+});
+
 // TEACHER FEEDBACK (2026-10-05): no word of the lesson is coloured. Colour marks structure — a stage
 // bar, a card, a label, a chip, a picture — and every word of the lesson itself reads in plain ink,
 // in English and in Urdu. Checked in the browser on every text the page prints.
-test('teacher rule: every word of the lesson reads in plain ink; colour is for structure only (all six lessons)', { timeout: 180000 }, async () => {
+test('teacher rule: every word of the lesson reads in plain ink; colour is for structure only (all ten lessons)', { timeout: 240000 }, async () => {
   const { chromium } = require('playwright-core');
   const br = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] });
   try {
     const page = await br.newPage({ viewport: { width: 520, height: 1200 } });
-    for (const [name, doc] of ALL) {
+    for (const [name, doc] of [...ALL, ...REBUILT]) {
       const c = compose(doc());
       await page.setContent(`<!doctype html><html><head><meta charset="utf-8"><style>${c.headCss}</style></head><body>${c.bodyHtml}</body></html>`);
       const bad = await page.evaluate(() => {
         // structure: dark cards in white type, labels, chips, pills, bars, numbers, pictures, chrome
         const STRUCT = '.q-hero,.q-today,.q-hook,.q-coach,.q-bar,.q-pill,.q-cap,.q-lbl,.q-n,.q-tag,.q-ref,.q-who,.q-sayl,.q-kw-w,'
-          + '.q-panel-t,.q-panel-n,.q-board-h,.q-step,.q-steps,.q-pz,.q-ev,.q-evn,.q-arrow,.q-track th,.q-deed,.q-chrome,svg,figure,.q-video-t';
+          + '.q-panel-t,.q-panel-n,.q-board-h,.q-step,.q-steps,.q-pz,.q-ev,.q-evn,.q-arrow,.q-track th,.q-deed,.q-chrome,svg,figure,.q-video-t,'
+          // the newer lessons' chart headings and arrow words, the support page's subject line and card labels
+          + '.q-cmp-h,.q-flow-ar,.q-p2k,.q-p2l,.q-key-l';
         const ink = getComputedStyle(document.querySelector('.ictq')).getPropertyValue('--ink').trim();
         const probe = document.createElement('span'); probe.style.color = ink; document.body.append(probe);
         const INK = getComputedStyle(probe).color; probe.remove();
