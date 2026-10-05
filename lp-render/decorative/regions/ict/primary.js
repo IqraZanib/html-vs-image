@@ -97,6 +97,9 @@ function composePrimary(guide) {
   const pill = (s, cls, icon = '') => (s ? `<span class="q-pill ${cls}">${icon ? `<span class="q-pill-ic">${icon}</span>` : ''}${lab(s)}</span>` : '');
   const minutes = (n) => (n ? L.min.replace('{n}', n) : '');
   const ARROW = rtl ? '←' : '→';
+  // AN ANSWER: a green tick badge (structure) before it; the answer's own words stay in plain ink.
+  // Teachers asked that no word of a lesson be coloured: colour marks structure, never words.
+  const answer = (a) => `<span class="q-ansgrp"><span class="q-ansb" aria-hidden="true">${ICON.check()}</span><b class="q-ans">${rich(a)}</b></span>`;
   const out = [];
   const add = (stage, html, attrs = '') => out.push(`<div class="q-blk"${stage ? ` data-stage="${stage}"` : ''}${attrs ? ` ${attrs}` : ''}>${html}</div>`);
   const counts = { visuals: 0 };
@@ -167,7 +170,7 @@ function composePrimary(guide) {
       switch (b.type) {
         case 'warmup':
           add(sid, `<div class="q-warm"><div class="q-lbl" data-first-only>${ICON.warmup()} ${lab(L.warmup)}</div><div class="units">${b.items.map((it, i) => `<div class="q-wi" data-units>`
-            + `<span dir="${dir(it.q)}"><b class="q-n">${i + 1}.</b> ${rich(it.q)} <b class="q-ans">${ARROW} ${rich(it.a)}</b></span>${it.tag ? `<span class="q-tag">${esc(it.tag)}</span>` : ''}</div>`).join('')}</div></div>`, 'data-split');
+            + `<span dir="${dir(it.q)}"><b class="q-n">${i + 1}.</b> ${rich(it.q)} ${answer(it.a)}</span>${it.tag ? `<span class="q-tag">${esc(it.tag)}</span>` : ''}</div>`).join('')}</div></div>`, 'data-split');
           break;
         case 'setup':
           add(sid, `<div class="q-lbl">${ICON.setup()} ${lab(L.setup)}</div>`, 'data-keep');
@@ -199,7 +202,7 @@ function composePrimary(guide) {
             units.push(`<div class="q-sub" data-units>${pill(L.together, 'blue big', ICON.group())}</div>`);
             for (const l of prevTogether.lines) units.push(`<div data-units><ul class="q-dots">${`<li>${T(l)}</li>`}</ul></div>`);
           }
-          units.push(`<div class="q-instr" data-units dir="${dir(b.instruction)}">▸ ${rich(b.instruction)}</div>`);
+          units.push(`<div class="q-instr" data-units dir="${dir(b.instruction)}"><span class="q-instr-m" aria-hidden="true"></span>${rich(b.instruction)}</div>`);
           if (b.visual) units.push(`<div data-units>${fig(b.visual, 'q-fig-tm')}</div>`);
           const quote = (arr) => (arr || []).forEach((l) => units.push(`<div class="q-lead" data-units dir="${dir(l)}">${rich(l)}</div>`));
           const script = (arr) => (arr || []).forEach((l) => units.push(`<div class="q-line" data-units dir="${dir(l)}">${rich(quoted(l))}</div>`));
@@ -246,7 +249,7 @@ function composePrimary(guide) {
               const pic = side ? `<div class="q-ifig">${draw(it.visual)}</div>` : '';
               const wide = it.visual && !side ? fig(it.visual, 'q-fig-item') : '';
               if (side) counts.visuals += 1;
-              const ans = it.answer ? `<div class="q-a" dir="${dir(it.answer)}"><b class="q-cap">${lab(it.sample ? L.sample : L.answer)}</b> ${rich(it.answer)}</div>` : '';
+              const ans = it.answer ? `<div class="q-a" dir="${dir(it.answer)}"><b class="q-cap q-a-cap"><span class="q-ansb" aria-hidden="true">${ICON.check()}</span>${lab(it.sample ? L.sample : L.answer)}</b> ${rich(it.answer)}</div>` : '';
               return `<div class="q-item${pic ? ' has-fig' : ''}" data-units><div class="q-item-q" dir="${dir(it.q)}"><b class="q-n">${i + 1}.</b> ${rich(it.q)} ${ref}</div>${pic}${wide}${ans}</div>`;
             }).join('')}</div></div>`, 'data-split');
           break;
@@ -259,7 +262,7 @@ function composePrimary(guide) {
           // a small picture (a clock, letter tiles) sits beside its question; a scene goes under it
           add(sid, `<div class="q-exit"><div class="q-cap">${ICON.ticket()} ${lab(L.exit)}</div>${b.items.map((it, i) => {
             const side = it.visual && SIDE.includes(it.visual.type);
-            const text = `<div class="q-exit-i" dir="${dir(it.q)}"><b class="q-n">${i + 1}.</b> ${rich(it.q)} <b class="q-ans">${ARROW} ${rich(it.criterion)}</b></div>`;
+            const text = `<div class="q-exit-i" dir="${dir(it.q)}"><b class="q-n">${i + 1}.</b> ${rich(it.q)} ${answer(it.criterion)}</div>`;
             if (side) { counts.visuals += 1; return `<div class="q-exit-row">${text}<div class="q-ifig">${draw(it.visual)}</div></div>`; }
             return text + (it.visual ? fig(it.visual, 'q-fig-exit') : '');
           }).join('')}</div>`);
@@ -357,20 +360,20 @@ html:not(.lp-print) .qpg{box-shadow:0 0 0 1px #d9dbe1,0 6px 20px rgba(30,32,48,.
 .q-today-t{font-size:25px;line-height:1.3;font-weight:700}
 .q-today-t[dir="rtl"]{line-height:1.9}
 .q-two{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.q-journey{background:var(--mint);border:1.5px solid var(--mint-bd);border-radius:9px;padding:9px 12px;color:var(--gtext)}
-.q-coming{background:var(--grey);border:1.5px solid var(--grey-bd);border-radius:9px;padding:9px 12px;color:var(--mut)}
+.q-journey{background:var(--mint);border:1.5px solid var(--mint-bd);border-radius:9px;padding:9px 12px;color:var(--ink)}
+.q-coming{background:var(--grey);border:1.5px solid var(--grey-bd);border-radius:9px;padding:9px 12px;color:var(--ink)}
 .q-journey .q-cap{color:var(--gtext)}.q-coming .q-cap{color:#4B5263}
-.q-outcome{background:var(--outcome);border-radius:9px;border-inline-start:6px solid var(--amber);padding:10px 14px 12px;color:#3D2C05}
+.q-outcome{background:var(--outcome);border-radius:9px;border-inline-start:6px solid var(--amber);padding:10px 14px 12px;color:var(--ink)}
 .q-outcome .q-cap{color:#8A5A00}
 .q-outcome-t{font-weight:600}
-.q-prepare{background:var(--mint);border:1.5px solid var(--mint-bd);border-radius:9px;padding:10px 14px 12px;color:var(--gtext)}
+.q-prepare{background:var(--mint);border:1.5px solid var(--mint-bd);border-radius:9px;padding:10px 14px 12px;color:var(--ink)}
 .q-prepare .q-cap{color:var(--gtext);margin-bottom:4px}
 .q-checks{display:flex;flex-wrap:wrap;gap:4px 16px;font-weight:600}
 .q-checks li{position:relative;padding-inline-start:28px}
 .q-checks li::before{content:"";position:absolute;inset-inline-start:0;top:.42em;width:17px;height:17px;border:2.5px solid var(--green);border-radius:6px;background:#fff}
 .q-checks li[dir="rtl"]::before,.q-checks li > [dir="rtl"]{}
 .ictq[dir="rtl"] .q-checks li::before{top:.7em}
-.q-video{background:var(--cream);border:1.5px solid var(--cream-bd);border-radius:9px;padding:10px 14px 12px;color:#7A5200}
+.q-video{background:var(--cream);border:1.5px solid var(--cream-bd);border-radius:9px;padding:10px 14px 12px;color:var(--ink)}
 .q-video-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
 .q-video-h .qic{width:26px;height:26px;vertical-align:-6px;align-self:center}
 .q-video-h .q-cap{color:#8A5A00}
@@ -434,7 +437,9 @@ html:not(.lp-print) .qpg{box-shadow:0 0 0 1px #d9dbe1,0 6px 20px rgba(30,32,48,.
 .q-dots > li::before{content:"";position:absolute;inset-inline-start:6px;top:.62em;width:8px;height:8px;border-radius:50%;background:var(--navy)}
 .ictq[dir="rtl"] .q-dots > li::before{top:.95em}
 .q-n{color:#8A5A00;font-weight:700}
-.q-ans{color:#2A7A4E;font-weight:700}
+.q-ans{color:var(--ink);font-weight:700}
+.q-ansgrp{white-space:nowrap}.q-ansgrp .q-ans{white-space:normal}
+.q-ansb{display:inline-flex;vertical-align:-3px;margin-inline-end:5px}.q-ansb .qic{width:19px;height:19px;vertical-align:0}
 .q-tag{display:block;text-align:end;font-size:15px;font-weight:700;color:var(--mut);margin-top:-2px}
 /* ── opening ── */
 .q-warm{border:1.5px solid var(--grey-bd);border-radius:9px;padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px}
@@ -462,20 +467,21 @@ html:not(.lp-print) .qpg{box-shadow:0 0 0 1px #d9dbe1,0 6px 20px rgba(30,32,48,.
 .q-card-yd{background:var(--mint);border:1.5px solid var(--mint-bd)}
 .q-card-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .q-sub{display:flex}
-.q-instr{color:#1E6B45;font-weight:700}
-.q-lead{font-weight:700;border-inline-start:3px solid #B9C7DB;padding-inline-start:12px;margin:4px 0;color:#2B3245}
-.q-line{color:#2B3245}
+.q-instr{color:var(--ink);font-weight:700;position:relative;padding-inline-start:20px}
+.q-instr-m{position:absolute;inset-inline-start:2px;top:.5em;width:0;height:0;border-block:6px solid transparent;border-inline-start:9px solid var(--green)}
+.q-lead{font-weight:700;border-inline-start:3px solid #B9C7DB;padding-inline-start:12px;margin:4px 0;color:var(--ink)}
+.q-line{color:var(--ink)}
 .q-frame{display:flex;gap:10px;align-items:flex-start;background:#fff;border:2px dashed #B9C7DB;border-radius:9px;padding:8px 12px;margin-top:4px}
 .q-frame .qic{margin-top:6px}
-.q-wstep{color:#2B3245}
+.q-wstep{color:var(--ink)}
 .q-ask{border-top:1.5px solid var(--cream-bd);padding-top:8px;margin-top:4px}
 .q-ask .q-cap{color:#8A5A00}
 .q-fig-worked{background:#fff;border-radius:9px;padding:8px}
-.q-mis{background:var(--mint);border:1.5px solid var(--mint-bd);border-radius:9px;padding:9px 12px;color:#1E6B45}
+.q-mis{background:var(--mint);border:1.5px solid var(--mint-bd);border-radius:9px;padding:9px 12px;color:var(--ink)}
 .q-mis .q-cap{color:#1E6B45}
-.q-half{display:flex;gap:8px;align-items:flex-start;color:#3B4152}
+.q-half{display:flex;gap:8px;align-items:flex-start;color:var(--ink)}
 .q-half .qic{margin-top:5px}
-.q-sayl{color:var(--green)}
+.q-sayl{display:inline-block;background:var(--green);color:#fff;border-radius:6px;padding:0 7px;font-size:16px;line-height:1.5;vertical-align:1px}
 .q-item{border-bottom:1px solid var(--mint-bd);padding:6px 0 8px;display:grid;grid-template-columns:1fr;gap:4px}
 .q-item:last-child{border-bottom:0}
 .q-item.has-fig{grid-template-columns:1fr auto;grid-template-areas:"q f" "a a"}
@@ -487,8 +493,8 @@ html:not(.lp-print) .qpg{box-shadow:0 0 0 1px #d9dbe1,0 6px 20px rgba(30,32,48,.
 .q-item.has-fig .q-fig-item{grid-column:1/-1}
 .q-fig-item{background:#fff;border-radius:12px;padding:6px;margin:2px 0}
 .q-ref{display:inline-flex;align-items:center;font-size:15px;font-weight:700;color:var(--mut);background:#fff;border-radius:999px;padding:0 8px;box-shadow:inset 0 0 0 1.5px var(--mint-bd)}
-.q-a{border-inline-start:3px solid #8FD1AE;padding-inline-start:12px;color:#1E7A4A;font-weight:700}
-.q-a .q-cap{color:#1E6B45;font-size:15px}
+.q-a{border-inline-start:3px solid #8FD1AE;padding-inline-start:12px;color:var(--ink);font-weight:600}
+.q-a .q-cap{color:#1E6B45;font-size:15px}.q-a-cap .q-ansb{margin-inline-end:4px}.q-a-cap .q-ansb .qic{width:16px;height:16px}
 .q-diff{border:1.5px solid var(--grey-bd);border-radius:9px;padding:9px 12px 11px;background:#fff}
 .q-diff .q-cap{color:#3B4152;display:flex;align-items:center;gap:6px}
 .q-fig-early{margin-top:8px}

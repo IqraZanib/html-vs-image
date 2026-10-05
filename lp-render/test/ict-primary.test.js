@@ -216,3 +216,40 @@ for (const [name, doc, lang] of [['Grade 1 Maths', MATHS, 'en'], ['Grade 2 Urdu'
     assert.ok(r.html.includes(lang === 'ur' ? `صفحہ 1 از ${total}` : `page 1 of ${total}`), 'page N of M');
   });
 }
+
+// TEACHER FEEDBACK (2026-10-05): no word of the lesson is coloured. Colour marks structure — a stage
+// bar, a card, a label, a chip, a picture — and every word of the lesson itself reads in plain ink,
+// in English and in Urdu. Checked in the browser on every text the page prints.
+test('teacher rule: every word of the lesson reads in plain ink; colour is for structure only (all six lessons)', { timeout: 180000 }, async () => {
+  const { chromium } = require('playwright-core');
+  const br = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] });
+  try {
+    const page = await br.newPage({ viewport: { width: 520, height: 1200 } });
+    for (const [name, doc] of ALL) {
+      const c = compose(doc());
+      await page.setContent(`<!doctype html><html><head><meta charset="utf-8"><style>${c.headCss}</style></head><body>${c.bodyHtml}</body></html>`);
+      const bad = await page.evaluate(() => {
+        // structure: dark cards in white type, labels, chips, pills, bars, numbers, pictures, chrome
+        const STRUCT = '.q-hero,.q-today,.q-hook,.q-coach,.q-bar,.q-pill,.q-cap,.q-lbl,.q-n,.q-tag,.q-ref,.q-who,.q-sayl,.q-kw-w,'
+          + '.q-panel-t,.q-panel-n,.q-board-h,.q-step,.q-steps,.q-pz,.q-ev,.q-evn,.q-arrow,.q-track th,.q-deed,.q-chrome,svg,figure,.q-video-t';
+        const ink = getComputedStyle(document.querySelector('.ictq')).getPropertyValue('--ink').trim();
+        const probe = document.createElement('span'); probe.style.color = ink; document.body.append(probe);
+        const INK = getComputedStyle(probe).color; probe.remove();
+        const out = [];
+        const tw = document.createTreeWalker(document.querySelector('.q-src'), NodeFilter.SHOW_TEXT);
+        let n;
+        while ((n = tw.nextNode())) {
+          const t = n.textContent.trim();
+          if (!/[A-Za-z؀-ۿ]{2}/.test(t)) continue;
+          const el = n.parentElement;
+          if (el.closest(STRUCT)) continue;
+          const col = getComputedStyle(el).color;
+          if (col !== INK) out.push(`${col} «${t.slice(0, 40)}» in .${[...el.classList].join('.') || el.tagName}`);
+        }
+        return out;
+      });
+      assert.deepStrictEqual(bad, [], `${name}: lesson words in a colour of their own`);
+      assert.ok(!/class="q-ans"[^>]*>\s*[→←]/.test(c.bodyHtml), `${name}: an answer is marked by a tick badge, not a coloured arrow`);
+    }
+  } finally { await br.close(); }
+});

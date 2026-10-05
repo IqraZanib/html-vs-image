@@ -188,6 +188,21 @@ lesson's. **Fixed from the approved pages:** a teacher
 line split at "p."; a clock drawn in text characters; the leaked key "model_solution:"; "(avatar)";
 a text table of pipes; Urdu arrows that pointed against the reading direction.
 
+**Teacher rule (2026-10-05): no word of the lesson is coloured.** Every word of the lesson reads
+in plain ink (`--ink`), in English and in Urdu. Colour marks structure only: stage bars, card
+backgrounds and borders, labels, chips and pills, numbers, pictures. This is where the page differs
+from the approved one, which printed answers, the teacher's instruction and some card text in green
+or brown:
+- An answer (warm-up, exit ticket) is marked by a green tick badge, not by a coloured arrow and words.
+- The "Answer" / "Sample answer" labels carry the same tick.
+- The teacher's instruction keeps its weight, with a green ▸ marker before it.
+- "Say:" is a small green chip.
+- The journey, coming-up, outcome, to-prepare, video and mistakes cards keep their colours; their
+  words are ink.
+The word-building board (syllable tiles, arrows, a line to write the word) and the other pictures are
+unchanged. `ict-primary.test.js` checks in the browser that every word the page prints, outside a
+label, chip, bar or picture, is ink, for all six lessons. The test fails when an answer turns green.
+
 **Not printed:** the coaching WhatsApp number (waiting for a decision, as for grades 6–12), and
 "Support pages follow" (no support pages follow these lessons).
 
