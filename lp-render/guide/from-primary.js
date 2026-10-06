@@ -61,7 +61,7 @@ function printedTexts(lesson) {
   if (lesson.video) out.push(lesson.video.title, lesson.video.note);
   for (const k of lesson.keywords) out.push(k.word, k.local, k.note, k.meaning);
   for (const b of lesson.board) { if (b.title) out.push(b.title); out.push(b.note); if (!b.drawn) out.push(...(b.lines || [])); out.push(...visualTexts(b.visual)); }
-  if (lesson.board_end) out.push(lesson.board_end.label, ...visualTexts(lesson.board_end.visual));
+  if (lesson.board_end) out.push(lesson.board_end.label, lesson.board_end.note, ...visualTexts(lesson.board_end.visual));
   for (const st of lesson.stages) {
     out.push(st.label);
     for (const b of st.blocks) {

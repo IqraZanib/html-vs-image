@@ -33,6 +33,9 @@ const REBUILT = [['G4 Science', SCIENCE], ['G1 GK', GK], ['G1 Islamiat', ISLAMIA
 const { lessonFromSlideScript } = require('../guide/from-slide-script');
 const script = (f) => () => lessonFromSlideScript(JSON.parse(fs.readFileSync(path.join(FX, 'slide-scripts', f), 'utf8')));
 const PIPELINE = [['G2 Maths (ICT slide script)', script('grade_2_math_ch1_seg1.slide_script.json')], ['G3 Maths (ICT slide script)', script('grade_3_math_ch1_seg1.slide_script.json')]];
+// and one from ICT's HTML path for Grades 1–5: its own lp_doc 3.0 (G1 GK, Urdu)
+const { lessonFromLpDocPrimary } = require('../guide/from-lpdoc-primary');
+PIPELINE.push(['G1 GK (ICT lp_doc)', () => lessonFromLpDocPrimary(JSON.parse(fs.readFileSync(path.join(FX, 'lp-doc', 'GK_g1_seg2.ur.lp.json'), 'utf8')))]);
 const compose = (doc) => composePrimary(buildGuideFromPrimary(doc).guide);
 // the page's words, as a reader sees them: tags off, entities decoded, spaces collapsed
 const words = (html) => html.replace(/<style[\s\S]*?<\/style>/g, ' ').replace(/<[^>]+>/g, ' ')
@@ -272,7 +275,7 @@ test('Grade 5 SST prints like its approved PDF: 8 pages, the teacher-support pag
 // TEACHER FEEDBACK (2026-10-05): no word of the lesson is coloured. Colour marks structure — a stage
 // bar, a card, a label, a chip, a picture — and every word of the lesson itself reads in plain ink,
 // in English and in Urdu. Checked in the browser on every text the page prints.
-test('teacher rule: every word of the lesson reads in plain ink; colour is for structure only (all twelve lessons)', { timeout: 240000 }, async () => {
+test('teacher rule: every word of the lesson reads in plain ink; colour is for structure only (all thirteen lessons)', { timeout: 240000 }, async () => {
   const { chromium } = require('playwright-core');
   const br = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] });
   try {

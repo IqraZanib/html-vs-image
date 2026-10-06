@@ -25,6 +25,7 @@ const { execFileSync } = require('node:child_process');
 const { buildGuideFromLpDoc, isLpDoc } = require('../lp-render/guide/from-lpdoc');
 const { buildGuideFromPrimary, isPrimaryLesson } = require('../lp-render/guide/from-primary');
 const { isSlideScript, lessonFromSlideScript } = require('../lp-render/guide/from-slide-script');
+const { isPrimaryLpDoc, lessonFromLpDocPrimary } = require('../lp-render/guide/from-lpdoc-primary');
 const { renderLessonImage } = require('../lp-render/pipeline');
 
 function parseArgs(argv) {
@@ -49,8 +50,12 @@ function parseArgs(argv) {
   let doc = JSON.parse(fs.readFileSync(src, 'utf8'));
   // ICT's own Grades 1–5 slide script (Stage D0 of its K-5 pipeline) is turned into a Grades 1–5
   // lesson file first; the converted file is written beside the PDF so it can be read
+  // A Grades 1–5 lp_doc (ICT's HTML path for Grades 1–5) is drawn on the Grades 1–5 page, not the
+  // grades 6–12 one; it too is converted first and the converted file written beside the PDF
   const fromScript = isSlideScript(doc);
+  const fromK5Doc = !fromScript && isPrimaryLpDoc(doc);
   if (fromScript) doc = lessonFromSlideScript(doc, { origin: origin || `ICT Grades 1–5 slide script ${path.basename(src)}`, chapter });
+  if (fromK5Doc) doc = lessonFromLpDocPrimary(doc, { origin: origin || `ICT Grades 1–5 lp_doc ${path.basename(src)}` });
   const primary = isPrimaryLesson(doc);
   if (!primary && !isLpDoc(doc)) throw new Error(`${src} is neither an ICT lp_doc (no sections[].blocks with provenance/page2) nor an ict-primary-lesson file`);
 
@@ -65,7 +70,7 @@ function parseArgs(argv) {
   fs.writeFileSync(`${base}.html`, r.html);   // the HTML + SVG page itself; open it in any browser
   fs.writeFileSync(`${base}.guide.json`, JSON.stringify(guide, null, 2));
   fs.writeFileSync(`${base}.report.json`, JSON.stringify(report, null, 2));
-  if (fromScript) fs.writeFileSync(`${base}.lesson.json`, `${JSON.stringify(doc, null, 2)}\n`);
+  if (fromScript || fromK5Doc) fs.writeFileSync(`${base}.lesson.json`, `${JSON.stringify(doc, null, 2)}\n`);
 
   const pages = (r.pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
   // each page as a vector SVG (text as outlines, so it looks the same anywhere)

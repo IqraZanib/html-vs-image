@@ -73,6 +73,23 @@ Printed as written, including four places where ICT's own text is wrong or cut s
 - G3: the "thousands place" meaning ends in "…";
 - G3: the slip's fix stops mid-sentence ("…so the place, not the digit").
 
+## ICT's HTML path: `lp-doc/`
+
+`lp-doc/GK_g1_seg2.ur.lp.json` is ICT's own Grades 1–5 lp_doc 3.0 for
+GRADE_1_GENERAL_KNOWLEDGE_CH1_SEG2. It is copied byte for byte from NIETE-Rumi `sandbox`,
+`bot/tests/fixtures/lp-v9/GK_g1_seg2.ur.lp.json` (commit b65f97d6, 5 Oct; Amena's v16/v17 revision).
+It is the only Grades 1–5 lp_doc reachable from here.
+
+```
+npm run render:ict -- lp-render/fixtures/ict-primary/lp-doc/GK_g1_seg2.ur.lp.json
+#   -> drawn on the Grades 1–5 page by lp-render/guide/from-lpdoc-primary.js (converted .lesson.json beside it)
+```
+
+What the document still marks "یہ حصہ ابھی تیار نہیں ہوا" (not ready yet) is left off the page and
+reported: `page2.differentiation.barrier`, `page2.model_answers` and `objectives.items`.
+
+The chapter line prints as the document gives it (`Ch.1 · میرا تعارف`).
+
 ## What a file holds
 
 The approved page's fields, in its order: `title`, `chapter`, `pages`, `period_minutes`, `day`,

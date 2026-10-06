@@ -158,7 +158,7 @@ function composePrimary(guide) {
   // ── START ───────────────────────────────────────────────────────────────────────────────
   const subj = lesson.subject;
   const kicker = rtl ? `${L.grade} ${N(lesson.grade)} · ${subj.toUpperCase()}` : `Grade ${lesson.grade} · ${subj}`;
-  const where = `${L.p}${rtl ? ' ' : ''}${lesson.pages} · <b>${esc(minutes(lesson.period_minutes))}</b>`;
+  const where = `${L.p}${rtl ? ' ' : ''}${N(lesson.pages)} · <b>${esc(minutes(lesson.period_minutes))}</b>`;
   add('start', `<header class="q-hero"><div class="q-hero-top"><span class="q-kick">${lab(kicker)}</span><span class="q-where">${where}</span></div>`
     + `<div class="q-hero-main"><div class="q-hero-text">${T(lesson.title, 'h1')}${T(lesson.chapter, 'div', 'q-chap')}</div>`
     + `${lesson.hero_visual ? `<div class="q-hero-badge">${heroBadge(lesson.hero_visual)}</div>` : ''}</div></header>`);
@@ -178,7 +178,7 @@ function composePrimary(guide) {
   }
   if (lesson.keywords.length) add('start', `<div class="q-kw"><div class="q-kw-h" data-first-only>${ICON.key()}<span class="q-cap">${lab(L.keywords)}</span></div>`
     + `<div class="q-kw-t units">${lesson.keywords.map((k) => `<div class="q-kw-r" data-units>${k.local || k.note ? `<div class="q-kw-w">${T(k.word, 'div')}${k.local ? T(k.local, 'div', 'q-kw-loc') : ''}${k.note ? T(k.note, 'div', 'q-kw-note') : ''}</div>` : T(k.word, 'div', 'q-kw-w')}${T(k.meaning, 'div', 'q-kw-m')}</div>`).join('')}</div></div>`, 'data-split');
-  add('start', `<div class="q-board"><div class="q-board-h" data-first-only>${ICON.board()} ${lab(L.board)}</div><div class="q-board-b units">${lesson.board.map((b, i) => {
+  if (lesson.board.length) add('start', `<div class="q-board"><div class="q-board-h" data-first-only>${ICON.board()} ${lab(L.board)}</div><div class="q-board-b units">${lesson.board.map((b, i) => {
     // an English line that carries Urdu words (a bilingual glossary) gets Nastaliq's taller line
     const lines = b.drawn ? [] : b.lines.map((l) => T(l, 'div', !rtl && AR.test(l) ? 'q-board-l q-mix' : 'q-board-l'));
     // the picture goes where the approved board has it: first, or after its first `visual_after` lines
@@ -188,7 +188,7 @@ function composePrimary(guide) {
   // the board as it should look at the end of the lesson (the newer approved lessons): its own card
   if (lesson.board_end) {
     add('start', `<div class="q-lbl">${ICON.board()} ${lab(lesson.board_end.label)}</div>`, 'data-keep');
-    add('start', `<div class="q-figcard">${fig(lesson.board_end.visual, 'q-fig-card')}</div>`);
+    add('start', `<div class="q-figcard">${lesson.board_end.note ? T(lesson.board_end.note, 'div', 'q-board-note') : ''}${fig(lesson.board_end.visual, 'q-fig-card')}</div>`);
   }
 
   // ── STAGES ──────────────────────────────────────────────────────────────────────────────
@@ -373,7 +373,7 @@ function composePrimary(guide) {
   // THE TEACHER-SUPPORT PAGES (newer approved lessons): the homework answered in full, on a page of their own
   if (lesson.support) {
     add('close', `<div class="q-follow" dir="${dir(L.supportFollow)}">${esc(L.supportFollow)}</div>`);
-    const kick = rtl ? `${L.grade} ${N(lesson.grade)} ${subj} · ${L.p} ${lesson.pages}` : `Grade ${lesson.grade} ${subj} · ${L.p} ${lesson.pages}`;
+    const kick = rtl ? `${L.grade} ${N(lesson.grade)} ${subj} · ${L.p} ${N(lesson.pages)}` : `Grade ${lesson.grade} ${subj} · ${L.p} ${lesson.pages}`;
     add('support', `<div class="q-p2"><div class="q-p2r"><span class="q-pill navy big">${ICON.clipboard()}${lab(L.support)}</span><span class="q-p2k">${lab(kick)}</span></div>${T(lesson.title, 'div', 'q-p2-t')}</div>`, 'data-newpage data-keep');
     lesson.support.sections.forEach((sec, si) => {
       add('support', `<div class="q-p2h"><b class="q-p2l">${esc(sec.letter || String.fromCharCode(65 + si))}</b>${T(sec.heading, 'span', 'q-p2n')}</div>`, 'data-keep');
@@ -383,7 +383,7 @@ function composePrimary(guide) {
 
   // the page chrome the page printer clones onto every page
   const footLine = rtl
-    ? `${L.grade} ${N(lesson.grade)} · ${subj} · ${lesson.chapter} · ${L.pp} ${lesson.pages}`
+    ? `${L.grade} ${N(lesson.grade)} · ${subj} · ${lesson.chapter} · ${L.pp} ${N(lesson.pages)}`
     : `Grade ${lesson.grade} ${subj} · ${lesson.chapter} · ${L.pp} ${lesson.pages}`;
   const chrome = `<div class="q-chrome" hidden><div class="q-run"><b dir="${dir(lesson.title)}">${esc(lesson.title)}</b><span class="q-run-c">· ${lab(L.continued)}</span></div>`
     + `<footer class="q-foot"><div dir="${dir(footLine)}">${esc(footLine)}</div><div class="q-pno"></div></footer></div>`;

@@ -263,6 +263,40 @@ New optional page pieces (the ten existing lessons print exactly as before):
 - behind/ahead tasks with answers;
 - an exit option's Roman-Urdu line and MCQ choices.
 
+**ICT's HTML path for Grades 1–5: the lp_doc itself (2026-10-06).**
+
+ICT also has an HTML path for Grades 1–5, beside the image path. The flow is:
+- enrichment → a lesson written as **lp_doc 3.0** (the grades 6–12 format);
+- → ICT's own lp-v9 renderer (HTML/CSS/SVG, a phone page) → PDF.
+
+The newer approved references (v17) come from it.
+
+What is still missing:
+- The step that turns ICT's Grades 1–5 enrichment into lp_doc has **not been found in any reachable
+  repo**: not in NIETE-Rumi (main, staging, sandbox), the skills pack (any branch) or the curriculum
+  explorer.
+- So existing lp_docs can be tested now, but authoring new Grades 1–5 lessons automatically is not
+  yet traced.
+- The only reachable Grades 1–5 lp_doc is ICT's own `GK_g1_seg2.ur.lp.json` (NIETE-Rumi sandbox,
+  5 Oct). It is copied here unchanged in `fixtures/ict-primary/lp-doc/`.
+
+`lp-render/guide/from-lpdoc-primary.js` draws a Grades 1–5 lp_doc on **our Grades 1–5 page**, not the
+grades 6–12 one. Before this, a grade 1 lp_doc came out in the 6–12 production design.
+- Each part goes where the approved v17 pages put it: board, opening, core idea, solved example
+  with its CFU, charts, mistakes, We Do, You Do, differentiation, remember, exit ticket, homework,
+  coaching, and the support page.
+- Every printed word is the document's own, and lesson words are in ink.
+- Against ICT's own renderer on the same file, this:
+  - draws the core-idea box, which ICT's sandbox renderer skips;
+  - prints list fields as sentences, where ICT joins them with commas;
+  - leaves "یہ حصہ ابھی تیار نہیں ہوا" (not ready yet) slots off the page and reports them;
+  - fits every page, where ICT's overflows one page by 126 px.
+- ICT's panels and flow diagrams become the page's own comparison and step-by-step cards. Any other
+  diagram type is refused.
+- The page number now follows the lesson's digits, so Urdu pages print it in Urdu.
+
+The twelve earlier Grades 1–5 lessons and grades 6–12 print exactly as before.
+
 **Not printed:** the coaching WhatsApp number (waiting for a decision, as for grades 6–12), and,
 in a lesson with no support pages, "Support pages follow".
 
