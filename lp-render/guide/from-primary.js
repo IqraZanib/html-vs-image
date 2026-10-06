@@ -14,14 +14,14 @@ const BLOCKS = {
   warmup: ['items'], setup: ['lines'], hook: ['text'], read_aloud: ['lines'], teacher_models: ['instruction'],
   worked: ['steps'], ask_this: [], mistakes: ['items'], halfway: ['text'], together: ['lines'], frames: ['lines'],
   set_task: ['lines'], alone: ['items'], differentiation: ['stuck', 'early'], exit: ['items'], homework: ['lines'],
-  concept: ['items'], remember: ['lines'], figure: ['label', 'visual'],
+  concept: ['items'], remember: ['lines'], figure: ['label', 'visual'], key_fact: ['lines'],
 };
 const VISUALS = {
   clock: ['time'], clock_pair: ['time'], scene: ['scene'], blender: ['parts', 'word'], blender_list: ['words'],
   blend_steps: ['steps'], tiles: ['parts'], predict: ['title', 'prompt'], dictionary: ['word', 'entry'],
   story_map: ['items'], tracker: ['columns', 'rows'], poster: ['items'],
   traffic_light: [], road_signs: ['signs'], road_sign: ['sign'], look_steps: ['steps'], ordinal_row: ['items'],
-  car_road: ['letters'], podium: ['places'], signboards: ['items'], deeds: ['items'], solar_system: [], compare: ['columns'], flow: ['items'], stairs: ['steps'], greeting: ['lines'], festivals: ['circles'],
+  car_road: ['letters'], podium: ['places'], signboards: ['items'], deeds: ['items'], solar_system: [], compare: ['columns'], flow: ['items'], stairs: ['steps'], greeting: ['lines'], festivals: ['circles'], place_value: ['number', 'heads'],
 };
 const SCENES = ['songbird', 'kite_tree', 'lake', 'crying_boy', 'pair_reading', 'bunty_home', 'bee_line', 'park_family', 'zebra_crossing'];
 const SIGNS = ['stop', 'parking', 'turn_left', 'no_cycling', 'hump', 'crossroads', 'children'];
@@ -39,6 +39,8 @@ function checkVisual(v, where, problems) {
   if ((v.type === 'clock' || v.type === 'clock_pair') && !/^\d{1,2}:\d{2}$/.test(String(v.time))) problems.push(`${where}: clock time "${v.time}" is not h:mm`);
   if (v.type === 'scene' && v.time != null && !/^\d{1,2}:\d{2}$/.test(String(v.time))) problems.push(`${where}: clock time "${v.time}" is not h:mm`);
   if (v.type === 'poster') for (const it of v.items || []) if (!/^\d{1,2}:\d{2}$/.test(String(it.time))) problems.push(`${where}: poster time "${it.time}" is not h:mm`);
+  // an empty number is the empty chart (the board before the lesson fills it)
+  if (v.type === 'place_value' && (!/^\d{0,4}$/.test(String(v.number)) || String(v.number).length > (v.heads || []).length)) problems.push(`${where}: place-value number "${v.number}" does not fit its ${(v.heads || []).length} places`);
   return 1;
 }
 
@@ -47,21 +49,26 @@ function checkVisual(v, where, problems) {
 // the words a drawn comparison, flow or table carries are the lesson's too
 const visualTexts = (v) => (!v ? [] : v.type === 'compare' ? [v.title, ...v.columns.flatMap((c) => [c.head, ...(c.lines || [])]), v.caption]
   : v.type === 'flow' ? [v.title, ...v.items.flatMap((c) => [c.head, ...(c.lines || [])]), v.arrow]
-    : v.type === 'tracker' ? [...v.columns, ...v.rows.flat()] : []);
+    : v.type === 'tracker' ? [...v.columns, ...v.rows.flat()]
+      : v.type === 'place_value' ? [...v.heads] : []);
 const list = (v) => (Array.isArray(v) ? v : v == null ? [] : [v]);
+// labelled sub-lines carry the lesson's words after their label
+const xs = (arr) => (arr || []).map((x) => x.text);
+// journey / coming up as a list: the page prints the next three
+const days = (v) => (Array.isArray(v) ? v.slice(0, 3).map((d) => (typeof d === 'string' ? d : d.topic)) : [v]);
 function printedTexts(lesson) {
-  const out = [lesson.title, lesson.chapter, lesson.journey, lesson.coming_up, lesson.outcome.code, lesson.outcome.text, ...(lesson.outcome.items || []), ...lesson.prepare];
+  const out = [lesson.title, lesson.today_note, lesson.chapter, ...days(lesson.journey), ...days(lesson.coming_up), lesson.outcome.code, lesson.outcome.text, ...(lesson.outcome.items || []), ...lesson.prepare];
   if (lesson.video) out.push(lesson.video.title, lesson.video.note);
-  for (const k of lesson.keywords) out.push(k.word, k.meaning);
-  for (const b of lesson.board) { if (b.title) out.push(b.title); if (!b.drawn) out.push(...(b.lines || [])); out.push(...visualTexts(b.visual)); }
+  for (const k of lesson.keywords) out.push(k.word, k.local, k.note, k.meaning);
+  for (const b of lesson.board) { if (b.title) out.push(b.title); out.push(b.note); if (!b.drawn) out.push(...(b.lines || [])); out.push(...visualTexts(b.visual)); }
   if (lesson.board_end) out.push(lesson.board_end.label, ...visualTexts(lesson.board_end.visual));
   for (const st of lesson.stages) {
     out.push(st.label);
     for (const b of st.blocks) {
       switch (b.type) {
-        case 'warmup': for (const it of b.items) out.push(it.q, it.a, ...(it.tag ? [it.tag] : [])); break;
-        case 'hook': case 'halfway': out.push(b.text); break;
-        case 'ask_this': out.push(...list(b.text), ...(b.items || [])); break;
+        case 'warmup': for (const it of b.items) out.push(it.q, it.a, ...xs(it.extras), ...(it.tag ? [it.tag] : [])); break;
+        case 'hook': case 'halfway': out.push(b.text, ...xs(b.extras)); break;
+        case 'ask_this': out.push(...list(b.text)); for (const it of b.items || []) out.push(...(typeof it === 'string' ? [it] : [it.q, ...xs(it.extras)])); break;
         case 'teacher_models':
           if (b.seq) for (const it of b.seq) { if (it.t) out.push(it.t); out.push(...visualTexts(it.v)); }
           else out.push(b.instruction, ...(b.lead || []), ...(b.script || []), ...(b.lead2 || []), ...(b.instruction2 ? [b.instruction2] : []), ...(b.script2 || []));
@@ -69,12 +76,13 @@ function printedTexts(lesson) {
         case 'concept': for (const it of b.items) out.push(it.lead, it.text); break;
         case 'remember': out.push(...b.lines); break;
         case 'figure': out.push(b.label); break;
-        case 'worked': out.push(...b.steps); break;
-        case 'mistakes': for (const m of b.items) out.push(m.pupil_says, m.you_ask); break;
+        case 'worked': out.push(b.label, b.problem, ...b.steps, b.answer); break;
+        case 'key_fact': out.push(...b.lines); break;
+        case 'mistakes': for (const m of b.items) out.push(m.pupil_says, m.why, m.you_ask); break;
         case 'set_task': out.push(...b.lines, ...(b.say ? [b.say] : [])); break;
-        case 'alone': for (const it of b.items) out.push(it.q, ...(it.ref ? [it.ref] : []), ...(it.answer ? [it.answer] : [])); break;
-        case 'differentiation': out.push(...list(b.stuck), ...list(b.early)); break;
-        case 'exit': for (const it of b.items) out.push(it.q, it.criterion); break;
+        case 'alone': for (const it of b.items) out.push(it.label, it.q, ...(it.ref ? [it.ref] : []), ...(it.answer ? [it.answer] : []), ...xs(it.extras)); break;
+        case 'differentiation': for (const v of [...list(b.stuck), ...list(b.early)]) out.push(...(typeof v === 'string' ? [v] : [v.q, v.answer, ...xs(v.extras)])); break;
+        case 'exit': for (const it of b.items) out.push(it.q, it.local, ...(it.choices || []), it.criterion, ...xs(it.extras)); out.push(...xs(b.extras)); break;
         default: out.push(...(b.lines || []));
       }
       out.push(...visualTexts(b.visual));

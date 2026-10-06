@@ -29,6 +29,10 @@ const GK = () => load('g1_ch1_GK_seg1.lesson.json');
 const ISLAMIAT = () => load('g1_ch4_Islamiat_seg6.lesson.json');
 const SST = () => load('g5_ch2_SST_seg3.lesson.json');
 const REBUILT = [['G4 Science', SCIENCE], ['G1 GK', GK], ['G1 Islamiat', ISLAMIAT], ['G5 SST', SST]];
+// two lessons straight from ICT's own Grades 1–5 pipeline: its Stage D0 slide scripts (G2, G3 Maths)
+const { lessonFromSlideScript } = require('../guide/from-slide-script');
+const script = (f) => () => lessonFromSlideScript(JSON.parse(fs.readFileSync(path.join(FX, 'slide-scripts', f), 'utf8')));
+const PIPELINE = [['G2 Maths (ICT slide script)', script('grade_2_math_ch1_seg1.slide_script.json')], ['G3 Maths (ICT slide script)', script('grade_3_math_ch1_seg1.slide_script.json')]];
 const compose = (doc) => composePrimary(buildGuideFromPrimary(doc).guide);
 // the page's words, as a reader sees them: tags off, entities decoded, spaces collapsed
 const words = (html) => html.replace(/<style[\s\S]*?<\/style>/g, ' ').replace(/<[^>]+>/g, ' ')
@@ -268,12 +272,12 @@ test('Grade 5 SST prints like its approved PDF: 8 pages, the teacher-support pag
 // TEACHER FEEDBACK (2026-10-05): no word of the lesson is coloured. Colour marks structure — a stage
 // bar, a card, a label, a chip, a picture — and every word of the lesson itself reads in plain ink,
 // in English and in Urdu. Checked in the browser on every text the page prints.
-test('teacher rule: every word of the lesson reads in plain ink; colour is for structure only (all ten lessons)', { timeout: 240000 }, async () => {
+test('teacher rule: every word of the lesson reads in plain ink; colour is for structure only (all twelve lessons)', { timeout: 240000 }, async () => {
   const { chromium } = require('playwright-core');
   const br = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] });
   try {
     const page = await br.newPage({ viewport: { width: 520, height: 1200 } });
-    for (const [name, doc] of [...ALL, ...REBUILT]) {
+    for (const [name, doc] of [...ALL, ...REBUILT, ...PIPELINE]) {
       const c = compose(doc());
       await page.setContent(`<!doctype html><html><head><meta charset="utf-8"><style>${c.headCss}</style></head><body>${c.bodyHtml}</body></html>`);
       const bad = await page.evaluate(() => {
@@ -281,7 +285,9 @@ test('teacher rule: every word of the lesson reads in plain ink; colour is for s
         const STRUCT = '.q-hero,.q-today,.q-hook,.q-coach,.q-bar,.q-pill,.q-cap,.q-lbl,.q-n,.q-tag,.q-ref,.q-who,.q-sayl,.q-kw-w,'
           + '.q-panel-t,.q-panel-n,.q-board-h,.q-step,.q-steps,.q-pz,.q-ev,.q-evn,.q-arrow,.q-track th,.q-deed,.q-chrome,svg,figure,.q-video-t,'
           // the newer lessons' chart headings and arrow words, the support page's subject line and card labels
-          + '.q-cmp-h,.q-flow-ar,.q-p2k,.q-p2l,.q-key-l';
+          + '.q-cmp-h,.q-flow-ar,.q-p2k,.q-p2l,.q-key-l,'
+          // the labels of a labelled sub-line (Listen for, Coach …) and the "+ N more days" note
+          + '.q-xl,.q-more';
         const ink = getComputedStyle(document.querySelector('.ictq')).getPropertyValue('--ink').trim();
         const probe = document.createElement('span'); probe.style.color = ink; document.body.append(probe);
         const INK = getComputedStyle(probe).color; probe.remove();

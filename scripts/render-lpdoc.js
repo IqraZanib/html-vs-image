@@ -24,26 +24,33 @@ const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 const { buildGuideFromLpDoc, isLpDoc } = require('../lp-render/guide/from-lpdoc');
 const { buildGuideFromPrimary, isPrimaryLesson } = require('../lp-render/guide/from-primary');
+const { isSlideScript, lessonFromSlideScript } = require('../lp-render/guide/from-slide-script');
 const { renderLessonImage } = require('../lp-render/pipeline');
 
 function parseArgs(argv) {
-  const out = { src: null, lang: undefined, dir: path.join(__dirname, '..', 'out', 'ict'), svg: false };
+  const out = { src: null, lang: undefined, dir: path.join(__dirname, '..', 'out', 'ict'), svg: false, origin: undefined, chapter: undefined };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--lang') out.lang = argv[++i];
     else if (argv[i] === '--svg') out.svg = true;
     else if (argv[i] === '--out') out.dir = path.resolve(argv[++i]);
+    else if (argv[i] === '--origin') out.origin = argv[++i];   // where a slide script came from, for its source note
+    else if (argv[i] === '--chapter') out.chapter = argv[++i]; // a slide script's chapter line (from its segmentation file)
     else if (!out.src) out.src = argv[i];
   }
   return out;
 }
 
 (async () => {
-  const { src, lang, dir, svg } = parseArgs(process.argv.slice(2));
+  const { src, lang, dir, svg, origin, chapter } = parseArgs(process.argv.slice(2));
   if (!src) {
-    console.error('usage: node scripts/render-lpdoc.js <lp_doc.json | lesson.json> [--lang en|ur] [--out <dir>] [--svg]');
+    console.error('usage: node scripts/render-lpdoc.js <lp_doc.json | lesson.json | _slide_script.json> [--lang en|ur] [--out <dir>] [--svg] [--origin <text>] [--chapter <text>]');
     process.exit(2);
   }
-  const doc = JSON.parse(fs.readFileSync(src, 'utf8'));
+  let doc = JSON.parse(fs.readFileSync(src, 'utf8'));
+  // ICT's own Grades 1–5 slide script (Stage D0 of its K-5 pipeline) is turned into a Grades 1–5
+  // lesson file first; the converted file is written beside the PDF so it can be read
+  const fromScript = isSlideScript(doc);
+  if (fromScript) doc = lessonFromSlideScript(doc, { origin: origin || `ICT Grades 1–5 slide script ${path.basename(src)}`, chapter });
   const primary = isPrimaryLesson(doc);
   if (!primary && !isLpDoc(doc)) throw new Error(`${src} is neither an ICT lp_doc (no sections[].blocks with provenance/page2) nor an ict-primary-lesson file`);
 
@@ -58,6 +65,7 @@ function parseArgs(argv) {
   fs.writeFileSync(`${base}.html`, r.html);   // the HTML + SVG page itself; open it in any browser
   fs.writeFileSync(`${base}.guide.json`, JSON.stringify(guide, null, 2));
   fs.writeFileSync(`${base}.report.json`, JSON.stringify(report, null, 2));
+  if (fromScript) fs.writeFileSync(`${base}.lesson.json`, `${JSON.stringify(doc, null, 2)}\n`);
 
   const pages = (r.pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
   // each page as a vector SVG (text as outlines, so it looks the same anywhere)

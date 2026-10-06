@@ -643,6 +643,7 @@ function heroBadge(spec) {
   if (!spec) return '';
   if (spec.type === 'clock') return `<svg class="qhero-art" viewBox="-6 -10 132 140" aria-hidden="true"><rect x="-6" y="-10" width="132" height="140" fill="#FFF3DC"/>${clockFace(60, 64, 46, spec.time)}</svg>`;
   if (spec.type === 'festivals') return festivalsBadge();
+  if (spec.type === 'place_value') return placeValueBadge(spec);
   if (spec.type === 'greeting') return greeting(spec).replace('class="qart"', 'class="qhero-art" preserveAspectRatio="xMidYMid slice"').replace(/viewBox="[^"]*"/, 'viewBox="40 80 400 150"');
   if (spec.type === 'stairs') return stairs(spec).replace('class="qart"', 'class="qhero-art" preserveAspectRatio="xMidYMid slice"').replace(/viewBox="[^"]*"/, 'viewBox="60 30 360 180"');
   if (spec.type === 'solar_system') return solarSystem(spec).replace('class="qart"', 'class="qhero-art" preserveAspectRatio="xMidYMid slice"').replace(/viewBox="[^"]*"/, 'viewBox="130 40 220 170"');
@@ -835,10 +836,70 @@ function festivalsBadge() {
   return `<svg class="qhero-art" viewBox="0 0 120 120" aria-hidden="true"><rect width="120" height="120" fill="${BOARD}"/>`
     + `<g transform="translate(84 72) scale(.62)">${eidIcon(BOARD)}</g><g transform="translate(36 70) scale(.62)">${flagIcon()}</g></svg>`;
 }
+// PLACE VALUE, as a maths lesson builds it: one column per place, holding exactly as many pieces as
+// that digit says — base-10 blocks (cube 1000 · flat 100 · rod 10 · dot 1) or bundles of sticks
+// (hundred-bundle · bundle of ten · single stick). Counted from the lesson's own number, never from
+// a picture description, so the drawing cannot disagree with the sum beside it.
+const WOOD = '#D9A066'; const WOOD_D = '#A0673E';
+const PV_PIECE = {
+  cube: { w: 30, h: 30, col: C.violet, draw: (x, y) => `<path d="M${x} ${y + 8}h22v22h-22z" fill="#C49BF2" stroke="#7B3FC4" stroke-width="1.4"/><path d="M${x} ${y + 8}l8-8h22l-8 8z" fill="#DCC3F8" stroke="#7B3FC4" stroke-width="1.4"/><path d="M${x + 22} ${y + 8}l8-8v22l-8 8z" fill="#A66EE6" stroke="#7B3FC4" stroke-width="1.4"/>` },
+  flat: { w: 30, h: 30, col: C.orange, draw: (x, y) => `<rect x="${x}" y="${y}" width="30" height="30" fill="#FFD2A6" stroke="#E07B1A" stroke-width="1.4"/>${Array.from({ length: 9 }, (_, k) => `<path d="M${x + 3 * (k + 1)} ${y}v30M${x} ${y + 3 * (k + 1)}h30" stroke="#F0A35E" stroke-width=".6"/>`).join('')}` },
+  rod: { w: 9, h: 46, col: C.sky, draw: (x, y) => `<rect x="${x}" y="${y}" width="9" height="46" fill="#BFDDFF" stroke="#2E86DE" stroke-width="1.3"/>${Array.from({ length: 9 }, (_, k) => `<path d="M${x} ${r1(y + 4.6 * (k + 1))}h9" stroke="#7DB7F5" stroke-width=".7"/>`).join('')}` },
+  dot: { w: 14, h: 14, col: C.coral, draw: (x, y) => `<circle cx="${x + 7}" cy="${y + 7}" r="6" fill="${C.coral}"/>` },
+  bigbundle: { w: 30, h: 56, col: C.orange, draw: (x, y) => `${Array.from({ length: 7 }, (_, k) => `<rect x="${x + k * 4.2}" y="${y}" width="3.4" height="56" rx="1.2" fill="${k % 2 ? WOOD : '#E2B07C'}" stroke="${WOOD_D}" stroke-width=".5"/>`).join('')}<rect x="${x - 1}" y="${y + 13}" width="32" height="5" rx="2" fill="${C.coral}"/><rect x="${x - 1}" y="${y + 38}" width="32" height="5" rx="2" fill="${C.coral}"/>` },
+  bundle: { w: 16, h: 56, col: C.sky, draw: (x, y) => `${Array.from({ length: 5 }, (_, k) => `<rect x="${x + k * 3.2}" y="${y}" width="2.6" height="56" rx="1" fill="${k % 2 ? WOOD : '#E2B07C'}" stroke="${WOOD_D}" stroke-width=".4"/>`).join('')}<rect x="${x - 1}" y="${y + 25}" width="18" height="5" rx="2" fill="${C.coral}"/>` },
+  stick: { w: 5, h: 56, col: C.aqua, draw: (x, y) => `<rect x="${x}" y="${y}" width="4" height="56" rx="1.4" fill="${WOOD}" stroke="${WOOD_D}" stroke-width=".6"/>` },
+};
+const PV_KIND = { blocks: ['cube', 'flat', 'rod', 'dot'], sticks: [null, 'bigbundle', 'bundle', 'stick'] };
+function placeValue(spec) {
+  const heads = spec.heads || [];
+  const n = heads.length;
+  const digits = String(spec.number).padStart(n, ' ').slice(-n).split('');
+  const pieces = PV_KIND[spec.kind === 'sticks' ? 'sticks' : 'blocks'].slice(-n);
+  const W = 480; const colW = (W - 16) / n; const top = 34;
+  const cols = digits.map((d, i) => {
+    const piece = PV_PIECE[pieces[i]] || PV_PIECE.dot;
+    const count = /\d/.test(d) ? Number(d) : 0;
+    const perRow = Math.max(1, Math.floor((colW - 14) / (piece.w + 5)));
+    const rows = Math.ceil(count / perRow);
+    return { d, piece, count, perRow, rows, h: rows ? rows * (piece.h + 6) - 6 : 0 };
+  });
+  const areaH = Math.max(40, ...cols.map((c) => c.h));
+  const H = top + 12 + areaH + 58;
+  let s = `<rect width="${W}" height="${H}" rx="14" fill="#F7FAFF"/>`;
+  cols.forEach((c, i) => {
+    const x0 = 8 + i * colW;
+    s += `<rect x="${x0 + 3}" y="6" width="${colW - 6}" height="${H - 12}" rx="10" fill="#fff" stroke="#DFE3EA" stroke-width="1.5"/>`
+      + `<rect x="${x0 + 3}" y="6" width="${colW - 6}" height="26" rx="10" fill="${c.piece.col}"/><rect x="${x0 + 3}" y="22" width="${colW - 6}" height="10" fill="${c.piece.col}"/>`
+      + `<text x="${x0 + colW / 2}" y="24" text-anchor="middle" ${FONT} font-weight="800" font-size="14" fill="#fff">${esc(heads[i])}</text>`;
+    const rowW = Math.min(c.count, c.perRow) * (c.piece.w + 5) - 5;
+    for (let k = 0; k < c.count; k++) {
+      const col = k % c.perRow; const row = Math.floor(k / c.perRow);
+      const px = x0 + (colW - rowW) / 2 + col * (c.piece.w + 5);
+      const py = top + 12 + (areaH - c.h) / 2 + row * (c.piece.h + 6);
+      s += c.piece.draw(r1(px), r1(py));
+    }
+    s += `<text x="${x0 + colW / 2}" y="${H - 18}" text-anchor="middle" ${FONT} font-weight="800" font-size="30" fill="${C.ink}">${esc(c.d.trim())}</text>`;
+  });
+  return svg(W, H, s, `${spec.number}: ${heads.map((h, i) => `${digits[i].trim() || 0} ${h}`).join(', ')}`);
+}
+function placeValueBadge(spec) {
+  const kinds = spec.kind === 'sticks' ? ['bigbundle', 'bundle', 'stick'] : ['cube', 'flat', 'rod', 'dot'];
+  const xs = spec.kind === 'sticks' ? [22, 60, 84] : [14, 48, 84, 98];
+  return `<svg class="qhero-art" viewBox="0 0 120 120" aria-hidden="true"><rect width="120" height="120" fill="#F7FAFF"/>${kinds.map((k, i) => PV_PIECE[k].draw(xs[i], 60 - PV_PIECE[k].h / 2)).join('')}</svg>`;
+}
+// the pieces as small inline icons, for a line that names them ("[cube] = 1000")
+const PV_ICON = (name) => {
+  const p = PV_PIECE[name === 'stick' ? 'stick' : name];
+  if (!p) return '';
+  const k = 18 / Math.max(p.w, p.h);
+  return `<svg class="qpv" viewBox="-2 -2 ${p.w + 4} ${p.h + 4}" width="${r1((p.w + 4) * k)}" height="${r1((p.h + 4) * k)}" aria-label="${name}" role="img">${p.draw(0, 0)}</svg>`;
+};
 const DRAW = {
   clock, clock_pair: clockPair, tiles, blender, blender_list: blenderList, blend_steps: blendSteps, scene, predict, dictionary, poster,
   traffic_light: trafficLightVisual, road_signs: roadSigns, road_sign: roadSignOne, look_steps: lookSteps, ordinal_row: ordinalRow,
   car_road: carRoad, podium, signboards: signboardVisual, solar_system: solarSystem, stairs, greeting, festivals,
+  place_value: placeValue,
 };
 // the visual types drawn as HTML by primary.js rather than as SVG here
 const HTML_VISUALS = ['story_map', 'tracker', 'deeds', 'compare', 'flow'];
@@ -849,4 +910,4 @@ function draw(spec) {
   return f(spec);
 }
 
-module.exports = { draw, DRAW, HTML_VISUALS, heroBadge, ICON, DEED, stageIcon, face, parseTime, C };
+module.exports = { draw, DRAW, HTML_VISUALS, heroBadge, ICON, DEED, stageIcon, face, parseTime, C, PV_ICON };

@@ -229,6 +229,40 @@ bubbles carrying the board's own words), and the hook's two circles on the board
 over a mosque and the flag of Pakistan; no person). Each lesson prints on as many pages as its
 approved PDF (6, 7, 7, 8). The six earlier lessons print exactly as before.
 
+**Straight from ICT's own Grades 1–5 pipeline (2026-10-06): G2 and G3 Maths.** ICT's K-5 pipeline
+runs offline in the operator workspace (`niete-nbpro`):
+- A page truth → B segmentation → C enrichment → D0 the slide script (`_slide_script.json`).
+- D: an image model then draws each page as a picture.
+- F: the pictures are joined into the PDF.
+
+The slide script is the whole lesson as fields: goal, SLO, key words, board, warm-up, I Do steps and lines (with
+their Roman-Urdu versions), worked example, CFU, slip, We Do, partner work, You Do problems with
+answers, behind/ahead, exit options, homework, reflection.
+
+`lp-render/guide/from-slide-script.js` turns that file into a Grades 1–5 lesson, and the page draws it,
+replacing step D:
+- Every teacher-facing field is printed word for word, in the script's order.
+- ICT's PDF of the same lesson is 4 full-page pictures with no text layer, about 14 MB before compression.
+- Ours: real text, pictures drawn in code, $0.
+- Not printed: the script's `diagram` strings (instructions to the image model, "[bundle][bundle]…") and
+  operator notes.
+- Instead, each worked number is drawn in a place-value chart counted from the number itself, so the
+  picture cannot disagree with the sum beside it: bundles of sticks for G2, base-10 blocks (cube, flat,
+  rod, dot) for G3. A "[cube] = 1000" line draws its pieces inline.
+
+New optional page pieces (the ten existing lessons print exactly as before):
+- a line under TODAY;
+- journey / coming up as a list of days;
+- a key word's Urdu and syllables;
+- a board note;
+- labelled sub-lines (Listen for, If they struggle, Why, How to run, Coach, Success criteria);
+- the Roman-Urdu teacher line;
+- a key-fact box;
+- a worked example's problem and answer (blue in We Do);
+- a word-problem chip;
+- behind/ahead tasks with answers;
+- an exit option's Roman-Urdu line and MCQ choices.
+
 **Not printed:** the coaching WhatsApp number (waiting for a decision, as for grades 6–12), and,
 in a lesson with no support pages, "Support pages follow".
 
@@ -241,9 +275,10 @@ npm run render:ict -- lp-render/fixtures/ict-primary/g2_ch10_Urdu_seg2.lesson.js
 
 - **Approval of the Grades 1–5 pages with pictures.** The pictures and the fixes above are this
   pack's additions to the approved design.
-- **Grades 1–5 lesson data.** All seven NIETE lessons here were transcribed or rebuilt from the
-  approved PDFs. Real lessons need ICT's Grades 1–5 lp_doc JSON (the v17 files behind the newer
-  references), which is not reachable from here.
+- **Grades 1–5 lesson data.** ICT's own slide scripts are now read directly (G2 and G3 Maths here).
+  - The niete-curriculum-explorer data (11 Sep) lists 1,315 K-5 lessons with a slide script.
+  - Still open: Urdu-medium scripts, revision panels, and the v17 lp_doc lessons behind the newer
+    approved references.
 - **Approval of the grades 6–12 adaptation.** The references are grade 1; the Teacher support page
   and the exam-bank exit option are this pack's reading of where grade 6–12 content belongs.
 - **Logo.** The header mark is a plain "N" monogram drawn in code; ICT's own logo file replaces it.

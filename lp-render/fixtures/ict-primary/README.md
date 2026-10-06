@@ -44,6 +44,35 @@ points and are printed exactly as given.
 The approved PDFs are NIETE's, shared with the Design lane on 2026-10-01 and 2026-10-05 (Google
 Drive file links, not copied into this repo).
 
+## Straight from ICT's pipeline: `slide-scripts/`
+
+Two lessons as ICT's own Grades 1–5 pipeline wrote them: its Stage D0 slide scripts, the files
+its image model draws from (round v8, published under R2 `ict-k5/renders/…`, listed in
+`Orenda-Project/niete-curriculum-explorer`, downloaded 2026-10-06). They are real pipeline output.
+They were not transcribed and are not test lessons. The only change: `meta.sourceFile`, an
+operator's local file path, was taken out.
+
+| File | Lesson |
+|---|---|
+| `slide-scripts/grade_2_math_ch1_seg1.slide_script.json` | Grade 2 Maths, Ch.1 "Numberland Adventures: Up to 999", day 1 of 12 — Recognise the place value of each digit (pp. 2–4) |
+| `slide-scripts/grade_3_math_ch1_seg1.slide_script.json` | Grade 3 Maths, Ch.1 "Number Ninjas: Mastering the Thousands", day 1 of 10 — Count up to 9999 (pp. 2–3) |
+
+```
+npm run render:ict -- lp-render/fixtures/ict-primary/slide-scripts/grade_2_math_ch1_seg1.slide_script.json \
+  --chapter "Ch.1 · Numberland Adventures: Up to 999"
+#   -> out/ict/grade_2_math_ch1_seg1.en.{pdf,html,page-N.svg,lesson.json,…}
+```
+
+`lp-render/guide/from-slide-script.js` turns the script into an `ict-primary-lesson` (written out
+as `.lesson.json` beside the PDF). The chapter title comes from the lesson's segmentation file
+(Stage B); the slide script itself names only the pages.
+
+Printed as written, including four places where ICT's own text is wrong or cut short:
+- G2: the CFU "value of the digit 2 in 123" says "listen for: Says 40" (it is 20);
+- G2: "Recalls: … counting by tens (Day 1" stops mid-phrase;
+- G3: the "thousands place" meaning ends in "…";
+- G3: the slip's fix stops mid-sentence ("…so the place, not the digit").
+
 ## What a file holds
 
 The approved page's fields, in its order: `title`, `chapter`, `pages`, `period_minutes`, `day`,
